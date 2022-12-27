@@ -1,0 +1,11 @@
+{
+    "projectOwner": "IoTomatoes_Team",
+    "projectName": "IoTomatoes_project",
+    "broker": {
+        "IP": "mqtt.eclipseprojects.io",
+        "port": 1883,
+        "baseTopic": "IoTomatoes_project"
+    },
+    "lastUpdate": 1672158694.7160568,
+    "servicesList": []
+}

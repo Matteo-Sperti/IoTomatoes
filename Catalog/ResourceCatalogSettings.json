@@ -1,0 +1,10 @@
+{
+    "owner": "IoTomatoes_Team",
+    "projectName": "IoTomatoes_project",
+    "REST_settings": {
+        "ip_address": "192.168.1.155",
+        "port": 8081
+    },
+    "filename": "ResourceCatalog.json",
+    "autoDeleteTime": 120
+}

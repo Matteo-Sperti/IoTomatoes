@@ -1,15 +1,11 @@
 import json
-import cherrypy
 import time
-
-refreshTime = 30
-
-class InvalidRequest(Exception):
-    def __init__(self, message):
-        self.message = message
+import threading
+import cherrypy
+from CustomExceptions import InvalidRequest
 
 class CatalogManager:
-    def __init__(self, heading : dict, key_list : list, filename = "catalog.json"):
+    def __init__(self, heading : dict, key_list : list, filename = "catalog.json", autoDeleteTime = 120):
         """Initialize the catalog manager.
         Keyword arguments:
         ``heading`` is a dictionary with the heading of the catalog,
@@ -17,6 +13,7 @@ class CatalogManager:
         ``filename`` is the name of the file to save the catalog in.
         """
         self.filename = filename
+        self.autoDeleteTime = autoDeleteTime
 
         try:
             fp = open(self.filename, "r")
@@ -28,8 +25,12 @@ class CatalogManager:
             self.catalog["lastUpdate"] = time.time(), 
             for key in key_list:
                 self.catalog[key] = []
+        finally:
+            t = threading.Thread(target=self.autoDeleteItems)
+            t.daemon = True
+            t.start()
 
-    def print(self, list_key : str):
+    def get_singleList(self, list_key : str):
         """Return the list ``list_key`` in json format."""
 
         try:
@@ -114,7 +115,32 @@ class CatalogManager:
         except KeyError:
             raise InvalidRequest("Invalid key")
 
-    def refresh(self):
+    def delete(self, list_key : str, IDvalue):
+        """Delete a device from the catalog.
+        Return a json with the status of the operation.
+        
+        Keyword arguments:
+        ``list_key`` is the name of the list to delete from and
+        ``ID`` is the ID of the item to delete
+        """
+        try:
+            ID_key = list_key.replace("sList","ID")
+            is_present = json.loads(self.search(list_key, ID_key, IDvalue))
+            if len(is_present) == 0:
+                out = {"Status": False}
+            else:
+                actualtime = time.time()
+                self.catalog["lastUpdate"] = actualtime
+                for i in range(len(self.catalog[list_key])):
+                    if str(self.catalog[list_key][i][ID_key]) == str(IDvalue):
+                        self.catalog[list_key].pop(i)
+                        break
+                out = {"Status": True}
+            return json.dumps(out, indent=4)
+        except KeyError:
+            raise InvalidRequest("Invalid key")
+
+    def autoDeleteItems(self):
         """Refresh the catalog removing the devices that are not online anymore."""
 
         actualtime = time.time()
@@ -122,25 +148,30 @@ class CatalogManager:
             if isinstance(self.catalog[key], list):
                 for device in self.catalog[key]:
                     try:
-                        if actualtime - device["lastUpdate"] > refreshTime:
+                        if actualtime - device["lastUpdate"] > self.autoDeleteTime:
                             self.catalog[key].remove(device)
                     except KeyError:
                         print("Device without lastUpdate field")
                         self.catalog[key].remove(device)
         self.catalog["lastUpdate"] = actualtime
-        time.sleep(refreshTime)
-
-class WebPage(object):
+        time.sleep(self.autoDeleteTime)
+    
+class RESTServiceCatalog(CatalogManager):
     exposed = True
+
+    def __init__(self, heading : dict, filename = "ServiceCatalog.json", autoDeleteTime = 120):
+        self.list_name = "servicesList"
+        self.base_uri = "ServiceCatalog"
+        super().__init__(heading, [self.list_name], filename, autoDeleteTime)
 
     def GET(self, *uri, **params):
         try:
-            if len(uri) == 0:
+            if len(uri) < 2:
                 raise InvalidRequest("No command received")
-            elif uri[0] == "print" and len(uri) == 2:
-                return Catalog.print(uri[1])
-            elif uri[0] == "search" and len(uri) == 3:
-                return Catalog.search(uri[1], uri[2], params[uri[2]])
+            elif len(uri) == 2 and uri[0] == self.base_uri and uri[1] == "getAll":
+                return self.get_singleList(self.list_name)
+            elif len(uri) == 3 and uri[0] == self.base_uri and uri[1] == "search":
+                return self.search(self.list_name, uri[2], params[uri[2]])
             else:
                 raise InvalidRequest("Invalid command")
                     
@@ -158,9 +189,9 @@ class WebPage(object):
         
     def PUT(self, *uri, **params):
         try:
-            if len(uri) == 2 and uri[0] == "update":
+            if len(uri) == 2 and uri[0] == self.base_uri and uri[1] == "update":
                 body_dict = json.loads(cherrypy.request.body.read())
-                return Catalog.update(uri[1], body_dict)
+                return self.update(self.list_name, body_dict)
             else:
                 raise InvalidRequest("Invalid command")
         except InvalidRequest as e:
@@ -173,11 +204,11 @@ class WebPage(object):
 
     def POST(self, *uri, **params):
         try:
-            if len(uri) == 1 and uri[0] == "save":
-                return Catalog.save()
-            if len(uri) == 2 and uri[0] == "insert":
+            if len(uri) == 2 and uri[0] == self.base_uri and uri[1] == "save":
+                return self.save()
+            elif len(uri) == 2 and uri[0] == self.base_uri and uri[1] == "insert":
                 body_dict = json.loads(cherrypy.request.body.read())
-                return Catalog.insert(uri[1], body_dict)
+                return self.insert(self.list_name, body_dict)
             else:
                 raise InvalidRequest("Invalid command")
         except InvalidRequest as e:
@@ -188,38 +219,22 @@ class WebPage(object):
             print(e_string)
             raise cherrypy.HTTPError(500, e_string)
 
-if __name__ == "__main__":
-    settings = json.load(open("settings.json"))
-
-    ip_address = settings["REST_settings"]["ip_address"]
-    port = settings["REST_settings"]["port"]
-
-    heading = {
-        "projectOwner": settings["owner"], 
-        "projectName": settings["projectName"],
-        "broker": settings["broker"],
-        }
-    key_list = ["farmsList", "devicesList", "usersList"]
-
-    Catalog = CatalogManager(heading, key_list, settings["filename"])
-
-    conf = {
-        '/': {
-            'request.dispatch': cherrypy.dispatch.MethodDispatcher(),
-            'tools.sessions.on': True
-        }
-    }
-    webService = WebPage()
-    cherrypy.tree.mount(webService, '/', conf)
-    cherrypy.config.update({'server.socket_host': ip_address})
-    cherrypy.config.update({'server.socket_port': port})
-    cherrypy.engine.start()
-
-    while True:
+    def DELETE(self, *uri, **params):
         try:
-            Catalog.refresh()
-        except KeyboardInterrupt:
-            break
-    cherrypy.engine.block()
-    Catalog.save()
-    print("Server stopped")
+            if len(uri) == 2 and uri[0] == self.base_uri and uri[1] == "delete":
+                return self.delete(self.list_name, params["ID"])
+            else:
+                raise InvalidRequest("Invalid command")
+        except InvalidRequest as e:
+            print(e.message)
+            raise cherrypy.HTTPError(400, e.message)
+        except:
+            e_string = "Unknown server error"
+            print(e_string)
+            raise cherrypy.HTTPError(500, e_string)
+
+class ResourceCatalog(CatalogManager):
+    def __init__(self, filename = "ResourceCatalog.json", autoDeleteTime = 120):
+        heading = {"lastUpdate": 0, "resourcesList": []}
+        key_list = ["CompanyList"]
+        super().__init__(heading, key_list, filename, autoDeleteTime)

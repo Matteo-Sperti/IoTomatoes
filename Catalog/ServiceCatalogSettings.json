@@ -1,0 +1,15 @@
+{
+    "owner": "IoTomatoes_Team",
+    "projectName": "IoTomatoes_project",
+    "broker": {
+        "IP": "mqtt.eclipseprojects.io",
+        "port": 1883,
+        "baseTopic": "IoTomatoes_project"
+    },
+    "REST_settings": {
+        "ip_address": "192.168.1.155",
+        "port": 8080
+    },
+    "filename": "ServiceCatalog.json",
+    "autoDeleteTime": 120
+}

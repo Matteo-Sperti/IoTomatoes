@@ -1,0 +1,20 @@
+{
+    "serviceName": "Irrigation",
+    "availableServices": [
+        "MQTT",
+        "REST"
+    ],
+    "servicesDetails": [
+        {
+            "serviceType": "MQTT",
+            "topic": [
+                "/humidity",
+                "/temperature"
+            ]
+        },
+        {
+            "serviceType": "REST",
+            "serviceIP": "dht11.org:8080"
+        }
+    ]
+}

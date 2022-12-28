@@ -1,0 +1,31 @@
+
+
+{
+    "deviceID": 6,
+    "deviceName": "DHT11",
+    "isActuator" : true,
+	"isSensor" : true,
+    "PowerConsumption_kW" : 9600,
+    "measureType": [
+        "Temperature",
+        "Humidity"
+    ],
+    "availableServices": [
+        "MQTT",
+        "REST"
+    ],
+    "servicesDetails": [
+        {
+            "serviceType": "MQTT",
+            "topic": [
+                "MySmartThingy/1/temp",
+                "MySmartThingy/1/hum"
+            ]
+        },
+        {
+            "serviceType": "REST",
+            "serviceIP": "dht11.org:8080"
+        }
+    ],
+    "lastUpdate": "2020-03-30"
+}

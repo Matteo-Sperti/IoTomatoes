@@ -1,23 +1,24 @@
 import json
 import cherrypy
+import threading
 from CatalogManager import CatalogManager
+from GenericService import GenericService
 from customExceptions import *
 
-class RESTServiceCatalog(CatalogManager):
+class RESTResourceCatalog(CatalogManager, GenericService):
     exposed = True
 
-    def __init__(self, heading : dict, name = "ServiceCatalog", filename = "ServiceCatalog.json", autoDeleteTime = 120):
-        """ Initialize the RESTServiceCatalog class.
-
-        Keyword arguments:
-        ``heading`` is the heading of the catalog
-        ``name`` is the name of the catalog
-        ``filename`` is the name of the file to save the catalog
-        ``autoDeleteTime`` is the time in seconds to delete the services that are not online anymore
-        """
-        self.list_name = "servicesList"
+    def __init__(self, heading, ServiceCatalog_url : str, name = "ResourceCatalog", filename = "ResourceCatalog.json", autoDeleteTime = 120):
+        self.list_name = "CompanyList"
         self.base_uri = name
         super().__init__(heading, [self.list_name], filename, autoDeleteTime)
+        
+        self.ServiceCatalog_url = ServiceCatalog_url
+        self.ID = self.register(heading)
+        
+        t = threading.Thread(target=self.refresh)
+        t.daemon = True
+        t.start()
 
     def GET(self, *uri, **params):
         """REST GET method.
@@ -125,22 +126,29 @@ class RESTServiceCatalog(CatalogManager):
             e_string = "Unknown server error"
             print(e_string)
             raise cherrypy.HTTPError(500, e_string)
-
+    
 
 if __name__ == "__main__":
-    settings = json.load(open("ServiceCatalogSettings.json"))
+    settings = json.load(open("ResourceCatalogSettings.json"))
 
     ip_address = settings["REST_settings"]["ip_address"]
     port = settings["REST_settings"]["port"]
 
     heading = {
-        "projectOwner": settings["owner"], 
-        "projectName": settings["projectName"],
-        "CatalogName": settings["CatalogName"],
-        "broker": settings["broker"],
-        }
+                "serviceName": settings["serviceName"],
+                "owner": settings["owner"],
+                "availableServices": [
+                    "REST"
+                ],
+                "servicesDetails": [
+                    {
+                        "serviceType": "REST",
+                        "serviceIP": f"{ip_address}:{port}"
+                    }
+                ]
+            }
 
-    Catalog = RESTServiceCatalog(heading, settings["CatalogName"], settings["filename"], settings["autoDeleteTime"])
+    Catalog = RESTResourceCatalog(heading, settings["ServiceCatalog_IP"], settings["serviceName"], settings["filename"], settings["autoDeleteTime"])
 
     conf = {
         '/': {

@@ -3,14 +3,6 @@ import json
 import time
 import cherrypy
 
-def validateJSON(jsonData):
-    try:
-        json.loads(jsonData)
-    except ValueError as err:
-        return False
-    return True
-
-
 
 class WeatherApp:
 	'''handles the weather requests'''
@@ -45,6 +37,8 @@ class WebPage(object):
 			elif uri[0] == "Lighting":
 				weather = WeatherApp()
 				return json.dumps(weather.LightingData())
+			elif uri[0] == "Custom":
+				#da sistemare
 			
 			else:
 				raise cherrypy.HTTPError(404,"Wrong URL")
@@ -53,23 +47,7 @@ class WebPage(object):
 
 
 
-	def POST(self,*uri,**params):
-		if len(uri) != 0:
-			if uri[0] == "Custom":
-				weather = WeatherApp()
-				bodyAsString = cherrypy.request.body.read()
-				bodyAsDictionary = json.loads(bodyAsString)
-				json.dump(bodyAsDictionary,open("CustomInput.json","w"))
-				data = weather.CustomData()
-				if validateJSON(json.loads(data)) == True:
-					return json.dumps(data)
-				else:
-					raise cherrypy.HTTPError(400,"The POST request is not correct")
-				
-		else:
-			raise cherrypy.HTTPError(404, "Please specify the service you want to use")
-
-
+	
 
 if __name__ == '__main__':
 	conf =  {

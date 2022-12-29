@@ -6,7 +6,7 @@
         "port": 1883,
         "baseTopic": "IoTomatoes"
     },
-    "lastUpdate": 1672338101.0294273,
+    "lastUpdate": 1672339325.40474,
     "servicesList": [
         {
             "serviceName": "Irrigation",
@@ -29,7 +29,7 @@
                 }
             ],
             "ID": 1,
-            "lastUpdate": 1672338101.0294273
+            "lastUpdate": 1672339325.40474
         }
     ]
 }

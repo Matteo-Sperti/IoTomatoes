@@ -1,7 +1,7 @@
 import json
 import cherrypy
 import threading
-from CatalogManager import CatalogManager
+from CatalogManager import *
 from GenericEndPoints import GenericService
 from customExceptions import *
 
@@ -22,7 +22,7 @@ class RESTResourceCatalog(CatalogManager, GenericService):
                 }
             ]
         }
-        
+        self.IDs = IDs(100)
         self.list_name = "CompanyList"
         self.base_uri = settings["serviceName"]
         super().__init__(ServiceInfo, [self.list_name], settings["filename"], settings["autoDeleteTime"])
@@ -140,19 +140,41 @@ class RESTResourceCatalog(CatalogManager, GenericService):
             raise cherrypy.HTTPError(500, e_string)
     
     def insertCompany(self, params):
-        if "name" in params and "address" in params and "email" in params and "phone" in params:
-            NewCompany = {
-                "name": params["name"],
-                "address": params["address"],
-                "email": params["email"],
-                "phone": params["phone"],
-                "adminID": 1
-            }
-            self.catalog["companies"].append({"name": params["name"], "address": params["address"], "email": params["email"], "phone": params["phone"]})
-            return "Company added"
-        else:
-            raise web_exception(400, "Invalid parameter")
+        if "name" in params:
+            ID = self.IDs.get_ID()
+            if ID != -1:
+                NewCompany = {
+                    "ID": ID,
+                    "name": params["name"],
+                    "adminID": 1,
+                    "devicesList": [],
+                    "usersList": []
+                }
+                if query_yes_no(f"Are you sure you want to add the company {params['name']}?"):
+                    self.catalog["CompanyList"].append(NewCompany)
+                    
+                    #inserisci l'utente nella lista degli utenti
 
+        
+        return {"Status": False}
+
+def query_yes_no(question):
+    """Ask a yes/no question via input() and return their answer.
+
+    "question" is a string that is presented to the user.
+    The "answer" return value is True for "yes" or False for "no".
+    """
+    valid = {"yes": True, "y": True, "ye": True, "no": False, "n": False}
+
+
+    while True:
+        choice = input(question + " [Y/n] ").lower()
+        if choice == "":
+            return valid["yes"]
+        elif choice in valid:
+            return valid[choice]
+        else:
+            print(f"Please respond with 'yes' or 'no' (or 'y' or 'n').\n")
 
 if __name__ == "__main__":
     settings = json.load(open("ResourceCatalogSettings.json"))

@@ -3,8 +3,28 @@ import time
 from threading import Thread
 from customExceptions import *
 
+class IDs:
+    def __init__(self, minID : int, maxID : int = -1):
+        self.minID = minID
+        self.maxID = maxID
+        self.ID_free_list = []
+
+    def get_ID(self):
+        if len(self.ID_free_list) > 0:
+            return self.ID_free_list.pop()
+        else:
+            if self.maxID != -1 and self.minID > self.maxID:
+                return -1
+            else:
+                ID = self.minID
+                self.minID += 1
+                return int(ID)
+
+    def free_ID(self, ID : int):
+        self.ID_free_list.append(ID)
+
 class CatalogManager:
-    def __init__(self, heading : dict, key_list : list, filename = "catalog.json", autoDeleteTime = 120, rangeID = [1,99]):
+    def __init__(self, heading : dict, key_list : list, filename = "catalog.json", autoDeleteTime = 120, IDs = IDs(1,99)):
         """Initialize the catalog manager.
         Keyword arguments:
         ``heading`` is a dictionary with the heading of the catalog,
@@ -13,7 +33,7 @@ class CatalogManager:
         """
         self.filename = filename
         self.autoDeleteTime = autoDeleteTime
-        self.ID_free_list = list(range(rangeID[-1], rangeID[0]-1, -1))
+        self.IDs = IDs
 
         self.catalog = heading
         self.catalog["lastUpdate"] = time.time(), 
@@ -103,17 +123,17 @@ class CatalogManager:
         ``new_item`` is the item in json format to insert
         """
         try:
-            if self.ID_free_list:
-                ID = self.ID_free_list.pop()
-            else:
+            ID = self.IDs.get_ID()
+            if ID == -1:
                 raise web_exception(500, "No more IDs available")
-            actualtime = time.time() 
-            self.catalog["lastUpdate"] = actualtime
-            new_item["ID"] = ID
-            new_item["lastUpdate"] = actualtime
-            self.catalog[list_key].append(new_item)
-            out = {"ID": ID}
-            return json.dumps(out, indent=4)
+            else:
+                actualtime = time.time() 
+                self.catalog["lastUpdate"] = actualtime
+                new_item["ID"] = ID
+                new_item["lastUpdate"] = actualtime
+                self.catalog[list_key].append(new_item)
+                out = {"ID": ID}
+                return json.dumps(out, indent=4)
         except KeyError:
             raise web_exception(500, "Invalid key")
 
@@ -155,7 +175,7 @@ class CatalogManager:
                 for i in range(len(current_list)):
                     if current_list[i]["ID"] == IDvalue:
                         current_list.pop(i)
-                        self.ID_free_list.append(IDvalue)
+                        self.IDs.free_ID(IDvalue)
                         break
                 out = {"Status": True}
             else:
@@ -210,7 +230,7 @@ class CatalogManager:
                     for device in self.catalog[key]:
                         try:
                             if actualtime - device["lastUpdate"] > self.autoDeleteTime:
-                                self.ID_free_list.append(device["ID"])
+                                self.IDs.free_ID(device["ID"])
                                 print(f"""Device {device["ID"]} removed""")
                                 self.catalog[key].remove(device)
                         except KeyError:

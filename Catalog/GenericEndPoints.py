@@ -66,9 +66,6 @@ def register(url: str, Service_info : dict) :
 
 class GenericService(): 
     def __init__(self, Service_info : dict, ServiceCatalog_url : str) :
-        self.start_service(Service_info, ServiceCatalog_url)    
-
-    def start_service(self, Service_info : dict, ServiceCatalog_url : str) :
         self.Service_info = Service_info
         self.ServiceCatalog_url = ServiceCatalog_url
         self.ID = register(self.ServiceCatalog_url, self.Service_info)

@@ -4,9 +4,10 @@ from threading import Thread
 from customExceptions import *
 
 class IDs:
-    def __init__(self, minID : int, maxID : int = -1):
+    def __init__(self, minID : int, maxID : int = -1, step = 1):
         self.minID = minID
         self.maxID = maxID
+        self.step = step
         self.ID_free_list = []
 
     def get_ID(self):
@@ -17,7 +18,7 @@ class IDs:
                 return -1
             else:
                 ID = self.minID
-                self.minID += 1
+                self.minID += self.step
                 return int(ID)
 
     def free_ID(self, ID : int):
@@ -34,7 +35,7 @@ class CatalogManager:
         self.filename = filename
         self.autoDeleteTime = autoDeleteTime
         self.IDs = IDs
-
+        self.owners = heading["owner"]
         self.catalog = heading
         self.catalog["lastUpdate"] = time.time(), 
         for key in key_list:

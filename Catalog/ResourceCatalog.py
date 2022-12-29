@@ -5,7 +5,39 @@ from CatalogManager import *
 from GenericEndPoints import GenericService
 from customExceptions import *
 
-class RESTResourceCatalog(CatalogManager, GenericService):
+IDperCompany = 10000
+
+class CompanyCatalog():
+    def __init__(self, heading, filename = "CompanyCatalog.json", autoDeleteTime = 120, IDs = IDs(10000, step=IDperCompany)):
+        self.heading = heading
+        self.filename = filename
+        self.autoDeleteTime = autoDeleteTime
+        self.IDs = IDs
+        self.companyList = []
+
+    def insertCompany(self, params):
+        if "name" in params:
+            ID = self.IDs.get_ID()
+            if ID != -1:
+                CompanyInfo = {
+                    "ID": ID,
+                    "name": params["name"],
+                    "adminID": 1,
+                }
+                if query_yes_no(f"Are you sure you want to add the company {params['name']}?"):
+                    NewCompany =CatalogManager(CompanyInfo, ["devicesList", "usersList"], autoDeleteTime=self.autoDeleteTime, IDs=IDs(ID+1, ID+IDperCompany-1))
+                    NewCompany.insert("usersList", {})
+                    self.companyList.append(NewCompany)
+
+
+                    #inserisci l'utente nella lista degli utenti
+
+        
+        return {"Status": False}
+
+
+
+class RESTResourceCatalog(GenericService):
     exposed = True
 
     def __init__(self, settings : dict):  
@@ -22,141 +54,21 @@ class RESTResourceCatalog(CatalogManager, GenericService):
                 }
             ]
         }
-        self.IDs = IDs(100)
-        self.list_name = "CompanyList"
+        self.catalog = CompanyCatalog(ServiceInfo, settings["filename"], settings["autodeleteTime"])
         self.base_uri = settings["serviceName"]
-        super().__init__(ServiceInfo, [self.list_name], settings["filename"], settings["autoDeleteTime"])
-        self.start_service(ServiceInfo, settings["serviceName"])
+        super().__init__(ServiceInfo, settings["serviceName"])
 
     def GET(self, *uri, **params):
-        """REST GET method.
-
-        Allowed commands:
-        ``/ServiceCatalog/get/<info>?ID=<ID>`` to get a service info by ID
-        ``/ServiceCatalog/getall`` to get all the services
-        ``/ServiceCatalog/search/<info>?<info>=<value>`` to search a service by info
-        """
-        try:
-            if len(uri) < 2:
-                raise web_exception(404, "No command received")
-            elif len(uri) == 3 and uri[0] == self.base_uri and uri[1] == "get" and uri[2] in ["REST", "MQTT"]:
-                if "ID" in params:
-                    return self.get(uri[2], int(params["ID"]))
-                else:
-                    raise web_exception(400, "Invalid parameter")
-            elif len(uri) == 2 and uri[0] == self.base_uri and uri[1] == "getall":
-                return self.get_all(self.list_name)
-            elif len(uri) == 2 and uri[0] == self.base_uri and uri[1] == "broker":
-                return self.get_broker()
-            elif len(uri) == 3 and uri[0] == self.base_uri and uri[1] == "search":
-                if uri[2] in params:
-                    return self.search(self.list_name, uri[2], params[uri[2]])
-                else: 
-                    raise web_exception(400, "Invalid parameter")
-            else:
-                raise web_exception(404, "Invalid Command")
-
-        except web_exception as e:
-            print(e.message)
-            raise cherrypy.HTTPError(e.code, e.message)
-        except:
-            e_string = "Server error"
-            print(e_string)
-            raise cherrypy.HTTPError(500, e_string)
-        
-    def PUT(self, *uri, **params):
-        """PUT REST method.
-
-        Allowed commands:
-        ``/ServiceCatalog/update`` to update the catalog:
-        The body of the request must contain the new service info in json format
-        ``/ServiceCatalog/refresh?ID=<ID>`` to refresh the lastUpdate field of a service by ID
-        """
-        try:
-            if len(uri) == 2 and uri[0] == self.base_uri and uri[1] == "update":
-                body_dict = json.loads(cherrypy.request.body.read())
-                return self.update(int(params["ID"]), body_dict)
-            elif len(uri) == 2 and uri[0] == self.base_uri and uri[1] == "refresh":
-                if "ID" in params:
-                    return self.refreshItem(int(params["ID"]))
-                else:
-                    raise web_exception(400, "Invalid parameter")
-            else:
-                raise web_exception(404, "Invalid command")
-        except web_exception as e:
-            print(e.message)
-            raise cherrypy.HTTPError(e.code, e.message)
-        except:
-            e_string = "Unknown server error"
-            print(e_string)
-            raise cherrypy.HTTPError(500, e_string)
+        pass
 
     def POST(self, *uri, **params):
-        """POST REST method.
-        
-        Allowed commands:
-        ``/ServiceCatalog/save`` to save the catalog in the file
-        ``/ServiceCatalog/insert`` to insert a new service in the catalog. 
-        The body of the request must contain the new service info
-        """
-        try:
-            if len(uri) == 2 and uri[0] == self.base_uri and uri[1] == "insertCompany":
-                return self.insertCompany(params)
-            elif len(uri) == 2 and uri[0] == self.base_uri and uri[1] == "save":
-                return self.save()
-            elif len(uri) == 2 and uri[0] == self.base_uri and uri[1] == "insert":
-                body_dict = json.loads(cherrypy.request.body.read())
-                return self.insert(self.list_name, body_dict)
-            else:
-                raise web_exception(404, "Invalid command")
-        except web_exception as e:
-            print(e.message)
-            raise cherrypy.HTTPError(e.code, e.message)
-        except:
-            e_string = "Unknown server error"
-            print(e_string)
-            raise cherrypy.HTTPError(500, e_string)
+        pass
+    
+    def PUT(self, *uri, **params):
+        pass
 
     def DELETE(self, *uri, **params):
-        """DELETE REST method.
-
-        Allowed commands:
-        ``/ServiceCatalog/delete?ID=<ID>`` to delete a service by ID
-        """
-        try:
-            if len(uri) == 2 and uri[0] == self.base_uri and uri[1] == "delete":
-                if "ID" in params:
-                    return self.delete(int(params["ID"]))
-                else:
-                    raise web_exception(400, "Invalid parameter")
-            else:
-                raise web_exception(404, "Invalid command")
-        except web_exception as e:
-            print(e.message)
-            raise cherrypy.HTTPError(e.code, e.message)
-        except:
-            e_string = "Unknown server error"
-            print(e_string)
-            raise cherrypy.HTTPError(500, e_string)
-    
-    def insertCompany(self, params):
-        if "name" in params:
-            ID = self.IDs.get_ID()
-            if ID != -1:
-                NewCompany = {
-                    "ID": ID,
-                    "name": params["name"],
-                    "adminID": 1,
-                    "devicesList": [],
-                    "usersList": []
-                }
-                if query_yes_no(f"Are you sure you want to add the company {params['name']}?"):
-                    self.catalog["CompanyList"].append(NewCompany)
-                    
-                    #inserisci l'utente nella lista degli utenti
-
-        
-        return {"Status": False}
+        pass
 
 def query_yes_no(question):
     """Ask a yes/no question via input() and return their answer.

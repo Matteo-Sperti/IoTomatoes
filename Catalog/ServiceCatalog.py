@@ -134,8 +134,7 @@ if __name__ == "__main__":
     port = settings["REST_settings"]["port"]
 
     heading = {
-        "projectOwner": settings["owner"], 
-        "projectName": settings["projectName"],
+        "owner": settings["owner"], 
         "CatalogName": settings["CatalogName"],
         "broker": settings["broker"],
         }

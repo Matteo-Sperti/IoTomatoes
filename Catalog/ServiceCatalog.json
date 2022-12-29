@@ -1,11 +1,34 @@
 {
-    "projectOwner": "IoTomatoes_Team",
-    "projectName": "IoTomatoes_project",
+    "owner": "IoTomatoes",
+    "CatalogName": "ServiceCatalog",
     "broker": {
         "IP": "mqtt.eclipseprojects.io",
         "port": 1883,
-        "baseTopic": "IoTomatoes_project"
+        "baseTopic": "IoTomatoes"
     },
-    "lastUpdate": 1672243019.6092079,
-    "servicesList": []
+    "lastUpdate": 1672318020.913547,
+    "servicesList": [
+        {
+            "serviceName": "Irrigation",
+            "availableServices": [
+                "MQTT",
+                "REST"
+            ],
+            "servicesDetails": [
+                {
+                    "serviceType": "MQTT",
+                    "topic": [
+                        "/humidity",
+                        "/temperature"
+                    ]
+                },
+                {
+                    "serviceType": "REST",
+                    "serviceIP": "dht11.org:8080"
+                }
+            ],
+            "ID": 1,
+            "lastUpdate": 1672318020.913547
+        }
+    ]
 }

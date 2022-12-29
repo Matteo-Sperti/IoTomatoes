@@ -2,23 +2,21 @@ import json
 import cherrypy
 import threading
 from CatalogManager import CatalogManager
-from GenericService import GenericService
+from GenericEndPoints import GenericService
 from customExceptions import *
 
 class RESTResourceCatalog(CatalogManager, GenericService):
     exposed = True
 
-    def __init__(self, heading, ServiceCatalog_url : str, name = "ResourceCatalog", filename = "ResourceCatalog.json", autoDeleteTime = 120):
+    def __init__(self, ServiceInfo : dict, ServiceCatalog_url : str, name = "ResourceCatalog", filename = "ResourceCatalog.json", autoDeleteTime = 120):
         self.list_name = "CompanyList"
         self.base_uri = name
-        super().__init__(heading, [self.list_name], filename, autoDeleteTime)
+        self.Service_info = ServiceInfo
+        super().__init__(self.Service_info, [self.list_name], filename, autoDeleteTime)
         
         self.ServiceCatalog_url = ServiceCatalog_url
-        self.ID = self.register(heading)
-        
-        t = threading.Thread(target=self.refresh)
-        t.daemon = True
-        t.start()
+        self.ID = self.register(self.Service_info, ServiceCatalog_url)
+        self.refresh_as_a_thread()
 
     def GET(self, *uri, **params):
         """REST GET method.

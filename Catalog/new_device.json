@@ -1,8 +1,7 @@
-
-
 {
-    "deviceID": 6,
+    "ID": 6,
     "deviceName": "DHT11",
+    "companyName" : "MySmartThingy",
     "isActuator" : true,
 	"isSensor" : true,
     "PowerConsumption_kW" : 9600,

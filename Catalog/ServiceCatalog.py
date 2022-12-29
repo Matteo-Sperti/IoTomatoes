@@ -6,7 +6,7 @@ from customExceptions import *
 class RESTServiceCatalog(CatalogManager):
     exposed = True
 
-    def __init__(self, heading : dict, name = "ServiceCatalog", filename = "ServiceCatalog.json", autoDeleteTime = 120):
+    def __init__(self, settings : dict):
         """ Initialize the RESTServiceCatalog class.
 
         Keyword arguments:
@@ -15,9 +15,15 @@ class RESTServiceCatalog(CatalogManager):
         ``filename`` is the name of the file to save the catalog
         ``autoDeleteTime`` is the time in seconds to delete the services that are not online anymore
         """
+        heading = {
+            "owner": settings["owner"], 
+            "CatalogName": settings["CatalogName"],
+            "broker": settings["broker"],
+            }
+
         self.list_name = "servicesList"
-        self.base_uri = name
-        super().__init__(heading, [self.list_name], filename, autoDeleteTime)
+        self.base_uri = settings["CatalogName"]
+        super().__init__(heading, [self.list_name], settings["filename"], settings["autoDeleteTime"])
 
     def GET(self, *uri, **params):
         """REST GET method.
@@ -30,13 +36,15 @@ class RESTServiceCatalog(CatalogManager):
         try:
             if len(uri) < 2:
                 raise web_exception(404, "No command received")
-            elif len(uri) == 2 and uri[0] == self.base_uri and uri[1] == "get":
+            elif len(uri) == 3 and uri[0] == self.base_uri and uri[1] == "get" and uri[2] in ["REST", "MQTT"]:
                 if "ID" in params:
-                    return self.get(params["ID"])
+                    return self.get(uri[2], int(params["ID"]))
                 else:
                     raise web_exception(400, "Invalid parameter")
             elif len(uri) == 2 and uri[0] == self.base_uri and uri[1] == "getall":
                 return self.get_all(self.list_name)
+            elif len(uri) == 2 and uri[0] == self.base_uri and uri[1] == "broker":
+                return self.get_broker()
             elif len(uri) == 3 and uri[0] == self.base_uri and uri[1] == "search":
                 if uri[2] in params:
                     return self.search(self.list_name, uri[2], params[uri[2]])
@@ -64,10 +72,10 @@ class RESTServiceCatalog(CatalogManager):
         try:
             if len(uri) == 2 and uri[0] == self.base_uri and uri[1] == "update":
                 body_dict = json.loads(cherrypy.request.body.read())
-                return self.update(self.list_name, body_dict)
+                return self.update(int(params["ID"]), body_dict)
             elif len(uri) == 2 and uri[0] == self.base_uri and uri[1] == "refresh":
                 if "ID" in params:
-                    return self.refreshItem(params["ID"])
+                    return self.refreshItem(int(params["ID"]))
                 else:
                     raise web_exception(400, "Invalid parameter")
             else:
@@ -113,7 +121,7 @@ class RESTServiceCatalog(CatalogManager):
         try:
             if len(uri) == 2 and uri[0] == self.base_uri and uri[1] == "delete":
                 if "ID" in params:
-                    return self.delete(params["ID"])
+                    return self.delete(int(params["ID"]))
                 else:
                     raise web_exception(400, "Invalid parameter")
             else:
@@ -133,13 +141,7 @@ if __name__ == "__main__":
     ip_address = settings["REST_settings"]["ip_address"]
     port = settings["REST_settings"]["port"]
 
-    heading = {
-        "owner": settings["owner"], 
-        "CatalogName": settings["CatalogName"],
-        "broker": settings["broker"],
-        }
-
-    Catalog = RESTServiceCatalog(heading, settings["CatalogName"], settings["filename"], settings["autoDeleteTime"])
+    Catalog = RESTServiceCatalog(settings)
 
     conf = {
         '/': {

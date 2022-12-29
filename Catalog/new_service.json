@@ -1,5 +1,6 @@
 {
-    "serviceName": "Irrigation",
+    "serviceName" : "Irrigation",
+    "ServiceCatalog_url" : "http://localhost:8080/ServiceCatalog",
     "availableServices": [
         "MQTT",
         "REST"

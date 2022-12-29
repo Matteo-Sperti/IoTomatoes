@@ -4,7 +4,7 @@ from threading import Thread
 from customExceptions import *
 
 class CatalogManager:
-    def __init__(self, heading : dict, key_list : list, filename = "catalog.json", autoDeleteTime = 120):
+    def __init__(self, heading : dict, key_list : list, filename = "catalog.json", autoDeleteTime = 120, rangeID = [1,99]):
         """Initialize the catalog manager.
         Keyword arguments:
         ``heading`` is a dictionary with the heading of the catalog,
@@ -13,26 +13,13 @@ class CatalogManager:
         """
         self.filename = filename
         self.autoDeleteTime = autoDeleteTime
-        self.BiggestID = 0
-        self.ID_free_list = []
-
-        # try:
-        #     fp = open(self.filename, "r")
-        #     self.catalog = json.load(fp)
-        #     self.catalog["lastUpdate"] = time.time(), 
-        #     fp.close()
-        # except FileNotFoundError:
-        #     self.catalog = heading
-        #     self.catalog["lastUpdate"] = time.time(), 
-        #     for key in key_list:
-        #         self.catalog[key] = []
+        self.ID_free_list = list(range(rangeID[-1], rangeID[0]-1, -1))
 
         self.catalog = heading
         self.catalog["lastUpdate"] = time.time(), 
         for key in key_list:
             self.catalog[key] = []
         self.autoDeleteItemsThread()
-
 
     def save(self):
         """Save the catalog in the file specified in the initialization."""
@@ -41,32 +28,49 @@ class CatalogManager:
         print("Catalog saved!\n")
         return json.dumps({"Status": True}, indent=4)
 
+    def print_catalog(self):
+        """Return the catalog in json format."""
+        return json.dumps(self.catalog, indent=4)
+
+    def load(self):
+        """Load the catalog from the file specified in the initialization."""
+        try:
+            self.catalog = json.load(open(self.filename, "r"))
+            print("Catalog loaded!\n")
+            return json.dumps({"Status": True}, indent=4)
+        except FileNotFoundError:
+            print("Catalog file not found!\n")
+            return json.dumps({"Status": False}, indent=4)
+
+    def get_broker(self):
+        """Return the broker info in json format."""
+        try:
+            return json.dumps(self.catalog["broker"], indent=4)
+        except KeyError:
+            raise web_exception(404, "Broker info not found")
+
     def get_all(self, list_key : str):
         """Return a json with all the items in the list specified in ``list_key``."""
-        
-        return json.dumps(self.catalog[list_key], indent=4)
+        try:
+            return json.dumps(self.catalog[list_key], indent=4)
+        except KeyError:
+            raise web_exception(404, "List not found")
 
-    def get(self, keyword_list, current_list = None):
-        """Return the information of ``keyword_list`` in json format.
+    def get(self, info : str, ID : int):
+        """Return the REST or MQTT information of item ``ID`` in json format.
 
         Keyword arguments:
-        ``keyword_list`` is a list of the keys to search in (nest),
-        ``current_list`` is the list to search in (nest). If None, the catalog is searched.
+        ``info`` is the type of information to return (REST, MQTT) and
+        ``ID`` is the ID of the item to return the information of
         """
-        if len(keyword_list) > 10:
-            raise web_exception(400, "Too many keys")
+        item = self.find_item(ID)
 
-        if current_list == None:
-            current_list = self.catalog
-
-        try:    
-            if len(keyword_list) == 1:
-                return json.dumps(current_list[keyword_list[0]], indent=4)
-            else: 
-                for item in current_list[keyword_list[0]]:
-                    return self.get(keyword_list[1:], item)
-        except KeyError:
-            raise web_exception(500, "Invalid key")        
+        if item != None:
+            if "servicesDetails" in item:
+                 for serviceInfo in item["servicesDetails"]:
+                    if serviceInfo["serviceType"] == info:
+                        return json.dumps(serviceInfo, indent=4)
+        raise web_exception(404, "Service info not found")
 
     def search(self, list_key : str, key : str, value):
         """Search for a item in the catalog.
@@ -102,8 +106,7 @@ class CatalogManager:
             if self.ID_free_list:
                 ID = self.ID_free_list.pop()
             else:
-                self.BiggestID += 1
-                ID = self.BiggestID
+                raise web_exception(500, "No more IDs available")
             actualtime = time.time() 
             self.catalog["lastUpdate"] = actualtime
             new_item["ID"] = ID
@@ -114,30 +117,28 @@ class CatalogManager:
         except KeyError:
             raise web_exception(500, "Invalid key")
 
-    def update(self, list_key : str, new_item : dict):
+    def update(self, ID : int, new_item : dict):
         """Update a device in the catalog.
         Return a json with the status of the operation.
         
         Keyword arguments:
-        ``list_key`` is the name of the list to update in and
+        ``ID`` is the ID of the item to update and
         ``new_item`` is the item in json format to update
         """
-        try:
-            is_present = json.loads(self.search(list_key, "ID", new_item["ID"]))
-            if len(is_present) == 0:
-                out = {"Status": False}
-            else:
-                actualtime = time.time()
-                self.catalog["lastUpdate"] = actualtime
-                new_item["lastUpdate"] = actualtime
-                for i in range(len(self.catalog[list_key])):
-                    if str(self.catalog[list_key][i]["ID"]) == str(new_item["ID"]):
-                        self.catalog[list_key][i] = new_item
-                        break
-                out = {"Status": True}
-            return json.dumps(out, indent=4)
-        except KeyError:
-            raise web_exception(500, "Invalid key")
+
+        item = self.find_item(ID)
+        if item != None:
+            actualtime = time.time()
+            self.catalog["lastUpdate"] = actualtime
+            for key in item:
+                if key in new_item:
+                    item[key] = new_item[key]
+            item["ID"] = ID
+            item["lastUpdate"] = actualtime
+            out = {"Status": True}
+        else:
+            out = {"Status": False}
+        return json.dumps(out, indent=4)
 
     def delete(self, IDvalue : int):
         """Delete a item from the catalog.
@@ -164,6 +165,7 @@ class CatalogManager:
             raise web_exception(500, "Invalid key")
     
     def find_list(self, IDvalue : int):
+        """Return the list where the item with the ID ``IDvalue`` is present."""
         for key in self.catalog:
             if isinstance(self.catalog[key], list):
                 for item in self.catalog[key]:
@@ -172,6 +174,8 @@ class CatalogManager:
         return None
 
     def find_item(self, IDvalue : int) :
+        """Return the item with the ID ``IDvalue``."""
+
         current_list = self.find_list(IDvalue)
         if current_list != None:
             for item in current_list:
@@ -197,7 +201,6 @@ class CatalogManager:
             out = {"Status": False}
         return json.dumps(out, indent=4)
 
-
     def autoDeleteItems(self):
         """Refresh the catalog removing the devices that are not online anymore."""
         while True:
@@ -208,6 +211,7 @@ class CatalogManager:
                         try:
                             if actualtime - device["lastUpdate"] > self.autoDeleteTime:
                                 self.ID_free_list.append(device["ID"])
+                                print(f"""Device {device["ID"]} removed""")
                                 self.catalog[key].remove(device)
                         except KeyError:
                             print("Device without lastUpdate field")

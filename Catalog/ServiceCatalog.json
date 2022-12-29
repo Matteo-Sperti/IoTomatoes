@@ -6,10 +6,11 @@
         "port": 1883,
         "baseTopic": "IoTomatoes"
     },
-    "lastUpdate": 1672318020.913547,
+    "lastUpdate": 1672338101.0294273,
     "servicesList": [
         {
             "serviceName": "Irrigation",
+            "ServiceCatalog_url": "http://localhost:8080/ServiceCatalog",
             "availableServices": [
                 "MQTT",
                 "REST"
@@ -28,7 +29,7 @@
                 }
             ],
             "ID": 1,
-            "lastUpdate": 1672318020.913547
+            "lastUpdate": 1672338101.0294273
         }
     ]
 }

@@ -8,15 +8,25 @@ from customExceptions import *
 class RESTResourceCatalog(CatalogManager, GenericService):
     exposed = True
 
-    def __init__(self, ServiceInfo : dict, ServiceCatalog_url : str, name = "ResourceCatalog", filename = "ResourceCatalog.json", autoDeleteTime = 120):
-        self.list_name = "CompanyList"
-        self.base_uri = name
-        self.Service_info = ServiceInfo
-        super().__init__(self.Service_info, [self.list_name], filename, autoDeleteTime)
+    def __init__(self, settings : dict):  
+        ServiceInfo = {
+            "serviceName": settings["serviceName"],
+            "owner": settings["owner"],
+            "availableServices": [
+                "REST"
+            ],
+            "servicesDetails": [
+                {
+                    "serviceType": "REST",
+                    "serviceIP": f"""{settings["REST_settings"]["ip_address"]}:{settings["REST_settings"]["port"]}"""
+                }
+            ]
+        }
         
-        self.ServiceCatalog_url = ServiceCatalog_url
-        self.ID = self.register(self.Service_info, ServiceCatalog_url)
-        self.refresh_as_a_thread()
+        self.list_name = "CompanyList"
+        self.base_uri = settings["serviceName"]
+        super().__init__(ServiceInfo, [self.list_name], settings["filename"], settings["autoDeleteTime"])
+        self.start_service(ServiceInfo, settings["serviceName"])
 
     def GET(self, *uri, **params):
         """REST GET method.
@@ -29,13 +39,15 @@ class RESTResourceCatalog(CatalogManager, GenericService):
         try:
             if len(uri) < 2:
                 raise web_exception(404, "No command received")
-            elif len(uri) == 2 and uri[0] == self.base_uri and uri[1] == "get":
+            elif len(uri) == 3 and uri[0] == self.base_uri and uri[1] == "get" and uri[2] in ["REST", "MQTT"]:
                 if "ID" in params:
-                    return self.get(params["ID"])
+                    return self.get(uri[2], int(params["ID"]))
                 else:
                     raise web_exception(400, "Invalid parameter")
             elif len(uri) == 2 and uri[0] == self.base_uri and uri[1] == "getall":
                 return self.get_all(self.list_name)
+            elif len(uri) == 2 and uri[0] == self.base_uri and uri[1] == "broker":
+                return self.get_broker()
             elif len(uri) == 3 and uri[0] == self.base_uri and uri[1] == "search":
                 if uri[2] in params:
                     return self.search(self.list_name, uri[2], params[uri[2]])
@@ -63,10 +75,10 @@ class RESTResourceCatalog(CatalogManager, GenericService):
         try:
             if len(uri) == 2 and uri[0] == self.base_uri and uri[1] == "update":
                 body_dict = json.loads(cherrypy.request.body.read())
-                return self.update(self.list_name, body_dict)
+                return self.update(int(params["ID"]), body_dict)
             elif len(uri) == 2 and uri[0] == self.base_uri and uri[1] == "refresh":
                 if "ID" in params:
-                    return self.refreshItem(params["ID"])
+                    return self.refreshItem(int(params["ID"]))
                 else:
                     raise web_exception(400, "Invalid parameter")
             else:
@@ -88,7 +100,9 @@ class RESTResourceCatalog(CatalogManager, GenericService):
         The body of the request must contain the new service info
         """
         try:
-            if len(uri) == 2 and uri[0] == self.base_uri and uri[1] == "save":
+            if len(uri) == 2 and uri[0] == self.base_uri and uri[1] == "insertCompany":
+                return self.insertCompany(params)
+            elif len(uri) == 2 and uri[0] == self.base_uri and uri[1] == "save":
                 return self.save()
             elif len(uri) == 2 and uri[0] == self.base_uri and uri[1] == "insert":
                 body_dict = json.loads(cherrypy.request.body.read())
@@ -112,7 +126,7 @@ class RESTResourceCatalog(CatalogManager, GenericService):
         try:
             if len(uri) == 2 and uri[0] == self.base_uri and uri[1] == "delete":
                 if "ID" in params:
-                    return self.delete(params["ID"])
+                    return self.delete(int(params["ID"]))
                 else:
                     raise web_exception(400, "Invalid parameter")
             else:
@@ -125,6 +139,20 @@ class RESTResourceCatalog(CatalogManager, GenericService):
             print(e_string)
             raise cherrypy.HTTPError(500, e_string)
     
+    def insertCompany(self, params):
+        if "name" in params and "address" in params and "email" in params and "phone" in params:
+            NewCompany = {
+                "name": params["name"],
+                "address": params["address"],
+                "email": params["email"],
+                "phone": params["phone"],
+                "adminID": 1
+            }
+            self.catalog["companies"].append({"name": params["name"], "address": params["address"], "email": params["email"], "phone": params["phone"]})
+            return "Company added"
+        else:
+            raise web_exception(400, "Invalid parameter")
+
 
 if __name__ == "__main__":
     settings = json.load(open("ResourceCatalogSettings.json"))
@@ -132,21 +160,7 @@ if __name__ == "__main__":
     ip_address = settings["REST_settings"]["ip_address"]
     port = settings["REST_settings"]["port"]
 
-    heading = {
-                "serviceName": settings["serviceName"],
-                "owner": settings["owner"],
-                "availableServices": [
-                    "REST"
-                ],
-                "servicesDetails": [
-                    {
-                        "serviceType": "REST",
-                        "serviceIP": f"{ip_address}:{port}"
-                    }
-                ]
-            }
-
-    Catalog = RESTResourceCatalog(heading, settings["ServiceCatalog_IP"], settings["serviceName"], settings["filename"], settings["autoDeleteTime"])
+    Catalog = RESTResourceCatalog(settings)
 
     conf = {
         '/': {

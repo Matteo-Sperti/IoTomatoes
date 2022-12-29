@@ -4,75 +4,88 @@ import time
 import threading
 from MyMQTT import MyMQTT
 
-class EndPoint():
-    def __init__(self, info : dict, url : str) :
-        self.CatalogUrl = url
-        self.ID = self.register(info)
-
+class RefreshThread(object):
+    def __init__(self, url: str, ID : int):
         self._stop = threading.Event()
-        self.RefreshThread = threading.Thread()
-        self.RefreshThread.daemon = True
-        self.RefreshThread.start()
+        self.t = threading.Thread(target=self.run_forever, args=(url, ID))
+        self.t.start()
 
     def close(self) :
         self._stop.set()
-        self.RefreshThread.join()
+        self.t.join()
 
     def stopped(self):
-        return self._stop.isSet()
+        return self._stop.is_set()
 
-    def run(self) :
-        while True :
-            if self.stopped():
-                return
-            print (f"Refreshing {self.ID}\n")
-            refreshed = False
-            while not refreshed:
-                res = requests.put(self.CatalogUrl + "/refresh", params={"ID": self.ID})
-                print("Richiesta fatta")
-                if res.status_code == 200:
+    def run_forever(self, url: str, ID : int) :
+            while True :
+                if self.stopped():
+                    print("RefreshThread stopped")
+                    return
+                refreshed = False
+                try:
+                    res = requests.put(url + "/refresh", params={"ID": ID})
+                    res.raise_for_status()
+                except requests.exceptions.ConnectionError:
+                    print(f"Connection Error\nRetrying connection\n")
+                except requests.exceptions.Timeout:
+                    print(f"Timeout\nRetrying connection\n")
+                except requests.exceptions.HTTPError as err:
+                    print(f"{err.response.status_code} : {err.response.reason}")
+                else:
                     stat = res.json()
                     if "Status" in stat and stat["Status"] == True:
                         refreshed = True
-                        print(f"Refreshed {self.ID}\n")
+                        print(f"Refreshed {ID}\n")
                     else:
-                        print(f"Error in the response\n")
-            time.sleep(60)
+                        print(stat)
 
-    def register(self, Service_info : dict) :
-        while True:
-            try:
-                res = requests.post(self.CatalogUrl + "/insert", json = Service_info)
-                res.raise_for_status()
-            except requests.exceptions.ConnectionError:
-                print(f"Connection Error\nRetrying connection\n")
-            except requests.exceptions.Timeout:
-                print(f"Timeout\nRetrying connection\n")
-            except requests.exceptions.HTTPError as err:
-                 print(f"{err.response.status_code} : {err.response.reason}")
-            else:
-                try:                    
-                    ID = res.json()["ID"]
-                    print(f"Registered {ID}\n")
-                    return ID
-                except:
-                    print(f"Error in the response\n")
+                if refreshed:
+                    time.sleep(60)
+                else:
+                    time.sleep(1)
 
-class GenericService(EndPoint): 
+def register(url: str, Service_info : dict) :
+    while True:
+        try:
+            res = requests.post(url + "/insert", json = Service_info)
+            res.raise_for_status()
+        except requests.exceptions.ConnectionError:
+            print(f"Connection Error\nRetrying connection\n")
+        except requests.exceptions.HTTPError as err:
+                print(f"{err.response.status_code} : {err.response.reason}")
+        except:
+            print(f"Error in the request\n")
+        else:
+            try:                    
+                ID = res.json()["ID"]
+                print(f"Registered {ID}\n")
+                return ID
+            except:
+                print(f"Error in the response\n")
+
+class GenericService(): 
     def __init__(self, Service_info : dict, ServiceCatalog_url : str) :
-        self.Service_info = Service_info
-        super().__init__(Service_info, ServiceCatalog_url)
+        self.start_service(Service_info, ServiceCatalog_url)    
 
-class GenericResource(EndPoint):  
+    def start_service(self, Service_info : dict, ServiceCatalog_url : str) :
+        self.Service_info = Service_info
+        self.ServiceCatalog_url = ServiceCatalog_url
+        self.ID = register(self.ServiceCatalog_url, self.Service_info)
+        self.Thread = RefreshThread(self.ServiceCatalog_url, self.ID)
+
+class GenericResource():  
     def __init__(self, Resource_info : dict, ServiceCatalog_url : str) :
         self.ServiceCatalog_url = ServiceCatalog_url
         self.Resource_info = Resource_info
-        super().__init__(Resource_info, self.get_ResourceCatalog_url())
+        self.ResourceCatalog_url = self.get_ResourceCatalog_url()
+        self.ID = register(self.ResourceCatalog_url, self.Resource_info)
+        self.Thread = RefreshThread(self.ResourceCatalog_url, self.ID)
 
     def get_ResourceCatalog_url(self) :
         while True:
             try:
-                res = requests.get(self.CatalogUrl + "7search/serviceName", params = {"serviceName": "ResourceCatalog"})
+                res = requests.get(self.ResourceCatalog_url + "7search/serviceName", params = {"serviceName": "ResourceCatalog"})
                 res.raise_for_status()
             except requests.exceptions.Timeout:
                 print(f"Timeout\nRetrying connection\n")
@@ -157,12 +170,11 @@ class GenericUser(GenericMQTTResource):
 
 if __name__ == "__main__":
     Service_info = json.load(open("new_service.json"))
-    ServiceCatalog_url = "http://localhost:8080/ServiceCatalog/"
+    ServiceCatalog_url = Service_info["ServiceCatalog_url"]
     serv = GenericService(Service_info, ServiceCatalog_url)
 
     try:
         while True:
             time.sleep(1)
     except KeyboardInterrupt:
-        print("Closing")
-        serv.close()
+        serv.Thread.close()

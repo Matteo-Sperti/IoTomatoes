@@ -1,0 +1,1 @@
+{"hourly": ["relativehumidity_2m","dewpoint_2m","precipitation","soil_temperature_6cm","soil_moisture_3_9cm"], "daily": ["precipitation_sum","precipitation_hours"]}

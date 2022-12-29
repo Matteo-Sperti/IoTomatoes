@@ -1,6 +1,17 @@
 import requests
 import json
 import time
+import cherrypy
+
+def validateJSON(jsonData):
+    try:
+        json.loads(jsonData)
+    except ValueError as err:
+        return False
+    return True
+
+
+
 class WeatherApp:
 	'''handles the weather requests'''
 	def __init__(self):
@@ -12,15 +23,62 @@ class WeatherApp:
 		json.dump(response.json(),open(fileOutput,"w")) #writes the output in the output file
 		return response.json()
 
-	def getData(self):
-		'''gets the data from the weather API'''
-		return self.makeRequest("WeatherInput.json","WeatherOutput.json") #makes the request and writes the output in the output file
+	def IrrigationData(self):
+		'''gets the data from the weather API for the irrigation service'''
+		return self.makeRequest("IrrigationInput.json","IrrigationOutput.json") #makes the request and writes the output in the output file
+	def LightingData(self):
+		'''gets the data from the weather API for the lighting service'''
+		return self.makeRequest("LightingInput.json","LightingOutput.json") #makes the request and writes the output in the output file
+	def CustomData(self):
+		'''gets the data from the weather API for a  custom user request'''
+		return self.makeRequest("CustomInput.json","CustomOutput.json") #makes the request and writes the output in the output file
+
+
+
+class WebPage(object):
+	exposed = True
+	def GET(self,*uri,**params):
+		if len(uri) != 0:
+			if uri[0] == "Irrigation":
+				weather = WeatherApp()
+				return json.dumps(weather.IrrigationData())
+			elif uri[0] == "Lighting":
+				weather = WeatherApp()
+				return json.dumps(weather.LightingData())
+			
+			else:
+				raise cherrypy.HTTPError(404,"Wrong URL")
+		else:
+			raise cherrypy.HTTPError(404, "Please specify the service you want to use")
+
+
+
+	def POST(self,*uri,**params):
+		if len(uri) != 0:
+			if uri[0] == "Custom":
+				weather = WeatherApp()
+				bodyAsString = cherrypy.request.body.read()
+				bodyAsDictionary = json.loads(bodyAsString)
+				json.dump(bodyAsDictionary,open("CustomInput.json","w"))
+				data = weather.CustomData()
+				if validateJSON(json.loads(data)) == True:
+					return json.dumps(data)
+				else:
+					raise cherrypy.HTTPError(400,"The POST request is not correct")
+				
+		else:
+			raise cherrypy.HTTPError(404, "Please specify the service you want to use")
+
+
 
 if __name__ == '__main__':
-	while True:
-		weather = WeatherApp()
-		weather.getData()
-		time.sleep(1800)
-		print(f"Weather data updated at {time.ctime()}")
-
-	
+	conf =  {
+			'/': {
+				 'request.dispatch': cherrypy.dispatch.MethodDispatcher(),
+				 'tools.sessions.on': True,
+		}
+	}
+	webService = WebPage()
+	cherrypy.tree.mount(webService, '/', conf)
+	cherrypy.engine.start()
+	cherrypy.engine.block()     

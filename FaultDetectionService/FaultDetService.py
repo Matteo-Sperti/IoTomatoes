@@ -42,7 +42,7 @@ class FaultDetector:
 		"""Update the status of a device in the deviceList"""
 		try:
 			for dev in self.deviceList:
-				if dev['ID'] == deviceID:
+				if str(dev['ID']) == deviceID:
 					dev['LastUpdate'] = datetime.datetime.now()
 					break
 		except:
@@ -68,7 +68,7 @@ class FaultDetector:
 		"""Check if a measure is within the thresholds"""
 		try:
 			for dev in self.deviceList:
-				if dev['ID'] == deviceID:
+				if str(dev['ID']) == deviceID:
 					if measureType in dev['measureType']:
 						if measure > self.thresholds[measureType]['max_value'] or measure < self.thresholds[measureType]['min_value']:
 							message = "Warning, Device " + str(dev['ID']) + " has sent a measure out of the thresholds, possible fault!"

@@ -38,7 +38,7 @@ if __name__ == "__main__":
 	test.start()
 	
 	iter = 0
-	dict = json.load(open('CompanyList.json'))
+	dict = json.load(open('../CompanyList.json'))
 	while(True):
 		for company in dict['CompanyList']:
 			for device in company['deviceList']:

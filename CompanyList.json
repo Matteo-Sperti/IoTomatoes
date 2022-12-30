@@ -1,0 +1,31 @@
+{
+    "CompanyList":[
+        {"companyName": "Company 1",
+         "ID": "1",
+         "userAdminID": "1",
+         "deviceList": [
+                {"ID":6, "deviceName":"Device 1", "isActuator": true, "PowerConsumption_kW":40},
+                {"ID":7, "deviceName":"Device 2", "isActuator": false, "PowerConsumption_kW":30},
+                {"ID":8, "deviceName":"Device 3", "isActuator": true, "PowerConsumption_kW":20}
+         ]
+        },
+        {"companyName": "Company 2",
+         "ID": "2",
+         "userAdminID": "2",
+         "deviceList": [
+                {"ID":9, "deviceName":"Device 4", "isActuator": true, "PowerConsumption_kW":40},
+                {"ID":10, "deviceName":"Device 5", "isActuator": false, "PowerConsumption_kW":30},
+                {"ID":11, "deviceName":"Device 6", "isActuator": true, "PowerConsumption_kW":20}
+         ]
+        },
+        {"companyName": "Company 3",
+         "ID": "3",
+         "userAdminID": "3",
+         "deviceList": [
+                {"ID":12, "deviceName":"Device 7", "isActuator": true, "PowerConsumption_kW":40},
+                {"ID":13, "deviceName":"Device 8", "isActuator": false, "PowerConsumption_kW":30},
+                {"ID":14, "deviceName":"Device 9", "isActuator": true, "PowerConsumption_kW":20}
+         ]
+    }
+    ]
+}

@@ -1,0 +1,7 @@
+companyName,ID,deviceName,PowerConsumption_kW,Datetime,Consumption
+Company 1,6,Device 1,40,2022-12-29 14:00:00,111.11
+Company 1,8,Device 3,20,2022-12-29 14:00:00,1000.0
+Company 2,9,Device 4,40,2022-12-29 14:00:00,1000.0
+Company 2,11,Device 6,20,2022-12-29 14:00:00,1000.0
+Company 3,12,Device 7,40,2022-12-29 14:00:00,1000.0
+Company 3,14,Device 9,20,2022-12-29 14:00:00,1000.0

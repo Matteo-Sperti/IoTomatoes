@@ -13,7 +13,7 @@ class CompanyCatalog():
         self.filename = filename
         self.autoDeleteTime = autoDeleteTime
         self.IDs = IDs
-        self.companyList = []
+        self.companiesList = []
 
     def insertCompany(self, params):
         if "name" in params:
@@ -27,14 +27,57 @@ class CompanyCatalog():
                 if query_yes_no(f"Are you sure you want to add the company {params['name']}?"):
                     NewCompany =CatalogManager(CompanyInfo, ["devicesList", "usersList"], autoDeleteTime=self.autoDeleteTime, IDs=IDs(ID+1, ID+IDperCompany-1))
                     NewCompany.insert("usersList", {})
-                    self.companyList.append(NewCompany)
-
+                    self.companiesList.append(NewCompany)
 
                     #inserisci l'utente nella lista degli utenti
-
         
         return {"Status": False}
 
+    def deleteCompany(self, CompanyID, userID):
+        for company in self.companiesList:
+            if company.catalog["ID"] == CompanyID:
+                if company.catalog["adminID"] == userID:
+                    if query_yes_no(f"Are you sure you want to delete the company {company.catalog['name']}?"):
+                        self.companiesList.remove(company)
+                        return {"Status": True}
+                else:
+                    raise web_exception(401, "You are not authorized to delete this company.")
+        
+        raise web_exception(404, "Company not found.") 
+
+    def insertUser(self, CompanyID, params):
+        for company in self.companiesList:
+            if company.catalog["ID"] == CompanyID:
+                return company.insert("usersList", params)
+        raise web_exception(404, "Company not found.")
+
+    def deleteUser(self, CompanyID, userID):
+        for company in self.companiesList:
+            if company.catalog["ID"] == CompanyID:
+                return company.delete("usersList", userID)
+        raise web_exception(404, "Company not found.")
+
+    def insertDevice(self, CompanyID, params):
+        for company in self.companiesList:
+            if company.catalog["ID"] == CompanyID:
+                return company.insert("devicesList", params)
+        raise web_exception(404, "Company not found.")
+
+    def deleteDevice(self, CompanyID, deviceID):
+        for company in self.companiesList:
+            if company.catalog["ID"] == CompanyID:
+                return company.delete("devicesList", deviceID)
+        raise web_exception(404, "Company not found.")
+
+    def __dict__(self):
+        CatalogDict = self.heading
+        CatalogDict["companiesList"] = []
+        for company in self.companiesList:
+            CatalogDict["companiesList"].append(company.__dict__())
+
+    def save(self):
+        with open(self.filename, "w") as file:
+            json.dump(self.__dict__, file, indent=4)
 
 
 class RESTResourceCatalog(GenericService):
@@ -54,9 +97,9 @@ class RESTResourceCatalog(GenericService):
                 }
             ]
         }
-        self.catalog = CompanyCatalog(ServiceInfo, settings["filename"], settings["autodeleteTime"])
+        self.catalog = CompanyCatalog(ServiceInfo, settings["filename"], settings["autoDeleteTime"])
         self.base_uri = settings["serviceName"]
-        super().__init__(ServiceInfo, settings["serviceName"])
+        super().__init__(ServiceInfo, settings["ServiceCatalog_url"])
 
     def GET(self, *uri, **params):
         pass
@@ -108,5 +151,6 @@ if __name__ == "__main__":
     cherrypy.engine.start()
 
     cherrypy.engine.block()
-    Catalog.save()
+    Catalog.Thread.close()
+    Catalog.catalog.save()
     print("Server stopped")

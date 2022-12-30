@@ -53,6 +53,9 @@ class CatalogManager:
         """Return the catalog in json format."""
         return json.dumps(self.catalog, indent=4)
 
+    def __dict__(self):
+        return self.catalog
+
     def load(self):
         """Load the catalog from the file specified in the initialization."""
         try:

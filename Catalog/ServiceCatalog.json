@@ -6,8 +6,23 @@
         "port": 1883,
         "baseTopic": "IoTomatoes"
     },
-    "lastUpdate": 1672339325.40474,
+    "lastUpdate": 1672417533.2408507,
     "servicesList": [
+        {
+            "serviceName": "ResourceCatalog",
+            "owner": "IoTomatoes",
+            "availableServices": [
+                "REST"
+            ],
+            "servicesDetails": [
+                {
+                    "serviceType": "REST",
+                    "serviceIP": "127.0.0.1:8081"
+                }
+            ],
+            "ID": 1,
+            "lastUpdate": 1672417493.7001433
+        },
         {
             "serviceName": "Irrigation",
             "ServiceCatalog_url": "http://localhost:8080/ServiceCatalog",
@@ -28,8 +43,8 @@
                     "serviceIP": "dht11.org:8080"
                 }
             ],
-            "ID": 1,
-            "lastUpdate": 1672339325.40474
+            "ID": 2,
+            "lastUpdate": 1672417448.8853137
         }
     ]
 }

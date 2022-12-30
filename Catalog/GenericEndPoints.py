@@ -18,32 +18,32 @@ class RefreshThread(object):
         return self._stop.is_set()
 
     def run_forever(self, url: str, ID : int) :
-            while True :
-                if self.stopped():
-                    print("RefreshThread stopped")
-                    return
-                refreshed = False
-                try:
-                    res = requests.put(url + "/refresh", params={"ID": ID})
-                    res.raise_for_status()
-                except requests.exceptions.ConnectionError:
-                    print(f"Connection Error\nRetrying connection\n")
-                except requests.exceptions.Timeout:
-                    print(f"Timeout\nRetrying connection\n")
-                except requests.exceptions.HTTPError as err:
-                    print(f"{err.response.status_code} : {err.response.reason}")
+        while True :
+            if self.stopped():
+                print("RefreshThread stopped")
+                return
+            refreshed = False
+            try:
+                res = requests.put(url + "/refresh", params={"ID": ID})
+                res.raise_for_status()
+            except requests.exceptions.ConnectionError:
+                print(f"Connection Error\nRetrying connection\n")
+            except requests.exceptions.Timeout:
+                print(f"Timeout\nRetrying connection\n")
+            except requests.exceptions.HTTPError as err:
+                print(f"{err.response.status_code} : {err.response.reason}")
+            else:
+                stat = res.json()
+                if "Status" in stat and stat["Status"] == True:
+                    refreshed = True
+                    print(f"Refreshed {ID}\n")
                 else:
-                    stat = res.json()
-                    if "Status" in stat and stat["Status"] == True:
-                        refreshed = True
-                        print(f"Refreshed {ID}\n")
-                    else:
-                        print(stat)
+                    print(stat)
 
-                if refreshed:
-                    time.sleep(60)
-                else:
-                    time.sleep(1)
+            if refreshed:
+                time.sleep(60)
+            else:
+                time.sleep(1)
 
 def register(url: str, Service_info : dict) :
     while True:

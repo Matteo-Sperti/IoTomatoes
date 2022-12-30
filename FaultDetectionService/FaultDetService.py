@@ -9,7 +9,6 @@ import os
 class FaultDetector:
 	def __init__(self):
 		"""Initialize the FaultDetector class"""
-
 		conf = json.load(open('FaultDetectionService_settings.json')) 
 		self.clientID = conf['clientID'] #FROM SERVICE CATALOG self.ID
 		self.catalogIP = conf['catalogIP']
@@ -56,9 +55,12 @@ class FaultDetector:
 			for dev in self.deviceList:
 				if dev['LastUpdate'] is not None:
 					if (currentTime - dev['LastUpdate']).total_seconds() > 300:
-						# Send a message to the users of the respective company to notify the fault
-						# TO DO
-						pass
+						message = "Warning, Device " + str(dev['ID']) + " has not sent a message for more than 5 minutes, possible fault!"
+						dict = {'Error': True, 'message' : message, 'deviceID' : dev['ID'], 'companyName' : dev['companyName']}
+						return dict
+					else:
+						dict = {'Error': False}
+						return dict
 		except:
 			raise Exception("Device not found")
 
@@ -69,13 +71,14 @@ class FaultDetector:
 				if dev['ID'] == deviceID:
 					if measureType in dev['measureType']:
 						if measure > self.thresholds[measureType]['max_value'] or measure < self.thresholds[measureType]['min_value']:
-							# Send a message to the users of the respective company to notify the fault
-							# TO DO
-							pass
-						break
+							message = "Warning, Device " + str(dev['ID']) + " has sent a measure out of the thresholds, possible fault!"
+							dict = {'Error': True, 'message' : message, 'deviceID' : dev['ID'], 'companyName' : dev['companyName']}
+							return dict
+						else:
+							dict = {'Error': False}
+							return dict
 		except:
 			raise Exception("Device not found")
-		return True
 
 
 class MQTTFaultDetector(FaultDetector):
@@ -120,11 +123,23 @@ class MQTTFaultDetector(FaultDetector):
 		measureType = topic_list[-1]
 		deviceID = topic_list[-2]
 		measure = msg.payload['measure']
-		self.checkMeasure(deviceID, measureType, measure)
-		self.updateDeviceStatus(deviceID)
+		dict_msg = self.checkMeasure(deviceID, measureType, measure)
+		if dict_msg['Error']:
+			self.Publish(dict_msg['message'], f"{self.basicTopic}/{self.serviceName}/alert/measureRange")
+
+	def Publish(self, message, topic):
+		"""
+			Publishes a message to alert the user of a possible fault
+			TOPICS: 
+				- IoTomatoes/FaultDetection/alertMeasureRange
+				- IoTomatoes/FaultDetection/alertNoMessage
+		"""
+		self._paho_mqtt.publish(topic, message, 2)
 
 if __name__ == "__main__":
 	fd = MQTTFaultDetector()
 	while True:
-		fd.checkDeviceStatus()
+		dict_check = fd.checkDeviceStatus()
+		if dict_check['Error']:
+			fd.Publish(dict_check['message'], f"{fd.basicTopic}/{fd.serviceName}/alert/noMessage")
 		time.sleep(5)

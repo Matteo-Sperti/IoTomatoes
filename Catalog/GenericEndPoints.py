@@ -3,6 +3,7 @@ import json
 import time
 import threading
 from MyMQTT import MyMQTT
+from ItemInfo import *
 
 class RefreshThread(object):
     def __init__(self, url: str, ID : int):
@@ -52,42 +53,44 @@ def register(url: str, Service_info : dict) :
             res.raise_for_status()
         except requests.exceptions.ConnectionError:
             print(f"Connection Error\nRetrying connection\n")
+            time.sleep(1)
         except requests.exceptions.HTTPError as err:
-                print(f"{err.response.status_code} : {err.response.reason}")
+            print(f"{err.response.status_code} : {err.response.reason}")
+            time.sleep(1)
         except:
             print(f"Error in the request\n")
+            time.sleep(1)
         else:
             try:                    
                 ID = res.json()["ID"]
-                print(f"Registered {ID}\n")
+                print(f"Registered ID: {ID}\n")
                 return ID
             except:
                 print(f"Error in the response\n")
 
 class GenericService(): 
-    def __init__(self, Service_info : dict, ServiceCatalog_url : str) :
+    def __init__(self, Service_info : ServiceInfo, ServiceCatalog_url : str) :
         self.Service_info = Service_info
         self.ServiceCatalog_url = ServiceCatalog_url
-        self.ID = register(self.ServiceCatalog_url, self.Service_info)
+        self.ID = register(self.ServiceCatalog_url, self.Service_info.__dict__())
         self.Thread = RefreshThread(self.ServiceCatalog_url, self.ID)
 
 class GenericResource():  
-    def __init__(self, Resource_info : dict, ServiceCatalog_url : str) :
+    def __init__(self, info, ServiceCatalog_url : str) :
         self.ServiceCatalog_url = ServiceCatalog_url
-        self.Resource_info = Resource_info
+        self.info = info
         self.ResourceCatalog_url = self.get_ResourceCatalog_url()
-        self.ID = register(self.ResourceCatalog_url, self.Resource_info)
+        self.ID = register(self.ResourceCatalog_url, self.info.__dict__())
         self.Thread = RefreshThread(self.ResourceCatalog_url, self.ID)
 
     def get_ResourceCatalog_url(self) :
         while True:
             try:
-                res = requests.get(self.ResourceCatalog_url + "7search/serviceName", params = {"serviceName": "ResourceCatalog"})
+                res = requests.get(self.ServiceCatalog_url + "/search/serviceName", params = {"serviceName": "ResourceCatalog"})
                 res.raise_for_status()
-            except requests.exceptions.Timeout:
-                print(f"Timeout\nRetrying connection\n")
-            except requests.exceptions.HTTPError as err:
-                print(f"{err.response.status_code} : {err.response.reason}")
+            except:
+                print(f"Connection Error\nRetrying connection\n")
+                time.sleep(1)
             else:
                 try:
                     for services in res.json()["servicesDetails"]:
@@ -97,31 +100,8 @@ class GenericResource():
                     print(f"Error in the Resource information\nRetrying connection\n")
 
 class GenericMQTTResource(GenericResource):
-    def __init__(self, ServiceCatalog_url : str) :
-        
-        ResourceInfo = {
-            "deviceName": "",
-            "companyName": "",
-            "deviceType": "",
-            "PowerConsumption_kW" : 0,
-            "measureType": [],
-            "availableServices": [
-                "MQTT",
-                "REST"
-            ],
-            "servicesDetails": [
-                {
-                    "serviceType": "MQTT",
-                    "topic": []
-                },
-                {
-                    "serviceType": "REST",
-                    "serviceIP": "dht11.org:8080"
-                }
-            ],
-        }
-        
-        super().__init__(ResourceInfo, ServiceCatalog_url)
+    def __init__(self, info, ServiceCatalog_url : str) :        
+        super().__init__(info, ServiceCatalog_url)
         self.BrokerIP, self.BrokerPort, self.baseTopic = self.get_broker(ServiceCatalog_url) 
         self.client = MyMQTT(self.ID, self.BrokerIP, self.BrokerPort, self)
 
@@ -132,38 +112,20 @@ class GenericMQTTResource(GenericResource):
                 res.raise_for_status()
             except requests.exceptions.Timeout:
                 print(f"Timeout\nRetrying connection\n")
+                time.sleep(1)
+            except requests.exceptions.ConnectionError:
+                print(f"Connection Error\nRetrying connection\n")
+                time.sleep(1)
             except requests.exceptions.HTTPError as HTTPError:
                 print(f"{HTTPError.response.status_code}: {HTTPError.response.title}\n")
+                time.sleep(1)
             else:
-                broker = res.json()
-                return broker["IP"], broker["port"], broker["baseTopic"]
-
-    def notify(self, topic, msg):
-        print(f"{self.ID} received {msg} on topic {topic}")
-
-class GenericSensor(GenericMQTTResource):
-    def __init__(self, ServiceCatalog_url : str) :
-        super().__init__(ServiceCatalog_url)
-        self.client.start()
-        self.client.mySubscribe(self.baseTopic + "/#")
-
-class GenericActuator(GenericMQTTResource):
-    def __init__(self, ServiceCatalog_url : str) :
-        super().__init__(ServiceCatalog_url)
-        self.client.start()
-
-    def publish(self, topic, msg):
-        self.client.myPublish(self.baseTopic + "/" + topic, msg)
-
-class GenericUser(GenericMQTTResource):
-    def __init__(self, ServiceCatalog_url : str) :
-        super().__init__(ServiceCatalog_url)
-        self.client.start()
-        self.client.mySubscribe(self.baseTopic + "/#")
-
-    def publish(self, topic, msg):
-        self.client.myPublish(self.baseTopic + "/" + topic, msg)
-
+                try:
+                    broker = res.json()
+                    return broker["IP"], broker["port"], broker["baseTopic"]
+                except KeyError:
+                    print(f"Error in the broker information\nRetrying connection\n")
+                    time.sleep(1)
 
 if __name__ == "__main__":
     Service_info = json.load(open("new_service.json"))

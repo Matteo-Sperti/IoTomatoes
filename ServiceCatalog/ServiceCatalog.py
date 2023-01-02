@@ -1,7 +1,7 @@
 import json
 import cherrypy
-from CatalogManager import CatalogManager
-from customExceptions import *
+from GenericClasses.CatalogManager import CatalogManager
+from GenericClasses.customExceptions import web_exception
 
 class RESTServiceCatalog(CatalogManager):
     exposed = True

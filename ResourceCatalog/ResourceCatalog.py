@@ -1,9 +1,9 @@
 import json
 import cherrypy
 import threading
-from CatalogManager import *
-from GenericEndPoints import GenericService
-from customExceptions import *
+from GenericClasses.CatalogManager import *
+from GenericClasses.GenericEndPoints import GenericService
+from GenericClasses.customExceptions import *
 
 IDperCompany = 10000
 

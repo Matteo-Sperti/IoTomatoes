@@ -1,0 +1,12 @@
+{
+    "owner": "IoTomatoes",
+    "CatalogName": "ServiceCatalog",
+    "broker": {
+        "IP": "mqtt.eclipseprojects.io",
+        "port": 1883,
+        "baseTopic": "IoTomatoes"
+    },
+    "telegramToken": "5984202488:AAEfyk1ihaceSKtAkXokLmvuxvqZXGhiFCg",
+    "lastUpdate": 1672660867.668004,
+    "servicesList": []
+}

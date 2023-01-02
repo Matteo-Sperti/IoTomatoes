@@ -4,10 +4,10 @@ from telepot.namedtuple import InlineKeyboardMarkup, InlineKeyboardButton
 import json
 import time
 import requests
-from MyMQTT import *
-from customExceptions import *
-from GenericEndPoints import GenericMQTTResource, RefreshThread, register
-from ItemInfo import UserInfo
+from GenericClasses.MyMQTT import *
+from GenericClasses.customExceptions import *
+from GenericClasses.GenericEndPoints import GenericMQTTResource, RefreshThread, register
+from GenericClasses.ItemInfo import UserInfo
 
 HelpMessage = ("Welcome to the IoTBot!\n")
 

@@ -10,32 +10,33 @@ class FaultDetector:
 	def __init__(self):
 		"""Initialize the FaultDetector class"""
 		conf = json.load(open('FaultDetectionService_settings.json')) 
-		self.clientID = conf['clientID'] #FROM SERVICE CATALOG self.ID
+		self.clientID = conf['clientID'] #FROM SERVICE CATALOG self.ID #FIX
 		self.catalogIP = conf['catalogIP']
 		self.serviceName = conf['serviceName']
 
-		ServiceInfo = json.loads(requests.get(f'{self.catalogIP}/{self.serviceName}?ID={self.ID}')) # TO CHECK
-
-		self.broker = json.loads(requests.get("self.catalogIP/broker"))
+		#ServiceInfo = json.loads(requests.get(f'{self.catalogIP}/{self.serviceName}?ID={self.ID}')) #FIX
+		ServiceInfo = {'broker': "mqtt.eclipseprojects.io", 'port': 1883, 'topic': 'IoTomatoes'}
+		#self.broker = json.loads(requests.get("self.catalogIP/broker")) #FIX
+		self.broker = ServiceInfo['broker']
 		self.port = ServiceInfo['port']
 		self.basicTopic = ServiceInfo['topic']
 
-		r = json.loads(requests.get(f'{self.catalogIP}/getCompanyList'))
-		CompanyList = self.updateCompanyList(r['CompanyList'])
-		self.deviceList = self.createDeviceList(CompanyList)
+		#r = json.loads(requests.get(f'{self.catalogIP}/getCompanyList')) #FIX
+		CompanyList = json.load(open("../CompanyList.json"))
+		self.deviceList = self.createDeviceList(CompanyList['CompanyList'])
 		self.thresholds = {
 							'temperature' : {'max_value': 4000,'min_value': -100, 'unit': '°C'},
 						 	'humidity' : {'max_value': 90, 'min_value': 0, 'unit': '%'},
 						  	'light' : {'max_value': 1000, 'min_value': 10**(-5), 'unit': 'lx'}
 						  }
 		
-	def createDeviceList(CompanyList : list):
+	def createDeviceList(self, CompanyList):
 		"""Create a list of all devices integrating informations about the last time a message was received from a device"""
 		deviceList = []
 		for comp in CompanyList:
 			for dev in comp['deviceList']:
-				if(dev['isSensor']):
-					deviceList.append(dev.copy().update({'companyName' : comp['companyName'], 'LastUpdate' : None}))
+				if dev['isSensor']:
+					deviceList.append({**dev, **{'companyName': comp['companyName'], 'LastUpdate': None}})
 		return deviceList
 
 	def updateDeviceStatus(self, deviceID : str):
@@ -48,7 +49,7 @@ class FaultDetector:
 		except:
 			raise Exception("Device not found")
 
-	def checkDeviceStatus(self,):
+	def checkDeviceStatus(self):
 		"""Check if a device has not sent a message for more than 5 minutes"""
 		currentTime = datetime.datetime.now()
 		try:
@@ -63,8 +64,10 @@ class FaultDetector:
 						return dict
 		except:
 			raise Exception("Device not found")
+		dict = {'Error': False} #FIX
+		return dict
 
-	def checkMeasure(self, deviceID: str, measureType: str,  measure : dict):
+	def checkMeasure(self, deviceID: str, measureType: str,  measure : float):
 		"""Check if a measure is within the thresholds"""
 		try:
 			for dev in self.deviceList:
@@ -122,10 +125,10 @@ class MQTTFaultDetector(FaultDetector):
 		topic_list = msg.topic.split('/')
 		measureType = topic_list[-1]
 		deviceID = topic_list[-2]
-		measure = msg.payload['measure']
+		measure = json.loads(msg.payload).get('measure')
 		dict_msg = self.checkMeasure(deviceID, measureType, measure)
-		if dict_msg['Error']:
-			self.Publish(dict_msg['message'], f"{self.basicTopic}/{self.serviceName}/alert/measureRange")
+		if dict_msg.get('Error',0):
+			self.Publish(dict_msg['message'], f"{self.basicTopic}/{self.serviceName}/alertMeasureRange")
 
 	def Publish(self, message, topic):
 		"""
@@ -140,6 +143,6 @@ if __name__ == "__main__":
 	fd = MQTTFaultDetector()
 	while True:
 		dict_check = fd.checkDeviceStatus()
-		if dict_check['Error']:
-			fd.Publish(dict_check['message'], f"{fd.basicTopic}/{fd.serviceName}/alert/noMessage")
-		time.sleep(5)
+		if dict_check.get('Error',0):
+			fd.Publish(dict_check['message'], f"{fd.basicTopic}/{fd.serviceName}/alertNoMessage")
+		time.sleep(300)

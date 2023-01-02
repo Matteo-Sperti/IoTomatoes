@@ -140,4 +140,4 @@ if __name__ == "__main__":
 	while True:
 		if datetime.now().minute >= 59: #Update the consumption every hour
 			cm.updateConsumption()
-		time.sleep(1)
+		time.sleep(60)

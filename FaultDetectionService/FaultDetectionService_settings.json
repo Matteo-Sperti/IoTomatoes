@@ -1,4 +1,5 @@
 {
+    "clientID": "FD123",
     "catalogIP": "ServiceCatalog",
     "serviceName": "FaultDetection"
 }

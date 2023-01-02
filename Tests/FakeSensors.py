@@ -37,7 +37,7 @@ if __name__ == "__main__":
 	test = FakeSensor("fakeSensors",'mqtt.eclipseprojects.io')
 	test.start()
 	
-	dict = json.load(open('CompanyList.json'))
+	dict = json.load(open('../CompanyList.json'))
 	while(True):
 		for company in dict['CompanyList']:
 			for device in company['deviceList']:

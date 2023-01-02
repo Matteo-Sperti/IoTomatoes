@@ -279,27 +279,3 @@ class DeviceInfo(Item):
                 self.setIPport(dict[key])
 
         self.refresh()
-                
-class CompanyInfo():
-    def __init__(self, name : str, ID : int = 0, adminID : int = 0):
-        self.info = {
-                    "ID": ID,
-                    "name": name,
-                    "adminID": adminID,
-                }
-
-class UserInfo():
-    def __init__(self):
-        self.info = {
-            "Name": "Pino",
-            "Surname" : "Daniele",
-            "Company" : "Pino Srl",
-            "TelegramID": 12313123123,
-            "ServiceCatalog_url" : "http://localhost:8080/ServiceCatalog"
-        }
-
-    def __str__(self):
-        return json.dumps(self.info)
-
-    def __dict__(self):
-        return self.info

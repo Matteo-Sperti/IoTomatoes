@@ -1,8 +1,11 @@
 import time
 import json
 import random
-from GenericClasses.GenericEndPoints import GenericMQTTResource
-from GenericClasses.ItemInfo import DeviceInfo
+import sys
+
+sys.path.append("../GenericClasses/")
+from GenericEndPoints import GenericMQTTResource
+from ItemInfo import DeviceInfo
 
 class IoTDevice(GenericMQTTResource):
     def __init__(self, DeviceInfo : DeviceInfo, ServiceCatalog_url: str):

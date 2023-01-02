@@ -5,8 +5,7 @@
         "ip_address": "127.0.0.1",
         "port": 8081
     },
-    "ServiceCatalog_IP": "127.0.0.1:8080",
-    "ServiceCatalog_url" : "http://localhost:8080/ServiceCatalog",
+    "ServiceCatalog_url" : "http://127.0.0.1:8080/ServiceCatalog",
     "filename": "ResourceCatalog.json",
     "autoDeleteTime": 120
 }

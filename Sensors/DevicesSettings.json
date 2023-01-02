@@ -1,5 +1,5 @@
 {
-    "ServiceCatalog_url" : "http://localhost:8080/ServiceCatalog",
+    "ServiceCatalog_url" : "http://127.0.0.1:8080/ServiceCatalog",
     "Companies" : ["MagicFarm", "PatataNovella"],
     "MeasuresType" : ["temperature", "humidity", "light", "soilMoisture"],
     "ActuatorsType" : ["led", "pump"],

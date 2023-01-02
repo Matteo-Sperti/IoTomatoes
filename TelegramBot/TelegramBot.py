@@ -12,10 +12,10 @@ from GenericClasses.ItemInfo import UserInfo
 HelpMessage = ("Welcome to the IoTBot!\n")
 
 class IoTBot(GenericMQTTResource):
-    def __init__(self, info : UserInfo, ServiceCatalog_url):
+    def __init__(self, ServiceCatalog_url):
         self.ServiceCatalog_url = ServiceCatalog_url
         self.ResourceCatalog_url = self.get_ResourceCatalog_url()
-        self.info = info
+
         #MQTT client
         self.MQTTclient_start()
         #TelegramBot
@@ -92,11 +92,9 @@ class IoTBot(GenericMQTTResource):
 if __name__ == "__main__":
     conf = json.load(open("TelegramSettings.json"))
 
-    # MyAlertBot    
-    sb = IoTBot(conf["UserInfo"], conf["ServiceCatalog_url"])
+    ServiceCatalog_url = conf["ServiceCatalog_url"]
 
-
-    sb = IoTBot()
+    sb = IoTBot(ServiceCatalog_url)
 
     while True:
         try:

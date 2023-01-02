@@ -6,6 +6,7 @@
         "port": 1883,
         "baseTopic": "IoTomatoes"
     },
+    "telegramToken": "5984202488:AAEfyk1ihaceSKtAkXokLmvuxvqZXGhiFCg",
     "REST_settings": {
         "ip_address": "127.0.0.1",
         "port": 8080

@@ -19,6 +19,7 @@ class RESTServiceCatalog(CatalogManager):
             "owner": settings["owner"], 
             "CatalogName": settings["CatalogName"],
             "broker": settings["broker"],
+            "telegramToken" : settings["telegramToken"],
             }
 
         self.list_name = "servicesList"
@@ -31,6 +32,8 @@ class RESTServiceCatalog(CatalogManager):
         Allowed commands:
         ``/ServiceCatalog/get/<info>?ID=<ID>`` to get a service info by ID
         ``/ServiceCatalog/getall`` to get all the services
+        ``/ServiceCatalog/broker`` to get the broker info
+        ``/ServiceCatalog/telegram`` to get the telegram token
         ``/ServiceCatalog/search/<info>?<info>=<value>`` to search a service by info
         """
         try:
@@ -44,7 +47,9 @@ class RESTServiceCatalog(CatalogManager):
             elif len(uri) == 2 and uri[0] == self.base_uri and uri[1] == "getall":
                 return self.get_all(self.list_name)
             elif len(uri) == 2 and uri[0] == self.base_uri and uri[1] == "broker":
-                return self.get_broker()
+                return self.broker
+            elif len(uri) == 2 and uri[0] == self.base_uri and uri[1] == "telegram":
+                return self.telegramToken
             elif len(uri) == 3 and uri[0] == self.base_uri and uri[1] == "search":
                 if uri[2] in params:
                     return self.search(self.list_name, uri[2], params[uri[2]])

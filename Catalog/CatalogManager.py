@@ -66,12 +66,21 @@ class CatalogManager:
             print("Catalog file not found!\n")
             return json.dumps({"Status": False}, indent=4)
 
-    def get_broker(self):
+    @property
+    def broker(self):
         """Return the broker info in json format."""
         try:
             return json.dumps(self.catalog["broker"], indent=4)
         except KeyError:
             raise web_exception(404, "Broker info not found")
+        
+    @property
+    def telegramToken(self):
+        """Return the telegram token in json format."""
+        try:
+            return json.dumps({"telegramToken": self.catalog["telegramToken"]}, indent=4)
+        except KeyError:
+            raise web_exception(404, "Telegram token not found")
 
     def get_all(self, list_key : str):
         """Return a json with all the items in the list specified in ``list_key``."""

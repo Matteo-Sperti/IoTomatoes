@@ -1,7 +1,7 @@
 import json
 import time
 import socket
-from customExceptions import *
+from customExceptions import InfoException
 
 class Item():
     def __init__(self, ID : int = 0, IPport : int = 8080, availableServices : list = [], servicesDetails : list = []):
@@ -60,6 +60,16 @@ class Item():
         self.info["ID"] = ID
         self.refresh()
 
+    def setIPport(self, IPport : int):
+        for service in self.info["servicesDetails"]:
+            if service["serviceType"] == "REST":
+                hostname = socket.gethostname()
+                local_ip = socket.gethostbyname(hostname)
+                service["serviceIP"] = f"{local_ip}:{IPport}"
+                self.refresh()
+                return
+        raise InfoException("No REST service found")
+
     def addService(self, service : str, serviceInfo : dict = {}):
         self.info["availableServices"].append(service)
         if "serviceType" not in serviceInfo:
@@ -101,28 +111,38 @@ class ServiceInfo(Item):
         self.info["serviceName"] = serviceName
         self.refresh()
 
-class Device(Item):
-    def __init__(self, deviceName : str, companyName : str, ID : int = 0, IPport : int = 8080, isActuator : bool = False, 
-                    isSensor : bool = False, measureType : list = [], actuators : list = [], PowerConsumption_kW : int = 0):
+class DeviceInfo(Item):
+    def __init__(self, deviceName : str = "", companyName : str = "", fieldID :int = 1, ID : int = 0, IPport : int = 8080, isActuator : bool = False, 
+                    isSensor : bool = False, measureType : list = [], actuators : list = [], PowerConsumption_kW : int = 0, filename : str = ""):
         super().__init__(ID, IPport)
-        self.info["deviceName"] = deviceName
-        self.info["companyName"] = companyName
-        self.info["isActuator"] = isActuator
-        self.info["isSensor"] = isSensor
-        self.info["measureType"] = measureType
-        self.info["actuators"] = actuators
-        self.info["PowerConsumption_kW"] = PowerConsumption_kW
+        if filename != "":
+            self.info["deviceName"] = deviceName
+            self.info["companyName"] = companyName
+            self.info["field"] = fieldID
+            self.info["isActuator"] = isActuator
+            self.info["isSensor"] = isSensor
+            self.info["measureType"] = measureType
+            self.info["actuators"] = actuators
+            self.info["PowerConsumption_kW"] = PowerConsumption_kW
 
-        MQTT_info = {
-            "serviceType" : "MQTT", 
-            "subscribedTopic": [],
-            "publishedTopic": []}
-        for measure in measureType:
-            MQTT_info["publishedTopic"].append(f"{self.companyName}/{self.ID}/{measure}")
-        for actuator in actuators:
-            MQTT_info["subscribedTopic"].append(f"{self.companyName}/{self.ID}/{actuator}")
+            MQTT_info = {
+                "serviceType" : "MQTT", 
+                "subscribedTopic": [],
+                "publishedTopic": []}
+            for measure in measureType:
+                MQTT_info["publishedTopic"].append(f"{self.companyName}/{self.field}/{self.ID}/{measure}")
+            for actuator in actuators:
+                MQTT_info["subscribedTopic"].append(f"{self.companyName}/{self.field}/{self.ID}/{actuator}")
 
-        self.addService("MQTT", MQTT_info)
+            self.addService("MQTT", MQTT_info)
+        else:
+            try:
+                fp = open(filename, "r")
+            except FileNotFoundError:
+                raise InfoException(f"File {filename} not found")
+            else:
+                dict = json.load(fp)
+                self.load_dict(dict)
 
     @property
     def deviceName(self) -> str:
@@ -131,6 +151,10 @@ class Device(Item):
     @property
     def companyName(self) -> str:
         return self.info["companyName"]
+
+    @property
+    def field(self) -> int:
+        return self.info["field"]
 
     @property
     def isActuator(self) -> bool:
@@ -166,6 +190,13 @@ class Device(Item):
                 return service["publishedTopic"]
         return []
 
+    @property
+    def IPaddress(self) -> str:
+        for service in self.info["servicesDetails"]:
+            if service["serviceType"] == "REST":
+                return service["serviceIP"]
+        return ""
+
     @deviceName.setter
     def deviceName(self, deviceName : str):
         self.info["deviceName"] = deviceName
@@ -176,8 +207,17 @@ class Device(Item):
         self.info["companyName"] = companyName
         self.refresh()
     
-    @isActuator.setter
-    def isActuator(self, isActuator : bool, actuators : list = []):
+    @field.setter
+    def field(self, field : int):
+        self.info["field"] = field
+        self.refresh()
+
+    @PowerConsumption_kW.setter
+    def PowerConsumption_kW(self, PowerConsumption_kW : int):
+        self.info["PowerConsumption_kW"] = PowerConsumption_kW
+        self.refresh()
+
+    def setActuator(self, isActuator : bool, actuators : list = []):
         self.info["isActuator"] = isActuator
 
         if isActuator:
@@ -195,13 +235,7 @@ class Device(Item):
 
         self.refresh()
 
-    @PowerConsumption_kW.setter
-    def PowerConsumption_kW(self, PowerConsumption_kW : int):
-        self.info["PowerConsumption_kW"] = PowerConsumption_kW
-        self.refresh()
-
-    @isSensor.setter
-    def isSensor(self, isSensor : bool, measureType : list = []):
+    def setSensor(self, isSensor : bool, measureType : list):
         self.info["isSensor"] = isSensor
 
         if isSensor:
@@ -218,8 +252,35 @@ class Device(Item):
                     service["publishedTopic"] = []
 
         self.refresh()
+    
+    def load_dict(self, dict : dict):
+        for key in dict:
+            if key == "deviceName":
+                self.deviceName = dict[key]
+            elif key == "companyName":
+                self.companyName = dict[key]
+            elif key == "field":
+                self.field = dict[key]
+            elif key == "isActuator":
+                self.setSensor = dict[key]
+            elif key == "isSensor":
+                if dict[key]:
+                    self.setSensor(True, dict["measureType"])
+                else:
+                    self.setSensor(False, [])
+            elif key == "isActuator":
+                if dict[key]:
+                    self.setActuator(True, dict["actuators"])
+                else:
+                    self.setActuator(False, [])
+            elif key == "PowerConsumption_kW":
+                self.PowerConsumption_kW = dict[key]
+            elif key == "IPport":
+                self.setIPport(dict[key])
 
-class Company():
+        self.refresh()
+                
+class CompanyInfo():
     def __init__(self, name : str, ID : int = 0, adminID : int = 0):
         self.info = {
                     "ID": ID,
@@ -227,7 +288,7 @@ class Company():
                     "adminID": adminID,
                 }
 
-class User():
+class UserInfo():
     def __init__(self):
         self.info = {
             "Name": "Pino",
@@ -237,3 +298,8 @@ class User():
             "ServiceCatalog_url" : "http://localhost:8080/ServiceCatalog"
         }
 
+    def __str__(self):
+        return json.dumps(self.info)
+
+    def __dict__(self):
+        return self.info

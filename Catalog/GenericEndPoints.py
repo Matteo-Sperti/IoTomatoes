@@ -3,7 +3,7 @@ import json
 import time
 import threading
 from MyMQTT import MyMQTT
-from ItemInfo import *
+from ItemInfo import ServiceInfo
 
 class RefreshThread(object):
     def __init__(self, url: str, ID : int):
@@ -46,11 +46,20 @@ class RefreshThread(object):
             else:
                 time.sleep(1)
 
-def register(url: str, Service_info : dict) :
+def register(url: str, info : dict, isService : bool = False, isDevice : bool = False, isUser : bool = False) -> int:
     while True:
         try:
-            res = requests.post(url + "/insert", json = Service_info)
-            res.raise_for_status()
+            if isService:
+                res = requests.post(url + "/insert", json = info)
+                res.raise_for_status()
+            elif isDevice:
+                res = requests.post(url + "/insert/device", json = info)
+                res.raise_for_status()
+            elif isUser:
+                res = requests.post(url + "/insert/user", json = info)
+                res.raise_for_status()
+            else:
+                raise Exception("A service, device or user must be specified")
         except requests.exceptions.ConnectionError:
             print(f"Connection Error\nRetrying connection\n")
             time.sleep(1)
@@ -72,16 +81,26 @@ class GenericService():
     def __init__(self, Service_info : ServiceInfo, ServiceCatalog_url : str) :
         self.Service_info = Service_info
         self.ServiceCatalog_url = ServiceCatalog_url
-        self.ID = register(self.ServiceCatalog_url, self.Service_info.__dict__())
+        self.ID = register(self.ServiceCatalog_url, self.Service_info.__dict__(), isService=True)
         self.Thread = RefreshThread(self.ServiceCatalog_url, self.ID)
 
-class GenericResource():  
-    def __init__(self, info, ServiceCatalog_url : str) :
+class GenericMQTTResource():
+    def __init__(self, info, ServiceCatalog_url : str, isDevice : bool = False, isUser : bool = False) :        
         self.ServiceCatalog_url = ServiceCatalog_url
-        self.info = info
         self.ResourceCatalog_url = self.get_ResourceCatalog_url()
-        self.ID = register(self.ResourceCatalog_url, self.info.__dict__())
+        self.info = info
+
+        #Register
+        self.ID = register(self.ResourceCatalog_url, self.info.__dict__(), isDevice=isDevice, isUser=isUser)
         self.Thread = RefreshThread(self.ResourceCatalog_url, self.ID)
+        
+        #MQTT client
+        self.MQTTclient_start()
+
+    def MQTTclient_start(self):
+        self.BrokerIP, self.BrokerPort, self.baseTopic = self.get_broker(ServiceCatalog_url) 
+        self.client = MyMQTT(self.ID, self.BrokerIP, self.BrokerPort, self)
+        self.client.start()
 
     def get_ResourceCatalog_url(self) :
         while True:
@@ -98,26 +117,14 @@ class GenericResource():
                             return services["serviceIP"]
                 except KeyError:
                     print(f"Error in the Resource information\nRetrying connection\n")
-
-class GenericMQTTResource(GenericResource):
-    def __init__(self, info, ServiceCatalog_url : str) :        
-        super().__init__(info, ServiceCatalog_url)
-        self.BrokerIP, self.BrokerPort, self.baseTopic = self.get_broker(ServiceCatalog_url) 
-        self.client = MyMQTT(self.ID, self.BrokerIP, self.BrokerPort, self)
-
+                    
     def get_broker(self, ServiceCatalog_url : str) :
         while True:
             try:
                 res = requests.get(ServiceCatalog_url + "/broker")
                 res.raise_for_status()
-            except requests.exceptions.Timeout:
-                print(f"Timeout\nRetrying connection\n")
-                time.sleep(1)
-            except requests.exceptions.ConnectionError:
+            except:
                 print(f"Connection Error\nRetrying connection\n")
-                time.sleep(1)
-            except requests.exceptions.HTTPError as HTTPError:
-                print(f"{HTTPError.response.status_code}: {HTTPError.response.title}\n")
                 time.sleep(1)
             else:
                 try:
@@ -126,6 +133,10 @@ class GenericMQTTResource(GenericResource):
                 except KeyError:
                     print(f"Error in the broker information\nRetrying connection\n")
                     time.sleep(1)
+
+    def stop(self):
+        self.Thread.close()
+        self.client.stop()
 
 if __name__ == "__main__":
     Service_info = json.load(open("new_service.json"))

@@ -6,9 +6,9 @@ import time
 import requests
 import sys
 
-sys.path.append("../GenericClasses/")
-from MyMQTT import *
-from customExceptions import *
+sys.path.append("../SupportClasses/")
+from MyMQTT import MyMQTT
+from MyExceptions import *
 from GenericEndPoints import GenericService, GenericMQTTResource
 from ItemInfo import ServiceInfo
 

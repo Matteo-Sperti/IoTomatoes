@@ -1,7 +1,8 @@
 import json
 import time
 import socket
-from customExceptions import InfoException
+
+from MyExceptions import InfoException
 
 class Item():
     def __init__(self, ID : int = 0, IPport : int = 8080, availableServices : list = [], servicesDetails : list = []):

@@ -1,29 +1,10 @@
 import requests
 import time
-import threading
+
 from MyMQTT import MyMQTT
 from ItemInfo import ServiceInfo
-from customExceptions import InfoException
-
-class MyThread(threading.Thread):
-    def __init__(self, target, args = None, interval = 1):
-        super().__init__()
-        self.target = target
-        self.args = args
-        self.interval = interval
-        self.stop_event = threading.Event()
-        self.daemon = True
-
-    def stop(self):
-        self.stop_event.set()
-
-    def is_stopped(self):
-        return self.stop_event.is_set()
-
-    def run(self):
-        while not self.is_stopped():
-            self.target(*self.args)
-            time.sleep(self.interval)
+from MyExceptions import InfoException
+from MyThread import MyThread
 
 class RefreshThread(MyThread):
     def __init__(self, url : str, ID : int, interval=60):

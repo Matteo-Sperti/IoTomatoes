@@ -3,7 +3,7 @@ import json
 import random
 import sys
 
-sys.path.append("../GenericClasses/")
+sys.path.append("../SupportClasses/")
 from GenericEndPoints import GenericMQTTResource
 from ItemInfo import DeviceInfo
 

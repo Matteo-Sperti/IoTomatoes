@@ -30,9 +30,6 @@ class FakeActuatorCommands:
 	def myOnConnect (self, paho_mqtt, userdata, flags, rc):
 		print ("Connected to %s with result code: %d" % (self.messageBroker, rc))
 
-
-
-
 if __name__ == "__main__":
 	test = FakeActuatorCommands("fakeActuatorCommands",'mqtt.eclipseprojects.io')
 	test.start()

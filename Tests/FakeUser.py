@@ -6,13 +6,29 @@ class FakeUser():
 		self.clientID = "FakeUser"
 		self.broker = "mqtt.eclipseprojects.io"
 		self.port = 1883
-
-		self.topics = ["IoTomatoes/FaultDetection/alertMeasureRange", "IoTomatoes/FaultDetection/alertNoMessage"]
+		self.companyList = json.load(open("../CompanyList.json"))['CompanyList']
+		self.basicTopic = "IoTomatoes"
+		self.topic_features = [ 
+						"alertMeasureRange",
+						"alertNoMessage",
+						"ErrorReported"
+						]
+		self.topics = self.createTopics()
 		self._paho_mqtt = PahoMQTT.Client(self.clientID, True)
-		
+		print("Topics : ")
+		for top in self.topics:
+			print(top, "\n")
+							
 		self.start()
 		self._paho_mqtt.on_connect = self.OnConnect
 		self._paho_mqtt.on_message = self.MessageReceived
+
+	def createTopics(self):
+		topics = []
+		for top in self.topic_features:
+			for comp in self.companyList:
+				topics.append(f"{self.basicTopic}/FaultDetection/{comp['companyName']}/{top}")
+		return topics
 
 	def start (self):
 		self._paho_mqtt.connect(self.broker, self.port)
@@ -31,7 +47,8 @@ class FakeUser():
 		print ("Connected to %s with result code: %d" % (self.broker, rc))
 
 	def MessageReceived (self, paho_mqtt , userdata, msg):
-		print("Message received: ", msg.payload, "on topic: ", msg.topic)
+		message = json.loads(msg.payload).get("message")
+		print("Message received: ", message)
 
 if __name__ == "__main__":
 	fu = FakeUser()

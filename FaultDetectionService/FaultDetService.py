@@ -6,6 +6,8 @@ import json
 import pandas as pd
 import os
 
+from CheckResult import *
+
 class FaultDetector:
 	def __init__(self):
 		"""Initialize the FaultDetector class"""
@@ -25,9 +27,10 @@ class FaultDetector:
 		CompanyList = json.load(open("../CompanyList.json"))
 		self.deviceList = self.createDeviceList(CompanyList['CompanyList'])
 		self.thresholds = {
-							'temperature' : {'max_value': 4000,'min_value': -100, 'unit': '°C'},
-						 	'humidity' : {'max_value': 90, 'min_value': 0, 'unit': '%'},
-						  	'light' : {'max_value': 1000, 'min_value': 10**(-5), 'unit': 'lx'}
+							'temperature' : {'max_value': 1000,'min_value': -100, 'unit': '°C'},
+						 	'humidity' : {'max_value': 100, 'min_value': 0, 'unit': '%'},
+						  	'light' : {'max_value': 1000, 'min_value': 10**(-5), 'unit': 'lx'},
+							'sound' : {'max_value': 100, 'min_value': -100, 'unit': 'dB'}
 						  }
 		
 	def createDeviceList(self, CompanyList):
@@ -39,49 +42,48 @@ class FaultDetector:
 					deviceList.append({**dev, **{'companyName': comp['companyName'], 'LastUpdate': None}})
 		return deviceList
 
-	def updateDeviceStatus(self, deviceID : str):
+	def updateDeviceStatus(self, deviceID : int):
 		"""Update the status of a device in the deviceList"""
-		try:
-			for dev in self.deviceList:
-				if str(dev['ID']) == deviceID:
-					dev['LastUpdate'] = datetime.datetime.now()
-					break
-		except:
-			raise Exception("Device not found")
+		for dev in self.deviceList:
+			if dev['ID'] == deviceID:
+				dev['LastUpdate'] = datetime.datetime.now()
+				break
 
-	def checkDeviceStatus(self):
+	def checkDeviceStatus(self, device : dict):
 		"""Check if a device has not sent a message for more than 5 minutes"""
 		currentTime = datetime.datetime.now()
-		try:
-			for dev in self.deviceList:
-				if dev['LastUpdate'] is not None:
-					if (currentTime - dev['LastUpdate']).total_seconds() > 300:
-						message = "Warning, Device " + str(dev['ID']) + " has not sent a message for more than 5 minutes, possible fault!"
-						dict = {'Error': True, 'message' : message, 'deviceID' : dev['ID'], 'companyName' : dev['companyName']}
-						return dict
-					else:
-						dict = {'Error': False}
-						return dict
-		except:
-			raise Exception("Device not found")
-		dict = {'Error': False} #FIX
-		return dict
+		if device['LastUpdate'] is not None:
+			elapsedTime = (currentTime - device['LastUpdate']).total_seconds()
+			if elapsedTime > 2:
+				message = f"Warning, Device {device['ID']} has not sent a message for more than 5 minutes, possible fault!"
+				return CheckResult(is_error=True, message=message, device_id=device['ID'], topic="alertNoMessage")
+			else:
+				return CheckResult(is_error=False)
+		return CheckResult(is_error=False)
 
-	def checkMeasure(self, deviceID: str, measureType: str,  measure : float):
+	def checkMeasure(self, companyName: str, deviceID: int, measureType: str,  measure : float):
 		"""Check if a measure is within the thresholds"""
-		try:
-			for dev in self.deviceList:
-				if str(dev['ID']) == deviceID:
-					if measureType in dev['measureType']:
-						if measure > self.thresholds[measureType]['max_value'] or measure < self.thresholds[measureType]['min_value']:
-							message = "Warning, Device " + str(dev['ID']) + " has sent a measure out of the thresholds, possible fault!"
-							dict = {'Error': True, 'message' : message, 'deviceID' : dev['ID'], 'companyName' : dev['companyName']}
-							return dict
-						else:
-							dict = {'Error': False}
-							return dict
-		except:
-			raise Exception("Device not found")
+		device = None
+
+		for dev in self.deviceList:
+			if dev['ID'] == deviceID:
+				device = dev
+				break
+		if not device:
+			return CheckResult(is_error=True, message="Error, Device not found", topic="ErrorReported") 
+		if measureType not in device['measureType']:
+			return CheckResult(is_error=True, message=f"Error, Measure type of device {deviceID} not recognized.", topic="ErrorReported") 
+
+		min_value = self.thresholds[measureType]['min_value']
+		max_value = self.thresholds[measureType]['max_value']
+
+		if min_value is None or max_value is None:
+			return CheckResult(is_error=True, message="Error, Thresholds not configured", topic="ErrorReported")
+
+		if measure > max_value or measure < min_value:
+			message = f"Warning, Device {deviceID} has sent a measure out of the thresholds, possible fault!"
+			return CheckResult(is_error=True, message=message, device_id=deviceID, topic="alertMeasureRange")
+		return CheckResult(is_error=False)
 
 
 class MQTTFaultDetector(FaultDetector):
@@ -121,28 +123,41 @@ class MQTTFaultDetector(FaultDetector):
 		print ("Connected to %s with result code: %d" % (self.broker, rc))
 
 	def MessageReceived (self, paho_mqtt , userdata, msg):
-		"""Parse the topic received"""
+		"""Parse the topic received, check the device status and the measure and publish the alert messages if needed
+			Subscribed topics format: 
+				- IoTomatoes/CompanyName/Field/DeviceID/MeasureType
+		"""
 		topic_list = msg.topic.split('/')
 		measureType = topic_list[-1]
-		deviceID = topic_list[-2]
+		deviceID = int(topic_list[-2])
+		companyName = topic_list[-4]
 		measure = json.loads(msg.payload).get('measure')
-		dict_msg = self.checkMeasure(deviceID, measureType, measure)
-		if dict_msg.get('Error',0):
-			self.Publish(dict_msg['message'], f"{self.basicTopic}/{self.serviceName}/alertMeasureRange")
+
+		measure_check = self.checkMeasure(companyName, deviceID, measureType, measure)
+		if measure_check.is_error:
+			self.Publish(measure_check.message, f"{self.basicTopic}/{self.serviceName}/{companyName}/{measure_check.topic}")
+		else:
+			self.updateDeviceStatus(deviceID)
 
 	def Publish(self, message, topic):
 		"""
 			Publishes a message to alert the user of a possible fault
 			TOPICS: 
-				- IoTomatoes/FaultDetection/alertMeasureRange
-				- IoTomatoes/FaultDetection/alertNoMessage
+				- IoTomatoes/FaultDetection/CompanyName/alertMeasureRange
+				- IoTomatoes/FaultDetection/CompanyName/alertNoMessage
+				- IoTomatoes/FaultDetection/CompanyName/ErrorReported
 		"""
-		self._paho_mqtt.publish(topic, message, 2)
+		payload =json.dumps({'message': message})
+		self._paho_mqtt.publish(topic, payload, 2)
 
 if __name__ == "__main__":
 	fd = MQTTFaultDetector()
 	while True:
-		dict_check = fd.checkDeviceStatus()
-		if dict_check.get('Error',0):
-			fd.Publish(dict_check['message'], f"{fd.basicTopic}/{fd.serviceName}/alertNoMessage")
-		time.sleep(300)
+		for dev in fd.deviceList:
+			status = fd.checkDeviceStatus(dev)
+			if status.is_error:
+				payload_message = status.message
+				companyName = dev['companyName']
+				fd.Publish(payload_message, f"{fd.basicTopic}/{fd.serviceName}/{companyName}/{status.topic}")
+
+		time.sleep(5)

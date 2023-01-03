@@ -30,9 +30,6 @@ class FakeSensor:
 	def myOnConnect (self, paho_mqtt, userdata, flags, rc):
 		print ("Connected to %s with result code: %d" % (self.messageBroker, rc))
 
-
-
-
 if __name__ == "__main__":
 	test = FakeSensor("fakeSensors",'mqtt.eclipseprojects.io')
 	test.start()
@@ -50,10 +47,10 @@ if __name__ == "__main__":
 							measure = round(random.uniform(0, 40),2)
 							test.myPublish(json.dumps({'measure': measure}))
 						elif(measure == 'humidity'):
-							measure = round(random.uniform(0, 100),2)
+							measure = round(random.uniform(0, 90),2)
 							test.myPublish(json.dumps({'measure': measure}))
 						elif(measure == 'light'):
-							measure = round(random.uniform(10**(-4), 5**3),5)
+							measure = round(random.uniform(10**(-4), 5000),5)
 							test.myPublish(json.dumps({'measure': measure}))
 						elif(measure == 'sound'):
 							measure = round(random.uniform(-20, 70),2)
@@ -62,6 +59,6 @@ if __name__ == "__main__":
 							print("Error: measure not found")
 						print("Payload sent: ", measure, "\n")
 		print("\n")
-		time.sleep(5)
+		time.sleep(7)
 
 	test.stop()

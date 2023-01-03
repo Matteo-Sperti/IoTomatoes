@@ -7,8 +7,8 @@ class Item():
     def __init__(self, ID : int = 0, IPport : int = 8080, availableServices : list = [], servicesDetails : list = []):
         self.info = {
             "ID" : ID,
-            "availableServices": [],
-            "servicesDetails": [],
+            "availableServices": list(),
+            "servicesDetails": list(),
             "lastUpdate": time.time()
         }
 

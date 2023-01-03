@@ -33,29 +33,29 @@ class RESTServiceCatalog(CatalogManager):
         """REST GET method.
 
         Allowed commands:
-        ``/ServiceCatalog/get/<info>?ID=<ID>`` to get a service info by ID
-        ``/ServiceCatalog/getall`` to get all the services
-        ``/ServiceCatalog/broker`` to get the broker info
-        ``/ServiceCatalog/telegram`` to get the telegram token
-        ``/ServiceCatalog/search/<info>?<info>=<value>`` to search a service by info
+        ``/get/<info>?ID=<ID>`` to get a service info by ID
+        ``/getall`` to get all the services
+        ``/broker`` to get the broker info
+        ``/telegram`` to get the telegram token
+        ``/search/<info>?<info>=<value>`` to search a service by info
         """
         try:
-            if len(uri) < 2:
+            if len(uri) == 0:
                 raise web_exception(404, "No command received")
-            elif len(uri) == 3 and uri[0] == self.base_uri and uri[1] == "get" and uri[2] in ["REST", "MQTT"]:
+            elif len(uri) == 2 and uri[0] == "get" and uri[1] in ["REST", "MQTT"]:
                 if "ID" in params:
-                    return self.get(uri[2], int(params["ID"]))
+                    return self.get(uri[1], int(params["ID"]))
                 else:
                     raise web_exception(400, "Invalid parameter")
-            elif len(uri) == 2 and uri[0] == self.base_uri and uri[1] == "getall":
+            elif len(uri) == 1 and uri[0] == "getall":
                 return self.get_all(self.list_name)
-            elif len(uri) == 2 and uri[0] == self.base_uri and uri[1] == "broker":
+            elif len(uri) == 1 and uri[0] == "broker":
                 return self.broker
-            elif len(uri) == 2 and uri[0] == self.base_uri and uri[1] == "telegram":
+            elif len(uri) == 1 and uri[0] == "telegram":
                 return self.telegramToken
-            elif len(uri) == 3 and uri[0] == self.base_uri and uri[1] == "search":
-                if uri[2] in params:
-                    return self.search(self.list_name, uri[2], params[uri[2]])
+            elif len(uri) == 2 and uri[0] == "search":
+                if uri[1] in params:
+                    return self.search(self.list_name, uri[1], params[uri[1]])
                 else: 
                     raise web_exception(400, "Invalid parameter")
             else:
@@ -73,15 +73,15 @@ class RESTServiceCatalog(CatalogManager):
         """PUT REST method.
 
         Allowed commands:
-        ``/ServiceCatalog/update`` to update the catalog:
+        ``/update`` to update the catalog:
         The body of the request must contain the new service info in json format
-        ``/ServiceCatalog/refresh?ID=<ID>`` to refresh the lastUpdate field of a service by ID
+        ``/refresh?ID=<ID>`` to refresh the lastUpdate field of a service by ID
         """
         try:
-            if len(uri) == 2 and uri[0] == self.base_uri and uri[1] == "update":
+            if len(uri) == 1 and uri[0] == "update":
                 body_dict = json.loads(cherrypy.request.body.read())
                 return self.update(int(params["ID"]), body_dict)
-            elif len(uri) == 2 and uri[0] == self.base_uri and uri[1] == "refresh":
+            elif len(uri) == 1 and uri[0] == "refresh":
                 if "ID" in params:
                     return self.refreshItem(int(params["ID"]))
                 else:
@@ -100,14 +100,14 @@ class RESTServiceCatalog(CatalogManager):
         """POST REST method.
         
         Allowed commands:
-        ``/ServiceCatalog/save`` to save the catalog in the file
-        ``/ServiceCatalog/insert`` to insert a new service in the catalog. 
+        ``/save`` to save the catalog in the file
+        ``/insert`` to insert a new service in the catalog. 
         The body of the request must contain the new service info
         """
         try:
-            if len(uri) == 2 and uri[0] == self.base_uri and uri[1] == "save":
+            if len(uri) == 1 and uri[0] == "save":
                 return self.save()
-            elif len(uri) == 2 and uri[0] == self.base_uri and uri[1] == "insert":
+            elif len(uri) == 1 and uri[0] == "insert":
                 body_dict = json.loads(cherrypy.request.body.read())
                 return self.insert(self.list_name, body_dict)
             else:
@@ -124,10 +124,10 @@ class RESTServiceCatalog(CatalogManager):
         """DELETE REST method.
 
         Allowed commands:
-        ``/ServiceCatalog/delete?ID=<ID>`` to delete a service by ID
+        ``/delete?ID=<ID>`` to delete a service by ID
         """
         try:
-            if len(uri) == 2 and uri[0] == self.base_uri and uri[1] == "delete":
+            if len(uri) == 1 and uri[0] == "delete":
                 if "ID" in params:
                     return self.delete(int(params["ID"]))
                 else:

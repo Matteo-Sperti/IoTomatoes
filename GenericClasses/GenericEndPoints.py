@@ -98,8 +98,8 @@ class GenericMQTTResource():
         self.MQTTclient_start()
 
     def MQTTclient_start(self):
-        self.BrokerIP, self.BrokerPort, self.baseTopic = self.get_broker(ServiceCatalog_url) 
-        self.client = MyMQTT(self.ID, self.BrokerIP, self.BrokerPort, self)
+        self.BrokerIP, self.BrokerPort, self.baseTopic = self.get_broker() 
+        self.client = MyMQTT(f"{self.baseTopic}_ID{self.ID}", self.BrokerIP, self.BrokerPort, self)
         self.client.start()
 
     def get_ResourceCatalog_url(self) :
@@ -112,16 +112,18 @@ class GenericMQTTResource():
                 time.sleep(1)
             else:
                 try:
-                    for services in res.json()["servicesDetails"]:
+                    res_dict = res.json()[0]
+                    serviceDetails = res_dict["servicesDetails"]
+                    for services in serviceDetails:
                         if services["serviceType"] == "REST":
                             return services["serviceIP"]
                 except KeyError:
                     print(f"Error in the Resource information\nRetrying connection\n")
                     
-    def get_broker(self, ServiceCatalog_url : str) :
+    def get_broker(self) :
         while True:
             try:
-                res = requests.get(ServiceCatalog_url + "/broker")
+                res = requests.get(self.ServiceCatalog_url + "/broker")
                 res.raise_for_status()
             except:
                 print(f"Connection Error\nRetrying connection\n")

@@ -12,11 +12,9 @@ class Item():
             "lastUpdate": time.time()
         }
 
-        hostname = socket.gethostname()
-        local_ip = socket.gethostbyname(hostname)
-
         self.info["availableServices"].append("REST")
-        self.info["servicesDetails"].append({"serviceType" : "REST", "serviceIP": f"{local_ip}:{IPport}"})
+        self.info["servicesDetails"].append({"serviceType" : "REST"})
+        self.setIPport(IPport)
 
         if len(availableServices) != len(servicesDetails):
             raise InfoException("Available services and details are different")
@@ -65,7 +63,7 @@ class Item():
             if service["serviceType"] == "REST":
                 hostname = socket.gethostname()
                 local_ip = socket.gethostbyname(hostname)
-                service["serviceIP"] = f"{local_ip}:{IPport}"
+                service["serviceIP"] = f"http://{local_ip}:{IPport}"
                 self.refresh()
                 return
         raise InfoException("No REST service found")

@@ -12,15 +12,31 @@ from customExceptions import *
 from GenericEndPoints import GenericService, GenericMQTTResource
 from ItemInfo import ServiceInfo
 
-HelpMessage = ("Welcome to the IoTBot!\n")
+HelpMessage = """Welcome to the IoTomatoesBot!
+
+This bot will help you to manage your IoT devices for your company.
+
+To start, you need to register your company and your admin account.
+
+To register your company, type /insert_new_company.
+Then you can add your devices and users.
+
+/register_new_user to add a new user to your company.
+"""
 
 class InsertNewCompany():
     def __init__(self, chatID, bot):
         self.chatID = chatID
         self.bot = bot
         self.status = 0
-        self.request = {"CompanyName" : "", "Name" : "", "Surname" : ""}
+
+        self.request = {"CompanyName" : "", "Name" : "", "Surname" : "", "CompanyToken" : ""}
         self.bot.sendMessage(self.chatID, f"Insert your {list(self.request.keys())[0]}")
+
+    def __eq__(self, __o: object) -> bool:
+        if isinstance(__o, InsertNewCompany):
+            return self.chatID == __o.chatID
+        return False
 
     @property
     def adminInfo(self):
@@ -28,35 +44,40 @@ class InsertNewCompany():
 
     @property
     def company(self):
-        return {"CompanyName": self.request["CompanyName"]}
+        return {"CompanyName": self.request["CompanyName"], "CompanyToken": self.request["CompanyToken"]}
 
-    def update(self, message, ResourceCatalog_url = ""): 
-        actualKey = list(self.request.keys())[self.status]
-        self.request[actualKey] = message
-        self.status += 1
+    def update(self, message): 
         if self.status < len(self.request):
-            self.bot.sendMessage(self.chatID, f"Insert your {list(self.request.keys())[self.status]}")
-        else:
-            if len(ResourceCatalog_url) > 0:
-                return self.insert_company(ResourceCatalog_url)
+            actualKey = list(self.request.keys())[self.status]
+            self.request[actualKey] = message
+            self.status += 1
+            if self.status < len(self.request):
+                self.bot.sendMessage(self.chatID, f"Insert your {list(self.request.keys())[self.status]}")
             else:
-                return False
-        return False
+                question = f"Your Token is {message}\nConfirm your registration?"
+                buttons = buttons = [[InlineKeyboardButton(text=f'YES ✅', callback_data='YES'), 
+                        InlineKeyboardButton(text=f'NO ❌', callback_data='NO')]]
+                keyboards = InlineKeyboardMarkup(inline_keyboard=buttons)
+                self.bot.sendMessage(self.chatID, question, reply_markup=keyboards)
+                self.status += 1
+
     
     def insert_company(self, ResourceCatalog_url):   
         try:
-            res = requests.post(ResourceCatalog_url + "/insertCompany", 
-                                    params=self.company, json=self.adminInfo)
+            res = requests.post(ResourceCatalog_url + "/insertCompany", params=self.company, data= json.dumps(self.adminInfo))
             res.raise_for_status()
-        except :
+        except requests.exceptions.HTTPError as err:
+            print(f"{err.response.status_code} : {err.response.reason}")
+            return False
+        except:
             print(f"Error in the connection with the Resource Catalog\n")
             return False
         else:
             try:
                 res_dict = res.json()
-                if res_dict["Status"] == "OK":
-                    CompanyID = res_dict["companyID"]
-                    CompanyToken = res_dict["companyToken"]
+                if res_dict["Status"]:
+                    CompanyID = res_dict["CompanyID"]
+                    CompanyToken = res_dict["CompanyToken"]
                     message = (f"""Company {self.company["CompanyName"]} registered\n"""
                             "Welcome to IoTomatoes Platform\n\n"
                             f"CompanyID: {CompanyID}\n"
@@ -152,7 +173,6 @@ class IoTBot(GenericService, GenericMQTTResource):
         MessageLoop(self.bot, {'chat': self.on_chat_message,
                                'callback_query': self.on_callback_query}).run_as_thread()
     
-
     def get_token(self):
         while True:
             try:
@@ -188,8 +208,7 @@ class IoTBot(GenericService, GenericMQTTResource):
         else:
             for chat in self.chat_active_list["insert_new_company"]:
                 if chat.chatID == chat_ID:
-                    if chat.update(message, self.ResourceCatalog_url):
-                        self.chat_active_list["insert_new_company"].remove(chat)
+                    chat.update(message)                                           
                     return
                     
             for chat in self.chat_active_list["register_new_user"]:
@@ -204,11 +223,22 @@ class IoTBot(GenericService, GenericMQTTResource):
     def on_callback_query(self,msg):
         _ , chat_ID , query_data = telepot.glance(msg,flavor='callback_query') # type: ignore
         
-        for chat in self.chat_active_list["register_new_user"]:
-            if chat.ID == chat_ID:
-                chat.update(chat, query_data)
-        
-        self.bot.sendMessage(chat_ID, text="No company selected")
+        if query_data in ["YES", "NO"]:
+            for chat in self.chat_active_list["insert_new_company"]:
+                if chat.chatID == chat_ID:
+                    if query_data == "YES":
+                        if not chat.insert_company(self.ResourceCatalog_url):
+                            self.bot.sendMessage(chat_ID, f"Internal Error\nRegistration canceled")
+                    else:
+                        self.bot.sendMessage(chat_ID, f"Registration canceled")
+                    self.chat_active_list["insert_new_company"].remove(chat)
+                    return
+        else:
+            for chat in self.chat_active_list["register_new_user"]:
+                if chat.chatID == chat_ID:
+                    chat.update(chat, query_data)
+                    return        
+            self.bot.sendMessage(chat_ID, text="No company selected")
 
     def notify(self, topic, msg):
         try:

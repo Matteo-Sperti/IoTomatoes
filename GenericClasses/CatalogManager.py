@@ -1,7 +1,25 @@
 import json
 import time
-from threading import Thread
+from GenericEndPoints import MyThread
 from customExceptions import *
+
+def query_yes_no(question):
+    """Ask a yes/no question via input() and return their answer.
+
+    "question" is a string that is presented to the user.
+    The "answer" return value is True for "yes" or False for "no".
+    """
+    valid = {"yes": True, "y": True, "ye": True, "no": False, "n": False}
+
+
+    while True:
+        choice = input(question + " [Y/n] ").lower()
+        if choice == "":
+            return valid["yes"]
+        elif choice in valid:
+            return valid[choice]
+        else:
+            print(f"Please respond with 'yes' or 'no' (or 'y' or 'n').\n")
 
 class IDs:
     def __init__(self, minID : int, maxID : int = -1, step = 1):
@@ -35,12 +53,11 @@ class CatalogManager:
         self.filename = filename
         self.autoDeleteTime = autoDeleteTime
         self.IDs = IDs
-        self.owners = heading["owner"]
         self.catalog = heading
         self.catalog["lastUpdate"] = time.time(), 
         for key in key_list:
             self.catalog[key] = []
-        self.autoDeleteItemsThread()
+        self.autoDeleteItemsThread = MyThread(self.autoDeleteItems, interval=self.autoDeleteTime)
 
     def save(self):
         """Save the catalog in the file specified in the initialization."""
@@ -53,7 +70,7 @@ class CatalogManager:
         """Return the catalog in json format."""
         return json.dumps(self.catalog, indent=4)
 
-    def __dict__(self):
+    def to_dict(self):
         return self.catalog
 
     def load(self):
@@ -236,24 +253,17 @@ class CatalogManager:
 
     def autoDeleteItems(self):
         """Refresh the catalog removing the devices that are not online anymore."""
-        while True:
-            actualtime = time.time()
-            for key in self.catalog:
-                if isinstance(self.catalog[key], list):
-                    for device in self.catalog[key]:
-                        try:
-                            if actualtime - device["lastUpdate"] > self.autoDeleteTime:
-                                self.IDs.free_ID(device["ID"])
-                                print(f"""Device {device["ID"]} removed""")
-                                self.catalog[key].remove(device)
-                        except KeyError:
-                            print("Device without lastUpdate field")
-                            self.catalog[key].remove(device)
-            self.catalog["lastUpdate"] = actualtime
-            time.sleep(self.autoDeleteTime)
 
-    def autoDeleteItemsThread(self):
-        """Start the thread that refresh the catalog removing the devices that are not online anymore."""
-        t = Thread(target=self.autoDeleteItems)
-        t.daemon = True
-        t.start()    
+        actualtime = time.time()
+        for key in self.catalog:
+            if isinstance(self.catalog[key], list):
+                for device in self.catalog[key]:
+                    try:
+                        if actualtime - device["lastUpdate"] > self.autoDeleteTime:
+                            self.IDs.free_ID(device["ID"])
+                            print(f"""Device {device["ID"]} removed""")
+                            self.catalog[key].remove(device)
+                    except KeyError:
+                        print("Device without lastUpdate field")
+                        self.catalog[key].remove(device)
+        self.catalog["lastUpdate"] = actualtime

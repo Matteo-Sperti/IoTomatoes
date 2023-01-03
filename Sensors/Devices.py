@@ -8,16 +8,16 @@ from GenericEndPoints import GenericMQTTResource
 from ItemInfo import DeviceInfo
 
 class IoTDevice(GenericMQTTResource):
-    def __init__(self, DeviceInfo : DeviceInfo, ServiceCatalog_url: str):
-        super().__init__(DeviceInfo, ServiceCatalog_url, isDevice=True)
+    def __init__(self, DeviceInfo : DeviceInfo, CompanyInfo, ServiceCatalog_url: str):
+        super().__init__(DeviceInfo, CompanyInfo, ServiceCatalog_url)
         self.client.start()
-        for topic in self.info.subscribedTopics:
+        for topic in self.ResourceInfo.subscribedTopics:
             self.client.mySubscribe(self.baseTopic + "/" + topic)
 
         self.message={
-            "companyName":self.info.companyName,
+            "companyName":self.ResourceInfo.companyName,
             "bn":self.ID,
-            "field":self.info.field,
+            "field":self.ResourceInfo.field,
             "e": {
                 "name": "",
                 "value": None,
@@ -30,7 +30,7 @@ class IoTDevice(GenericMQTTResource):
         print(f"{self.ID} received {msg} on topic {topic}")
 
     def run(self):
-        for topic in self.info.publishedTopics:
+        for topic in self.ResourceInfo.publishedTopics:
             self.publish(topic, eval(f"self.get_{topic.lower()}()"))
             
     def publish(self, topic, msg):

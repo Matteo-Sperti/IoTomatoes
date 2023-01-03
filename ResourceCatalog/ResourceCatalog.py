@@ -1,5 +1,6 @@
 import json
 import cherrypy
+import socket
 import sys
 sys.path.append("../GenericClasses/")
 
@@ -7,7 +8,6 @@ from CatalogManager import *
 from GenericEndPoints import GenericService
 from customExceptions import *
 from ItemInfo import ServiceInfo
-
 
 IDperCompany = 10000
 
@@ -19,7 +19,7 @@ class CompanyCatalog():
         self.IDs = IDs
         self.companiesList = []
 
-    def insertCompany(self, CompanyInfo, AdminInfo):
+    def insertCompany(self, CompanyInfo : dict, AdminInfo : dict):
         if "CompanyName" in CompanyInfo and  "CompanyToken" in CompanyInfo:
             ID = self.IDs.get_ID()
             if ID != -1:
@@ -30,11 +30,12 @@ class CompanyCatalog():
                     "adminID": 1,
                 }
                 if query_yes_no(f"Are you sure you want to add the company {CompanyInfo['CompanyName']}?"):
-                    NewCompany = CatalogManager(CompanyInfo, ["devicesList", "usersList"], autoDeleteTime=self.autoDeleteTime, IDs=IDs(ID+1, ID+IDperCompany-1))
-                    AdminID = NewCompany.insert("usersList", AdminInfo)
+                    NewCompany = CatalogManager(CompanyInfo, ["devicesList", "usersList"], 
+                                                autoDeleteTime=self.autoDeleteTime, IDs=IDs(ID+1, ID+IDperCompany-1))
+                    AdminID = json.loads(NewCompany.insert("usersList", AdminInfo))["ID"]
                     NewCompany.catalog["adminID"] = AdminID
                     self.companiesList.append(NewCompany)
-                    return {"Status": True, "CompanyID": ID}
+                    return {"Status": True, "CompanyID": ID, "CompanyToken": CompanyInfo["CompanyToken"]}
         
         return {"Status": False}
 
@@ -70,13 +71,13 @@ class CompanyCatalog():
 
     def __dict__(self):
         CatalogDict = self.heading
-        CatalogDict["companiesList"] = []
+        CatalogDict["companiesList"] = list()
         for company in self.companiesList:
-            CatalogDict["companiesList"].append(company.__dict__())
+            CatalogDict["companiesList"].append(company.to_dict())
 
     def save(self):
-        with open(self.filename, "w") as file:
-            json.dump(self.__dict__, file, indent=4)
+        with open(self.filename, "w") as f:
+            json.dump(self.__dict__(), f)
 
 
 class RESTResourceCatalog(GenericService):
@@ -94,18 +95,19 @@ class RESTResourceCatalog(GenericService):
     def POST(self, *uri, **params):
         try:
             if len(uri) > 0:
-                if len(uri) == 2 and uri[1] == "insertCompany":
+                if len(uri) == 1 and uri[0] == "insertCompany":
                     body_dict = json.loads(cherrypy.request.body.read())
+                    print(body_dict, params)
                     return self.catalog.insertCompany(params, body_dict)
-                elif len(uri) == 3 and uri [1] == "insert":
-                    if uri[2] in ["user", "device"]:
+                elif len(uri) == 2 and uri [2] == "insert":
+                    if uri[1] in ["user", "device"]:
                         body_dict = json.loads(cherrypy.request.body.read())
                         return self.catalog.insertItem(uri[2], params, body_dict)
             raise web_exception(404, "Resource not found.")
         except web_exception as e:
-            return cherrypy.HTTPError(e.code, e.message)
+            raise cherrypy.HTTPError(e.code, e.message)
         except:
-            return cherrypy.HTTPError(500, "Internal Server Error.")
+            raise cherrypy.HTTPError(500, "Internal Server Error.")
     
     def PUT(self, *uri, **params):
         try:
@@ -121,34 +123,18 @@ class RESTResourceCatalog(GenericService):
     def DELETE(self, *uri, **params):
         pass
 
-def query_yes_no(question):
-    """Ask a yes/no question via input() and return their answer.
-
-    "question" is a string that is presented to the user.
-    The "answer" return value is True for "yes" or False for "no".
-    """
-    valid = {"yes": True, "y": True, "ye": True, "no": False, "n": False}
-
-
-    while True:
-        choice = input(question + " [Y/n] ").lower()
-        if choice == "":
-            return valid["yes"]
-        elif choice in valid:
-            return valid[choice]
-        else:
-            print(f"Please respond with 'yes' or 'no' (or 'y' or 'n').\n")
-
 if __name__ == "__main__":
     settings = json.load(open("ResourceCatalogSettings.json"))
 
-    ip_address = settings["REST_settings"]["ip_address"]
-    port = settings["REST_settings"]["port"]
+
+    port = settings["IPport"]
 
     Service_info = ServiceInfo(settings["serviceName"], IPport=port)
     ServiceCatalog_url = settings["ServiceCatalog_url"]
     Catalog = RESTResourceCatalog(Service_info, ServiceCatalog_url)
     
+    ip_address = socket.gethostbyname(socket.gethostname())
+
     conf = {
         '/': {
             'request.dispatch': cherrypy.dispatch.MethodDispatcher(),
@@ -164,7 +150,7 @@ if __name__ == "__main__":
         while True:
             time.sleep(3)
     except KeyboardInterrupt:
-        Catalog.Thread.close()
+        Catalog.Thread.stop()
         cherrypy.engine.block()
         Catalog.catalog.save()
         print("Server stopped")

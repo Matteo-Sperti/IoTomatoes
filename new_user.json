@@ -1,7 +1,0 @@
-{
-    "Name": "Pino",
-    "Surname" : "Daniele",
-    "Company" : "Pino Srl",
-    "TelegramID": 12313123123,
-    "ServiceCatalog_url" : "http://localhost:8080/ServiceCatalog"
-}

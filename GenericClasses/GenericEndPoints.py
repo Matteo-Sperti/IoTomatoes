@@ -1,98 +1,97 @@
 import requests
-import json
 import time
 import threading
 from MyMQTT import MyMQTT
 from ItemInfo import ServiceInfo
+from customExceptions import InfoException
 
-class RefreshThread(object):
-    def __init__(self, url: str, ID : int):
-        self._stop = threading.Event()
-        self.t = threading.Thread(target=self.run_forever, args=(url, ID))
-        self.t.start()
+class MyThread(threading.Thread):
+    def __init__(self, target, args = None, interval = 1):
+        super().__init__()
+        self.target = target
+        self.args = args
+        self.interval = interval
+        self.stop_event = threading.Event()
+        self.daemon = True
 
-    def close(self) :
-        self._stop.set()
-        self.t.join()
+    def stop(self):
+        self.stop_event.set()
 
-    def stopped(self):
-        return self._stop.is_set()
+    def is_stopped(self):
+        return self.stop_event.is_set()
 
-    def run_forever(self, url: str, ID : int) :
-        while True :
-            if self.stopped():
-                print("RefreshThread stopped")
-                return
-            refreshed = False
+    def run(self):
+        while not self.is_stopped():
+            self.target(*self.args)
+            time.sleep(self.interval)
+
+class RefreshThread(MyThread):
+    def __init__(self, url : str, ID : int, interval=60):
+        super().__init__(self.refresh_item, (url, ID), interval)
+
+    def refresh_item(self, url : str, ID : int):
+        refreshed = False
+        while not refreshed :
             try:
                 res = requests.put(url + "/refresh", params={"ID": ID})
                 res.raise_for_status()
-            except requests.exceptions.ConnectionError:
-                print(f"Connection Error\nRetrying connection\n")
-            except requests.exceptions.Timeout:
-                print(f"Timeout\nRetrying connection\n")
             except requests.exceptions.HTTPError as err:
                 print(f"{err.response.status_code} : {err.response.reason}")
+            except:
+                print(f"Connection Error\nRetrying connection\n")
             else:
                 stat = res.json()
                 if "Status" in stat and stat["Status"] == True:
                     refreshed = True
-                    print(f"Refreshed {ID}\n")
+                    print(f"Refreshed correctly to the Catalog; myID = {ID}\n")
                 else:
                     print(stat)
-
-            if refreshed:
-                time.sleep(60)
-            else:
-                time.sleep(1)
-
-def register(url: str, info : dict, isService : bool = False, isDevice : bool = False, isUser : bool = False) -> int:
-    while True:
-        try:
-            if isService:
-                res = requests.post(url + "/insert", json = info)
-                res.raise_for_status()
-            elif isDevice:
-                res = requests.post(url + "/insert/device", json = info)
-                res.raise_for_status()
-            elif isUser:
-                res = requests.post(url + "/insert/user", json = info)
-                res.raise_for_status()
-            else:
-                raise Exception("A service, device or user must be specified")
-        except requests.exceptions.ConnectionError:
-            print(f"Connection Error\nRetrying connection\n")
-            time.sleep(1)
-        except requests.exceptions.HTTPError as err:
-            print(f"{err.response.status_code} : {err.response.reason}")
-            time.sleep(1)
-        except:
-            print(f"Error in the request\n")
-            time.sleep(1)
-        else:
-            try:                    
-                ID = res.json()["ID"]
-                print(f"Registered ID: {ID}\n")
-                return ID
-            except:
-                print(f"Error in the response\n")
 
 class GenericService(): 
     def __init__(self, Service_info : ServiceInfo, ServiceCatalog_url : str) :
         self.Service_info = Service_info
         self.ServiceCatalog_url = ServiceCatalog_url
-        self.ID = register(self.ServiceCatalog_url, self.Service_info.__dict__(), isService=True)
+        self.ID = self.register(self.Service_info.__dict__())
         self.Thread = RefreshThread(self.ServiceCatalog_url, self.ID)
+        self.Thread.start()
+
+    def register(self, info : dict) -> int:
+        while True:
+            try:
+                res = requests.post(self.ServiceCatalog_url + "/insert", json = info)
+                res.raise_for_status()
+            except requests.exceptions.HTTPError as err:
+                print(f"{err.response.status_code} : {err.response.reason}")
+                time.sleep(1)
+            except:
+                print(f"Connection Error\nRetrying connection\n")
+                time.sleep(1)
+            else:
+                try:                    
+                    ID = res.json()["ID"]
+                    print(f"Registered correctly to the ServiceCatalog.\nID: {ID}\n")
+                    return ID
+                except:
+                    print(f"Error in the response\n")
 
 class GenericMQTTResource():
-    def __init__(self, info, ServiceCatalog_url : str, isDevice : bool = False, isUser : bool = False) :        
+    def __init__(self, ResourceInfo, CompanyInfo : dict, ServiceCatalog_url : str) :        
         self.ServiceCatalog_url = ServiceCatalog_url
         self.ResourceCatalog_url = self.get_ResourceCatalog_url()
-        self.info = info
+        self.ResourceInfo = ResourceInfo
+
+        if CompanyInfo is not None and "CompanyName" in CompanyInfo and "CompanyToken" in CompanyInfo:
+            self.CompanyInfo = {
+                "CompanyName" : CompanyInfo["CompanyName"],
+                "CompanyToken" : CompanyInfo["CompanyToken"]
+            }
+        else:
+            raise InfoException("CompanyInfo is not valid")
 
         #Register
-        self.ID = register(self.ResourceCatalog_url, self.info.__dict__(), isDevice=isDevice, isUser=isUser)
+        self.ID = self.register_device(self.ResourceInfo.__dict__())
         self.Thread = RefreshThread(self.ResourceCatalog_url, self.ID)
+        self.Thread.start()
         
         #MQTT client
         self.MQTTclient_start()
@@ -101,6 +100,25 @@ class GenericMQTTResource():
         self.BrokerIP, self.BrokerPort, self.baseTopic = self.get_broker() 
         self.client = MyMQTT(f"{self.baseTopic}_ID{self.ID}", self.BrokerIP, self.BrokerPort, self)
         self.client.start()
+
+    def register_device(self, info : dict) -> int:
+        while True:
+            try:
+                res = requests.post(self.ResourceCatalog_url + "/insert/device", params=self.CompanyInfo, json = info)
+                res.raise_for_status()
+            except requests.exceptions.HTTPError as err:
+                print(f"{err.response.status_code} : {err.response.reason}")
+                time.sleep(1)
+            except:
+                print(f"Connection Error\nRetrying connection\n")
+                time.sleep(1)
+            else:
+                try:                    
+                    ID = res.json()["ID"]
+                    print(f"Registered correctly to the ServiceCatalog.\nID: {ID}\n")
+                    return ID
+                except:
+                    print(f"Error in the response\n")
 
     def get_ResourceCatalog_url(self) :
         while True:
@@ -117,8 +135,9 @@ class GenericMQTTResource():
                     for services in serviceDetails:
                         if services["serviceType"] == "REST":
                             return services["serviceIP"]
-                except KeyError:
+                except:
                     print(f"Error in the Resource information\nRetrying connection\n")
+                    time.sleep(1)
                     
     def get_broker(self) :
         while True:
@@ -132,21 +151,10 @@ class GenericMQTTResource():
                 try:
                     broker = res.json()
                     return broker["IP"], broker["port"], broker["baseTopic"]
-                except KeyError:
+                except:
                     print(f"Error in the broker information\nRetrying connection\n")
                     time.sleep(1)
 
     def stop(self):
-        self.Thread.close()
+        self.Thread.stop()
         self.client.stop()
-
-if __name__ == "__main__":
-    Service_info = json.load(open("new_service.json"))
-    ServiceCatalog_url = Service_info["ServiceCatalog_url"]
-    serv = GenericService(Service_info, ServiceCatalog_url)
-
-    try:
-        while True:
-            time.sleep(1)
-    except KeyboardInterrupt:
-        serv.Thread.close()

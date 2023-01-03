@@ -7,9 +7,8 @@ import requests
 import sys
 
 sys.path.append("../SupportClasses/")
-from MyMQTT import MyMQTT
 from MyExceptions import *
-from GenericEndPoints import GenericService, GenericMQTTResource
+from GenericEndPoints import GenericService, GenericMQTTResource, GenericMQTTEndpoint
 from ItemInfo import ServiceInfo
 
 HelpMessage = """Welcome to the IoTomatoesBot!
@@ -18,15 +17,20 @@ This bot will help you to manage your IoT devices for your company.
 
 To start, you need to register your company and your admin account.
 
-To register your company, type /insert_new_company.
+To register your company, type /insert_company.
 Then you can add your devices and users.
 
-/register_new_user to add a new user to your company.
+/register_user to add a new user to your company.
+/users to see all the users of your company.
+/devices to see all the active devices of your company.
 """
 
 class InsertNewCompany():
-    def __init__(self, chatID, bot):
+    def __init__(self, chatID, bot, ResourceCatalog_url, companyList):
         self.chatID = chatID
+        self.completed = False
+        self.ResourceCatalog_url = ResourceCatalog_url
+        self.companyList = companyList
         self.bot = bot
         self.status = 0
 
@@ -55,16 +59,24 @@ class InsertNewCompany():
                 self.bot.sendMessage(self.chatID, f"Insert your {list(self.request.keys())[self.status]}")
             else:
                 question = f"Your Token is {message}\nConfirm your registration?"
-                buttons = buttons = [[InlineKeyboardButton(text=f'YES ✅', callback_data='YES'), 
-                        InlineKeyboardButton(text=f'NO ❌', callback_data='NO')]]
+                buttons = buttons = [[InlineKeyboardButton(text=f'YES ✅', callback_data='yes'), 
+                        InlineKeyboardButton(text=f'NO ❌', callback_data='no')]]
                 keyboards = InlineKeyboardMarkup(inline_keyboard=buttons)
                 self.bot.sendMessage(self.chatID, question, reply_markup=keyboards)
                 self.status += 1
-
-    
-    def insert_company(self, ResourceCatalog_url):   
+        else:
+            if message == "yes":
+                if not self.insert_company():
+                    self.bot.sendMessage(self.chatID, "Registration failed")
+                else:
+                    self.companyList.append(self.company["CompanyName"])
+            else:
+                self.bot.sendMessage(self.chatID, "Registration canceled")
+            self.completed = True
+            
+    def insert_company(self):   
         try:
-            res = requests.post(ResourceCatalog_url + "/insertCompany", params=self.company, data= json.dumps(self.adminInfo))
+            res = requests.post(self.ResourceCatalog_url + "/insertCompany", params=self.company, data= json.dumps(self.adminInfo))
             res.raise_for_status()
         except requests.exceptions.HTTPError as err:
             print(f"{err.response.status_code} : {err.response.reason}")
@@ -74,7 +86,9 @@ class InsertNewCompany():
             return False
         else:
             try:
+                print(res)
                 res_dict = res.json()
+                print(res_dict)
                 if res_dict["Status"]:
                     CompanyID = res_dict["CompanyID"]
                     CompanyToken = res_dict["CompanyToken"]
@@ -89,8 +103,10 @@ class InsertNewCompany():
                 return False
 
 class RegisterNewUser():
-    def __init__(self, chatID, bot, companyList = []):
+    def __init__(self, chatID, bot, ResourceCatalog_url, companyList = []):
         self.chatID = chatID
+        self.completed = False
+        self.ResourceCatalog_url = ResourceCatalog_url
         self.bot = bot
         self.status = 0
         self.request = {"CompanyName" : "", "Name" : "", "Surname" : "", "CompanyToken" : ""}
@@ -112,23 +128,34 @@ class RegisterNewUser():
     def company(self):
         return {"CompanyName": self.request["CompanyName"], "CompanyToken" : self.request["CompanyToken"]}
 
-    def update(self, message, companyList = [], ResourceCatalog_url = ""):            
-        actualKey = list(self.request.keys())[self.status]
-        self.request[actualKey] = message
-        self.status += 1
+    def update(self, message):            
         if self.status < len(self.request):
-            self.bot.sendMessage(self.chatID, f"Insert your {list(self.request.keys())[self.status]}")
-        else:
-            if len(ResourceCatalog_url) > 0:
-                return self.insert_user(ResourceCatalog_url)
+            actualKey = list(self.request.keys())[self.status]
+            self.request[actualKey] = message
+            self.status += 1
+            if self.status < len(self.request):
+                self.bot.sendMessage(self.chatID, f"Insert your {list(self.request.keys())[self.status]}")
             else:
-                return False
-        return False
+                question = (f"Your name is {self.completeName}\n"
+                            f"Company: {self.company['CompanyName']}\n"
+                            f"CompanyToke:{message}\n\n"
+                            "Confirm your registration?")
+                buttons = buttons = [[InlineKeyboardButton(text=f'YES ✅', callback_data='yes'), 
+                        InlineKeyboardButton(text=f'NO ❌', callback_data='no')]]
+                keyboards = InlineKeyboardMarkup(inline_keyboard=buttons)
+                self.bot.sendMessage(self.chatID, question, reply_markup=keyboards)
+                self.status += 1
+        else:
+            if message == "yes":
+                if not self.insert_user():
+                    self.bot.sendMessage(self.chatID, "Registration failed")
+            else:
+                self.bot.sendMessage(self.chatID, "Registration canceled")
+            self.completed = True
 
-    def insert_user(self, ResourceCatalog_url):
+    def insert_user(self):
         try:
-            res = requests.post(ResourceCatalog_url + f"""/insert/user""", 
-                                    params=self.company, json=self.adminInfo)
+            res = requests.post(self.ResourceCatalog_url + f"""/insert/user""", params=self.company, json=self.adminInfo)
             res.raise_for_status()
         except :
             print(f"Error in the connection with the Resource Catalog\n")
@@ -143,9 +170,8 @@ class RegisterNewUser():
                             f"UserID: {UserID}\n")
                     self.bot.sendMessage(self.chatID, text=message)
                     return True
-                elif res_dict["Status"] == "TokenError":
+                elif res_dict["Status"] == "CompanyToken not valid":
                     self.bot.sendMessage(self.chatID, text="CompanyToken not valid\n")
-
                     return False
             except:
                 print(f"Error in the information\n")
@@ -158,16 +184,13 @@ class IoTBot(GenericService, GenericMQTTResource):
         self.ResourceCatalog_url = self.get_ResourceCatalog_url()
 
         #MQTT client
-        self.MQTTclient_start()
+        self.client = GenericMQTTEndpoint(f"IoTomatoes_ID{self.ID}",self.ServiceCatalog_url, self)
         self.__message = {'bn': "", 'e': [{'n': "",'v': "", 'u': "", 't': ""}]}
         #TelegramBot
         self.tokenBot = self.get_token()
         self.bot = telepot.Bot(self.tokenBot)
         
-        self.chat_active_list = {
-            "insert_new_company" : [],
-            "register_new_user" : []
-        }
+        self.chat_active_list = []
         self.companyList = []
 
         MessageLoop(self.bot, {'chat': self.on_chat_message,
@@ -199,46 +222,38 @@ class IoTBot(GenericService, GenericMQTTResource):
         _, _, chat_ID = telepot.glance(msg)  # type: ignore
         
         message = msg['text']
-        if message == "/start":
+        if message == "/start" or message == "/help":
             self.bot.sendMessage(chat_ID, text=HelpMessage)
-        elif message == "/insert_new_company":
-            self.chat_active_list["insert_new_company"].append(InsertNewCompany(chat_ID, self.bot))
-        elif message == "/register_new_user":
-            self.chat_active_list["register_new_user"].append(RegisterNewUser(chat_ID, self.bot))
-        else:
-            for chat in self.chat_active_list["insert_new_company"]:
-                if chat.chatID == chat_ID:
-                    chat.update(message)                                           
-                    return
-                    
-            for chat in self.chat_active_list["register_new_user"]:
-                if chat.chatID == chat_ID:
-                    if chat.update(message, self.companyList, self.ResourceCatalog_url):
-                        self.chat_active_list["register_new_user"].remove(chat)
-                    return
-
+        elif message == "/insert_company":
+            self.chat_active_list.append(InsertNewCompany(chat_ID, self.bot, self.ResourceCatalog_url, self.companyList))
+        elif message == "/register_user":
+            if self.companyList == []:
+                self.bot.sendMessage(chat_ID, text="No company registered")
             else:
-                self.bot.sendMessage(chat_ID, text="Command not found")
+                self.chat_active_list.append(RegisterNewUser(chat_ID, self.bot, self.ResourceCatalog_url, self.companyList))
+        elif message == "/users":
+            pass
+        elif message == "/devices":
+            pass
+        else:
+            for chat in self.chat_active_list:
+                if chat.chatID == chat_ID:
+                    chat.update(message) 
+                    if chat.completed:
+                        self.chat_active_list.remove(chat)                                          
+                    return
+            self.bot.sendMessage(chat_ID, text="Command not found")
 
     def on_callback_query(self,msg):
         _ , chat_ID , query_data = telepot.glance(msg,flavor='callback_query') # type: ignore
-        
-        if query_data in ["YES", "NO"]:
-            for chat in self.chat_active_list["insert_new_company"]:
-                if chat.chatID == chat_ID:
-                    if query_data == "YES":
-                        if not chat.insert_company(self.ResourceCatalog_url):
-                            self.bot.sendMessage(chat_ID, f"Internal Error\nRegistration canceled")
-                    else:
-                        self.bot.sendMessage(chat_ID, f"Registration canceled")
-                    self.chat_active_list["insert_new_company"].remove(chat)
-                    return
-        else:
-            for chat in self.chat_active_list["register_new_user"]:
-                if chat.chatID == chat_ID:
-                    chat.update(chat, query_data)
-                    return        
-            self.bot.sendMessage(chat_ID, text="No company selected")
+
+        for chat in self.chat_active_list:
+            if chat.chatID == chat_ID:
+                chat.update(query_data)
+                if chat.completed:
+                    self.chat_active_list.remove(chat)
+                return        
+        self.bot.sendMessage(chat_ID, text="Error\nThis chat is not active")
 
     def notify(self, topic, msg):
         try:
@@ -262,7 +277,7 @@ if __name__ == "__main__":
     ServiceCatalog_url = conf["ServiceCatalog_url"]
     BotInfo = ServiceInfo(conf["ServiceName"], IPport=conf["IPport"])
 
-    sb = IoTBot(BotInfo, ServiceCatalog_url)
+    IoTomatoesBOT = IoTBot(BotInfo, ServiceCatalog_url)
 
     while True:
         try:
@@ -270,4 +285,4 @@ if __name__ == "__main__":
         except KeyboardInterrupt:
             break
 
-    sb.client.stop()
+    IoTomatoesBOT.client.stop()

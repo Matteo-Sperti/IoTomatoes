@@ -267,6 +267,7 @@ class CompanyCatalog():
         self.companiesList = []
 
     def insertCompany(self, CompanyInfo : dict, AdminInfo : dict):
+        out = {"Status": False}
         if "CompanyName" in CompanyInfo and  "CompanyToken" in CompanyInfo:
             ID = self.IDs.get_ID()
             if ID != -1:
@@ -282,9 +283,9 @@ class CompanyCatalog():
                     AdminID = json.loads(NewCompany.insert("usersList", AdminInfo))["ID"]
                     NewCompany.catalog["adminID"] = AdminID
                     self.companiesList.append(NewCompany)
-                    return {"Status": True, "CompanyID": ID, "CompanyToken": CompanyInfo["CompanyToken"]}
+                    out = {"Status": True, "CompanyID": ID, "CompanyToken": CompanyInfo["CompanyToken"]}
         
-        return {"Status": False}
+        return json.dumps(out, indent=4)
 
     def deleteCompany(self, CompanyID, userID):
         for company in self.companiesList:

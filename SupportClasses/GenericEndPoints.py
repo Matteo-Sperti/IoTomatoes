@@ -1,7 +1,8 @@
 import requests
 import time
+import json
+import paho.mqtt.client as PahoMQTT
 
-from MyMQTT import MyMQTT
 from ItemInfo import ServiceInfo
 from MyExceptions import InfoException
 from MyThread import MyThread
@@ -34,7 +35,6 @@ class GenericService():
         self.ServiceCatalog_url = ServiceCatalog_url
         self.ID = self.register(self.Service_info.__dict__())
         self.Thread = RefreshThread(self.ServiceCatalog_url, self.ID)
-        self.Thread.start()
 
     def register(self, info : dict) -> int:
         while True:
@@ -75,12 +75,7 @@ class GenericMQTTResource():
         self.Thread.start()
         
         #MQTT client
-        self.MQTTclient_start()
-
-    def MQTTclient_start(self):
-        self.BrokerIP, self.BrokerPort, self.baseTopic = self.get_broker() 
-        self.client = MyMQTT(f"{self.baseTopic}_ID{self.ID}", self.BrokerIP, self.BrokerPort, self)
-        self.client.start()
+        self.client = GenericMQTTEndpoint(f"IoTomatoes_ID{self.ID}",self.ServiceCatalog_url, self)
 
     def register_device(self, info : dict) -> int:
         while True:
@@ -139,3 +134,70 @@ class GenericMQTTResource():
     def stop(self):
         self.Thread.stop()
         self.client.stop()
+
+class GenericMQTTEndpoint():
+    def __init__(self, clientID, ServiceCatalog_url : str, notifier) :
+        self.ServiceCatalog_url = ServiceCatalog_url
+        self.broker, self.port, self.baseTopic = self.get_broker()
+        self.notifier = notifier
+        self.clientID = clientID
+        self._isSubscriber = False
+        # create an instance of paho.mqtt.client
+        self._paho_mqtt = PahoMQTT.Client(clientID, True)
+        # register the callback
+        self._paho_mqtt.on_connect = self.myOnConnect
+        self._paho_mqtt.on_message = self.myOnMessageReceived
+        self.start()
+
+    def get_broker(self) :
+        while True:
+            try:
+                res = requests.get(self.ServiceCatalog_url + "/broker")
+                res.raise_for_status()
+            except:
+                print(f"Connection Error\nRetrying connection\n")
+                time.sleep(1)
+            else:
+                try:
+                    broker = res.json()
+                    return broker["IP"], broker["port"], broker["baseTopic"]
+                except:
+                    print(f"Error in the broker information\nRetrying connection\n")
+                    time.sleep(1)
+
+    def myOnConnect(self, paho_mqtt, userdata, flags, rc):
+        print("Connected to %s with result code: %d" % (self.broker, rc))
+
+    def myOnMessageReceived(self, paho_mqtt, userdata, msg):
+        # A new message is received
+        self.notifier.notify(msg.topic, msg.payload) # type : ignore
+
+    def myPublish(self, topic, msg):
+        # publish a message with a certain topic
+        self._paho_mqtt.publish(topic, json.dumps(msg), 2)
+
+    def mySubscribe(self, topic):
+        # subscribe for a topic
+        self._paho_mqtt.subscribe(topic, 2)
+        # just to remember that it works also as a subscriber
+        self._isSubscriber = True
+        self._topic = topic
+        print("subscribed to %s" % (topic))
+
+    def start(self):
+        # manage connection to broker
+        self._paho_mqtt.connect(self.broker, self.port)
+        self._paho_mqtt.loop_start()
+
+    def unsubscribe(self):
+        if (self._isSubscriber):
+            # remember to unsuscribe if it is working also as subscriber
+            self._paho_mqtt.unsubscribe(self._topic)
+
+    def stop(self):
+        if (self._isSubscriber):
+            # remember to unsuscribe if it is working also as subscriber
+            self._paho_mqtt.unsubscribe(self._topic)
+
+        self._paho_mqtt.loop_stop()
+        self._paho_mqtt.disconnect()

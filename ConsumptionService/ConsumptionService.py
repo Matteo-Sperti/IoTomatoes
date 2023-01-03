@@ -5,6 +5,7 @@ import requests
 import json
 import pandas as pd
 import os
+from CheckResult import *
 
 class ConsumptionManager:
 	def __init__(self):
@@ -23,6 +24,19 @@ class ConsumptionManager:
 
 		r = json.loads(requests.get(f'{self.catalogIP}/getCompanyList'))
 		self.CompanyList = self.updateCompanyList(r['CompanyList'])
+
+	def checkActuator(self, deviceID : int):
+		"""Check if an actuator is in the list of the actuators\n
+		Parameters:\n
+			- deviceID (int) - 'ID of the device to check'\n
+		Return:\n
+			- (bool) - 'True if the device is in the list, False otherwise'"""
+
+		for comp in self.CompanyList:
+			for dev in comp['deviceList']:
+				if dev['ID'] == deviceID:
+					return CheckResult(is_error = False)
+		return CheckResult(is_error=False, message="Error, Actuator not found", topic="ErrorReported")
 
 	def updateCompanyList(CompanyList : list):
 		"""Update the company list with the actuators status and consumption"""
@@ -122,17 +136,24 @@ class MQTTConsumptionManager(ConsumptionManager):
 		print ("Connected to %s with result code: %d" % (self.broker, rc))
 
 	def MessageReceived (self, paho_mqtt , userdata, msg):
-		"""Parse the message received and control the topic"""
-		try:
-			command = list[msg.payload.values()][0]
-			head, deviceID = os.path.split(msg.topic)
-			topic, companyName = os.path.split(head)
-			if topic not in self.basicTopics:
-				raise ValueError("Topic not valid")
-			else:
-				self.upgradeStatus(companyName, deviceID, command)
-		except ValueError as e:
-			print(e)
+		"""Parse the message received and control the topic\n
+			Subscribed topics format:\n
+				- IoTomatoes/CompanyName/Field/DeviceID/command
+		"""
+		command = msg.payload.get('command')
+		head, deviceID = os.path.split(msg.topic)
+		topic, companyName = os.path.split(head)
+		check_actuator = self.checkActuator(companyName, deviceID)
+
+		if check_actuator.is_error:
+			self.Publish(f"IoTomatoes/{self.serviceName}/{companyName}/{check_actuator.topic}", check_actuator.message)
+		else:
+			self.upgradeStatus(companyName, deviceID, command)
+
+	def Publish(self, topic, message):
+		"""Publish a message to a topic"""
+		payload = json.dumps({'message': message})
+		self._paho_mqtt.publish(topic, payload, 2)
 
 
 if __name__ == "__main__":

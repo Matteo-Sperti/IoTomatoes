@@ -34,7 +34,11 @@ class FaultDetector:
 						  }
 		
 	def createDeviceList(self, CompanyList):
-		"""Create a list of all devices integrating informations about the last time a message was received from a device"""
+		"""Create a list of all devices integrating informations about the last time a message was received from a device\n
+		Parameters:\n
+			 - CompanyList (list of dict) - 'List of all companies and their devices'\n
+		return: \n
+			- deviceList (list of dict) - 'List of all devices updated'"""
 		deviceList = []
 		for comp in CompanyList:
 			for dev in comp['deviceList']:
@@ -43,14 +47,24 @@ class FaultDetector:
 		return deviceList
 
 	def updateDeviceStatus(self, deviceID : int):
-		"""Update the status of a device in the deviceList"""
+		"""Update the status of a device in the deviceList\n
+		Parameters:\n
+			- deviceID (int) - 'ID of the device to update'"""
+		
 		for dev in self.deviceList:
 			if dev['ID'] == deviceID:
 				dev['LastUpdate'] = datetime.datetime.now()
 				break
 
 	def checkDeviceStatus(self, device : dict):
-		"""Check if a device has not sent a message for more than 5 minutes"""
+		"""Check if a device has not sent a message for more than 5 minutes\n
+		Parameters:\n
+		 	- device (dict) - 'Device to check'\n
+		return: CheckResult object with:\n
+			- error (bool): ".is_error"\n
+			- message (str): ".message"\n
+			-  topic (str): ".topic" """
+
 		currentTime = datetime.datetime.now()
 		if device['LastUpdate'] is not None:
 			elapsedTime = (currentTime - device['LastUpdate']).total_seconds()
@@ -62,7 +76,17 @@ class FaultDetector:
 		return CheckResult(is_error=False)
 
 	def checkMeasure(self, companyName: str, deviceID: int, measureType: str,  measure : float):
-		"""Check if a measure is within the thresholds"""
+		"""Check if a measure is out of the thresholds\n
+		Parameters:\n
+			- companyName (str) - 'Name of the company of the device'\n
+			- deviceID (int) - 'ID of the device'\n
+			- measureType (str) - 'Type of the measure to check'\n
+			- measure (float) - 'Value of the measure to check'\n
+		return: CheckResult object with:\n
+			- error (bool): ".is_error"\n
+			- message (str): ".message"\n
+			-  topic (str): ".topic" """
+
 		device = None
 
 		for dev in self.deviceList:
@@ -123,8 +147,8 @@ class MQTTFaultDetector(FaultDetector):
 		print ("Connected to %s with result code: %d" % (self.broker, rc))
 
 	def MessageReceived (self, paho_mqtt , userdata, msg):
-		"""Parse the topic received, check the device status and the measure and publish the alert messages if needed
-			Subscribed topics format: 
+		"""Parse the topic received, check the device status and the measure and publish the alert messages if needed.\n
+			Subscribed TOPICS format:\n
 				- IoTomatoes/CompanyName/Field/DeviceID/MeasureType
 		"""
 		topic_list = msg.topic.split('/')
@@ -141,8 +165,8 @@ class MQTTFaultDetector(FaultDetector):
 
 	def Publish(self, message, topic):
 		"""
-			Publishes a message to alert the user of a possible fault
-			TOPICS: 
+			Publishes a message to alert the user of a possible fault\n
+			TOPICS:\n 
 				- IoTomatoes/FaultDetection/CompanyName/alertMeasureRange
 				- IoTomatoes/FaultDetection/CompanyName/alertNoMessage
 				- IoTomatoes/FaultDetection/CompanyName/ErrorReported

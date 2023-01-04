@@ -1,5 +1,11 @@
 {
     "clientID": "FD123",
     "catalogIP": "ServiceCatalog",
-    "serviceName": "FaultDetection"
+    "serviceName": "FaultDetection",
+    "thresholds": {
+        "temperature" : {"max_value": 10000,"min_value": -100, "unit": "°C"},
+        "humidity" : {"max_value": 100, "min_value": 0, "unit": "%"},
+        "light" : {"max_value": 10000, "min_value": 0.00001, "unit": "lx"},
+        "moisture" : {"max_value": 100, "min_value": 0, "unit": "%"}
+      }
 }

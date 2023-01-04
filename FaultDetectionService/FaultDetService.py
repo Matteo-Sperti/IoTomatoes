@@ -17,6 +17,7 @@ class FaultDetector:
 		self.clientID = conf['clientID'] #!FINAL: FROM SERVICE CATALOG self.ID
 		self.catalogIP = conf['catalogIP']
 		self.serviceName = conf['serviceName']
+		self.thresholds = conf['thresholds']
 
 		#ServiceInfo = json.loads(requests.get(f'{self.catalogIP}/{self.serviceName}?ID={self.ID}')) #!FINAL
 		ServiceInfo = {'broker': "mqtt.eclipseprojects.io", 'port': 1883, 'topic': 'IoTomatoes'} #*TEST
@@ -28,13 +29,6 @@ class FaultDetector:
 		#r = json.loads(requests.get(f'{self.catalogIP}/getCompanyList')) #!FINAL
 		CompanyList = json.load(open("../CompanyList.json")) #*TEST
 		self.deviceList = self.createDeviceList(CompanyList['CompanyList'])
-		self.thresholds = {
-							'temperature' : {'max_value': 1000,'min_value': -100, 'unit': '°C'},
-						 	'humidity' : {'max_value': 100, 'min_value': 0, 'unit': '%'},
-						  	'light' : {'max_value': 1000, 'min_value': 10**(-5), 'unit': 'lx'},
-							'sound' : {'max_value': 100, 'min_value': -100, 'unit': 'dB'}
-						  }
-		
 	def createDeviceList(self, CompanyList):
 		"""Create a list of all devices integrating informations about the last time a message was received from a device\n
 		Parameters:\n

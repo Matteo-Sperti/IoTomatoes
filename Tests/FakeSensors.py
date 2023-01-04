@@ -52,8 +52,8 @@ if __name__ == "__main__":
 						elif(measure == 'light'):
 							measure = round(random.uniform(10**(-4), 5000),5)
 							test.myPublish(json.dumps({'measure': measure}))
-						elif(measure == 'sound'):
-							measure = round(random.uniform(-20, 70),2)
+						elif(measure == 'moisture'):
+							measure = round(random.uniform(0, 100),2)
 							test.myPublish(json.dumps({'measure': measure}))
 						else:
 							print("Error: measure not found")

@@ -1,4 +1,6 @@
 {
+    "clientID": "CM123",
     "catalogIP": "ServiceCatalog",
-    "serviceName": "ConsumptionManagement"
+    "serviceName": "ConsumptionManagement",
+    "topic": "IoTomatoes"
 }

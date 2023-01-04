@@ -28,6 +28,7 @@ class FakeUser():
 		for top in self.topic_features:
 			for comp in self.companyList:
 				topics.append(f"{self.basicTopic}/FaultDetection/{comp['companyName']}/{top}")
+				topics.append(f"{self.basicTopic}/ConsumptionManagement/{comp['companyName']}/ErrorReported")
 		return topics
 
 	def start (self):

@@ -40,7 +40,7 @@ if __name__ == "__main__":
 		for company in dict['CompanyList']:
 			for device in company['deviceList']:
 				if device['isActuator']:
-					topic = f"IoTomatoes/{company['companyName']}/{device['ID']}/command"
+					topic = f"IoTomatoes/{company['companyName']}/{device['field']}/{device['ID']}/command"
 					print(topic)
 					test.topic = topic
 					if iter == 0:
@@ -48,15 +48,15 @@ if __name__ == "__main__":
 					else:
 						if(device['status'] == 'OFF' or device['status'] == None):
 							device['status'] = 'ON'
-							test.myPublish(json.dumps({"status": device['status']}))
+							test.myPublish(json.dumps({"command": device['status']}))
 						elif(device['status'] == 'ON'):
 							device['status'] = 'OFF'
-							test.myPublish(json.dumps({"status": device['status']}))
+							test.myPublish(json.dumps({"command": device['status']}))
 						else:
 							print("ERROR")
 						print("Payload sent: ",device['status'], "\n")
 		print("\n")
 		iter+=1
-		time.sleep(round(random.uniform(1,5)))
+		time.sleep(round(random.uniform(8,12)))
 
 	test.stop()

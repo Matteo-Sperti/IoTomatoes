@@ -4,36 +4,36 @@
          "ID": "1",
          "userAdminID": "1",
          "deviceList": [
-                {"ID":1, "deviceName":"Device1", "isActuator": true, "isSensor": false, "PowerConsumption_kW":40},
-                {"ID":2, "deviceName":"Device2", "isActuator": false, "isSensor": true, "measureType":["temperature", "humidity"]},
-                {"ID":3, "deviceName":"Device3", "isActuator": true, "isSensor": false, "PowerConsumption_kW":20}
+                {"ID":1, "deviceName":"Device1", "field": 3, "isActuator": true, "isSensor": false, "PowerConsumption_kW":40},
+                {"ID":2, "deviceName":"Device2", "field": 2, "isActuator": false, "isSensor": true, "measureType":["temperature", "humidity"]},
+                {"ID":3, "deviceName":"Device3", "field": 4, "isActuator": true, "isSensor": false, "PowerConsumption_kW":20}
          ]
         },
         {"companyName": "Company2",
          "ID": "2",
          "userAdminID": "2",
          "deviceList": [
-                {"ID":4, "deviceName":"Device4", "isActuator": true, "isSensor": false, "PowerConsumption_kW":40},
-                {"ID":5, "deviceName":"Device5", "isActuator": false, "isSensor": true, "measureType":["light"]},
-                {"ID":6, "deviceName":"Device6", "isActuator": true, "isSensor": false, "PowerConsumption_kW":20}
+                {"ID":4, "deviceName":"Device4", "field": 3, "isActuator": true, "isSensor": false, "PowerConsumption_kW":40},
+                {"ID":5, "deviceName":"Device5", "field": 8, "isActuator": false, "isSensor": true, "measureType":["light"]},
+                {"ID":6, "deviceName":"Device6", "field": 2, "isActuator": true, "isSensor": false, "PowerConsumption_kW":20}
          ]
         },
         {"companyName": "Company3",
          "ID": "3",
          "userAdminID": "3",
          "deviceList": [
-                {"ID":7, "deviceName":"Device7", "isActuator": true, "isSensor": false, "PowerConsumption_kW":40},
-                {"ID":8, "deviceName":"Device8", "isActuator": false, "isSensor": true, "measureType":["sound"]},
-                {"ID":9, "deviceName":"Device9", "isActuator": true, "isSensor": false, "PowerConsumption_kW":20}
+                {"ID":7, "deviceName":"Device7", "field": 3, "isActuator": true, "isSensor": false, "PowerConsumption_kW":40},
+                {"ID":8, "deviceName":"Device8", "field": 1, "isActuator": false, "isSensor": true, "measureType":["sound"]},
+                {"ID":9, "deviceName":"Device9", "field": 3, "isActuator": true, "isSensor": false, "PowerConsumption_kW":20}
          ]
         },
         {"companyName": "Company4",
          "ID": "4",
          "userAdminID": "4",
          "deviceList": [
-                {"ID":10, "deviceName":"Device10", "isActuator": true, "isSensor": false, "PowerConsumption_kW":40},
-                {"ID":11, "deviceName":"Device11", "isActuator": false, "isSensor": true, "measureType":["light", "temperature"]},
-                {"ID":12, "deviceName":"Device12", "isActuator": true, "isSensor": false, "PowerConsumption_kW":20}
+                {"ID":10, "deviceName":"Device10", "field": 4, "isActuator": true, "isSensor": false, "PowerConsumption_kW":40},
+                {"ID":11, "deviceName":"Device11", "field": 6, "isActuator": false, "isSensor": true, "measureType":["light", "temperature"]},
+                {"ID":12, "deviceName":"Device12", "field": 6, "isActuator": true, "isSensor": false, "PowerConsumption_kW":20}
          ]
         }
     ]

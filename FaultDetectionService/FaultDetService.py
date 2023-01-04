@@ -6,25 +6,27 @@ import json
 import pandas as pd
 import os
 
+import sys
+sys.path.append('/Users/federicomoscato/IoTomatoes/IoTomatoes')
 from CheckResult import *
 
 class FaultDetector:
 	def __init__(self):
 		"""Initialize the FaultDetector class"""
 		conf = json.load(open('FaultDetectionService_settings.json')) 
-		self.clientID = conf['clientID'] #FROM SERVICE CATALOG self.ID #FIX
+		self.clientID = conf['clientID'] #!FINAL: FROM SERVICE CATALOG self.ID
 		self.catalogIP = conf['catalogIP']
 		self.serviceName = conf['serviceName']
 
-		#ServiceInfo = json.loads(requests.get(f'{self.catalogIP}/{self.serviceName}?ID={self.ID}')) #FIX
-		ServiceInfo = {'broker': "mqtt.eclipseprojects.io", 'port': 1883, 'topic': 'IoTomatoes'}
-		#self.broker = json.loads(requests.get("self.catalogIP/broker")) #FIX
-		self.broker = ServiceInfo['broker']
+		#ServiceInfo = json.loads(requests.get(f'{self.catalogIP}/{self.serviceName}?ID={self.ID}')) #!FINAL
+		ServiceInfo = {'broker': "mqtt.eclipseprojects.io", 'port': 1883, 'topic': 'IoTomatoes'} #*TEST
+		#self.broker = json.loads(requests.get("self.catalogIP/broker")) #!FINAL
+		self.broker = ServiceInfo['broker'] #*TEST
 		self.port = ServiceInfo['port']
 		self.basicTopic = ServiceInfo['topic']
 
-		#r = json.loads(requests.get(f'{self.catalogIP}/getCompanyList')) #FIX
-		CompanyList = json.load(open("../CompanyList.json"))
+		#r = json.loads(requests.get(f'{self.catalogIP}/getCompanyList')) #!FINAL
+		CompanyList = json.load(open("../CompanyList.json")) #*TEST
 		self.deviceList = self.createDeviceList(CompanyList['CompanyList'])
 		self.thresholds = {
 							'temperature' : {'max_value': 1000,'min_value': -100, 'unit': '°C'},
@@ -159,7 +161,7 @@ class MQTTFaultDetector(FaultDetector):
 
 		measure_check = self.checkMeasure(companyName, deviceID, measureType, measure)
 		if measure_check.is_error:
-			self.Publish(measure_check.message, f"{self.basicTopic}/{self.serviceName}/{companyName}/{measure_check.topic}")
+			self.Publish(measure_check.message, f"{companyName}/{measure_check.topic}")
 		else:
 			self.updateDeviceStatus(deviceID)
 
@@ -171,17 +173,20 @@ class MQTTFaultDetector(FaultDetector):
 				- IoTomatoes/FaultDetection/CompanyName/alertNoMessage
 				- IoTomatoes/FaultDetection/CompanyName/ErrorReported
 		"""
+		topic_sent = f"{self.basicTopic}/{self.serviceName}/{topic}"
 		payload =json.dumps({'message': message})
-		self._paho_mqtt.publish(topic, payload, 2)
+		self._paho_mqtt.publish(topic_sent, payload, 2)
 
 if __name__ == "__main__":
 	fd = MQTTFaultDetector()
 	while True:
+		time.sleep(5) #!FINAL: 300
+
 		for dev in fd.deviceList:
 			status = fd.checkDeviceStatus(dev)
 			if status.is_error:
 				payload_message = status.message
 				companyName = dev['companyName']
-				fd.Publish(payload_message, f"{fd.basicTopic}/{fd.serviceName}/{companyName}/{status.topic}")
+				fd.Publish(payload_message, f"{companyName}/{status.topic}")
 
-		time.sleep(5)
+		

@@ -3,19 +3,28 @@ import time
 import json
 import paho.mqtt.client as PahoMQTT
 
-from ItemInfo import ServiceInfo
+from ItemInfo import EndpointInfo as EInfo
 from MyExceptions import InfoException
 from MyThread import MyThread
 
 class RefreshThread(MyThread):
-    def __init__(self, url : str, ID : int, interval=60):
-        super().__init__(self.refresh_item, (url, ID), interval)
+    def __init__(self, url : str, ID : int, interval=60, CompanyInfo : dict = {}):
+        """RefreshThread class. Refresh the Catalog every ``interval`` seconds.
+        
+        ``url {str}``: Catalog URL.\n
+        ``ID {int}``: ID of the item.\n
+        ``interval {int}``: refresh interval in seconds (default = 60).\n
+        ``CompanyInfo {dict}``: Company information (default = {}), needed only if the item is a resource.
+        """
+        super().__init__(self.refresh_item, (url, ID, CompanyInfo), interval)
 
-    def refresh_item(self, url : str, ID : int):
+    def refresh_item(self, url : str, ID : int, CompanyInfo : dict = {}):
+        """Refresh item ``ID`` in the Catalog at ``url``."""
+
         refreshed = False
         while not refreshed :
             try:
-                res = requests.put(url + "/refresh", params={"ID": ID})
+                res = requests.put(url + "/refresh", params={"ID": ID}.update(CompanyInfo))
                 res.raise_for_status()
             except requests.exceptions.HTTPError as err:
                 print(f"{err.response.status_code} : {err.response.reason}")
@@ -29,17 +38,51 @@ class RefreshThread(MyThread):
                 else:
                     print(stat)
 
-class GenericService(): 
-    def __init__(self, Service_info : ServiceInfo, ServiceCatalog_url : str) :
-        self.Service_info = Service_info
-        self.ServiceCatalog_url = ServiceCatalog_url
-        self.ID = self.register(self.Service_info.__dict__())
-        self.Thread = RefreshThread(self.ServiceCatalog_url, self.ID)
+class GenericEndpoint(): 
+    def __init__(self, settings : dict, isService : bool = False, 
+                    isResource : bool = True, CompanyInfo : dict = {}) :
+        """GenericEndpoint class. It is the base class for all the endpoints."""
 
-    def register(self, info : dict) -> int:
+        if "ServiceCatalog_url" not in settings:
+            raise InfoException("The Service Catalog URL is missing")
+        self.ServiceCatalog_url = settings["ServiceCatalog_url"]
+        self._MQTTclient = False
+        if isService ^isResource:
+            raise InfoException("The Endpoint must be a service or a resource, not both or none")
+        else:
+            self._isService = isService
+            self._isResource = isResource
+            self.EndpointInfo, self._CompanyInfo = EInfo(isService=isService, 
+                                                            isResource=isResource).construct(settings, CompanyInfo)
+
+    def start(self):
+        if self._isService:
+            self.start_as_a_service()
+        elif self._isResource:
+            self.start_as_a_resource()
+        
+        if EInfo(self.EndpointInfo).isMQTT:
+            self.start_MQTTclient()
+
+    def stop(self):
+        self._RefreshThread.stop()
+
+        if self._MQTTclient:
+            if (self._isSubscriber):
+                # remember to unsuscribe if it is working also as subscriber
+                self._paho_mqtt.unsubscribe(self._topic)
+
+            self._paho_mqtt.loop_stop()
+            self._paho_mqtt.disconnect()
+
+    def start_as_a_service(self) :
+        self.ID = self.register_service()
+        self._RefreshThread = RefreshThread(self.ServiceCatalog_url, self.ID)
+
+    def register_service(self) -> int:
         while True:
             try:
-                res = requests.post(self.ServiceCatalog_url + "/insert", json = info)
+                res = requests.post(self.ServiceCatalog_url + "/insert", json = self.EndpointInfo)
                 res.raise_for_status()
             except requests.exceptions.HTTPError as err:
                 print(f"{err.response.status_code} : {err.response.reason}")
@@ -55,32 +98,17 @@ class GenericService():
                 except:
                     print(f"Error in the response\n")
 
-class GenericMQTTResource():
-    def __init__(self, ResourceInfo, CompanyInfo : dict, ServiceCatalog_url : str) :        
-        self.ServiceCatalog_url = ServiceCatalog_url
+    def start_as_a_resource(self) :        
         self.ResourceCatalog_url = self.get_ResourceCatalog_url()
-        self.ResourceInfo = ResourceInfo
-
-        if CompanyInfo is not None and "CompanyName" in CompanyInfo and "CompanyToken" in CompanyInfo:
-            self.CompanyInfo = {
-                "CompanyName" : CompanyInfo["CompanyName"],
-                "CompanyToken" : CompanyInfo["CompanyToken"]
-            }
-        else:
-            raise InfoException("CompanyInfo is not valid")
-
         #Register
-        self.ID = self.register_device(self.ResourceInfo.__dict__())
-        self.Thread = RefreshThread(self.ResourceCatalog_url, self.ID)
-        self.Thread.start()
-        
-        #MQTT client
-        self.client = GenericMQTTEndpoint(f"IoTomatoes_ID{self.ID}",self.ServiceCatalog_url, self)
+        self.ID = self.register_device()
+        self._RefreshThread = RefreshThread(self.ResourceCatalog_url, self.ID, CompanyInfo = self._CompanyInfo)
 
-    def register_device(self, info : dict) -> int:
+    def register_device(self) -> int:
         while True:
             try:
-                res = requests.post(self.ResourceCatalog_url + "/insert/device", params=self.CompanyInfo, json = info)
+                res = requests.post(self.ResourceCatalog_url + "/insert/device", 
+                                        params=self._CompanyInfo, json = self.EndpointInfo)
                 res.raise_for_status()
             except requests.exceptions.HTTPError as err:
                 print(f"{err.response.status_code} : {err.response.reason}")
@@ -99,7 +127,8 @@ class GenericMQTTResource():
     def get_ResourceCatalog_url(self) :
         while True:
             try:
-                res = requests.get(self.ServiceCatalog_url + "/search/serviceName", params = {"serviceName": "ResourceCatalog"})
+                res = requests.get(self.ServiceCatalog_url + "/search/serviceName", 
+                                    params = {"serviceName": "ResourceCatalog"})
                 res.raise_for_status()
             except:
                 print(f"Connection Error\nRetrying connection\n")
@@ -131,46 +160,30 @@ class GenericMQTTResource():
                     print(f"Error in the broker information\nRetrying connection\n")
                     time.sleep(1)
 
-    def stop(self):
-        self.Thread.stop()
-        self.client.stop()
-
-class GenericMQTTEndpoint():
-    def __init__(self, clientID, ServiceCatalog_url : str, notifier) :
-        self.ServiceCatalog_url = ServiceCatalog_url
-        self.broker, self.port, self.baseTopic = self.get_broker()
-        self.notifier = notifier
-        self.clientID = clientID
+    def start_MQTTclient(self) :
+        self._MQTTclient = True
+        self._broker, self._port, self._baseTopic = self.get_broker()
+        self.MQTTclientID = f"IoTomatoes_ID{self.ID}"
         self._isSubscriber = False
         # create an instance of paho.mqtt.client
-        self._paho_mqtt = PahoMQTT.Client(clientID, True)
+        self._paho_mqtt = PahoMQTT.Client(self.MQTTclientID, True)
         # register the callback
         self._paho_mqtt.on_connect = self.myOnConnect
         self._paho_mqtt.on_message = self.myOnMessageReceived
-        self.start()
+        # manage connection to broker
+        self._paho_mqtt.connect(self._broker, self._port)
+        self._paho_mqtt.loop_start()
+        # subscribe the topics
+        for topic in EInfo(self.EndpointInfo).subscribedTopic:
+            self.mySubscribe(self._baseTopic + topic)
 
-    def get_broker(self) :
-        while True:
-            try:
-                res = requests.get(self.ServiceCatalog_url + "/broker")
-                res.raise_for_status()
-            except:
-                print(f"Connection Error\nRetrying connection\n")
-                time.sleep(1)
-            else:
-                try:
-                    broker = res.json()
-                    return broker["IP"], broker["port"], broker["baseTopic"]
-                except:
-                    print(f"Error in the broker information\nRetrying connection\n")
-                    time.sleep(1)
 
     def myOnConnect(self, paho_mqtt, userdata, flags, rc):
-        print("Connected to %s with result code: %d" % (self.broker, rc))
+        print("Connected to %s with result code: %d" % (self._broker, rc))
 
     def myOnMessageReceived(self, paho_mqtt, userdata, msg):
         # A new message is received
-        self.notifier.notify(msg.topic, msg.payload) # type : ignore
+        self.notify(msg.topic, msg.payload) # type: ignore
 
     def myPublish(self, topic, msg):
         # publish a message with a certain topic
@@ -184,20 +197,7 @@ class GenericMQTTEndpoint():
         self._topic = topic
         print("subscribed to %s" % (topic))
 
-    def start(self):
-        # manage connection to broker
-        self._paho_mqtt.connect(self.broker, self.port)
-        self._paho_mqtt.loop_start()
-
     def unsubscribe(self):
         if (self._isSubscriber):
             # remember to unsuscribe if it is working also as subscriber
             self._paho_mqtt.unsubscribe(self._topic)
-
-    def stop(self):
-        if (self._isSubscriber):
-            # remember to unsuscribe if it is working also as subscriber
-            self._paho_mqtt.unsubscribe(self._topic)
-
-        self._paho_mqtt.loop_stop()
-        self._paho_mqtt.disconnect()

@@ -4,10 +4,11 @@ import random
 import sys
 
 sys.path.append("../SupportClasses/")
-from GenericEndPoints import GenericMQTTResource
-from ItemInfo import DeviceInfo
+from GenericEndpoint import GenericEndpoint
+from MyExceptions import InfoException
+from ItemInfo import EndpointInfo as EInfo
 
-class IoTDevice(GenericMQTTResource):
+class IoTDevice(GenericEndpoint):
     def __init__(self, DeviceInfo : DeviceInfo, CompanyInfo, ServiceCatalog_url: str):
         super().__init__(DeviceInfo, CompanyInfo, ServiceCatalog_url)
         self.client.start()

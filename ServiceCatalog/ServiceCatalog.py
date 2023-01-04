@@ -2,11 +2,13 @@ import json
 import cherrypy
 import time
 import sys
+import socket
 
 sys.path.append("../SupportClasses/")
-from MyExceptions import web_exception
+from MyExceptions import *
 from MyThread import MyThread
 from MyIDGenerator import IDs
+from ItemInfo import EndpointInfo as EInfo
 
 serviceList_Name = "servicesList"
 
@@ -112,22 +114,23 @@ class ServiceCatalogManager:
         except KeyError:
             raise web_exception(500, "Invalid key")
 
-    def insert(self, new_item : dict):
+    def insert(self, item_dict : dict):
         """Insert a new device in the catalog.
         Return a json with the status of the operation.
         
         Keyword arguments:
-        ``new_item`` is the item in json format to insert.
+        ``item_dict`` is the item in json format to insert.
         """
         try:
             ID = self.IDs.get_ID()
             if ID == -1:
                 raise web_exception(500, "No more IDs available")
             else:
-                actualtime = time.time() 
-                self.catalog["lastUpdate"] = actualtime
-                new_item["ID"] = ID
-                new_item["lastUpdate"] = actualtime
+                self.catalog["lastUpdate"] = time.time() 
+                try:
+                    new_item = EInfo(isService=True).constructService(ID, item_dict)
+                except InfoException as e:
+                    raise web_exception(500, e.message)
                 self.catalog[serviceList_Name].append(new_item)
                 out = {"ID": ID}
                 return json.dumps(out, indent=4)
@@ -361,8 +364,8 @@ class RESTServiceCatalog():
 if __name__ == "__main__":
     settings = json.load(open("ServiceCatalogSettings.json"))
 
-    ip_address = settings["REST_settings"]["ip_address"]
-    port = settings["REST_settings"]["port"]
+    local_ip = socket.gethostbyname(socket.gethostname())
+    port = settings["IPport"]
 
     Catalog = RESTServiceCatalog(settings)
 
@@ -373,7 +376,7 @@ if __name__ == "__main__":
         }
     }
     cherrypy.tree.mount(Catalog, '/', conf)
-    cherrypy.config.update({'server.socket_host': ip_address})
+    cherrypy.config.update({'server.socket_host': local_ip})
     cherrypy.config.update({'server.socket_port': port})
     cherrypy.engine.start()
     

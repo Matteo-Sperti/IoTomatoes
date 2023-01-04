@@ -6,8 +6,8 @@ import sys
 
 sys.path.append("../SupportClasses/")
 from GenericEndpoint import GenericEndpoint
+from ItemInfo import *
 from MyExceptions import *
-from ItemInfo import EndpointInfo as EInfo
 from MyIDGenerator import IDs
 from MyThread import MyThread
 
@@ -191,7 +191,7 @@ class ResourceCatalogManager():
             else:
                 self.catalog["lastUpdate"] =  time.time() 
                 try:
-                    new_item = EInfo(isResource=True).constructResource(ID, deviceInfo)
+                    new_item = constructResource(ID, CompanyInfo, deviceInfo)
                 except InfoException as e:
                     raise web_exception(500, e.message)
                 company[devicesList_name].append(new_item)
@@ -353,9 +353,14 @@ if __name__ == "__main__":
     ip_address = socket.gethostbyname(socket.gethostname())
     port = settings["IPport"]
     settings["IPaddress"] = ip_address
-    
+
     try:
         Catalog = RESTResourceCatalog(settings)
+    except InfoException as e:
+        print(e.message)
+    except KeyError as e:
+        print(e)
+        print("KeyError, Error while creating the catalog")
     except:
         print("Error while creating the catalog")
     else:

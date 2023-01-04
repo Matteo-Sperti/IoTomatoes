@@ -3,7 +3,7 @@ import time
 import json
 import paho.mqtt.client as PahoMQTT
 
-from ItemInfo import EndpointInfo as EInfo
+from ItemInfo import * 
 from MyExceptions import InfoException
 from MyThread import MyThread
 
@@ -46,32 +46,29 @@ class GenericEndpoint():
         if "ServiceCatalog_url" not in settings:
             raise InfoException("The Service Catalog URL is missing")
         self.ServiceCatalog_url = settings["ServiceCatalog_url"]
-        self._MQTTclient = False
-        if isService ^isResource:
+        if isService ^ isResource:
             raise InfoException("The Endpoint must be a service or a resource, not both or none")
         else:
             self._isService = isService
             self._isResource = isResource
-            self.EndpointInfo, self._CompanyInfo = EInfo(isService=isService, 
-                                                            isResource=isResource).construct(settings, CompanyInfo)
+            self.EndpointInfo, self._CompanyInfo = construct(settings, CompanyInfo, isService, isResource)
+            self._MQTTclient = isMQTT(self.EndpointInfo)
+            self._subscribedTopics = subscribedTopics(self.EndpointInfo)
 
     def start(self):
         if self._isService:
             self.start_as_a_service()
         elif self._isResource:
             self.start_as_a_resource()
-        
-        if EInfo(self.EndpointInfo).isMQTT:
+
+        if self._MQTTclient:
             self.start_MQTTclient()
 
     def stop(self):
         self._RefreshThread.stop()
 
         if self._MQTTclient:
-            if (self._isSubscriber):
-                # remember to unsuscribe if it is working also as subscriber
-                self._paho_mqtt.unsubscribe(self._topic)
-
+            self.unsubscribe_all()
             self._paho_mqtt.loop_stop()
             self._paho_mqtt.disconnect()
 
@@ -174,9 +171,8 @@ class GenericEndpoint():
         self._paho_mqtt.connect(self._broker, self._port)
         self._paho_mqtt.loop_start()
         # subscribe the topics
-        for topic in EInfo(self.EndpointInfo).subscribedTopic:
+        for topic in self._subscribedTopics:
             self.mySubscribe(self._baseTopic + topic)
-
 
     def myOnConnect(self, paho_mqtt, userdata, flags, rc):
         print("Connected to %s with result code: %d" % (self._broker, rc))
@@ -194,10 +190,10 @@ class GenericEndpoint():
         self._paho_mqtt.subscribe(topic, 2)
         # just to remember that it works also as a subscriber
         self._isSubscriber = True
-        self._topic = topic
         print("subscribed to %s" % (topic))
 
-    def unsubscribe(self):
+    def unsubscribe_all(self):
         if (self._isSubscriber):
             # remember to unsuscribe if it is working also as subscriber
-            self._paho_mqtt.unsubscribe(self._topic)
+            for topic in self._subscribedTopics:
+                self._paho_mqtt.unsubscribe(self._baseTopic + topic)

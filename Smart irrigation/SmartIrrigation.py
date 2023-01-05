@@ -117,7 +117,7 @@ class SmartIrrigation(GenericEndpoint):
 
 
 if __name__=="__main__":
-    settings = json.load(open("SmartLightingSettings.json"))
+    settings = json.load(open("SmartIrrigationSettings.json"))
 
     ip_address = gethostbyname(gethostname())
     port = settings["IPport"]
@@ -133,7 +133,7 @@ if __name__=="__main__":
     irrigation=SmartIrrigation(settings)
     irrigation.start()
 
-    cherrypy.tree.mount(irrigation, "/SmartIrrigation", conf)
+    cherrypy.tree.mount(irrigation, "/", conf)
     cherrypy.config.update({'server.socket_host': ip_address})
     cherrypy.config.update({'server.socket_port': port})
     cherrypy.engine.start()

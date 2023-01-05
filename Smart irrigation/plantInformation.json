@@ -31,23 +31,12 @@
                     "lastMeasures": {
                         "temperature": {
                             "values": [
-                                30,
-                                23,
-                                37,
-                                29,
-                                36,
-                                27,
                                 21
                             ],
                             "lastUpdate": 1672341171.9981072
                         },
                         "soilMoisture": {
                             "values": [
-                                52,
-                                46,
-                                56,
-                                53,
-                                63,
                                 68
                             ],
                             "lastUpdate": 1672341175.2341275
@@ -84,25 +73,12 @@
                     "lastMeasures": {
                         "temperature": {
                             "values": [
-                                30,
-                                25,
-                                29,
-                                29,
-                                39,
-                                21,
-                                32,
                                 36
                             ],
                             "lastUpdate": 1672341177.25489
                         },
                         "soilMoisture": {
                             "values": [
-                                67,
-                                49,
-                                60,
-                                69,
-                                63,
-                                46,
                                 60
                             ],
                             "lastUpdate": 1672341176.0969133

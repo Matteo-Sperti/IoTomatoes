@@ -143,7 +143,7 @@ if __name__=="__main__":
     lighting=SmartLighting(settings)
     lighting.start()
 
-    cherrypy.tree.mount(lighting, "/SmartLighting", conf)
+    cherrypy.tree.mount(lighting, "/", conf)
     cherrypy.config.update({'server.socket_host': ip_address})
     cherrypy.config.update({'server.socket_port': port})
     cherrypy.engine.start()

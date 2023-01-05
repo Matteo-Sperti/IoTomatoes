@@ -1,0 +1,73 @@
+{
+    "company": [
+        "Andrea",
+        "Federico"
+    ],
+    "companyList": [
+        {
+            "companyName": "Andrea",
+            "fieldsNumber": 1,
+            "fields": [
+                {
+                    "fieldID": 1,
+                    "plantType": "tomatoes",
+                    "lux": 4100,
+                    "light": [
+                        "pieno sole",
+                        "sole parziale"
+                    ],
+                    "lightMeasures": {
+                        "values": [
+                            4465,
+                            4705,
+                            4354,
+                            4003,
+                            4384
+                        ],
+                        "lastUpdate": 1672352950.996713
+                    }
+                }
+            ]
+        },
+        {
+            "companyName": "Federico",
+            "fieldsNumber": 2,
+            "fields": [
+                {
+                    "fieldID": 1,
+                    "plantType": "potatoes",
+                    "lux": 4500,
+                    "light": [
+                        "pieno sole",
+                        "sole parziale"
+                    ],
+                    "lightMeasures": {
+                        "values": [
+                            4484,
+                            4823,
+                            4373,
+                            4463,
+                            4579
+                        ],
+                        "lastUpdate": 1672352952.386986
+                    }
+                },
+                {
+                    "fieldID": 2,
+                    "plantType": "tomatoes",
+                    "lux": 4100,
+                    "light": [
+                        "pieno sole",
+                        "sole parziale"
+                    ],
+                    "lightMeasures": {
+                        "values": [
+                            54
+                        ],
+                        "lastUpdate": ""
+                    }
+                }
+            ]
+        }
+    ]
+}

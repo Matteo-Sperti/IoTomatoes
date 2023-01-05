@@ -1,33 +1,22 @@
 import paho.mqtt.client as PahoMQTT
 import datetime
 import time
-import requests
 import json
 import pandas as pd
-import os
 
 import sys
-sys.path.append('/Users/federicomoscato/IoTomatoes/IoTomatoes')
+sys.path.append('../SupportClasses/')
+from GenericEndpoint import GenericEndpoint
 from Tests.CheckResult import *
 
-class ConsumptionManager:
-	def __init__(self):
+class ConsumptionManager (GenericEndpoint):
+	def __init__(self, settings : dict):
 		"""Initialize the ConsumptionManager class"""
 
-		conf = json.load(open('ConsumptionService_settings.json')) #*TEST
-		self.clientID = conf['clientID'] #FROM SERVICE CATALOG self.ID #!FINAL
-		self.catalogIP = conf['catalogIP']
-		self.serviceName = conf['serviceName']
-
-		#ServiceInfo = json.loads(requests.get(f'{self.catalogIP}/{self.serviceName}?ID={self.ID}')) #!FINAL
-		ServiceInfo = {'broker': "mqtt.eclipseprojects.io", 'port': 1883, 'topic': 'IoTomatoes'} #*TEST
-		#self.broker = json.loads(requests.get("self.catalogIP/broker"))
-		self.broker = ServiceInfo['broker']
-		self.port = ServiceInfo['port']
-		self.basicTopic = ServiceInfo['topic']
-
+		super().__init__(settings, isService=True)
+		
 		#r = json.loads(requests.get(f'{self.catalogIP}/getCompanyList')) #!FINAL
-		r = json.load(open('../CompanyList.json')) #*TEST
+		r = json.load(open('../Tests/CompanyList.json')) #*TEST
 		self.CompanyList = self.updateCompanyList(r['CompanyList'])
 
 	def checkActuator(self, deviceID : int):

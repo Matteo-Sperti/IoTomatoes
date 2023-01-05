@@ -3,7 +3,6 @@ import json
 import time
 import cherrypy
 
-
 def validateJSON(jsonData):
     try:
         json.loads(jsonData)

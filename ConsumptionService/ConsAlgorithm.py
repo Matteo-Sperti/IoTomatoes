@@ -10,7 +10,7 @@ class Consumption_Algorithm:
     def __init__(self):
         self.reg = None
     
-    def create_features(df):
+    def create_features(self, df):
         """
         Create time series features based on time series index.
         """

@@ -4,11 +4,11 @@ import time
 import requests
 import json
 import pandas as pd
-import os
 
 import sys
-sys.path.append('/Users/federicomoscato/IoTomatoes/IoTomatoes')
+sys.path.append('../')
 from Tests.CheckResult import *
+from SupportClasses.GenericEndpoint import GenericEndpoint
 
 class FaultDetector:
 	def __init__(self):

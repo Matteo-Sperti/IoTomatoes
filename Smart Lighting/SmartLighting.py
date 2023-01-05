@@ -126,7 +126,7 @@ class SmartLighting(GenericEndpoint):
 
 
 if __name__=="__main__":
-    settings = json.load(open("SmartLightingSettings.json"))
+    settings = json.load(open("SmartLightingSettings.json", "r"))
 
     ip_address = gethostbyname(gethostname())
     port = settings["IPport"]

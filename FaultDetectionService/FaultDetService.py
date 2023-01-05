@@ -8,7 +8,7 @@ import os
 
 import sys
 sys.path.append('/Users/federicomoscato/IoTomatoes/IoTomatoes')
-from CheckResult import *
+from Tests.CheckResult import *
 
 class FaultDetector:
 	def __init__(self):

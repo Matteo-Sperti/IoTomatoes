@@ -24,12 +24,16 @@ class RefreshThread(MyThread):
         refreshed = False
         while not refreshed :
             try:
-                res = requests.put(url + "/refresh", params={"ID": ID}.update(CompanyInfo))
+                param = CompanyInfo.copy()
+                param.update({"ID": ID})
+                res = requests.put(url + "/refresh", params=param)
                 res.raise_for_status()
             except requests.exceptions.HTTPError as err:
                 print(f"{err.response.status_code} : {err.response.reason}")
+                time.sleep(1)
             except:
                 print(f"Connection Error\nRetrying connection\n")
+                time.sleep(1)
             else:
                 stat = res.json()
                 if "Status" in stat and stat["Status"] == True:
@@ -37,6 +41,7 @@ class RefreshThread(MyThread):
                     print(f"Refreshed correctly to the Catalog; myID = {ID}\n")
                 else:
                     print(stat)
+                    time.sleep(1)
 
 class GenericEndpoint(): 
     def __init__(self, settings : dict, isService : bool = False, 
@@ -187,6 +192,7 @@ class GenericEndpoint():
 
     def mySubscribe(self, topic):
         # subscribe for a topic
+        print(topic)
         self._paho_mqtt.subscribe(topic, 2)
         # just to remember that it works also as a subscriber
         self._isSubscriber = True

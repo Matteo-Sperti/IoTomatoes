@@ -1,6 +1,15 @@
 {
     "ServiceCatalog_url" : "http://127.0.0.1:8080",
-    "ServiceName" : "IoTomatoes_bot",
-    "IPport" : 8083
-
+    "serviceName" : "IoTomatoes_bot",
+    "IPport" : 8083,
+    "availableServices" : [
+        "MQTT"
+    ],
+    "servicesDetails" : [
+        {
+            "serviceType": "MQTT",
+            "subscribedTopics": ["+/TelegramBot/#"],
+            "publishedTopics": []
+        }
+    ]
 }

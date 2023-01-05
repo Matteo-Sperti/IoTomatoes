@@ -5,6 +5,7 @@ import json
 import time
 import requests
 import sys
+from socket import gethostname, gethostbyname
 
 from Commands import *
 sys.path.append("../SupportClasses/")
@@ -119,9 +120,13 @@ class IoTBot(GenericEndpoint):
 if __name__ == "__main__":
     settings = json.load(open("TelegramSettings.json"))
 
+    local_IPaddress = gethostbyname(gethostname())
+    settings["IPaddress"] = local_IPaddress
+    
     try:
         IoTomatoesBOT = IoTBot(settings)
-    except:
+    except Exception as e:
+        print(e)
         print("Error in the initialization of the IoTBot")
     else:
         print("IoTBot started")

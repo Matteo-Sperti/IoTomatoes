@@ -2,13 +2,13 @@ import json
 import cherrypy
 import time
 import sys
-import socket
+from socket import gethostname, gethostbyname
 
 sys.path.append("../SupportClasses/")
 from MyExceptions import *
 from MyThread import MyThread
 from MyIDGenerator import IDs
-from ItemInfo import EndpointInfo as EInfo
+from ItemInfo import *
 
 serviceList_Name = "servicesList"
 
@@ -23,7 +23,7 @@ class ServiceCatalogManager:
         self.filename = filename
         self.autoDeleteTime = autoDeleteTime
         self.IDs = IDs
-        self.catalog = heading
+        self.catalog = heading.copy()
         self.catalog["lastUpdate"] = time.time()
         self.catalog[serviceList_Name] = []
         self.autoDeleteItemsThread = MyThread(self.autoDeleteItems, interval=self.autoDeleteTime)
@@ -128,7 +128,7 @@ class ServiceCatalogManager:
             else:
                 self.catalog["lastUpdate"] = time.time() 
                 try:
-                    new_item = EInfo(isService=True).constructService(ID, item_dict)
+                    new_item = constructService(ID, item_dict)
                 except InfoException as e:
                     raise web_exception(500, e.message)
                 self.catalog[serviceList_Name].append(new_item)
@@ -364,7 +364,8 @@ class RESTServiceCatalog():
 if __name__ == "__main__":
     settings = json.load(open("ServiceCatalogSettings.json"))
 
-    local_ip = socket.gethostbyname(socket.gethostname())
+    # local_ip = gethostbyname(gethostname())
+    local_ip = "127.0.0.1"
     port = settings["IPport"]
 
     Catalog = RESTServiceCatalog(settings)

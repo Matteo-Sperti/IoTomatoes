@@ -1,7 +1,7 @@
 import json
 import time
 import cherrypy
-import socket
+from socket import gethostname, gethostbyname
 import sys
 
 sys.path.append("../SupportClasses/")
@@ -37,18 +37,14 @@ def query_yes_no(question):
 class ResourceCatalogManager():
     def __init__(self, heading : dict, filename = "CompanyCatalog.json", autoDeleteTime = 120, 
                     IDs = IDs(100)):
-        self.catalog = heading
+        self.catalog = heading.copy()
+        self.catalog["lastUpdate"] = time.time()
         self.catalog[companyList_name] = []
-        self.catalog["lastUpdate"] = time.time(),
 
         self._filename = filename
         self._IDs = IDs
         self._autoDeleteTime = autoDeleteTime
         self.autoDeleteItemsThread = MyThread(self.autoDeleteItems, interval=self._autoDeleteTime)
-
-    def stop(self):
-        self.autoDeleteItemsThread.stop()
-        self.save()
 
     def save(self):
         try:
@@ -306,9 +302,9 @@ class RESTResourceCatalog(GenericEndpoint):
         super().__init__(settings, isService=True)
         self.catalog = ResourceCatalogManager(self.EndpointInfo, filename, autoDeleteTime)
 
-
     def close(self):
-        self.catalog.stop()
+        self.catalog.autoDeleteItemsThread.stop()
+        self.catalog.save()
         self.stop()
 
     def GET(self, *uri, **params):
@@ -350,7 +346,7 @@ class RESTResourceCatalog(GenericEndpoint):
 if __name__ == "__main__":
     settings = json.load(open("ResourceCatalogSettings.json"))
 
-    ip_address = socket.gethostbyname(socket.gethostname())
+    ip_address = gethostbyname(gethostname())
     port = settings["IPport"]
     settings["IPaddress"] = ip_address
 
@@ -381,6 +377,6 @@ if __name__ == "__main__":
             while True:
                 time.sleep(3)
         except KeyboardInterrupt:
-            Catalog.stop()
+            Catalog.close()
             cherrypy.engine.block()
             print("Server stopped")

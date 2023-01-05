@@ -9,6 +9,61 @@
             "serviceIP": "http://172.20.10.3:8081"
         }
     ],
-    "lastUpdate": 1672913581.3802361,
-    "companiesList": []
+    "lastUpdate": 1672919891.9610603,
+    "companiesList": [
+        {
+            "ID": 100,
+            "CompanyName": "PatataNovella",
+            "CompanyToken": "123",
+            "adminID": 101,
+            "usersList": [
+                {
+                    "Name": "Matteo",
+                    "Surname": "Sperti",
+                    "telegramID": 615608459,
+                    "ID": 101,
+                    "lastUpdate": 1672919849.0390937
+                }
+            ],
+            "devicesList": [
+                {
+                    "ID": 104,
+                    "availableServices": [
+                        "MQTT"
+                    ],
+                    "servicesDetails": [
+                        {
+                            "serviceType": "MQTT",
+                            "subscribedTopics": [],
+                            "publishedTopics": []
+                        }
+                    ],
+                    "deviceName": "Device_29",
+                    "field": 2,
+                    "PowerConsumption_kW": 7,
+                    "isActuator": false,
+                    "actuator": [],
+                    "isSensor": false,
+                    "measureType": [],
+                    "lastUpdate": 1672919891.9620035
+                }
+            ]
+        },
+        {
+            "ID": 102,
+            "CompanyName": "Magic Farm",
+            "CompanyToken": "456",
+            "adminID": 103,
+            "usersList": [
+                {
+                    "Name": "Pino",
+                    "Surname": "Farlocco",
+                    "telegramID": 615608459,
+                    "ID": 103,
+                    "lastUpdate": 1672919875.6402
+                }
+            ],
+            "devicesList": []
+        }
+    ]
 }

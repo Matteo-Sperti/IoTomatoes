@@ -71,21 +71,21 @@ def getIPaddress(dict_ : dict) -> str:
             return service["serviceIP"]
     return ""
 
-def construct(EInfo : dict, CompInfo : dict = {}, isService : bool = False, isResource : bool = False):
-    if isResource ^ isService:
+def construct(EInfo : dict, isService : bool = False, isResource : bool = False):
+    if not isResource ^ isService:
         raise InfoException("isResource and isService are not compatible")
     if isService:
         info = _makeService(EInfo)
         CompanyInfo = {}
     else:
-        if "CompanyName" not in CompInfo and "CompanyToken" not in CompInfo:
+        if "CompanyName" not in EInfo and "CompanyToken" not in EInfo:
             raise InfoException("Company name is missing")
         else:
             CompanyInfo = {
-                "CompanyName" : CompInfo["CompanyName"],
-                "CompanyToken" : CompInfo["CompanyToken"]
+                "CompanyName" : EInfo["CompanyName"],
+                "CompanyToken" : EInfo["CompanyToken"]
             }
-        info = _makeResource(EInfo, CompInfo)
+        info = _makeResource(EInfo, CompanyInfo)
     return info, CompanyInfo
 
 def constructService(ID : int, EInfo : dict):
@@ -96,10 +96,17 @@ def constructService(ID : int, EInfo : dict):
     return info
 
 def constructResource(ID : int, CompInfo : dict, EInfo : dict):
+    print("sono in constructResource")
+    print("ID: ", ID)
+    print("CompInfo: ", CompInfo)
+    print("EInfo: ", EInfo)
     info = {}
     info["ID"] = ID
     _makeResource(EInfo, CompInfo, info)
+    print("ho fatto la resource")
+    _makeResourceTopic(EInfo, CompInfo, info)
     info["lastUpdate"] = time.time()
+    print("ho fatto la resourceTopic")
     return info
 
 def _makeService(EInfo : dict, info : dict = {}):
@@ -124,12 +131,35 @@ def _makeService(EInfo : dict, info : dict = {}):
     
     return info
 
+def _makeResourceTopic(EInfo : dict, CompInfo : dict, dict_to_construct : dict):
+    if "ID" not in dict_to_construct:
+        raise InfoException("ID is missing")
+
+    MQTT_info = {
+                "serviceType" : "MQTT", 
+                "subscribedTopics": [],
+                "publishedTopics": []
+                }
+
+    if "isActuator" in EInfo and EInfo["isActuator"] == True:
+        if "actuator" not in EInfo:
+            raise InfoException("Actuators names is missing")
+        for actuator in EInfo["actuators"]:
+            MQTT_info["subscribedTopics"].append(f"{CompInfo['CompanyName']}/{EInfo['field']}/{EInfo['ID']}/{actuator}")
+
+    if "isSensor" in EInfo and EInfo["isSensor"] == True:
+        if "measureType" not in EInfo:
+            raise InfoException("Measure type is missing")
+        for measure in EInfo["measureType"]:
+            MQTT_info["publishedTopics"].append(f"{CompInfo['CompanyName']}/{EInfo['field']}/{EInfo['ID']}/{measure}")
+
+    _addService(dict_to_construct, "MQTT", MQTT_info)
+
+
 def _makeResource(EInfo : dict, CompInfo : dict, info : dict = {}):
     info["availableServices"] = []
     info["servicesDetails"] = []
 
-    if "ID" not in info:
-        raise InfoException("ID is missing")
     if "CompanyName" not in CompInfo:
         raise InfoException("Company name is missing")
 
@@ -141,21 +171,18 @@ def _makeResource(EInfo : dict, CompInfo : dict, info : dict = {}):
     if "field" in EInfo:
         info["field"] = EInfo["field"]
     else: 
-        info["field"] = 1
-
-    MQTT_info = {
-                "serviceType" : "MQTT", 
-                "subscribedTopics": [],
-                "publishedTopics": []
-                }
+        info["field"] = 1 
+    
+    if "PowerConsumption_kW" in EInfo:
+        info["PowerConsumption_kW"] = EInfo["PowerConsumption_kW"]
+    else:
+        info["PowerConsumption_kW"] = 0
 
     if "isActuator" in EInfo and EInfo["isActuator"] == True:
         if "actuator" not in EInfo:
             raise InfoException("Actuators names is missing")
         info["isActuator"] = True
         info["actuator"] = EInfo["actuators"]
-        for actuator in EInfo["actuators"]:
-            MQTT_info["subscribedTopics"].append(f"{CompInfo['CompanyName']}/{info['field']}/{info['ID']}/{actuator}")
     else:
         info["isActuator"] = False
         info["actuator"] = []
@@ -165,19 +192,9 @@ def _makeResource(EInfo : dict, CompInfo : dict, info : dict = {}):
             raise InfoException("Measure type is missing")
         info["isSensor"] = True
         info["measureType"] = EInfo["measureType"]
-        for measure in EInfo["measureType"]:
-            MQTT_info["publishedTopics"].append(f"{CompInfo['CompanyName']}/{info['field']}/{info['ID']}/{measure}")
     else:
         info["isSensor"] = False
         info["measureType"] = []
-    
-    if "PowerConsumption_kW" in EInfo:
-        info["PowerConsumption_kW"] = EInfo["PowerConsumption_kW"]
-    else:
-        info["PowerConsumption_kW"] = 0
-
-    _addService(info, "MQTT", MQTT_info)
-
     return info
 
 def _setIPport(local_ip : str,  IPport : int, dict_ : dict = {}):

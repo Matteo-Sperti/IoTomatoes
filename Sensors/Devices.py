@@ -2,24 +2,21 @@ import time
 import json
 import random
 import sys
+from socket import gethostname, gethostbyname
 
 sys.path.append("../SupportClasses/")
 from GenericEndpoint import GenericEndpoint
-from MyExceptions import InfoException
-from ItemInfo import EndpointInfo as EInfo
+from ItemInfo import *
 
 class IoTDevice(GenericEndpoint):
-    def __init__(self, DeviceInfo : DeviceInfo, CompanyInfo, ServiceCatalog_url: str):
-        super().__init__(DeviceInfo, CompanyInfo, ServiceCatalog_url)
-        self.client.start()
-        for topic in self.ResourceInfo.subscribedTopics:
-            self.client.mySubscribe(self.baseTopic + "/" + topic)
+    def __init__(self, DeviceInfo : dict):
+        super().__init__(DeviceInfo, isResource=True)
 
-        self.message={
-            "companyName":self.ResourceInfo.companyName,
-            "bn":self.ID,
-            "field":self.ResourceInfo.field,
-            "e": {
+        self._message={
+            "companyName" : getCompanyName(self._CompanyInfo),
+            "bn" : 0,
+            "field" : getField(self._EndpointInfo),
+            "e" : {
                 "name": "",
                 "value": None,
                 "unit": "",       
@@ -31,49 +28,43 @@ class IoTDevice(GenericEndpoint):
         print(f"{self.ID} received {msg} on topic {topic}")
 
     def run(self):
-        for topic in self.ResourceInfo.publishedTopics:
-            self.publish(topic, eval(f"self.get_{topic.lower()}()"))
-            
-    def publish(self, topic, msg):
-        self.client.myPublish(self.baseTopic + "/" + topic, msg)
+        for topic in publishedTopics(self._EndpointInfo):
+            self.myPublish(topic, eval(f"self.get_{topic.lower()}()"))
+    
+    def construct_message(self, measure : str, unit : str) :
+        message=self._message
+        message["bn"]=self.ID
+        message["e"]["name"] = measure
+        message["e"]["value"] = 0
+        message["e"]["timestamp"] = time.time()
+        message["e"]["unit"] = unit
+        return message
 
     def get_temperature(self):
-        message=self.message
-        message["e"]["name"]="temperature"
-        message["e"]["value"]=random.randint(20,40)
-        message["e"]["timestamp"]=time.time()
-        message["e"]["unit"]="°C"
+        message = self.construct_message("temperature", "°C")
+        message["e"]["value"] = random.randint(20,40)
         return message
 
     def get_humidity(self):
-        message=self.message
-        message["e"]["name"] = "humidity"
+        message = self.construct_message("humidity", "%")
         message["e"]["value"] = random.randint(20,80)
-        message["e"]["timestamp"] = time.time()
-        message["e"]["unit"] = "%"
         return message
 
     def get_light(self):
-        message=self.message
-        message["e"]["name"] = "light"
+        message = self.construct_message("light", "lx") #1 lux = 1 lumen/m2
         message["e"]["value"] = random.randint(20,40)
-        message["e"]["timestamp"] = time.time()
-        message["e"]["unit"] = "lx"       #1 lux = 1 lumen/m2
         return message
 
 
     def get_soilMoisture(self):
-        message=self.message
-        message["e"]["name"] = "soilMoisture"
-        message["e"]["value"] = random.randint(45,70)
-        message["e"]["timestamp"] = time.time()
-        message["e"]["unit"] = "%"
+        message = self.construct_message("soilMoisture", "%")
+        message["e"]["value"] = random.randint(20,80)
         return message
 
 if __name__ == "__main__":
-    settings = json.load(open("settings.json", "r"))
+    settings = json.load(open("DevicesSettings.json", "r"))
     ServiceCatalog_url = settings["ServiceCatalog_url"]
-    measureTypeInterval = settings["measureTimeInterval"]
+    measureTimeInterval = settings["measureTimeInterval"]
     NumberOfFieldsPerCompany = settings["NumberOfFieldsPerCompany"]
     NumberOfDevicesPerField = settings["NumberOfDevicesPerField"]
 
@@ -97,15 +88,31 @@ if __name__ == "__main__":
                     actuators = random.sample(settings["ActuatorsType"], 1)
                     PowerConsumption_kW = random.randint(5, 20)
 
-                Device_information = DeviceInfo(f"Device{i}", company, j, 0, IPport, isActuator, isSensor, measures, actuators, PowerConsumption_kW)
+                Device_information = {
+                    "deviceName" : f"Device_{j*NumberOfDevicesPerField + i}",
+                    "field" : j,
+                    "IPport" : IPport,
+                    "IPaddress" : gethostbyname(gethostname()),
+                    "isSensor" : isSensor,
+                    "isActuator" : isActuator,
+                    "measures" : measures,
+                    "actuators" : actuators,
+                    "PowerConsumption_kW" : PowerConsumption_kW,
+                    "CompanyName" : company["CompanyName"],
+                    "CompanyToken" : company["CompanyToken"],
+                    "ServiceCatalog_url" : ServiceCatalog_url
+                }
 
-                Sensors.append(IoTDevice(Device_information, ServiceCatalog_url))
+                Sensors.append(IoTDevice(Device_information))
     
     try:
+        for sensor in Sensors:
+            sensor.start()
+
         while True:
             for sensor in Sensors:
                 sensor.run()
-                time.sleep(measureTypeInterval)
+                time.sleep(measureTimeInterval)
     except KeyboardInterrupt:
         for sensor in Sensors:
             sensor.stop()

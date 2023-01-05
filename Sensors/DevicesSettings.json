@@ -1,6 +1,15 @@
 {
     "ServiceCatalog_url" : "http://127.0.0.1:8080",
-    "Companies" : ["MagicFarm", "PatataNovella"],
+    "Companies" : [
+        {
+            "CompanyName" : "PatataNovella",
+            "CompanyToken" : "123"
+        },
+        {
+            "CompanyName" : "Magic Farm",
+            "CompanyToken" : "456"
+        }
+    ],
     "MeasuresType" : ["temperature", "humidity", "light", "soilMoisture"],
     "ActuatorsType" : ["led", "pump"],
     "NumberOfDevicesPerField" : 10,

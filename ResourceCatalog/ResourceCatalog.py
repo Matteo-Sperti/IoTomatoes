@@ -11,7 +11,6 @@ from MyExceptions import *
 from MyIDGenerator import IDs
 from MyThread import MyThread
 
-IDperCompany = 10000
 companyList_name = "companiesList"
 devicesList_name = "devicesList"
 usersList_name = "usersList"
@@ -108,7 +107,7 @@ class ResourceCatalogManager():
     
     def insertCompany(self, CompanyInfo : dict, AdminInfo : dict):
         out = {"Status": False}
-        if "CompanyName" in CompanyInfo and  "CompanyToken" in CompanyInfo:
+        if all(key in CompanyInfo for key in ["CompanyName", "CompanyToken"]):
             ID = self._IDs.get_ID()
             AdminID = self._IDs.get_ID()
             if ID == -1 or AdminID == -1:
@@ -124,7 +123,7 @@ class ResourceCatalogManager():
                         devicesList_name: []
                     }
                     new_item = AdminInfo
-                    new_item["ID"] = ID
+                    new_item["ID"] = AdminID
                     new_item["lastUpdate"] =  time.time()
                     NewCompany[usersList_name].append(new_item)
                     self.catalog[companyList_name].append(NewCompany)
@@ -140,7 +139,7 @@ class ResourceCatalogManager():
         except KeyError:
             raise web_exception(404, "List not found")
 
-    def get(self, CompanyInfo : dict, info : str, ID : int):
+    def getItem(self, CompanyInfo : dict, ID : int):
         """Return the REST or MQTT information of item ``ID`` in json format.
 
         Keyword arguments:
@@ -150,33 +149,14 @@ class ResourceCatalogManager():
         item = self.find_item(CompanyInfo, ID)
 
         if item != None:
-            if "servicesDetails" in item:
-                 for serviceInfo in item["servicesDetails"]:
-                    if serviceInfo["serviceType"] == info:
-                        return json.dumps(serviceInfo, indent=4)
+            return json.dumps(item, indent=4)
         raise web_exception(404, "Service info not found")
 
-    def search(self, list_key : str, key : str, value):
-        """Search for a item in the catalog.
-        Return a json with the item if found, otherwise return an empty list.
-
-        Keyword arguments: 
-        ``list_key`` is the name of the list to search in, 
-        ``key`` is the key to search for and
-        ``value``is the value to search for
-        """
-        try:      
-            output = []
-            for device in self.catalog[list_key]:
-                if isinstance(device[key], list):
-                    if value in device[key]:
-                        output.append(device)
-                else:
-                    if str(device[key]) == str(value):
-                        output.append(device)
-            return json.dumps(output, indent=4)
-        except KeyError:
-            raise web_exception(500, "Invalid key")
+    def getCompany(self, CompanyInfo : dict):
+        company = self.findCompany(CompanyInfo)
+        if company != None:
+            return json.dumps(company, indent=4)
+        raise web_exception(404, "Company not found")
 
     def insertDevice(self, CompanyInfo : dict, deviceInfo : dict):
         company = self.findCompany(CompanyInfo)
@@ -236,7 +216,7 @@ class ResourceCatalogManager():
             out = {"Status": False}
         return json.dumps(out, indent=4)
 
-    def delete(self, CompanyInfo : dict, IDvalue : int):
+    def deleteItem(self, CompanyInfo : dict, IDvalue : int):
         """Delete a item from the catalog.
         Return a json with the status of the operation.
         
@@ -300,7 +280,7 @@ class RESTResourceCatalog(GenericEndpoint):
         filename = settings["filename"]
         autoDeleteTime = settings["autoDeleteTime"]
         super().__init__(settings, isService=True)
-        self.catalog = ResourceCatalogManager(self.EndpointInfo, filename, autoDeleteTime)
+        self.catalog = ResourceCatalogManager(self._EndpointInfo, filename, autoDeleteTime)
 
     def close(self):
         self.catalog.autoDeleteItemsThread.stop()
@@ -308,7 +288,21 @@ class RESTResourceCatalog(GenericEndpoint):
         self.stop()
 
     def GET(self, *uri, **params):
-        pass
+        try:
+            if len(uri) > 0:
+                if len(uri) == 1 and uri[0] == "getCompany":
+                    if all(key in params for key in ["CompanyName", "CompanyToken"]):
+                        CompanyInfo = {"CompanyName": params["CompanyName"], "CompanyToken": params["CompanyToken"]}
+                        return self.catalog.getCompany(CompanyInfo)
+                elif len(uri) == 2 and uri[1] == "get":
+                    if all(key in params for key in ["ID", "CompanyName", "CompanyToken"]):
+                        CompanyInfo = {"CompanyName": params["CompanyName"], "CompanyToken": params["CompanyToken"]}
+                        return self.catalog.getItem(CompanyInfo, params["ID"])
+            raise web_exception(404, "Resource not found.")
+        except web_exception as e:
+            raise cherrypy.HTTPError(e.code, e.message)
+        except:
+            raise cherrypy.HTTPError(500, "Internal Server Error")
 
     def POST(self, *uri, **params):
         try:
@@ -317,7 +311,7 @@ class RESTResourceCatalog(GenericEndpoint):
                     body_dict = json.loads(cherrypy.request.body.read())
                     print(body_dict, params)
                     return self.catalog.insertCompany(params, body_dict)
-                elif len(uri) == 2 and uri [2] == "insert":
+                elif len(uri) == 2 and uri [0] == "insert":
                     body_dict = json.loads(cherrypy.request.body.read())
                     if uri[1] == "user":
                         return self.catalog.insertUser(params, body_dict)
@@ -332,8 +326,10 @@ class RESTResourceCatalog(GenericEndpoint):
     def PUT(self, *uri, **params):
         try:
             if len(uri) > 0:
-                if len(uri) == 3 and uri[2] == "refresh" and "ID" in params:
-                    return self.catalog.refreshItem(uri[1], params["ID"])
+                if len(uri) == 1 and uri[0] == "refresh":
+                    if all(key in params for key in ["ID", "CompanyName", "CompanyToken"]):
+                        CompanyInfo = {"CompanyName": params["CompanyName"], "CompanyToken": params["CompanyToken"]}
+                        return self.catalog.refreshItem(CompanyInfo, params["ID"])
             raise web_exception(404, "Resource not found.")
         except web_exception as e:
             return cherrypy.HTTPError(e.code, e.message)
@@ -378,5 +374,6 @@ if __name__ == "__main__":
                 time.sleep(3)
         except KeyboardInterrupt:
             Catalog.close()
+            print("Catalog closed, press Ctrl+C to stop the server")
             cherrypy.engine.block()
             print("Server stopped")

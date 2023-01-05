@@ -63,9 +63,7 @@ class InsertNewCompany():
             return False
         else:
             try:
-                print(res)
                 res_dict = res.json()
-                print(res_dict)
                 if res_dict["Status"]:
                     CompanyID = res_dict["CompanyID"]
                     CompanyToken = res_dict["CompanyToken"]

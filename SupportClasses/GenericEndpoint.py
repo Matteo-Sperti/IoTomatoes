@@ -45,20 +45,18 @@ class RefreshThread(MyThread):
 
 class GenericEndpoint(): 
     def __init__(self, settings : dict, isService : bool = False, 
-                    isResource : bool = True, CompanyInfo : dict = {}) :
+                    isResource : bool = False) :
         """GenericEndpoint class. It is the base class for all the endpoints."""
 
         if "ServiceCatalog_url" not in settings:
             raise InfoException("The Service Catalog URL is missing")
         self.ServiceCatalog_url = settings["ServiceCatalog_url"]
-        if isService ^ isResource:
+        if not isService ^ isResource:
             raise InfoException("The Endpoint must be a service or a resource, not both or none")
         else:
             self._isService = isService
             self._isResource = isResource
-            self.EndpointInfo, self._CompanyInfo = construct(settings, CompanyInfo, isService, isResource)
-            self._MQTTclient = isMQTT(self.EndpointInfo)
-            self._subscribedTopics = subscribedTopics(self.EndpointInfo)
+            self._EndpointInfo, self._CompanyInfo = construct(settings, isService, isResource)
 
     def start(self):
         if self._isService:
@@ -66,7 +64,9 @@ class GenericEndpoint():
         elif self._isResource:
             self.start_as_a_resource()
 
+        self._MQTTclient = isMQTT(self._EndpointInfo)
         if self._MQTTclient:
+            self._subscribedTopics = subscribedTopics(self._EndpointInfo)
             self.start_MQTTclient()
 
     def stop(self):
@@ -84,7 +84,7 @@ class GenericEndpoint():
     def register_service(self) -> int:
         while True:
             try:
-                res = requests.post(self.ServiceCatalog_url + "/insert", json = self.EndpointInfo)
+                res = requests.post(self.ServiceCatalog_url + "/insert", json = self._EndpointInfo)
                 res.raise_for_status()
             except requests.exceptions.HTTPError as err:
                 print(f"{err.response.status_code} : {err.response.reason}")
@@ -105,12 +105,13 @@ class GenericEndpoint():
         #Register
         self.ID = self.register_device()
         self._RefreshThread = RefreshThread(self.ResourceCatalog_url, self.ID, CompanyInfo = self._CompanyInfo)
+        self._EndpointInfo = self.get_device_info()
 
     def register_device(self) -> int:
         while True:
             try:
                 res = requests.post(self.ResourceCatalog_url + "/insert/device", 
-                                        params=self._CompanyInfo, json = self.EndpointInfo)
+                                        params=self._CompanyInfo, json = self._EndpointInfo)
                 res.raise_for_status()
             except requests.exceptions.HTTPError as err:
                 print(f"{err.response.status_code} : {err.response.reason}")
@@ -125,6 +126,22 @@ class GenericEndpoint():
                     return ID
                 except:
                     print(f"Error in the response\n")
+
+    def get_device_info(self) -> dict:
+        while True:
+            try:
+                res = requests.get(self.ResourceCatalog_url + "/get", 
+                                    params = {"ID": self.ID, **self._CompanyInfo})
+                res.raise_for_status()
+            except:
+                print(f"Connection Error\nRetrying connection\n")
+                time.sleep(1)
+            else:
+                try:
+                    return res.json()[0]
+                except:
+                    print(f"Error in the Resource information\nRetrying connection\n")
+                    time.sleep(1)
 
     def get_ResourceCatalog_url(self) :
         while True:

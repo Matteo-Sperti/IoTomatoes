@@ -26,10 +26,9 @@ Then you can add your devices and users.
 /devices to see all the active devices of your company.
 """
 
-class IoTBot(GenericEndpoint):
+class IoTBot():
     def __init__(self, settings :dict):
-        super().__init__(settings, isService=True)
-        self.ResourceCatalog_url = self.get_ResourceCatalog_url()
+        self.Service = GenericEndpoint(settings, isService=True)
 
         self.__message = {'bn': "", 'e': [{'n': "",'v': "", 'u': "", 't': ""}]}
         #TelegramBot
@@ -45,7 +44,7 @@ class IoTBot(GenericEndpoint):
     def get_token(self):
         while True:
             try:
-                res = requests.get(self.ServiceCatalog_url + "/telegram")
+                res = requests.get(self.Service.ServiceCatalog_url + "/telegram")
                 res.raise_for_status()
             except :
                 print(f"Error in the connection with the Service Catalog\nRetrying connection\n")
@@ -71,12 +70,12 @@ class IoTBot(GenericEndpoint):
         if message == "/start" or message == "/help":
             self.bot.sendMessage(chat_ID, text=HelpMessage)
         elif message == "/insert_company":
-            self.chat_active_list.append(InsertNewCompany(chat_ID, self.bot, self.ResourceCatalog_url, self.companyList))
+            self.chat_active_list.append(InsertNewCompany(chat_ID, self.bot, self.Service.ResourceCatalog_url, self.companyList))
         elif message == "/register_user":
             if self.companyList == []:
                 self.bot.sendMessage(chat_ID, text="No company registered")
             else:
-                self.chat_active_list.append(RegisterNewUser(chat_ID, self.bot, self.ResourceCatalog_url, self.companyList))
+                self.chat_active_list.append(RegisterNewUser(chat_ID, self.bot, self.Service.ResourceCatalog_url, self.companyList))
         elif message == "/users":
             pass
         elif message == "/devices":
@@ -130,11 +129,11 @@ if __name__ == "__main__":
         print("Error in the initialization of the IoTBot")
     else:
         print("IoTBot started")
-        IoTomatoesBOT.start()
+        IoTomatoesBOT.Service.start()
         while True:
             try:
                 time.sleep(3)
             except KeyboardInterrupt:
                 break
 
-        IoTomatoesBOT.stop()
+        IoTomatoesBOT.Service.stop()

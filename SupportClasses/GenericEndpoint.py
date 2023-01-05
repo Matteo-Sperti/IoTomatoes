@@ -80,6 +80,8 @@ class GenericEndpoint():
     def start_as_a_service(self) :
         self.ID = self.register_service()
         self._RefreshThread = RefreshThread(self.ServiceCatalog_url, self.ID)
+        if self._EndpointInfo["serviceName"] != "ResourceCatalog":
+            self.ResourceCatalog_url = self.get_ResourceCatalog_url()
 
     def register_service(self) -> int:
         while True:
@@ -104,8 +106,9 @@ class GenericEndpoint():
         self.ResourceCatalog_url = self.get_ResourceCatalog_url()
         #Register
         self.ID = self.register_device()
-        self._RefreshThread = RefreshThread(self.ResourceCatalog_url, self.ID, CompanyInfo = self._CompanyInfo)
         self._EndpointInfo = self.get_device_info()
+        self._RefreshThread = RefreshThread(self.ResourceCatalog_url, self.ID, CompanyInfo = self._CompanyInfo)
+
 
     def register_device(self) -> int:
         while True:
@@ -138,7 +141,7 @@ class GenericEndpoint():
                 time.sleep(1)
             else:
                 try:
-                    return res.json()[0]
+                    return res.json()
                 except:
                     print(f"Error in the Resource information\nRetrying connection\n")
                     time.sleep(1)

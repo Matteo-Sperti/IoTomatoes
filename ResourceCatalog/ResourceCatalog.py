@@ -68,14 +68,16 @@ class ResourceCatalogManager():
             return json.dumps({"Status": False}, indent=4)
 
     def isAuthorize(self, company : dict, credentials : dict):
-        if "CompanyName" in credentials and "CompanyToken" in credentials:
-            if (company["CompanyName"] == credentials["CompanyName"]
-                        and company["CompanyToken"] == credentials["CompanyToken"]):
+        if "CompanyName" not in credentials or "CompanyToken" not in credentials:
+            raise web_exception(400, "Missing credentials")
+
+        if company["CompanyName"] == credentials["CompanyName"]:
+            if company["CompanyToken"] == credentials["CompanyToken"]:
                 return True
             else:
                 raise web_exception(401, "Wrong credentials")
         else:
-            raise web_exception(400, "Missing credentials")
+            return False
     
     def findCompany(self, CompanyInfo):
         for company in self.catalog[companyList_name]:
@@ -113,11 +115,15 @@ class ResourceCatalogManager():
             if ID == -1 or AdminID == -1:
                 raise web_exception(500, "No more IDs available")
             else:
+                print(f"New company: {CompanyInfo['CompanyName']}\n"
+                        f"CompanyToken: {CompanyInfo['CompanyToken']}\n"
+                        f"Admin information: \n"
+                        f"{json.dumps(AdminInfo, indent=4)}\n")
                 if query_yes_no(f"Are you sure you want to add the company {CompanyInfo['CompanyName']}?"):
                     NewCompany = {
                         "ID": ID,
                         "CompanyName": CompanyInfo["CompanyName"],
-                        "CompanyToken": CompanyInfo["CompanyToken"],
+                        "CompanyToken": str(CompanyInfo["CompanyToken"]),
                         "adminID": AdminID,
                         usersList_name: [],
                         devicesList_name: []
@@ -273,19 +279,19 @@ class ResourceCatalogManager():
         self.catalog["lastUpdate"] = actualtime
 
 
-class RESTResourceCatalog(GenericEndpoint):
+class RESTResourceCatalog():
     exposed = True
 
     def __init__(self, settings : dict): 
         filename = settings["filename"]
         autoDeleteTime = settings["autoDeleteTime"]
-        super().__init__(settings, isService=True)
-        self.catalog = ResourceCatalogManager(self._EndpointInfo, filename, autoDeleteTime)
+        self.Service = GenericEndpoint(settings, isService=True)
+        self.catalog = ResourceCatalogManager(self.Service._EndpointInfo, filename, autoDeleteTime)
 
     def close(self):
         self.catalog.autoDeleteItemsThread.stop()
         self.catalog.save()
-        self.stop()
+        self.Service.stop()
 
     def GET(self, *uri, **params):
         try:
@@ -294,10 +300,10 @@ class RESTResourceCatalog(GenericEndpoint):
                     if all(key in params for key in ["CompanyName", "CompanyToken"]):
                         CompanyInfo = {"CompanyName": params["CompanyName"], "CompanyToken": params["CompanyToken"]}
                         return self.catalog.getCompany(CompanyInfo)
-                elif len(uri) == 2 and uri[1] == "get":
+                elif len(uri) == 1 and uri[0] == "get":
                     if all(key in params for key in ["ID", "CompanyName", "CompanyToken"]):
                         CompanyInfo = {"CompanyName": params["CompanyName"], "CompanyToken": params["CompanyToken"]}
-                        return self.catalog.getItem(CompanyInfo, params["ID"])
+                        return self.catalog.getItem(CompanyInfo, int(params["ID"]))
             raise web_exception(404, "Resource not found.")
         except web_exception as e:
             raise cherrypy.HTTPError(e.code, e.message)
@@ -309,7 +315,6 @@ class RESTResourceCatalog(GenericEndpoint):
             if len(uri) > 0:
                 if len(uri) == 1 and uri[0] == "insertCompany":
                     body_dict = json.loads(cherrypy.request.body.read())
-                    print(body_dict, params)
                     return self.catalog.insertCompany(params, body_dict)
                 elif len(uri) == 2 and uri [0] == "insert":
                     body_dict = json.loads(cherrypy.request.body.read())
@@ -329,7 +334,7 @@ class RESTResourceCatalog(GenericEndpoint):
                 if len(uri) == 1 and uri[0] == "refresh":
                     if all(key in params for key in ["ID", "CompanyName", "CompanyToken"]):
                         CompanyInfo = {"CompanyName": params["CompanyName"], "CompanyToken": params["CompanyToken"]}
-                        return self.catalog.refreshItem(CompanyInfo, params["ID"])
+                        return self.catalog.refreshItem(CompanyInfo, int(params["ID"]))
             raise web_exception(404, "Resource not found.")
         except web_exception as e:
             return cherrypy.HTTPError(e.code, e.message)
@@ -356,7 +361,7 @@ if __name__ == "__main__":
     except:
         print("Error while creating the catalog")
     else:
-        Catalog.start()
+        Catalog.Service.start()
         
         conf = {
             '/': {

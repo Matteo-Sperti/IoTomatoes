@@ -29,7 +29,8 @@ class IoTDevice(GenericEndpoint):
 
     def run(self):
         for topic in publishedTopics(self._EndpointInfo):
-            self.myPublish(topic, eval(f"self.get_{topic.lower()}()"))
+            message = eval(f"self.get_{topic.split('/')[-1]}()")
+            self.myPublish(topic, message)
     
     def construct_message(self, measure : str, unit : str) :
         message=self._message
@@ -90,13 +91,13 @@ if __name__ == "__main__":
 
                 Device_information = {
                     "deviceName" : f"Device_{j*NumberOfDevicesPerField + i}",
-                    "field" : j,
+                    "field" : j + 1,
                     "IPport" : IPport,
                     "IPaddress" : gethostbyname(gethostname()),
                     "isSensor" : isSensor,
                     "isActuator" : isActuator,
-                    "measures" : measures,
-                    "actuators" : actuators,
+                    "measureType" : measures,
+                    "actuatorType" : actuators,
                     "PowerConsumption_kW" : PowerConsumption_kW,
                     "CompanyName" : company["CompanyName"],
                     "CompanyToken" : company["CompanyToken"],

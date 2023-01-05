@@ -9,11 +9,11 @@
             "serviceIP": "http://172.20.10.3:8081"
         }
     ],
-    "lastUpdate": 1672919891.9610603,
+    "lastUpdate": 1672934136.332983,
     "companiesList": [
         {
             "ID": 100,
-            "CompanyName": "PatataNovella",
+            "CompanyName": "Magic Farm",
             "CompanyToken": "123",
             "adminID": 101,
             "usersList": [
@@ -22,10 +22,1036 @@
                     "Surname": "Sperti",
                     "telegramID": 615608459,
                     "ID": 101,
-                    "lastUpdate": 1672919849.0390937
+                    "lastUpdate": 1672933788.0942988
                 }
             ],
             "devicesList": [
+                {
+                    "ID": 107,
+                    "availableServices": [
+                        "MQTT"
+                    ],
+                    "servicesDetails": [
+                        {
+                            "serviceType": "MQTT",
+                            "subscribedTopics": [],
+                            "publishedTopics": [
+                                "Magic_Farm/1/107/light",
+                                "Magic_Farm/1/107/temperature",
+                                "Magic_Farm/1/107/soilMoisture"
+                            ]
+                        }
+                    ],
+                    "deviceName": "Device_3",
+                    "field": 1,
+                    "PowerConsumption_kW": 0,
+                    "isActuator": false,
+                    "actuatorType": [],
+                    "isSensor": true,
+                    "measureType": [
+                        "light",
+                        "temperature",
+                        "soilMoisture"
+                    ],
+                    "lastUpdate": 1672933820.87941
+                },
+                {
+                    "ID": 111,
+                    "availableServices": [
+                        "MQTT"
+                    ],
+                    "servicesDetails": [
+                        {
+                            "serviceType": "MQTT",
+                            "subscribedTopics": [
+                                "Magic_Farm/1/111/led"
+                            ],
+                            "publishedTopics": [
+                                "Magic_Farm/1/111/soilMoisture",
+                                "Magic_Farm/1/111/light",
+                                "Magic_Farm/1/111/humidity"
+                            ]
+                        }
+                    ],
+                    "deviceName": "Device_7",
+                    "field": 1,
+                    "PowerConsumption_kW": 17,
+                    "isActuator": true,
+                    "actuatorType": [
+                        "led"
+                    ],
+                    "isSensor": true,
+                    "measureType": [
+                        "soilMoisture",
+                        "light",
+                        "humidity"
+                    ],
+                    "lastUpdate": 1672933821.681245
+                },
+                {
+                    "ID": 115,
+                    "availableServices": [
+                        "MQTT"
+                    ],
+                    "servicesDetails": [
+                        {
+                            "serviceType": "MQTT",
+                            "subscribedTopics": [],
+                            "publishedTopics": []
+                        }
+                    ],
+                    "deviceName": "Device_11",
+                    "field": 2,
+                    "PowerConsumption_kW": 0,
+                    "isActuator": false,
+                    "actuatorType": [],
+                    "isSensor": false,
+                    "measureType": [],
+                    "lastUpdate": 1672933822.3652277
+                },
+                {
+                    "ID": 119,
+                    "availableServices": [
+                        "MQTT"
+                    ],
+                    "servicesDetails": [
+                        {
+                            "serviceType": "MQTT",
+                            "subscribedTopics": [
+                                "Magic_Farm/2/119/led"
+                            ],
+                            "publishedTopics": []
+                        }
+                    ],
+                    "deviceName": "Device_15",
+                    "field": 2,
+                    "PowerConsumption_kW": 20,
+                    "isActuator": true,
+                    "actuatorType": [
+                        "led"
+                    ],
+                    "isSensor": false,
+                    "measureType": [],
+                    "lastUpdate": 1672933823.0575209
+                },
+                {
+                    "ID": 123,
+                    "availableServices": [
+                        "MQTT"
+                    ],
+                    "servicesDetails": [
+                        {
+                            "serviceType": "MQTT",
+                            "subscribedTopics": [
+                                "Magic_Farm/2/123/pump"
+                            ],
+                            "publishedTopics": [
+                                "Magic_Farm/2/123/light",
+                                "Magic_Farm/2/123/soilMoisture"
+                            ]
+                        }
+                    ],
+                    "deviceName": "Device_19",
+                    "field": 2,
+                    "PowerConsumption_kW": 15,
+                    "isActuator": true,
+                    "actuatorType": [
+                        "pump"
+                    ],
+                    "isSensor": true,
+                    "measureType": [
+                        "light",
+                        "soilMoisture"
+                    ],
+                    "lastUpdate": 1672933823.6877127
+                },
+                {
+                    "ID": 127,
+                    "availableServices": [
+                        "MQTT"
+                    ],
+                    "servicesDetails": [
+                        {
+                            "serviceType": "MQTT",
+                            "subscribedTopics": [
+                                "Magic_Farm/3/127/led"
+                            ],
+                            "publishedTopics": []
+                        }
+                    ],
+                    "deviceName": "Device_23",
+                    "field": 3,
+                    "PowerConsumption_kW": 19,
+                    "isActuator": true,
+                    "actuatorType": [
+                        "led"
+                    ],
+                    "isSensor": false,
+                    "measureType": [],
+                    "lastUpdate": 1672933824.397424
+                },
+                {
+                    "ID": 131,
+                    "availableServices": [
+                        "MQTT"
+                    ],
+                    "servicesDetails": [
+                        {
+                            "serviceType": "MQTT",
+                            "subscribedTopics": [
+                                "Magic_Farm/3/131/led"
+                            ],
+                            "publishedTopics": []
+                        }
+                    ],
+                    "deviceName": "Device_27",
+                    "field": 3,
+                    "PowerConsumption_kW": 19,
+                    "isActuator": true,
+                    "actuatorType": [
+                        "led"
+                    ],
+                    "isSensor": false,
+                    "measureType": [],
+                    "lastUpdate": 1672933825.053072
+                },
+                {
+                    "ID": 162,
+                    "availableServices": [
+                        "MQTT"
+                    ],
+                    "servicesDetails": [
+                        {
+                            "serviceType": "MQTT",
+                            "subscribedTopics": [
+                                "Magic_Farm/1/162/led"
+                            ],
+                            "publishedTopics": [
+                                "Magic_Farm/1/162/humidity",
+                                "Magic_Farm/1/162/temperature",
+                                "Magic_Farm/1/162/soilMoisture",
+                                "Magic_Farm/1/162/light"
+                            ]
+                        }
+                    ],
+                    "deviceName": "Device_0",
+                    "field": 1,
+                    "PowerConsumption_kW": 7,
+                    "isActuator": true,
+                    "actuatorType": [
+                        "led"
+                    ],
+                    "isSensor": true,
+                    "measureType": [
+                        "humidity",
+                        "temperature",
+                        "soilMoisture",
+                        "light"
+                    ],
+                    "lastUpdate": 1672934125.7638316
+                },
+                {
+                    "ID": 160,
+                    "availableServices": [
+                        "MQTT"
+                    ],
+                    "servicesDetails": [
+                        {
+                            "serviceType": "MQTT",
+                            "subscribedTopics": [
+                                "Magic_Farm/1/160/led"
+                            ],
+                            "publishedTopics": []
+                        }
+                    ],
+                    "deviceName": "Device_1",
+                    "field": 1,
+                    "PowerConsumption_kW": 10,
+                    "isActuator": true,
+                    "actuatorType": [
+                        "led"
+                    ],
+                    "isSensor": false,
+                    "measureType": [],
+                    "lastUpdate": 1672934125.9684482
+                },
+                {
+                    "ID": 158,
+                    "availableServices": [
+                        "MQTT"
+                    ],
+                    "servicesDetails": [
+                        {
+                            "serviceType": "MQTT",
+                            "subscribedTopics": [
+                                "Magic_Farm/1/158/pump"
+                            ],
+                            "publishedTopics": [
+                                "Magic_Farm/1/158/humidity"
+                            ]
+                        }
+                    ],
+                    "deviceName": "Device_2",
+                    "field": 1,
+                    "PowerConsumption_kW": 6,
+                    "isActuator": true,
+                    "actuatorType": [
+                        "pump"
+                    ],
+                    "isSensor": true,
+                    "measureType": [
+                        "humidity"
+                    ],
+                    "lastUpdate": 1672934126.1231942
+                },
+                {
+                    "ID": 156,
+                    "availableServices": [
+                        "MQTT"
+                    ],
+                    "servicesDetails": [
+                        {
+                            "serviceType": "MQTT",
+                            "subscribedTopics": [
+                                "Magic_Farm/1/156/pump"
+                            ],
+                            "publishedTopics": [
+                                "Magic_Farm/1/156/temperature"
+                            ]
+                        }
+                    ],
+                    "deviceName": "Device_3",
+                    "field": 1,
+                    "PowerConsumption_kW": 10,
+                    "isActuator": true,
+                    "actuatorType": [
+                        "pump"
+                    ],
+                    "isSensor": true,
+                    "measureType": [
+                        "temperature"
+                    ],
+                    "lastUpdate": 1672934126.2919588
+                },
+                {
+                    "ID": 154,
+                    "availableServices": [
+                        "MQTT"
+                    ],
+                    "servicesDetails": [
+                        {
+                            "serviceType": "MQTT",
+                            "subscribedTopics": [],
+                            "publishedTopics": [
+                                "Magic_Farm/1/154/temperature"
+                            ]
+                        }
+                    ],
+                    "deviceName": "Device_4",
+                    "field": 1,
+                    "PowerConsumption_kW": 0,
+                    "isActuator": false,
+                    "actuatorType": [],
+                    "isSensor": true,
+                    "measureType": [
+                        "temperature"
+                    ],
+                    "lastUpdate": 1672934126.4742522
+                },
+                {
+                    "ID": 152,
+                    "availableServices": [
+                        "MQTT"
+                    ],
+                    "servicesDetails": [
+                        {
+                            "serviceType": "MQTT",
+                            "subscribedTopics": [
+                                "Magic_Farm/1/152/pump"
+                            ],
+                            "publishedTopics": [
+                                "Magic_Farm/1/152/light",
+                                "Magic_Farm/1/152/soilMoisture"
+                            ]
+                        }
+                    ],
+                    "deviceName": "Device_5",
+                    "field": 1,
+                    "PowerConsumption_kW": 13,
+                    "isActuator": true,
+                    "actuatorType": [
+                        "pump"
+                    ],
+                    "isSensor": true,
+                    "measureType": [
+                        "light",
+                        "soilMoisture"
+                    ],
+                    "lastUpdate": 1672934126.6414118
+                },
+                {
+                    "ID": 150,
+                    "availableServices": [
+                        "MQTT"
+                    ],
+                    "servicesDetails": [
+                        {
+                            "serviceType": "MQTT",
+                            "subscribedTopics": [
+                                "Magic_Farm/1/150/pump"
+                            ],
+                            "publishedTopics": [
+                                "Magic_Farm/1/150/temperature"
+                            ]
+                        }
+                    ],
+                    "deviceName": "Device_6",
+                    "field": 1,
+                    "PowerConsumption_kW": 15,
+                    "isActuator": true,
+                    "actuatorType": [
+                        "pump"
+                    ],
+                    "isSensor": true,
+                    "measureType": [
+                        "temperature"
+                    ],
+                    "lastUpdate": 1672934126.8604562
+                },
+                {
+                    "ID": 148,
+                    "availableServices": [
+                        "MQTT"
+                    ],
+                    "servicesDetails": [
+                        {
+                            "serviceType": "MQTT",
+                            "subscribedTopics": [
+                                "Magic_Farm/1/148/led"
+                            ],
+                            "publishedTopics": []
+                        }
+                    ],
+                    "deviceName": "Device_7",
+                    "field": 1,
+                    "PowerConsumption_kW": 17,
+                    "isActuator": true,
+                    "actuatorType": [
+                        "led"
+                    ],
+                    "isSensor": false,
+                    "measureType": [],
+                    "lastUpdate": 1672934127.0108309
+                },
+                {
+                    "ID": 146,
+                    "availableServices": [
+                        "MQTT"
+                    ],
+                    "servicesDetails": [
+                        {
+                            "serviceType": "MQTT",
+                            "subscribedTopics": [
+                                "Magic_Farm/1/146/led"
+                            ],
+                            "publishedTopics": [
+                                "Magic_Farm/1/146/temperature"
+                            ]
+                        }
+                    ],
+                    "deviceName": "Device_8",
+                    "field": 1,
+                    "PowerConsumption_kW": 15,
+                    "isActuator": true,
+                    "actuatorType": [
+                        "led"
+                    ],
+                    "isSensor": true,
+                    "measureType": [
+                        "temperature"
+                    ],
+                    "lastUpdate": 1672934127.179957
+                },
+                {
+                    "ID": 144,
+                    "availableServices": [
+                        "MQTT"
+                    ],
+                    "servicesDetails": [
+                        {
+                            "serviceType": "MQTT",
+                            "subscribedTopics": [],
+                            "publishedTopics": [
+                                "Magic_Farm/1/144/temperature",
+                                "Magic_Farm/1/144/humidity"
+                            ]
+                        }
+                    ],
+                    "deviceName": "Device_9",
+                    "field": 1,
+                    "PowerConsumption_kW": 0,
+                    "isActuator": false,
+                    "actuatorType": [],
+                    "isSensor": true,
+                    "measureType": [
+                        "temperature",
+                        "humidity"
+                    ],
+                    "lastUpdate": 1672934127.3326464
+                },
+                {
+                    "ID": 142,
+                    "availableServices": [
+                        "MQTT"
+                    ],
+                    "servicesDetails": [
+                        {
+                            "serviceType": "MQTT",
+                            "subscribedTopics": [
+                                "Magic_Farm/2/142/led"
+                            ],
+                            "publishedTopics": [
+                                "Magic_Farm/2/142/light"
+                            ]
+                        }
+                    ],
+                    "deviceName": "Device_10",
+                    "field": 2,
+                    "PowerConsumption_kW": 16,
+                    "isActuator": true,
+                    "actuatorType": [
+                        "led"
+                    ],
+                    "isSensor": true,
+                    "measureType": [
+                        "light"
+                    ],
+                    "lastUpdate": 1672934127.520533
+                },
+                {
+                    "ID": 140,
+                    "availableServices": [
+                        "MQTT"
+                    ],
+                    "servicesDetails": [
+                        {
+                            "serviceType": "MQTT",
+                            "subscribedTopics": [
+                                "Magic_Farm/2/140/led"
+                            ],
+                            "publishedTopics": [
+                                "Magic_Farm/2/140/humidity",
+                                "Magic_Farm/2/140/light"
+                            ]
+                        }
+                    ],
+                    "deviceName": "Device_11",
+                    "field": 2,
+                    "PowerConsumption_kW": 20,
+                    "isActuator": true,
+                    "actuatorType": [
+                        "led"
+                    ],
+                    "isSensor": true,
+                    "measureType": [
+                        "humidity",
+                        "light"
+                    ],
+                    "lastUpdate": 1672934127.6730862
+                },
+                {
+                    "ID": 138,
+                    "availableServices": [
+                        "MQTT"
+                    ],
+                    "servicesDetails": [
+                        {
+                            "serviceType": "MQTT",
+                            "subscribedTopics": [],
+                            "publishedTopics": [
+                                "Magic_Farm/2/138/light",
+                                "Magic_Farm/2/138/temperature"
+                            ]
+                        }
+                    ],
+                    "deviceName": "Device_12",
+                    "field": 2,
+                    "PowerConsumption_kW": 0,
+                    "isActuator": false,
+                    "actuatorType": [],
+                    "isSensor": true,
+                    "measureType": [
+                        "light",
+                        "temperature"
+                    ],
+                    "lastUpdate": 1672934127.8557994
+                },
+                {
+                    "ID": 136,
+                    "availableServices": [
+                        "MQTT"
+                    ],
+                    "servicesDetails": [
+                        {
+                            "serviceType": "MQTT",
+                            "subscribedTopics": [],
+                            "publishedTopics": [
+                                "Magic_Farm/2/136/soilMoisture"
+                            ]
+                        }
+                    ],
+                    "deviceName": "Device_13",
+                    "field": 2,
+                    "PowerConsumption_kW": 0,
+                    "isActuator": false,
+                    "actuatorType": [],
+                    "isSensor": true,
+                    "measureType": [
+                        "soilMoisture"
+                    ],
+                    "lastUpdate": 1672934128.039659
+                },
+                {
+                    "ID": 134,
+                    "availableServices": [
+                        "MQTT"
+                    ],
+                    "servicesDetails": [
+                        {
+                            "serviceType": "MQTT",
+                            "subscribedTopics": [],
+                            "publishedTopics": []
+                        }
+                    ],
+                    "deviceName": "Device_14",
+                    "field": 2,
+                    "PowerConsumption_kW": 0,
+                    "isActuator": false,
+                    "actuatorType": [],
+                    "isSensor": false,
+                    "measureType": [],
+                    "lastUpdate": 1672934128.2120466
+                },
+                {
+                    "ID": 132,
+                    "availableServices": [
+                        "MQTT"
+                    ],
+                    "servicesDetails": [
+                        {
+                            "serviceType": "MQTT",
+                            "subscribedTopics": [
+                                "Magic_Farm/2/132/pump"
+                            ],
+                            "publishedTopics": [
+                                "Magic_Farm/2/132/humidity",
+                                "Magic_Farm/2/132/soilMoisture",
+                                "Magic_Farm/2/132/temperature"
+                            ]
+                        }
+                    ],
+                    "deviceName": "Device_15",
+                    "field": 2,
+                    "PowerConsumption_kW": 8,
+                    "isActuator": true,
+                    "actuatorType": [
+                        "pump"
+                    ],
+                    "isSensor": true,
+                    "measureType": [
+                        "humidity",
+                        "soilMoisture",
+                        "temperature"
+                    ],
+                    "lastUpdate": 1672934128.3647478
+                },
+                {
+                    "ID": 130,
+                    "availableServices": [
+                        "MQTT"
+                    ],
+                    "servicesDetails": [
+                        {
+                            "serviceType": "MQTT",
+                            "subscribedTopics": [
+                                "Magic_Farm/2/130/pump"
+                            ],
+                            "publishedTopics": [
+                                "Magic_Farm/2/130/soilMoisture",
+                                "Magic_Farm/2/130/light",
+                                "Magic_Farm/2/130/temperature"
+                            ]
+                        }
+                    ],
+                    "deviceName": "Device_16",
+                    "field": 2,
+                    "PowerConsumption_kW": 17,
+                    "isActuator": true,
+                    "actuatorType": [
+                        "pump"
+                    ],
+                    "isSensor": true,
+                    "measureType": [
+                        "soilMoisture",
+                        "light",
+                        "temperature"
+                    ],
+                    "lastUpdate": 1672934128.5066285
+                },
+                {
+                    "ID": 128,
+                    "availableServices": [
+                        "MQTT"
+                    ],
+                    "servicesDetails": [
+                        {
+                            "serviceType": "MQTT",
+                            "subscribedTopics": [],
+                            "publishedTopics": [
+                                "Magic_Farm/2/128/soilMoisture",
+                                "Magic_Farm/2/128/light"
+                            ]
+                        }
+                    ],
+                    "deviceName": "Device_17",
+                    "field": 2,
+                    "PowerConsumption_kW": 0,
+                    "isActuator": false,
+                    "actuatorType": [],
+                    "isSensor": true,
+                    "measureType": [
+                        "soilMoisture",
+                        "light"
+                    ],
+                    "lastUpdate": 1672934128.6640654
+                },
+                {
+                    "ID": 126,
+                    "availableServices": [
+                        "MQTT"
+                    ],
+                    "servicesDetails": [
+                        {
+                            "serviceType": "MQTT",
+                            "subscribedTopics": [],
+                            "publishedTopics": []
+                        }
+                    ],
+                    "deviceName": "Device_18",
+                    "field": 2,
+                    "PowerConsumption_kW": 0,
+                    "isActuator": false,
+                    "actuatorType": [],
+                    "isSensor": false,
+                    "measureType": [],
+                    "lastUpdate": 1672934128.8321147
+                },
+                {
+                    "ID": 124,
+                    "availableServices": [
+                        "MQTT"
+                    ],
+                    "servicesDetails": [
+                        {
+                            "serviceType": "MQTT",
+                            "subscribedTopics": [],
+                            "publishedTopics": [
+                                "Magic_Farm/2/124/temperature",
+                                "Magic_Farm/2/124/light",
+                                "Magic_Farm/2/124/humidity"
+                            ]
+                        }
+                    ],
+                    "deviceName": "Device_19",
+                    "field": 2,
+                    "PowerConsumption_kW": 0,
+                    "isActuator": false,
+                    "actuatorType": [],
+                    "isSensor": true,
+                    "measureType": [
+                        "temperature",
+                        "light",
+                        "humidity"
+                    ],
+                    "lastUpdate": 1672934129.0188591
+                },
+                {
+                    "ID": 122,
+                    "availableServices": [
+                        "MQTT"
+                    ],
+                    "servicesDetails": [
+                        {
+                            "serviceType": "MQTT",
+                            "subscribedTopics": [],
+                            "publishedTopics": [
+                                "Magic_Farm/3/122/humidity",
+                                "Magic_Farm/3/122/soilMoisture",
+                                "Magic_Farm/3/122/temperature"
+                            ]
+                        }
+                    ],
+                    "deviceName": "Device_20",
+                    "field": 3,
+                    "PowerConsumption_kW": 0,
+                    "isActuator": false,
+                    "actuatorType": [],
+                    "isSensor": true,
+                    "measureType": [
+                        "humidity",
+                        "soilMoisture",
+                        "temperature"
+                    ],
+                    "lastUpdate": 1672934129.1575198
+                },
+                {
+                    "ID": 120,
+                    "availableServices": [
+                        "MQTT"
+                    ],
+                    "servicesDetails": [
+                        {
+                            "serviceType": "MQTT",
+                            "subscribedTopics": [
+                                "Magic_Farm/3/120/led"
+                            ],
+                            "publishedTopics": [
+                                "Magic_Farm/3/120/light",
+                                "Magic_Farm/3/120/humidity",
+                                "Magic_Farm/3/120/soilMoisture",
+                                "Magic_Farm/3/120/temperature"
+                            ]
+                        }
+                    ],
+                    "deviceName": "Device_21",
+                    "field": 3,
+                    "PowerConsumption_kW": 14,
+                    "isActuator": true,
+                    "actuatorType": [
+                        "led"
+                    ],
+                    "isSensor": true,
+                    "measureType": [
+                        "light",
+                        "humidity",
+                        "soilMoisture",
+                        "temperature"
+                    ],
+                    "lastUpdate": 1672934129.3393838
+                },
+                {
+                    "ID": 118,
+                    "availableServices": [
+                        "MQTT"
+                    ],
+                    "servicesDetails": [
+                        {
+                            "serviceType": "MQTT",
+                            "subscribedTopics": [],
+                            "publishedTopics": [
+                                "Magic_Farm/3/118/temperature",
+                                "Magic_Farm/3/118/soilMoisture",
+                                "Magic_Farm/3/118/humidity"
+                            ]
+                        }
+                    ],
+                    "deviceName": "Device_22",
+                    "field": 3,
+                    "PowerConsumption_kW": 0,
+                    "isActuator": false,
+                    "actuatorType": [],
+                    "isSensor": true,
+                    "measureType": [
+                        "temperature",
+                        "soilMoisture",
+                        "humidity"
+                    ],
+                    "lastUpdate": 1672934129.478998
+                },
+                {
+                    "ID": 116,
+                    "availableServices": [
+                        "MQTT"
+                    ],
+                    "servicesDetails": [
+                        {
+                            "serviceType": "MQTT",
+                            "subscribedTopics": [
+                                "Magic_Farm/3/116/led"
+                            ],
+                            "publishedTopics": [
+                                "Magic_Farm/3/116/humidity",
+                                "Magic_Farm/3/116/soilMoisture"
+                            ]
+                        }
+                    ],
+                    "deviceName": "Device_23",
+                    "field": 3,
+                    "PowerConsumption_kW": 7,
+                    "isActuator": true,
+                    "actuatorType": [
+                        "led"
+                    ],
+                    "isSensor": true,
+                    "measureType": [
+                        "humidity",
+                        "soilMoisture"
+                    ],
+                    "lastUpdate": 1672934129.648553
+                },
+                {
+                    "ID": 114,
+                    "availableServices": [
+                        "MQTT"
+                    ],
+                    "servicesDetails": [
+                        {
+                            "serviceType": "MQTT",
+                            "subscribedTopics": [
+                                "Magic_Farm/3/114/pump"
+                            ],
+                            "publishedTopics": [
+                                "Magic_Farm/3/114/light",
+                                "Magic_Farm/3/114/soilMoisture",
+                                "Magic_Farm/3/114/humidity"
+                            ]
+                        }
+                    ],
+                    "deviceName": "Device_24",
+                    "field": 3,
+                    "PowerConsumption_kW": 10,
+                    "isActuator": true,
+                    "actuatorType": [
+                        "pump"
+                    ],
+                    "isSensor": true,
+                    "measureType": [
+                        "light",
+                        "soilMoisture",
+                        "humidity"
+                    ],
+                    "lastUpdate": 1672934129.8184118
+                },
+                {
+                    "ID": 112,
+                    "availableServices": [
+                        "MQTT"
+                    ],
+                    "servicesDetails": [
+                        {
+                            "serviceType": "MQTT",
+                            "subscribedTopics": [],
+                            "publishedTopics": []
+                        }
+                    ],
+                    "deviceName": "Device_25",
+                    "field": 3,
+                    "PowerConsumption_kW": 0,
+                    "isActuator": false,
+                    "actuatorType": [],
+                    "isSensor": false,
+                    "measureType": [],
+                    "lastUpdate": 1672934129.954146
+                },
+                {
+                    "ID": 110,
+                    "availableServices": [
+                        "MQTT"
+                    ],
+                    "servicesDetails": [
+                        {
+                            "serviceType": "MQTT",
+                            "subscribedTopics": [
+                                "Magic_Farm/3/110/pump"
+                            ],
+                            "publishedTopics": [
+                                "Magic_Farm/3/110/humidity",
+                                "Magic_Farm/3/110/soilMoisture",
+                                "Magic_Farm/3/110/temperature"
+                            ]
+                        }
+                    ],
+                    "deviceName": "Device_26",
+                    "field": 3,
+                    "PowerConsumption_kW": 10,
+                    "isActuator": true,
+                    "actuatorType": [
+                        "pump"
+                    ],
+                    "isSensor": true,
+                    "measureType": [
+                        "humidity",
+                        "soilMoisture",
+                        "temperature"
+                    ],
+                    "lastUpdate": 1672934130.1391847
+                },
+                {
+                    "ID": 108,
+                    "availableServices": [
+                        "MQTT"
+                    ],
+                    "servicesDetails": [
+                        {
+                            "serviceType": "MQTT",
+                            "subscribedTopics": [
+                                "Magic_Farm/3/108/led"
+                            ],
+                            "publishedTopics": [
+                                "Magic_Farm/3/108/humidity",
+                                "Magic_Farm/3/108/soilMoisture",
+                                "Magic_Farm/3/108/temperature"
+                            ]
+                        }
+                    ],
+                    "deviceName": "Device_27",
+                    "field": 3,
+                    "PowerConsumption_kW": 20,
+                    "isActuator": true,
+                    "actuatorType": [
+                        "led"
+                    ],
+                    "isSensor": true,
+                    "measureType": [
+                        "humidity",
+                        "soilMoisture",
+                        "temperature"
+                    ],
+                    "lastUpdate": 1672934130.3076148
+                },
+                {
+                    "ID": 106,
+                    "availableServices": [
+                        "MQTT"
+                    ],
+                    "servicesDetails": [
+                        {
+                            "serviceType": "MQTT",
+                            "subscribedTopics": [
+                                "Magic_Farm/3/106/pump"
+                            ],
+                            "publishedTopics": [
+                                "Magic_Farm/3/106/temperature",
+                                "Magic_Farm/3/106/humidity",
+                                "Magic_Farm/3/106/light"
+                            ]
+                        }
+                    ],
+                    "deviceName": "Device_28",
+                    "field": 3,
+                    "PowerConsumption_kW": 7,
+                    "isActuator": true,
+                    "actuatorType": [
+                        "pump"
+                    ],
+                    "isSensor": true,
+                    "measureType": [
+                        "temperature",
+                        "humidity",
+                        "light"
+                    ],
+                    "lastUpdate": 1672934130.465018
+                },
                 {
                     "ID": 104,
                     "availableServices": [
@@ -39,31 +1065,1115 @@
                         }
                     ],
                     "deviceName": "Device_29",
-                    "field": 2,
-                    "PowerConsumption_kW": 7,
+                    "field": 3,
+                    "PowerConsumption_kW": 0,
                     "isActuator": false,
-                    "actuator": [],
+                    "actuatorType": [],
                     "isSensor": false,
                     "measureType": [],
-                    "lastUpdate": 1672919891.9620035
+                    "lastUpdate": 1672934130.6168804
                 }
             ]
         },
         {
             "ID": 102,
-            "CompanyName": "Magic Farm",
+            "CompanyName": "PatataNovella",
             "CompanyToken": "456",
             "adminID": 103,
             "usersList": [
                 {
-                    "Name": "Pino",
-                    "Surname": "Farlocco",
+                    "Name": "Matteo",
+                    "Surname": "Ciao",
                     "telegramID": 615608459,
                     "ID": 103,
-                    "lastUpdate": 1672919875.6402
+                    "lastUpdate": 1672933817.4767818
                 }
             ],
-            "devicesList": []
+            "devicesList": [
+                {
+                    "ID": 137,
+                    "availableServices": [
+                        "MQTT"
+                    ],
+                    "servicesDetails": [
+                        {
+                            "serviceType": "MQTT",
+                            "subscribedTopics": [],
+                            "publishedTopics": [
+                                "PatataNovella/1/137/light",
+                                "PatataNovella/1/137/temperature",
+                                "PatataNovella/1/137/soilMoisture"
+                            ]
+                        }
+                    ],
+                    "deviceName": "Device_3",
+                    "field": 1,
+                    "PowerConsumption_kW": 0,
+                    "isActuator": false,
+                    "actuatorType": [],
+                    "isSensor": true,
+                    "measureType": [
+                        "light",
+                        "temperature",
+                        "soilMoisture"
+                    ],
+                    "lastUpdate": 1672933826.0565457
+                },
+                {
+                    "ID": 141,
+                    "availableServices": [
+                        "MQTT"
+                    ],
+                    "servicesDetails": [
+                        {
+                            "serviceType": "MQTT",
+                            "subscribedTopics": [],
+                            "publishedTopics": [
+                                "PatataNovella/1/141/soilMoisture",
+                                "PatataNovella/1/141/light",
+                                "PatataNovella/1/141/humidity"
+                            ]
+                        }
+                    ],
+                    "deviceName": "Device_7",
+                    "field": 1,
+                    "PowerConsumption_kW": 0,
+                    "isActuator": false,
+                    "actuatorType": [],
+                    "isSensor": true,
+                    "measureType": [
+                        "soilMoisture",
+                        "light",
+                        "humidity"
+                    ],
+                    "lastUpdate": 1672933826.7190006
+                },
+                {
+                    "ID": 145,
+                    "availableServices": [
+                        "MQTT"
+                    ],
+                    "servicesDetails": [
+                        {
+                            "serviceType": "MQTT",
+                            "subscribedTopics": [],
+                            "publishedTopics": [
+                                "PatataNovella/2/145/humidity",
+                                "PatataNovella/2/145/soilMoisture",
+                                "PatataNovella/2/145/temperature"
+                            ]
+                        }
+                    ],
+                    "deviceName": "Device_11",
+                    "field": 2,
+                    "PowerConsumption_kW": 0,
+                    "isActuator": false,
+                    "actuatorType": [],
+                    "isSensor": true,
+                    "measureType": [
+                        "humidity",
+                        "soilMoisture",
+                        "temperature"
+                    ],
+                    "lastUpdate": 1672933827.453681
+                },
+                {
+                    "ID": 149,
+                    "availableServices": [
+                        "MQTT"
+                    ],
+                    "servicesDetails": [
+                        {
+                            "serviceType": "MQTT",
+                            "subscribedTopics": [
+                                "PatataNovella/2/149/pump"
+                            ],
+                            "publishedTopics": []
+                        }
+                    ],
+                    "deviceName": "Device_15",
+                    "field": 2,
+                    "PowerConsumption_kW": 15,
+                    "isActuator": true,
+                    "actuatorType": [
+                        "pump"
+                    ],
+                    "isSensor": false,
+                    "measureType": [],
+                    "lastUpdate": 1672933828.2410629
+                },
+                {
+                    "ID": 153,
+                    "availableServices": [
+                        "MQTT"
+                    ],
+                    "servicesDetails": [
+                        {
+                            "serviceType": "MQTT",
+                            "subscribedTopics": [
+                                "PatataNovella/2/153/led"
+                            ],
+                            "publishedTopics": []
+                        }
+                    ],
+                    "deviceName": "Device_19",
+                    "field": 2,
+                    "PowerConsumption_kW": 17,
+                    "isActuator": true,
+                    "actuatorType": [
+                        "led"
+                    ],
+                    "isSensor": false,
+                    "measureType": [],
+                    "lastUpdate": 1672933829.0588145
+                },
+                {
+                    "ID": 157,
+                    "availableServices": [
+                        "MQTT"
+                    ],
+                    "servicesDetails": [
+                        {
+                            "serviceType": "MQTT",
+                            "subscribedTopics": [
+                                "PatataNovella/3/157/led"
+                            ],
+                            "publishedTopics": [
+                                "PatataNovella/3/157/soilMoisture",
+                                "PatataNovella/3/157/temperature",
+                                "PatataNovella/3/157/light",
+                                "PatataNovella/3/157/humidity"
+                            ]
+                        }
+                    ],
+                    "deviceName": "Device_23",
+                    "field": 3,
+                    "PowerConsumption_kW": 10,
+                    "isActuator": true,
+                    "actuatorType": [
+                        "led"
+                    ],
+                    "isSensor": true,
+                    "measureType": [
+                        "soilMoisture",
+                        "temperature",
+                        "light",
+                        "humidity"
+                    ],
+                    "lastUpdate": 1672933829.904064
+                },
+                {
+                    "ID": 161,
+                    "availableServices": [
+                        "MQTT"
+                    ],
+                    "servicesDetails": [
+                        {
+                            "serviceType": "MQTT",
+                            "subscribedTopics": [
+                                "PatataNovella/3/161/pump"
+                            ],
+                            "publishedTopics": [
+                                "PatataNovella/3/161/temperature"
+                            ]
+                        }
+                    ],
+                    "deviceName": "Device_27",
+                    "field": 3,
+                    "PowerConsumption_kW": 12,
+                    "isActuator": true,
+                    "actuatorType": [
+                        "pump"
+                    ],
+                    "isSensor": true,
+                    "measureType": [
+                        "temperature"
+                    ],
+                    "lastUpdate": 1672933830.7289996
+                },
+                {
+                    "ID": 164,
+                    "availableServices": [
+                        "MQTT"
+                    ],
+                    "servicesDetails": [
+                        {
+                            "serviceType": "MQTT",
+                            "subscribedTopics": [
+                                "PatataNovella/1/164/led"
+                            ],
+                            "publishedTopics": [
+                                "PatataNovella/1/164/light",
+                                "PatataNovella/1/164/humidity"
+                            ]
+                        }
+                    ],
+                    "deviceName": "Device_0",
+                    "field": 1,
+                    "PowerConsumption_kW": 19,
+                    "isActuator": true,
+                    "actuatorType": [
+                        "led"
+                    ],
+                    "isSensor": true,
+                    "measureType": [
+                        "light",
+                        "humidity"
+                    ],
+                    "lastUpdate": 1672934130.7877357
+                },
+                {
+                    "ID": 165,
+                    "availableServices": [
+                        "MQTT"
+                    ],
+                    "servicesDetails": [
+                        {
+                            "serviceType": "MQTT",
+                            "subscribedTopics": [
+                                "PatataNovella/1/165/led"
+                            ],
+                            "publishedTopics": [
+                                "PatataNovella/1/165/humidity",
+                                "PatataNovella/1/165/light",
+                                "PatataNovella/1/165/temperature"
+                            ]
+                        }
+                    ],
+                    "deviceName": "Device_1",
+                    "field": 1,
+                    "PowerConsumption_kW": 5,
+                    "isActuator": true,
+                    "actuatorType": [
+                        "led"
+                    ],
+                    "isSensor": true,
+                    "measureType": [
+                        "humidity",
+                        "light",
+                        "temperature"
+                    ],
+                    "lastUpdate": 1672934130.954496
+                },
+                {
+                    "ID": 166,
+                    "availableServices": [
+                        "MQTT"
+                    ],
+                    "servicesDetails": [
+                        {
+                            "serviceType": "MQTT",
+                            "subscribedTopics": [],
+                            "publishedTopics": [
+                                "PatataNovella/1/166/humidity",
+                                "PatataNovella/1/166/soilMoisture",
+                                "PatataNovella/1/166/light"
+                            ]
+                        }
+                    ],
+                    "deviceName": "Device_2",
+                    "field": 1,
+                    "PowerConsumption_kW": 0,
+                    "isActuator": false,
+                    "actuatorType": [],
+                    "isSensor": true,
+                    "measureType": [
+                        "humidity",
+                        "soilMoisture",
+                        "light"
+                    ],
+                    "lastUpdate": 1672934131.112899
+                },
+                {
+                    "ID": 167,
+                    "availableServices": [
+                        "MQTT"
+                    ],
+                    "servicesDetails": [
+                        {
+                            "serviceType": "MQTT",
+                            "subscribedTopics": [],
+                            "publishedTopics": [
+                                "PatataNovella/1/167/soilMoisture",
+                                "PatataNovella/1/167/light",
+                                "PatataNovella/1/167/temperature"
+                            ]
+                        }
+                    ],
+                    "deviceName": "Device_3",
+                    "field": 1,
+                    "PowerConsumption_kW": 0,
+                    "isActuator": false,
+                    "actuatorType": [],
+                    "isSensor": true,
+                    "measureType": [
+                        "soilMoisture",
+                        "light",
+                        "temperature"
+                    ],
+                    "lastUpdate": 1672934131.2978847
+                },
+                {
+                    "ID": 168,
+                    "availableServices": [
+                        "MQTT"
+                    ],
+                    "servicesDetails": [
+                        {
+                            "serviceType": "MQTT",
+                            "subscribedTopics": [
+                                "PatataNovella/1/168/led"
+                            ],
+                            "publishedTopics": [
+                                "PatataNovella/1/168/temperature",
+                                "PatataNovella/1/168/light"
+                            ]
+                        }
+                    ],
+                    "deviceName": "Device_4",
+                    "field": 1,
+                    "PowerConsumption_kW": 17,
+                    "isActuator": true,
+                    "actuatorType": [
+                        "led"
+                    ],
+                    "isSensor": true,
+                    "measureType": [
+                        "temperature",
+                        "light"
+                    ],
+                    "lastUpdate": 1672934131.5783942
+                },
+                {
+                    "ID": 169,
+                    "availableServices": [
+                        "MQTT"
+                    ],
+                    "servicesDetails": [
+                        {
+                            "serviceType": "MQTT",
+                            "subscribedTopics": [
+                                "PatataNovella/1/169/pump"
+                            ],
+                            "publishedTopics": [
+                                "PatataNovella/1/169/humidity",
+                                "PatataNovella/1/169/soilMoisture"
+                            ]
+                        }
+                    ],
+                    "deviceName": "Device_5",
+                    "field": 1,
+                    "PowerConsumption_kW": 17,
+                    "isActuator": true,
+                    "actuatorType": [
+                        "pump"
+                    ],
+                    "isSensor": true,
+                    "measureType": [
+                        "humidity",
+                        "soilMoisture"
+                    ],
+                    "lastUpdate": 1672934131.7321117
+                },
+                {
+                    "ID": 170,
+                    "availableServices": [
+                        "MQTT"
+                    ],
+                    "servicesDetails": [
+                        {
+                            "serviceType": "MQTT",
+                            "subscribedTopics": [
+                                "PatataNovella/1/170/led"
+                            ],
+                            "publishedTopics": [
+                                "PatataNovella/1/170/humidity"
+                            ]
+                        }
+                    ],
+                    "deviceName": "Device_6",
+                    "field": 1,
+                    "PowerConsumption_kW": 7,
+                    "isActuator": true,
+                    "actuatorType": [
+                        "led"
+                    ],
+                    "isSensor": true,
+                    "measureType": [
+                        "humidity"
+                    ],
+                    "lastUpdate": 1672934131.947386
+                },
+                {
+                    "ID": 171,
+                    "availableServices": [
+                        "MQTT"
+                    ],
+                    "servicesDetails": [
+                        {
+                            "serviceType": "MQTT",
+                            "subscribedTopics": [
+                                "PatataNovella/1/171/pump"
+                            ],
+                            "publishedTopics": [
+                                "PatataNovella/1/171/light",
+                                "PatataNovella/1/171/humidity",
+                                "PatataNovella/1/171/temperature"
+                            ]
+                        }
+                    ],
+                    "deviceName": "Device_7",
+                    "field": 1,
+                    "PowerConsumption_kW": 17,
+                    "isActuator": true,
+                    "actuatorType": [
+                        "pump"
+                    ],
+                    "isSensor": true,
+                    "measureType": [
+                        "light",
+                        "humidity",
+                        "temperature"
+                    ],
+                    "lastUpdate": 1672934132.1942255
+                },
+                {
+                    "ID": 172,
+                    "availableServices": [
+                        "MQTT"
+                    ],
+                    "servicesDetails": [
+                        {
+                            "serviceType": "MQTT",
+                            "subscribedTopics": [],
+                            "publishedTopics": []
+                        }
+                    ],
+                    "deviceName": "Device_8",
+                    "field": 1,
+                    "PowerConsumption_kW": 0,
+                    "isActuator": false,
+                    "actuatorType": [],
+                    "isSensor": false,
+                    "measureType": [],
+                    "lastUpdate": 1672934132.4250286
+                },
+                {
+                    "ID": 173,
+                    "availableServices": [
+                        "MQTT"
+                    ],
+                    "servicesDetails": [
+                        {
+                            "serviceType": "MQTT",
+                            "subscribedTopics": [
+                                "PatataNovella/1/173/led"
+                            ],
+                            "publishedTopics": [
+                                "PatataNovella/1/173/temperature"
+                            ]
+                        }
+                    ],
+                    "deviceName": "Device_9",
+                    "field": 1,
+                    "PowerConsumption_kW": 7,
+                    "isActuator": true,
+                    "actuatorType": [
+                        "led"
+                    ],
+                    "isSensor": true,
+                    "measureType": [
+                        "temperature"
+                    ],
+                    "lastUpdate": 1672934132.6097126
+                },
+                {
+                    "ID": 174,
+                    "availableServices": [
+                        "MQTT"
+                    ],
+                    "servicesDetails": [
+                        {
+                            "serviceType": "MQTT",
+                            "subscribedTopics": [],
+                            "publishedTopics": [
+                                "PatataNovella/2/174/temperature",
+                                "PatataNovella/2/174/humidity",
+                                "PatataNovella/2/174/light"
+                            ]
+                        }
+                    ],
+                    "deviceName": "Device_10",
+                    "field": 2,
+                    "PowerConsumption_kW": 0,
+                    "isActuator": false,
+                    "actuatorType": [],
+                    "isSensor": true,
+                    "measureType": [
+                        "temperature",
+                        "humidity",
+                        "light"
+                    ],
+                    "lastUpdate": 1672934132.7780118
+                },
+                {
+                    "ID": 175,
+                    "availableServices": [
+                        "MQTT"
+                    ],
+                    "servicesDetails": [
+                        {
+                            "serviceType": "MQTT",
+                            "subscribedTopics": [],
+                            "publishedTopics": [
+                                "PatataNovella/2/175/humidity",
+                                "PatataNovella/2/175/soilMoisture"
+                            ]
+                        }
+                    ],
+                    "deviceName": "Device_11",
+                    "field": 2,
+                    "PowerConsumption_kW": 0,
+                    "isActuator": false,
+                    "actuatorType": [],
+                    "isSensor": true,
+                    "measureType": [
+                        "humidity",
+                        "soilMoisture"
+                    ],
+                    "lastUpdate": 1672934133.0068603
+                },
+                {
+                    "ID": 176,
+                    "availableServices": [
+                        "MQTT"
+                    ],
+                    "servicesDetails": [
+                        {
+                            "serviceType": "MQTT",
+                            "subscribedTopics": [
+                                "PatataNovella/2/176/led"
+                            ],
+                            "publishedTopics": [
+                                "PatataNovella/2/176/light",
+                                "PatataNovella/2/176/humidity"
+                            ]
+                        }
+                    ],
+                    "deviceName": "Device_12",
+                    "field": 2,
+                    "PowerConsumption_kW": 8,
+                    "isActuator": true,
+                    "actuatorType": [
+                        "led"
+                    ],
+                    "isSensor": true,
+                    "measureType": [
+                        "light",
+                        "humidity"
+                    ],
+                    "lastUpdate": 1672934133.20927
+                },
+                {
+                    "ID": 177,
+                    "availableServices": [
+                        "MQTT"
+                    ],
+                    "servicesDetails": [
+                        {
+                            "serviceType": "MQTT",
+                            "subscribedTopics": [],
+                            "publishedTopics": []
+                        }
+                    ],
+                    "deviceName": "Device_13",
+                    "field": 2,
+                    "PowerConsumption_kW": 0,
+                    "isActuator": false,
+                    "actuatorType": [],
+                    "isSensor": false,
+                    "measureType": [],
+                    "lastUpdate": 1672934133.40758
+                },
+                {
+                    "ID": 178,
+                    "availableServices": [
+                        "MQTT"
+                    ],
+                    "servicesDetails": [
+                        {
+                            "serviceType": "MQTT",
+                            "subscribedTopics": [
+                                "PatataNovella/2/178/led"
+                            ],
+                            "publishedTopics": [
+                                "PatataNovella/2/178/light",
+                                "PatataNovella/2/178/humidity",
+                                "PatataNovella/2/178/soilMoisture",
+                                "PatataNovella/2/178/temperature"
+                            ]
+                        }
+                    ],
+                    "deviceName": "Device_14",
+                    "field": 2,
+                    "PowerConsumption_kW": 13,
+                    "isActuator": true,
+                    "actuatorType": [
+                        "led"
+                    ],
+                    "isSensor": true,
+                    "measureType": [
+                        "light",
+                        "humidity",
+                        "soilMoisture",
+                        "temperature"
+                    ],
+                    "lastUpdate": 1672934133.606009
+                },
+                {
+                    "ID": 179,
+                    "availableServices": [
+                        "MQTT"
+                    ],
+                    "servicesDetails": [
+                        {
+                            "serviceType": "MQTT",
+                            "subscribedTopics": [
+                                "PatataNovella/2/179/led"
+                            ],
+                            "publishedTopics": [
+                                "PatataNovella/2/179/humidity",
+                                "PatataNovella/2/179/temperature"
+                            ]
+                        }
+                    ],
+                    "deviceName": "Device_15",
+                    "field": 2,
+                    "PowerConsumption_kW": 18,
+                    "isActuator": true,
+                    "actuatorType": [
+                        "led"
+                    ],
+                    "isSensor": true,
+                    "measureType": [
+                        "humidity",
+                        "temperature"
+                    ],
+                    "lastUpdate": 1672934133.8071575
+                },
+                {
+                    "ID": 180,
+                    "availableServices": [
+                        "MQTT"
+                    ],
+                    "servicesDetails": [
+                        {
+                            "serviceType": "MQTT",
+                            "subscribedTopics": [
+                                "PatataNovella/2/180/led"
+                            ],
+                            "publishedTopics": [
+                                "PatataNovella/2/180/light",
+                                "PatataNovella/2/180/soilMoisture",
+                                "PatataNovella/2/180/temperature"
+                            ]
+                        }
+                    ],
+                    "deviceName": "Device_16",
+                    "field": 2,
+                    "PowerConsumption_kW": 13,
+                    "isActuator": true,
+                    "actuatorType": [
+                        "led"
+                    ],
+                    "isSensor": true,
+                    "measureType": [
+                        "light",
+                        "soilMoisture",
+                        "temperature"
+                    ],
+                    "lastUpdate": 1672934134.052637
+                },
+                {
+                    "ID": 181,
+                    "availableServices": [
+                        "MQTT"
+                    ],
+                    "servicesDetails": [
+                        {
+                            "serviceType": "MQTT",
+                            "subscribedTopics": [],
+                            "publishedTopics": [
+                                "PatataNovella/2/181/temperature",
+                                "PatataNovella/2/181/humidity",
+                                "PatataNovella/2/181/light",
+                                "PatataNovella/2/181/soilMoisture"
+                            ]
+                        }
+                    ],
+                    "deviceName": "Device_17",
+                    "field": 2,
+                    "PowerConsumption_kW": 0,
+                    "isActuator": false,
+                    "actuatorType": [],
+                    "isSensor": true,
+                    "measureType": [
+                        "temperature",
+                        "humidity",
+                        "light",
+                        "soilMoisture"
+                    ],
+                    "lastUpdate": 1672934134.2078452
+                },
+                {
+                    "ID": 182,
+                    "availableServices": [
+                        "MQTT"
+                    ],
+                    "servicesDetails": [
+                        {
+                            "serviceType": "MQTT",
+                            "subscribedTopics": [],
+                            "publishedTopics": [
+                                "PatataNovella/2/182/temperature",
+                                "PatataNovella/2/182/soilMoisture",
+                                "PatataNovella/2/182/humidity"
+                            ]
+                        }
+                    ],
+                    "deviceName": "Device_18",
+                    "field": 2,
+                    "PowerConsumption_kW": 0,
+                    "isActuator": false,
+                    "actuatorType": [],
+                    "isSensor": true,
+                    "measureType": [
+                        "temperature",
+                        "soilMoisture",
+                        "humidity"
+                    ],
+                    "lastUpdate": 1672934134.4547079
+                },
+                {
+                    "ID": 183,
+                    "availableServices": [
+                        "MQTT"
+                    ],
+                    "servicesDetails": [
+                        {
+                            "serviceType": "MQTT",
+                            "subscribedTopics": [],
+                            "publishedTopics": [
+                                "PatataNovella/2/183/humidity",
+                                "PatataNovella/2/183/light"
+                            ]
+                        }
+                    ],
+                    "deviceName": "Device_19",
+                    "field": 2,
+                    "PowerConsumption_kW": 0,
+                    "isActuator": false,
+                    "actuatorType": [],
+                    "isSensor": true,
+                    "measureType": [
+                        "humidity",
+                        "light"
+                    ],
+                    "lastUpdate": 1672934134.6547873
+                },
+                {
+                    "ID": 184,
+                    "availableServices": [
+                        "MQTT"
+                    ],
+                    "servicesDetails": [
+                        {
+                            "serviceType": "MQTT",
+                            "subscribedTopics": [
+                                "PatataNovella/3/184/led"
+                            ],
+                            "publishedTopics": [
+                                "PatataNovella/3/184/light"
+                            ]
+                        }
+                    ],
+                    "deviceName": "Device_20",
+                    "field": 3,
+                    "PowerConsumption_kW": 9,
+                    "isActuator": true,
+                    "actuatorType": [
+                        "led"
+                    ],
+                    "isSensor": true,
+                    "measureType": [
+                        "light"
+                    ],
+                    "lastUpdate": 1672934134.8389997
+                },
+                {
+                    "ID": 185,
+                    "availableServices": [
+                        "MQTT"
+                    ],
+                    "servicesDetails": [
+                        {
+                            "serviceType": "MQTT",
+                            "subscribedTopics": [],
+                            "publishedTopics": [
+                                "PatataNovella/3/185/humidity",
+                                "PatataNovella/3/185/light",
+                                "PatataNovella/3/185/temperature"
+                            ]
+                        }
+                    ],
+                    "deviceName": "Device_21",
+                    "field": 3,
+                    "PowerConsumption_kW": 0,
+                    "isActuator": false,
+                    "actuatorType": [],
+                    "isSensor": true,
+                    "measureType": [
+                        "humidity",
+                        "light",
+                        "temperature"
+                    ],
+                    "lastUpdate": 1672934135.009031
+                },
+                {
+                    "ID": 186,
+                    "availableServices": [
+                        "MQTT"
+                    ],
+                    "servicesDetails": [
+                        {
+                            "serviceType": "MQTT",
+                            "subscribedTopics": [
+                                "PatataNovella/3/186/led"
+                            ],
+                            "publishedTopics": [
+                                "PatataNovella/3/186/soilMoisture"
+                            ]
+                        }
+                    ],
+                    "deviceName": "Device_22",
+                    "field": 3,
+                    "PowerConsumption_kW": 13,
+                    "isActuator": true,
+                    "actuatorType": [
+                        "led"
+                    ],
+                    "isSensor": true,
+                    "measureType": [
+                        "soilMoisture"
+                    ],
+                    "lastUpdate": 1672934135.175481
+                },
+                {
+                    "ID": 187,
+                    "availableServices": [
+                        "MQTT"
+                    ],
+                    "servicesDetails": [
+                        {
+                            "serviceType": "MQTT",
+                            "subscribedTopics": [],
+                            "publishedTopics": [
+                                "PatataNovella/3/187/light",
+                                "PatataNovella/3/187/temperature",
+                                "PatataNovella/3/187/humidity"
+                            ]
+                        }
+                    ],
+                    "deviceName": "Device_23",
+                    "field": 3,
+                    "PowerConsumption_kW": 0,
+                    "isActuator": false,
+                    "actuatorType": [],
+                    "isSensor": true,
+                    "measureType": [
+                        "light",
+                        "temperature",
+                        "humidity"
+                    ],
+                    "lastUpdate": 1672934135.3313036
+                },
+                {
+                    "ID": 188,
+                    "availableServices": [
+                        "MQTT"
+                    ],
+                    "servicesDetails": [
+                        {
+                            "serviceType": "MQTT",
+                            "subscribedTopics": [],
+                            "publishedTopics": [
+                                "PatataNovella/3/188/soilMoisture"
+                            ]
+                        }
+                    ],
+                    "deviceName": "Device_24",
+                    "field": 3,
+                    "PowerConsumption_kW": 0,
+                    "isActuator": false,
+                    "actuatorType": [],
+                    "isSensor": true,
+                    "measureType": [
+                        "soilMoisture"
+                    ],
+                    "lastUpdate": 1672934135.5165155
+                },
+                {
+                    "ID": 189,
+                    "availableServices": [
+                        "MQTT"
+                    ],
+                    "servicesDetails": [
+                        {
+                            "serviceType": "MQTT",
+                            "subscribedTopics": [
+                                "PatataNovella/3/189/pump"
+                            ],
+                            "publishedTopics": []
+                        }
+                    ],
+                    "deviceName": "Device_25",
+                    "field": 3,
+                    "PowerConsumption_kW": 13,
+                    "isActuator": true,
+                    "actuatorType": [
+                        "pump"
+                    ],
+                    "isSensor": false,
+                    "measureType": [],
+                    "lastUpdate": 1672934135.6849864
+                },
+                {
+                    "ID": 190,
+                    "availableServices": [
+                        "MQTT"
+                    ],
+                    "servicesDetails": [
+                        {
+                            "serviceType": "MQTT",
+                            "subscribedTopics": [
+                                "PatataNovella/3/190/pump"
+                            ],
+                            "publishedTopics": [
+                                "PatataNovella/3/190/light",
+                                "PatataNovella/3/190/temperature",
+                                "PatataNovella/3/190/soilMoisture",
+                                "PatataNovella/3/190/humidity"
+                            ]
+                        }
+                    ],
+                    "deviceName": "Device_26",
+                    "field": 3,
+                    "PowerConsumption_kW": 5,
+                    "isActuator": true,
+                    "actuatorType": [
+                        "pump"
+                    ],
+                    "isSensor": true,
+                    "measureType": [
+                        "light",
+                        "temperature",
+                        "soilMoisture",
+                        "humidity"
+                    ],
+                    "lastUpdate": 1672934135.8390584
+                },
+                {
+                    "ID": 191,
+                    "availableServices": [
+                        "MQTT"
+                    ],
+                    "servicesDetails": [
+                        {
+                            "serviceType": "MQTT",
+                            "subscribedTopics": [
+                                "PatataNovella/3/191/led"
+                            ],
+                            "publishedTopics": [
+                                "PatataNovella/3/191/light",
+                                "PatataNovella/3/191/soilMoisture",
+                                "PatataNovella/3/191/temperature",
+                                "PatataNovella/3/191/humidity"
+                            ]
+                        }
+                    ],
+                    "deviceName": "Device_27",
+                    "field": 3,
+                    "PowerConsumption_kW": 16,
+                    "isActuator": true,
+                    "actuatorType": [
+                        "led"
+                    ],
+                    "isSensor": true,
+                    "measureType": [
+                        "light",
+                        "soilMoisture",
+                        "temperature",
+                        "humidity"
+                    ],
+                    "lastUpdate": 1672934136.0054302
+                },
+                {
+                    "ID": 192,
+                    "availableServices": [
+                        "MQTT"
+                    ],
+                    "servicesDetails": [
+                        {
+                            "serviceType": "MQTT",
+                            "subscribedTopics": [],
+                            "publishedTopics": [
+                                "PatataNovella/3/192/temperature"
+                            ]
+                        }
+                    ],
+                    "deviceName": "Device_28",
+                    "field": 3,
+                    "PowerConsumption_kW": 0,
+                    "isActuator": false,
+                    "actuatorType": [],
+                    "isSensor": true,
+                    "measureType": [
+                        "temperature"
+                    ],
+                    "lastUpdate": 1672934136.1482763
+                },
+                {
+                    "ID": 193,
+                    "availableServices": [
+                        "MQTT"
+                    ],
+                    "servicesDetails": [
+                        {
+                            "serviceType": "MQTT",
+                            "subscribedTopics": [
+                                "PatataNovella/3/193/led"
+                            ],
+                            "publishedTopics": [
+                                "PatataNovella/3/193/temperature",
+                                "PatataNovella/3/193/humidity"
+                            ]
+                        }
+                    ],
+                    "deviceName": "Device_29",
+                    "field": 3,
+                    "PowerConsumption_kW": 7,
+                    "isActuator": true,
+                    "actuatorType": [
+                        "led"
+                    ],
+                    "isSensor": true,
+                    "measureType": [
+                        "temperature",
+                        "humidity"
+                    ],
+                    "lastUpdate": 1672934136.332983
+                }
+            ]
         }
     ]
 }

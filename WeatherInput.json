@@ -1,0 +1,1 @@
+{"hourly": ["cloudcover", "shortwave_radiation","relativehumidity_2m", "dewpoint_2m", "precipitation", "soil_temperature_6cm", "soil_moisture_3_9cm"], "daily": ["sunrise", "sunset", "shortwave_radiation_sum","precipitation_sum", "precipitation_hours"], "latitude": [45.5], "longitude": [9.2], "timezone": ["auto"]}

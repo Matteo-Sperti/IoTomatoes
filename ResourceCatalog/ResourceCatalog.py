@@ -279,19 +279,19 @@ class ResourceCatalogManager():
         self.catalog["lastUpdate"] = actualtime
 
 
-class RESTResourceCatalog():
+class RESTResourceCatalog(GenericEndpoint):
     exposed = True
 
     def __init__(self, settings : dict): 
         filename = settings["filename"]
         autoDeleteTime = settings["autoDeleteTime"]
-        self.Service = GenericEndpoint(settings, isService=True)
-        self.catalog = ResourceCatalogManager(self.Service._EndpointInfo, filename, autoDeleteTime)
+        super().__init__(settings, isService=True)
+        self.catalog = ResourceCatalogManager(self._EndpointInfo, filename, autoDeleteTime)
 
     def close(self):
         self.catalog.autoDeleteItemsThread.stop()
         self.catalog.save()
-        self.Service.stop()
+        self.stop()
 
     def GET(self, *uri, **params):
         try:
@@ -361,7 +361,7 @@ if __name__ == "__main__":
     except:
         print("Error while creating the catalog")
     else:
-        Catalog.Service.start()
+        Catalog.start()
         
         conf = {
             '/': {

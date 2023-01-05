@@ -199,8 +199,16 @@ class GenericEndpoint():
         for topic in self._subscribedTopics:
             self.mySubscribe(self._baseTopic + topic)
 
-    def myOnConnect(self, paho_mqtt, userdata, flags, rc):
-        print("Connected to %s with result code: %d" % (self._broker, rc))
+    def myOnConnect(self,client,userdata,flags,rc):
+        """It provides information about Connection result with the broker"""
+
+        dic={
+            "0":f"Connection successful to {self._broker}",
+            "1":f"Connection to {self._broker} refused - incorrect protocol version",
+            "2":f"Connection to {self._broker} refused - invalid client identifier",
+            "3":f"Connection to {self._broker} refused - server unavailable",
+        }             
+        print(dic[str(rc)])
 
     def myOnMessageReceived(self, paho_mqtt, userdata, msg):
         # A new message is received

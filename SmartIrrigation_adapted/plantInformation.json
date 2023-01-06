@@ -1,0 +1,122 @@
+{
+    "company": [
+        "Andrea",
+        "Federico"
+    ],
+    "companyList": [
+        {
+            "companyName": "Andrea",
+            "fieldsNumber": 1,
+            "fields": [
+                {
+                    "fieldID": 1,
+                    "plantType": "tomatoes",
+                    "temperatureLimit": {
+                        "min":15,
+                        "max":30,
+                        "unit":"°C"
+                    },
+                    "soilMoistureLimit": {
+                        "min":65,
+                        "max":75,
+                        "unit":"%"
+                    },
+                    "precipitationLimit":{
+                        "max":2,
+                        "unit":"mm"
+                    },
+                    "lastMeasures": {
+                        "temperature": {
+                            "values": [
+                                28
+                            ],
+                            "unit":"°C",
+                            "lastUpdate": 1672959834.955249
+                        },
+                        "soilMoisture": {
+                            "values": [
+                                59
+                            ],
+                            "unit":"%",
+                            "lastUpdate": 1672959835.5233257
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "companyName": "Federico",
+            "fieldsNumber": 2,
+            "fields": [
+                {
+                    "fieldID": 1,
+                    "plantType": "potatoes",
+                    "temperatureLimit":{
+                        "min":15,
+                        "max":30,
+                        "unit":"°C"
+                    },
+                    "soilMoistureLimit": {
+                        "min":70,
+                        "max":80,
+                        "unit":"%"
+                    },
+                    "precipitationLimit": {
+                        "max":3,
+                        "unit":"mm"
+                    },
+                    "lastMeasures": {
+                        "temperature": {
+                            "values": [
+                                24
+                            ],
+                            "unit":"°C",
+                            "lastUpdate": 1672959831.2678316
+                        },
+                        "soilMoisture": {
+                            "values": [
+                                78
+                            ],
+                            "unit":"%",
+                            "lastUpdate": 1672959835.5935006
+                        }
+                    }
+                },
+                {
+                    "fieldID": 2,
+                    "plantType": "tomatoes",
+                    "temperatureLimit": {
+                        "min":15,
+                        "max":30,
+                        "unit":"°C"
+                    },
+                    "soilMoistureLimit": {
+                        "min":65,
+                        "max":75,
+                        "unit":"%"
+                    },
+                    "precipitationLimit":{
+                        "max":2,
+                        "unit":"mm"
+                    },
+                    "lastMeasures": {
+                        "temperature": {
+                            "values": [
+                                54
+                            ],
+                            "unit":"°C",
+                            "lastUpdate": ""
+                        },
+                        "soilMoisture": {
+                            "values": [
+                                44
+                            ],
+                            "unit":"%",
+                            "lastUpdate": ""
+                        }
+                    }
+                }
+            ]
+        }
+    ]
+}

@@ -150,11 +150,14 @@ class ResourceCatalogManager():
                         return item
         return None
     
-    def get_all(self, list_key : str):
-        """Return a json with all the items in the list specified in `list_key`.
+    def get_all(self, SystemToken : str):
+        """Return a json with the list of all the companies in the catalog.
+
+        Arguments:\n
+        `SystemToken` -- the token of the system to authorize the request.
         """
         try:
-            return json.dumps(self.catalog[list_key], indent=4)
+            return json.dumps(self.catalog[companyList_name], indent=4)
         except KeyError:
             raise web_exception(404, "List not found")
 

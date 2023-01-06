@@ -56,7 +56,6 @@ class IoTDevice(GenericEndpoint):
         message["e"]["value"] = random.randint(20,40)
         return message
 
-
     def get_soilMoisture(self):
         message = self.construct_message("soilMoisture", "%")
         message["e"]["value"] = random.randint(20,80)

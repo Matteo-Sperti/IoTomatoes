@@ -1,6 +1,6 @@
 {
     "ServiceCatalog_url" : "http://127.0.0.1:8080",
-    "serviceName" : "Smart Lighting",
+    "serviceName" : "ConsumptionService",
     "IPport" : 8085,
     "availableServices" : [
         "MQTT"
@@ -8,7 +8,7 @@
     "servicesDetails" : [
         {
             "serviceType": "MQTT",
-            "subscribedTopics": ["+/+/light"],
+            "subscribedTopics": ["+/+/+/led", "+/+/+/pump/"],
             "publishedTopics": []
         }
     ]

@@ -10,9 +10,9 @@ from GenericEndpoint import GenericEndpoint
 from Tests.CheckResult import *
 
 class ConsumptionManager (GenericEndpoint):
-	def __init__(self, settings : dict):
+	def __init__(self, filename):
 		"""Initialize the ConsumptionManager class"""
-
+		settings = json.load(open(filename))
 		super().__init__(settings, isService=True)
 		
 		#r = json.loads(requests.get(f'{self.catalogIP}/getCompanyList')) #!FINAL

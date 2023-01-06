@@ -37,7 +37,7 @@ def measureType(dict_ : dict) -> list:
     else:
         return dict_["measureType"]
 
-def actuators(dict_ : dict) -> list:
+def actuatorType(dict_ : dict) -> list:
     if "actuatorType" not in dict_:
         raise InfoException("actuatorType is missing")
     else:

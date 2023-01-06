@@ -81,7 +81,8 @@ class ResourceCatalogManager():
         Raise an exception is the `CompanyToken` is not correct.
         """
 
-        if "CompanyName" not in credentials or "CompanyToken" not in credentials:
+        if "CompanyName" not in credentials or not ("CompanyToken" in credentials 
+                and "SystemToken" in credentials):
             raise web_exception(400, "Missing credentials")
 
         if company["CompanyName"] == credentials["CompanyName"]:
@@ -91,6 +92,25 @@ class ResourceCatalogManager():
                 raise web_exception(401, "Wrong credentials")
         else:
             return False
+
+    def accessInfo(self, params : dict):
+        """Return the access info of a device.
+
+        Arguments:\n
+        `params` -- a dictionary with the parameters of the request.
+        Must contain the `CompanyName` and `CompanyToken` or `SystemToken`.\n
+        Return:\n
+        JSON with the access info of the device, or an error message.
+        """
+        if "CompanyName" in params:
+            if "CompanyToken" in params:
+                CompanyInfo = {"CompanyName": params["CompanyName"], "CompanyToken": params["CompanyToken"]}
+                return CompanyInfo
+            elif "SystemToken" in params:
+                CompanyInfo = {"CompanyName": params["CompanyName"], "SystemToken": params["SystemToken"]}
+                return CompanyInfo
+
+        raise web_exception(400, "Error in the access information")
     
     def findCompany(self, CompanyInfo):
         """Return the pointer to the company specified in `CompanyInfo`.
@@ -130,6 +150,79 @@ class ResourceCatalogManager():
                         return item
         return None
     
+    def get_all(self, list_key : str):
+        """Return a json with all the items in the list specified in `list_key`.
+        """
+        try:
+            return json.dumps(self.catalog[list_key], indent=4)
+        except KeyError:
+            raise web_exception(404, "List not found")
+
+    def getItem(self, CompanyInfo : dict, ID : int):
+        """Return the information of item `ID` in json format.
+
+        Arguments:
+        `CompanyInfo` -- the information about the company.
+        Must contain the `CompanyName` and `CompanyToken`.\n
+        `ID` -- the ID of the item.
+        """
+        item = self.find_item(CompanyInfo, ID)
+
+        if item != None:
+            return json.dumps(item, indent=4)
+        raise web_exception(404, "Service info not found")
+
+    def getCompany(self, CompanyInfo : dict):
+        """Return the information of the company specified in `CompanyInfo` in json format.
+
+        Arguments:
+        `CompanyInfo` -- the information about the company.
+        Must contain the `CompanyName` and `CompanyToken`.
+        """
+        company = self.findCompany(CompanyInfo)
+        if company != None:
+            return json.dumps(company, indent=4)
+        raise web_exception(404, "Company not found")
+
+    def getDevices(self, CompanyInfo : dict):
+        """Return the list of devices of the company specified in `CompanyInfo` in json format.
+
+        Arguments: \n
+        `CompanyInfo` -- the information about the company.
+        Must contain the `CompanyName` and `CompanyToken`.
+        """
+        company = self.findCompany(CompanyInfo)
+        if company != None:
+            return json.dumps(company[devicesList_name], indent=4)
+        raise web_exception(404, "Company not found")
+
+    def getUsers(self, CompanyInfo : dict):
+        """Return the list of users of the company specified in `CompanyInfo` in json format.
+
+        Arguments: \n
+        `CompanyInfo` -- the information about the company.
+        Must contain the `CompanyName` and `CompanyToken`.
+        """
+        company = self.findCompany(CompanyInfo)
+        if company != None:
+            return json.dumps(company[usersList_name], indent=4)
+        raise web_exception(404, "Company not found")
+
+    def getTopics(self, CompanyInfo : dict, field : str, ResourceType : str):
+        """Return the list of topics of the company specified in `CompanyInfo` in json format.
+
+        Arguments: \n
+        `CompanyInfo` -- the information about the company.
+        Must contain the `CompanyName` and `CompanyToken`.
+        """
+        company = self.findCompany(CompanyInfo)
+        if company != None:
+            for item in company[devicesList_name]:
+                if getField(item) == field:
+                    if ResourceType in measureType(item) or ResourceType in actuatorType(item):
+                        return json.dumps(publishedTopics(item), indent=4)
+        raise web_exception(404, "Company not found")
+
     def insertCompany(self, CompanyInfo : dict, AdminInfo : dict):
         """Insert a new company in the catalog.
 
@@ -170,40 +263,6 @@ class ResourceCatalogManager():
                     out = {"Status": True, "CompanyID": ID, "CompanyToken": CompanyInfo["CompanyToken"]}
         
         return json.dumps(out, indent=4)
-
-    def get_all(self, list_key : str):
-        """Return a json with all the items in the list specified in `list_key`.
-        """
-        try:
-            return json.dumps(self.catalog[list_key], indent=4)
-        except KeyError:
-            raise web_exception(404, "List not found")
-
-    def getItem(self, CompanyInfo : dict, ID : int):
-        """Return the information of item `ID` in json format.
-
-        Arguments:
-        `CompanyInfo` -- the information about the company.
-        Must contain the `CompanyName` and `CompanyToken`.\n
-        `ID` -- the ID of the item.
-        """
-        item = self.find_item(CompanyInfo, ID)
-
-        if item != None:
-            return json.dumps(item, indent=4)
-        raise web_exception(404, "Service info not found")
-
-    def getCompany(self, CompanyInfo : dict):
-        """Return the information of the company specified in `CompanyInfo` in json format.
-
-        Arguments:
-        `CompanyInfo` -- the information about the company.
-        Must contain the `CompanyName` and `CompanyToken`.
-        """
-        company = self.findCompany(CompanyInfo)
-        if company != None:
-            return json.dumps(company, indent=4)
-        raise web_exception(404, "Company not found")
 
     def insertDevice(self, CompanyInfo : dict, deviceInfo : dict):
         company = self.findCompany(CompanyInfo)
@@ -357,20 +416,33 @@ class RESTResourceCatalog(GenericEndpoint):
         """GET method for the REST API.
         Return a json with the requested information.
         
-        Allowed commands:
+        Allowed commands: \n
         `/getCompany`: return the company information. The parameters are `CompanyName` and `CompanyToken`.\n
         `/get`: return the device information. The parameters are `ID`, `CompanyName` and `CompanyToken`.\n
+        `/devices`: return the list of devices. The parameters are `CompanyName` and `CompanyToken`.\n
+        `/users`: return the list of users. The parameters are `CompanyName` and `CompanyToken`.\n
+        `/topics/led`: return the list of led topics. The parameters are `field`,  `CompanyName` and `CompanyToken`.\n
         """
         try:
             if len(uri) > 0:
                 if len(uri) == 1 and uri[0] == "getCompany":
-                    if all(key in params for key in ["CompanyName", "CompanyToken"]):
-                        CompanyInfo = {"CompanyName": params["CompanyName"], "CompanyToken": params["CompanyToken"]}
-                        return self.catalog.getCompany(CompanyInfo)
+                    CompanyInfo = self.catalog.accessInfo(params)
+                    return self.catalog.getCompany(CompanyInfo)
                 elif len(uri) == 1 and uri[0] == "get":
-                    if all(key in params for key in ["ID", "CompanyName", "CompanyToken"]):
-                        CompanyInfo = {"CompanyName": params["CompanyName"], "CompanyToken": params["CompanyToken"]}
+                    if "ID" in params:
+                        CompanyInfo = self.catalog.accessInfo(params)
                         return self.catalog.getItem(CompanyInfo, int(params["ID"]))
+                elif len(uri) == 1 and uri[0] == "devices":
+                    CompanyInfo = self.catalog.accessInfo(params)
+                    return self.catalog.getDevices(CompanyInfo)
+                elif len(uri) == 1 and uri[0] == "users":
+                    CompanyInfo = self.catalog.accessInfo(params)
+                    return self.catalog.getUsers(CompanyInfo)
+                elif len(uri) == 2 and uri[0] == "topics":
+                    if "field" in params:
+                        CompanyInfo = self.catalog.accessInfo(params)
+                        return self.catalog.getTopics(CompanyInfo, params["field"], uri[1])
+
             raise web_exception(404, "Resource not found.")
         except web_exception as e:
             raise cherrypy.HTTPError(e.code, e.message)

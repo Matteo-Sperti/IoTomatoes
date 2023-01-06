@@ -2,6 +2,8 @@ import time
 
 from MyExceptions import InfoException
 
+### Get item information from a dictionary ###
+
 def getID(dict_ : dict) -> int:
     if "ID" not in dict_:
         raise InfoException("ID is missing")   
@@ -71,7 +73,22 @@ def getIPaddress(dict_ : dict) -> str:
             return service["serviceIP"]
     return ""
 
+### Construct item dictionary according to the specification of the catalog ###
+
 def construct(EInfo : dict, isService : bool = False, isResource : bool = False):
+    """Construct the dictionary of a resource or a service according to the specification of the catalog.
+    
+    Parameters:\n
+    `EInfo` (dict): The dictionary containing the information of the resource or service.\n
+    `isService` (bool): True if the dictionary is a service, False otherwise.\n
+    `isResource` (bool): True if the dictionary is a resource, False otherwise. 
+    `isService` and `isResource` are mutually exclusive.\n
+    
+    Returns:\n
+    `info` (dict): The dictionary of the resource or service.\n
+    `CompanyInfo` (dict): The dictionary containing the information of the company 
+    of the resource, empty if the endoint is a service.
+    """
     if not isResource ^ isService:
         raise InfoException("isResource and isService are not compatible")
     if isService:
@@ -89,6 +106,15 @@ def construct(EInfo : dict, isService : bool = False, isResource : bool = False)
     return info, CompanyInfo
 
 def constructService(ID : int, EInfo : dict):
+    """ Construct the dictionary of a service according to the specification of the catalog.
+
+    Parameters:\n
+    `ID` (int): The ID of the service.\n
+    `EInfo` (dict): The dictionary containing the information of the service.\n
+
+    Returns:\n
+    `info` (dict): The dictionary of the service.\n
+    """
     info = {}
     info["ID"] = ID
     _makeService(EInfo, info)
@@ -96,6 +122,16 @@ def constructService(ID : int, EInfo : dict):
     return info
 
 def constructResource(ID : int, CompInfo : dict, EInfo : dict):
+    """ Construct the dictionary of a resource according to the specification of the catalog.
+
+    Parameters:\n
+    `ID` (int): The ID of the resource.\n
+    `CompInfo` (dict): The dictionary containing the information of the company of the resource.\n
+    `EInfo` (dict): The dictionary containing the information of the resource.\n
+
+    Returns:\n
+    `info` (dict): The dictionary of the resource.\n
+    """
     info = {}
     info["ID"] = ID
     _makeResource(EInfo, CompInfo, info)

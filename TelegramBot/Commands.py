@@ -9,9 +9,11 @@ class InsertNewCompany():
         self.ResourceCatalog_url = ResourceCatalog_url
         self.companyList = companyList
         self.bot = bot
-        self.status = 0
+        self._status = 0
+        self._coordSTD = 44.969741, 7.464239
 
-        self.request = {"CompanyName" : "", "Name" : "", "Surname" : "", "CompanyToken" : ""}
+        self.request = {"CompanyName" : "", "Name" : "", "Surname" : "", 
+                            "CompanyToken" : "", "CompanyLocation" : ""}
         self.bot.sendMessage(self.chatID, f"Insert your {list(self.request.keys())[0]}")
 
     def __eq__(self, __o: object) -> bool:
@@ -28,19 +30,23 @@ class InsertNewCompany():
         return {"CompanyName": self.request["CompanyName"], "CompanyToken": self.request["CompanyToken"]}
 
     def update(self, message): 
-        if self.status < len(self.request):
-            actualKey = list(self.request.keys())[self.status]
+        if self._status < len(self.request):
+            actualKey = list(self.request.keys())[self._status]
+            print(message)
             self.request[actualKey] = message
-            self.status += 1
-            if self.status < len(self.request):
-                self.bot.sendMessage(self.chatID, f"Insert your {list(self.request.keys())[self.status]}")
+            self._status += 1
+            if self._status < len(self.request):
+                self.bot.sendMessage(self.chatID, f"Insert your {list(self.request.keys())[self._status]}")
+                if self._status == len(self.request) - 1:
+                    self.bot.sendMessage(self.chatID, "Insert your location:")
+                    self.bot.sendLocation(self.chatID, self._coordSTD)
             else:
                 question = f"Your Token is {message}\nConfirm your registration?"
                 buttons = buttons = [[InlineKeyboardButton(text=f'YES ✅', callback_data='yes'), 
                         InlineKeyboardButton(text=f'NO ❌', callback_data='no')]]
                 keyboards = InlineKeyboardMarkup(inline_keyboard=buttons)
                 self.bot.sendMessage(self.chatID, question, reply_markup=keyboards)
-                self.status += 1
+                self._status += 1
         else:
             if message == "yes":
                 if not self.insert_company():

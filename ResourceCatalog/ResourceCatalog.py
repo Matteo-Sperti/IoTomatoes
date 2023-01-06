@@ -36,6 +36,15 @@ def query_yes_no(question):
 class ResourceCatalogManager():
     def __init__(self, heading : dict, filename = "CompanyCatalog.json", autoDeleteTime = 120, 
                     IDs = IDs(100)):
+        """Initialize the catalog manager.
+    
+        Arguments:\n
+        `heading` -- the heading of the catalog.\n
+        `filename` -- the name of the file where the catalog is saved. \n
+        `autoDeleteTime` -- the time in seconds after which the items are 
+        deleted from the catalog (default 120 seconds).\n
+        `IDs` -- the IDs generator (default integer number > 100).
+        """
         self.catalog = heading.copy()
         self.catalog["lastUpdate"] = time.time()
         self.catalog[companyList_name] = []
@@ -46,6 +55,8 @@ class ResourceCatalogManager():
         self.autoDeleteItemsThread = MyThread(self.autoDeleteItems, interval=self._autoDeleteTime)
 
     def save(self):
+        """Save the catalog to the file specified in the initialization."""
+
         try:
             fp = open(self._filename, "w")
             json.dump(self.catalog, fp, indent=4)
@@ -55,19 +66,21 @@ class ResourceCatalogManager():
 
     def print_catalog(self):
         """Return the catalog in json format."""
+
         return json.dumps(self.catalog, indent=4)
 
-    def load(self):
-        """Load the catalog from the file specified in the initialization."""
-        try:
-            self.catalog = json.load(open(self._filename, "r"))
-            print("Catalog loaded!\n")
-            return json.dumps({"Status": True}, indent=4)
-        except FileNotFoundError:
-            print("Catalog file not found!\n")
-            return json.dumps({"Status": False}, indent=4)
-
     def isAuthorize(self, company : dict, credentials : dict):
+        """Check if the credentials are correct for the company.
+        
+        Arguments:\n
+        `company` -- the company to check.\n
+        `credentials` -- the credentials to access the `company`.\n
+        
+        Return:\n
+        `True` if the credentials are correct, `False` if the credential are for different company.
+        Raise an exception is the `CompanyToken` is not correct.
+        """
+
         if "CompanyName" not in credentials or "CompanyToken" not in credentials:
             raise web_exception(400, "Missing credentials")
 
@@ -80,13 +93,22 @@ class ResourceCatalogManager():
             return False
     
     def findCompany(self, CompanyInfo):
+        """Return the pointer to the company specified in `CompanyInfo`.
+        
+        Arguments:\n
+        `CompanyInfo` -- the information about the company.
+        Must contain the `CompanyName` and `CompanyToken`."""
+
         for company in self.catalog[companyList_name]:
             if self.isAuthorize(company, CompanyInfo):
                 return company
         return None
 
     def find_list(self, CompanyInfo : dict, IDvalue : int):
-        """Return the list where the item with the ID ``IDvalue`` is present."""
+        """Return the list where the item with the ID `IDvalue` is present.
+        `CompanyInfo` is used to check if the request is authorized.
+        Must contain the `CompanyName` and `CompanyToken`.
+        """
 
         company = self.findCompany(CompanyInfo)
         if company != None:
@@ -97,7 +119,8 @@ class ResourceCatalogManager():
         return None
 
     def find_item(self, CompanyInfo : dict, IDvalue : int) :
-        """Return the item with the ID ``IDvalue``."""
+        """Return the item with the ID `IDvalue`.
+        `CompanyInfo` is used to check if the request is authorized."""
 
         company = self.findCompany(CompanyInfo)
         if company != None:
@@ -108,6 +131,16 @@ class ResourceCatalogManager():
         return None
     
     def insertCompany(self, CompanyInfo : dict, AdminInfo : dict):
+        """Insert a new company in the catalog.
+
+        Arguments:\n
+        `CompanyInfo` -- the information about the company.
+        Must contain the `CompanyName` and `CompanyToken`.\n
+        `AdminInfo` -- the information about the admin of the company.\n
+
+        Return:\n
+        JSON with the status of the operation.
+        """
         out = {"Status": False}
         if all(key in CompanyInfo for key in ["CompanyName", "CompanyToken"]):
             ID = self._IDs.get_ID()
@@ -115,7 +148,7 @@ class ResourceCatalogManager():
             if ID == -1 or AdminID == -1:
                 raise web_exception(500, "No more IDs available")
             else:
-                print(f"New company: {CompanyInfo['CompanyName']}\n"
+                print(f"\nNew company: {CompanyInfo['CompanyName']}\n"
                         f"CompanyToken: {CompanyInfo['CompanyToken']}\n"
                         f"Admin information: \n"
                         f"{json.dumps(AdminInfo, indent=4)}\n")
@@ -139,18 +172,20 @@ class ResourceCatalogManager():
         return json.dumps(out, indent=4)
 
     def get_all(self, list_key : str):
-        """Return a json with all the items in the list specified in ``list_key``."""
+        """Return a json with all the items in the list specified in `list_key`.
+        """
         try:
             return json.dumps(self.catalog[list_key], indent=4)
         except KeyError:
             raise web_exception(404, "List not found")
 
     def getItem(self, CompanyInfo : dict, ID : int):
-        """Return the REST or MQTT information of item ``ID`` in json format.
+        """Return the information of item `ID` in json format.
 
-        Keyword arguments:
-        ``info`` is the type of information to return (REST, MQTT) and
-        ``ID`` is the ID of the item to return the information of
+        Arguments:
+        `CompanyInfo` -- the information about the company.
+        Must contain the `CompanyName` and `CompanyToken`.\n
+        `ID` -- the ID of the item.
         """
         item = self.find_item(CompanyInfo, ID)
 
@@ -159,6 +194,12 @@ class ResourceCatalogManager():
         raise web_exception(404, "Service info not found")
 
     def getCompany(self, CompanyInfo : dict):
+        """Return the information of the company specified in `CompanyInfo` in json format.
+
+        Arguments:
+        `CompanyInfo` -- the information about the company.
+        Must contain the `CompanyName` and `CompanyToken`.
+        """
         company = self.findCompany(CompanyInfo)
         if company != None:
             return json.dumps(company, indent=4)
@@ -183,6 +224,16 @@ class ResourceCatalogManager():
             raise web_exception(500, "No Company found")
 
     def insertUser(self, CompanyInfo : dict, userInfo : dict):
+        """Insert a new user in the catalog.
+
+        Arguments:\n
+        `CompanyInfo` -- the information about the company.
+        Must contain the `CompanyName` and `CompanyToken`.\n
+        `userInfo` -- the information about the user.\n
+        
+        Return:\n
+        JSON with the ID of the user, or an error message.
+        """
         company = self.findCompany(CompanyInfo)
         if company != None:
             ID = self._IDs.get_ID()
@@ -203,9 +254,9 @@ class ResourceCatalogManager():
         """Update a device in the catalog.
         Return a json with the status of the operation.
         
-        Keyword arguments:
-        ``ID`` is the ID of the item to update and
-        ``new_item`` is the item in json format to update
+        Arguments:
+        `ID` -- ID of the item to update and
+        `new_item` -- the item in json format to update
         """
 
         item = self.find_item(CompanyInfo, ID)
@@ -226,8 +277,8 @@ class ResourceCatalogManager():
         """Delete a item from the catalog.
         Return a json with the status of the operation.
         
-        Keyword arguments:
-        ``IDvalue`` is the ID of the item to delete
+        Arguments:
+        `IDvalue` -- the ID of the item to delete
         """
 
         current_list = self.find_list(CompanyInfo, IDvalue)
@@ -248,8 +299,10 @@ class ResourceCatalogManager():
         """Refresh the lastUpdate field of a device.
         Return a json with the status of the operation.
 
-        Keyword arguments:
-        ``IDvalue`` is the ID of the item to refresh
+        Aarguments:
+        `CompanyInfo` -- the information about the company.
+        Must contain the `CompanyName` and `CompanyToken`.\n
+        `IDvalue` -- the ID of the item to refresh.\n
         """
 
         item = self.find_item(CompanyInfo, IDvalue)
@@ -283,17 +336,31 @@ class RESTResourceCatalog(GenericEndpoint):
     exposed = True
 
     def __init__(self, settings : dict): 
+        """Initialize the REST endpoint.
+
+        Arguments:
+        `settings` is a dictionary with the settings of the endpoint.
+        """
         filename = settings["filename"]
         autoDeleteTime = settings["autoDeleteTime"]
         super().__init__(settings, isService=True)
         self.catalog = ResourceCatalogManager(self._EndpointInfo, filename, autoDeleteTime)
 
     def close(self):
+        """Close the endpoint and save the catalog."""
+
         self.catalog.autoDeleteItemsThread.stop()
         self.catalog.save()
         self.stop()
 
     def GET(self, *uri, **params):
+        """GET method for the REST API.
+        Return a json with the requested information.
+        
+        Allowed commands:
+        `/getCompany`: return the company information. The parameters are `CompanyName` and `CompanyToken`.\n
+        `/get`: return the device information. The parameters are `ID`, `CompanyName` and `CompanyToken`.\n
+        """
         try:
             if len(uri) > 0:
                 if len(uri) == 1 and uri[0] == "getCompany":
@@ -311,6 +378,15 @@ class RESTResourceCatalog(GenericEndpoint):
             raise cherrypy.HTTPError(500, "Internal Server Error")
 
     def POST(self, *uri, **params):
+        """POST method for the REST API.
+        Return a json with the status of the operation.
+        
+        Allowed commands:
+        `/insertCompany`: insert a new company in the catalog. 
+        The parameters are the company information and the Administrator information.\n
+        `/insert/device`: insert a new device in the catalog. The parameters are the device information.\n
+        `/insert/user`: insert a new user in the catalog. The parameters are the user information.\n
+        """
         try:
             if len(uri) > 0:
                 if len(uri) == 1 and uri[0] == "insertCompany":
@@ -329,6 +405,12 @@ class RESTResourceCatalog(GenericEndpoint):
             raise cherrypy.HTTPError(500, "Internal Server Error.")
     
     def PUT(self, *uri, **params):
+        """PUT method for the REST API.
+
+        Allowed commands:
+        `/refresh`: update the device information. 
+        The parameters are `ID`, `CompanyName` and `CompanyToken`.\n
+        """
         try:
             if len(uri) > 0:
                 if len(uri) == 1 and uri[0] == "refresh":
@@ -342,6 +424,12 @@ class RESTResourceCatalog(GenericEndpoint):
             return cherrypy.HTTPError(500, "Internal Server Error.")
 
     def DELETE(self, *uri, **params):
+        """DELETE method for the REST API.
+
+        Allowed commands:
+        `/deleteCompany`: delete the company from the platform. 
+        The parameters are `telegramID`, `CompanyName` and `CompanyToken`.\n
+        """
         pass
 
 if __name__ == "__main__":

@@ -9,17 +9,17 @@ from MyThread import MyThread
 
 class RefreshThread(MyThread):
     def __init__(self, url : str, ID : int, interval=60, CompanyInfo : dict = {}):
-        """RefreshThread class. Refresh the Catalog every ``interval`` seconds.
+        """RefreshThread class. Refresh the Catalog every `interval` seconds.
         
-        ``url {str}``: Catalog URL.\n
-        ``ID {int}``: ID of the item.\n
-        ``interval {int}``: refresh interval in seconds (default = 60).\n
-        ``CompanyInfo {dict}``: Company information (default = {}), needed only if the item is a resource.
+        `url {str}`: Catalog URL.\n
+        `ID {int}`: ID of the item.\n
+        `interval {int}`: refresh interval in seconds (default = 60).\n
+        `CompanyInfo {dict}`: Company information (default = {}), needed only if the item is a resource.
         """
         super().__init__(self.refresh_item, (url, ID, CompanyInfo), interval)
 
     def refresh_item(self, url : str, ID : int, CompanyInfo : dict = {}):
-        """Refresh item ``ID`` in the Catalog at ``url``."""
+        """Refresh item `ID` in the Catalog at `url`."""
 
         refreshed = False
         while not refreshed :
@@ -46,7 +46,13 @@ class RefreshThread(MyThread):
 class GenericEndpoint(): 
     def __init__(self, settings : dict, isService : bool = False, 
                     isResource : bool = False) :
-        """GenericEndpoint class. It is the base class for all the endpoints."""
+        """GenericEndpoint class. It is the base class for all the endpoints.
+        
+        `settings {dict}`: dictionary containing the settings of the endpoint.\n
+        `isService {bool}`: True if the endpoint is a service, False otherwise (default = False).\n
+        `isResource {bool}`: True if the endpoint is a resource, False otherwise (default = False).
+        `isService {bool}` and `isResource {bool}` are mutually exclusive.
+        """
 
         if "ServiceCatalog_url" not in settings:
             raise InfoException("The Service Catalog URL is missing")
@@ -59,6 +65,8 @@ class GenericEndpoint():
             self._EndpointInfo, self._CompanyInfo = construct(settings, isService, isResource)
 
     def start(self):
+        """Start the endpoint."""
+
         if self._isService:
             self.start_as_a_service()
         elif self._isResource:
@@ -70,6 +78,8 @@ class GenericEndpoint():
             self.start_MQTTclient()
 
     def stop(self):
+        """Stop the endpoint."""
+
         self._RefreshThread.stop()
 
         if self._MQTTclient:
@@ -78,12 +88,17 @@ class GenericEndpoint():
             self._paho_mqtt.disconnect()
 
     def start_as_a_service(self) :
+        """ Start the endpoint as a service.
+        It registers the service to the Service Catalog and starts the RefreshThread."""
+
         self.ID = self.register_service()
         self._RefreshThread = RefreshThread(self.ServiceCatalog_url, self.ID)
         if self._EndpointInfo["serviceName"] != "ResourceCatalog":
             self.ResourceCatalog_url = self.get_ResourceCatalog_url()
 
     def register_service(self) -> int:
+        """Register the service to the Service Catalog."""
+
         while True:
             try:
                 res = requests.post(self.ServiceCatalog_url + "/insert", json = self._EndpointInfo)
@@ -103,6 +118,9 @@ class GenericEndpoint():
                     print(f"Error in the response\n")
 
     def start_as_a_resource(self) :        
+        """ Start the endpoint as a resource.
+        It registers the resource to the Resource Catalog and starts the RefreshThread."""
+
         self.ResourceCatalog_url = self.get_ResourceCatalog_url()
         #Register
         self.ID = self.register_device()
@@ -111,6 +129,8 @@ class GenericEndpoint():
 
 
     def register_device(self) -> int:
+        """Register the resource to the Resource Catalog."""
+
         while True:
             try:
                 res = requests.post(self.ResourceCatalog_url + "/insert/device", 
@@ -131,6 +151,8 @@ class GenericEndpoint():
                     print(f"Error in the response\n")
 
     def get_device_info(self) -> dict:
+        """Get the information of the resource from the Resource Catalog."""
+
         while True:
             try:
                 res = requests.get(self.ResourceCatalog_url + "/get", 
@@ -147,6 +169,8 @@ class GenericEndpoint():
                     time.sleep(1)
 
     def get_ResourceCatalog_url(self) :
+        """Get the URL of the Resource Catalog from the Service Catalog."""
+
         while True:
             try:
                 res = requests.get(self.ServiceCatalog_url + "/search/serviceName", 
@@ -167,6 +191,8 @@ class GenericEndpoint():
                     time.sleep(1)
                     
     def get_broker(self) :
+        """Get the broker information from the Service Catalog."""
+
         while True:
             try:
                 res = requests.get(self.ServiceCatalog_url + "/broker")
@@ -183,6 +209,9 @@ class GenericEndpoint():
                     time.sleep(1)
 
     def start_MQTTclient(self) :
+        """Start the MQTT client.
+        It subscribes the topics and starts the MQTT client loop.
+        """
         self._MQTTclient = True
         self._broker, self._port, self._baseTopic = self.get_broker()
         self.MQTTclientID = f"IoTomatoes_ID{self.ID}"
@@ -211,22 +240,31 @@ class GenericEndpoint():
         print(dic[str(rc)])
 
     def myOnMessageReceived(self, paho_mqtt, userdata, msg):
+        """When a message is received, it is processed by this callback. 
+        It redirects the message to the notify method (which must be implemented by the user)"""
+
         # A new message is received
-        self.notify(msg.topic, msg.payload) # type: ignore
+        self.notify(msg.topic, json.loads(msg.payload)) # type: ignore
 
     def myPublish(self, topic, msg):
+        """It publishes a dictionary message `msg` in `topic`"""
+
         # publish a message with a certain topic
         self._paho_mqtt.publish(topic, json.dumps(msg), 2)
 
     def mySubscribe(self, topic):
+        """It subscribes to `topic`"""
+
         # subscribe for a topic
         print(topic)
         self._paho_mqtt.subscribe(topic, 2)
         # just to remember that it works also as a subscriber
         self._isSubscriber = True
-        print("subscribed to %s" % (topic))
+        print("Subscribed to %s" % (topic))
 
     def unsubscribe_all(self):
+        """It unsubscribes all the topics"""
+
         if (self._isSubscriber):
             # remember to unsuscribe if it is working also as subscriber
             for topic in self._subscribedTopics:

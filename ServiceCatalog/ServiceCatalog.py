@@ -15,10 +15,12 @@ serviceList_Name = "servicesList"
 class ServiceCatalogManager:
     def __init__(self, heading : dict, filename = "catalog.json", autoDeleteTime = 120, IDs = IDs(1,99)):
         """Initialize the catalog manager.
-        Keyword arguments:
-        ``heading`` is a dictionary with the heading of the catalog,
-        ``filename`` is the name of the file to save the catalog in,
-        ``autoDeleteTime`` is the time in seconds after which the items are deleted from the catalog if not refreshed.
+
+        Arguments: \n
+        `heading` is a dictionary with the heading of the catalog.\n
+        `filename` is the name of the file to save the catalog in.\n
+        `autoDeleteTime` is the time in seconds after which the items are deleted from the catalog if not refreshed (default is 120). \n
+        `IDs` is the ID generator object to use for the services (default is integer from 1 to 99).\n
         """
         self.filename = filename
         self.autoDeleteTime = autoDeleteTime
@@ -29,7 +31,9 @@ class ServiceCatalogManager:
         self.autoDeleteItemsThread = MyThread(self.autoDeleteItems, interval=self.autoDeleteTime)
 
     def save(self):
-        """Save the catalog in the file specified in the initialization."""
+        """Save the catalog in the file specified in the initialization. 
+
+        Return: json with the status of the operation."""
         
         json.dump(self.catalog, open(self.filename, "w"), indent=4)
         print("Catalog saved!\n")
@@ -41,7 +45,9 @@ class ServiceCatalogManager:
         return json.dumps(self.catalog, indent=4)
 
     def load(self):
-        """Load the catalog from the file specified in the initialization."""
+        """Load the catalog from the file specified in the initialization.
+
+        Return: json with the status of the operation."""
 
         try:
             self.catalog = json.load(open(self.filename, "r"))
@@ -78,11 +84,11 @@ class ServiceCatalogManager:
             raise web_exception(404, "List not found")
 
     def get(self, info : str, ID : int):
-        """Return the REST or MQTT information of item ``ID`` in json format.
+        """Return the REST or MQTT information of item `ID` in json format.
 
-        Keyword arguments:
-        ``info`` is the type of information to return (REST, MQTT) and
-        ``ID`` is the ID of the item to return the information of.
+        Arguments:
+        `info` is the type of information to return (REST, MQTT) and
+        `ID` is the ID of the item to return the information of.
         """
         item = self.find_item(ID)
 
@@ -97,9 +103,9 @@ class ServiceCatalogManager:
         """Search for a item in the catalog.
         Return a json with the item if found, otherwise return an empty list.
 
-        Keyword arguments: 
-        ``key`` is the key to search for and
-        ``value``is the value to search for.
+        Arguments: 
+        `key` is the key to search for and
+        `value`is the value to search for.
         """
         try:      
             output = []
@@ -118,8 +124,8 @@ class ServiceCatalogManager:
         """Insert a new device in the catalog.
         Return a json with the status of the operation.
         
-        Keyword arguments:
-        ``item_dict`` is the item in json format to insert.
+        Arguments:
+        `item_dict` is the item in json format to insert.
         """
         try:
             ID = self.IDs.get_ID()
@@ -141,9 +147,9 @@ class ServiceCatalogManager:
         """Update a device in the catalog.
         Return a json with the status of the operation.
         
-        Keyword arguments:
-        ``ID`` is the ID of the item to update and
-        ``new_item`` is the item in json format to update.
+        Arguments:
+        `ID` is the ID of the item to update and
+        `new_item` is the item in json format to update.
         """
 
         item = self.find_item(ID)
@@ -164,8 +170,8 @@ class ServiceCatalogManager:
         """Delete a item from the catalog.
         Return a json with the status of the operation.
         
-        Keyword arguments:
-        ``IDvalue`` is the ID of the item to delete.
+        Arguments:
+        `IDvalue` is the ID of the item to delete.
         """
         try:
             item = self.find_item(IDvalue)
@@ -183,7 +189,7 @@ class ServiceCatalogManager:
 
 
     def find_item(self, IDvalue : int) :
-        """Return the item with the ID ``IDvalue``."""
+        """Return the item with the ID `IDvalue`."""
 
         for item in self.catalog[serviceList_Name]:
             if item["ID"] == IDvalue:
@@ -194,8 +200,8 @@ class ServiceCatalogManager:
         """Refresh the lastUpdate field of a device.
         Return a json with the status of the operation.
 
-        Keyword arguments:
-        ``IDvalue`` is the ID of the item to refresh.
+        Arguments:
+        `IDvalue` is the ID of the item to refresh.
         """
 
         item = self.find_item(IDvalue)
@@ -232,11 +238,11 @@ class RESTServiceCatalog():
     def __init__(self, settings : dict):
         """ Initialize the RESTServiceCatalog class.
 
-        Keyword arguments:\n
-        ``heading`` is the heading of the catalog.\n
-        ``name`` is the name of the catalog.\n
-        ``filename`` is the name of the file to save the catalog.\n
-        ``autoDeleteTime`` is the time in seconds to delete the services that are not online anymore.\n
+        Arguments:\n
+        `heading` is the heading of the catalog.\n
+        `name` is the name of the catalog.\n
+        `filename` is the name of the file to save the catalog.\n
+        `autoDeleteTime` is the time in seconds to delete the services that are not online anymore.\n
         """
         heading = {
             "owner": settings["owner"], 
@@ -251,11 +257,11 @@ class RESTServiceCatalog():
         """REST GET method.
 
         Allowed commands:\n
-        ``/get/<info>?ID=<ID>`` to get a service info by ID, where ``<info>`` is ``REST`` or ``MQTT``.\n 
-        ``/getall`` to get all the services.\n
-        ``/broker`` to get the broker info.\n
-        ``/telegram`` to get the telegram toke.\n
-        ``/search/<info>?<info>=<value>`` to search a service by info.
+        `/get/<info>?ID=<ID>` to get service info by ID, where `<info>` is `REST` or `MQTT`.\n 
+        `/getall` to get all the services.\n
+        `/broker` to get the broker info.\n
+        `/telegram` to get the telegram token.\n
+        `/search/<info>?<info>=<value>` to search a service by info.
         """
         try:
             if len(uri) == 0:
@@ -291,9 +297,9 @@ class RESTServiceCatalog():
         """PUT REST method.
 
         Allowed commands:\n
-        ``/update`` to update the catalog.
+        `/update` to update the catalog.
         The body of the request must contain the new service info in json format. \n
-        ``/refresh?ID=<ID>`` to refresh the lastUpdate field of a service by ID.\n
+        `/refresh?ID=<ID>` to refresh the lastUpdate field of a service by ID.\n
         """
         try:
             if len(uri) == 1 and uri[0] == "update":
@@ -318,8 +324,8 @@ class RESTServiceCatalog():
         """POST REST method.
         
         Allowed commands:\n
-        ``/save`` to save the catalog in the file.\n
-        ``/insert`` to insert a new service in the catalog. 
+        `/save` to save the catalog in the file.\n
+        `/insert` to insert a new service in the catalog. 
         The body of the request must contain the new service info.
         """
         try:
@@ -342,7 +348,7 @@ class RESTServiceCatalog():
         """DELETE REST method.
 
         Allowed commands:\n
-        ``/delete?ID=<ID>`` to delete a service by ID.
+        `/delete?ID=<ID>` to delete a service by ID.
         """
         try:
             if len(uri) == 1 and uri[0] == "delete":

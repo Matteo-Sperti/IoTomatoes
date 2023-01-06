@@ -1,6 +1,7 @@
 import telepot
 from telepot.loop import MessageLoop
 from telepot.namedtuple import InlineKeyboardMarkup, InlineKeyboardButton
+from telepot.delegate import per_chat_id, create_open, pave_event_space
 import json
 import time
 import requests
@@ -26,6 +27,56 @@ Then you can add your devices and users.
 /devices to see all the active devices of your company.
 """
 
+class MessageHandler(telepot.helper.ChatHandler):
+    def __init__(self, *args, **kwargs):
+        super(MessageHandler, self).__init__(*args, **kwargs)
+        self._count = 0
+
+    def on_chat_message(self, msg):
+        self._count += 1
+        self.sender.sendMessage(self._count)
+
+    def on_chat_message(self, msg):
+        _, _, chat_ID = telepot.glance(msg)  # type: ignore
+        
+        message = msg['text']
+        if message == "/start" or message == "/help":
+            self.bot.sendMessage(chat_ID, text=HelpMessage)
+        elif message == "/insert_company":
+            self.chat_active_list.append(InsertNewCompany(chat_ID, self.bot, self.ResourceCatalog_url, self.companyList))
+        else:
+            for chat in self.chat_active_list:
+                if chat.chatID == chat_ID:
+                    chat.update(message) 
+                    if chat.completed:
+                        self.chat_active_list.remove(chat)                                          
+                    return
+
+            if self.companyList == []:
+                self.bot.sendMessage(chat_ID, text="Error, no company registered")
+            else:
+                if message == "/register_user":
+                    self.chat_active_list.append(RegisterNewUser(chat_ID, self.bot, self.ResourceCatalog_url, self.companyList))
+                elif message == "/users":
+                    self.chat_active_list.append(RegisterNewUser(chat_ID, self.bot, self.ResourceCatalog_url, self.companyList))
+                elif message == "/devices":
+                    self.chat_active_list.append(RegisterNewUser(chat_ID, self.bot, self.ResourceCatalog_url, self.companyList))
+                else:
+
+                    self.bot.sendMessage(chat_ID, text="Command not found")
+
+    def on_callback_query(self,msg):
+        _ , chat_ID , query_data = telepot.glance(msg,flavor='callback_query') # type: ignore
+
+        for chat in self.chat_active_list:
+            if chat.chatID == chat_ID:
+                chat.update(query_data)
+                if chat.completed:
+                    self.chat_active_list.remove(chat)
+                return        
+        self.bot.sendMessage(chat_ID, text="Error\nThis chat is not active")
+
+
 class IoTBot(GenericEndpoint):
     def __init__(self, settings :dict):
         super().__init__(settings, isService=True)
@@ -33,7 +84,8 @@ class IoTBot(GenericEndpoint):
         self.__message = {'bn': "", 'e': [{'n': "",'v': "", 'u': "", 't': ""}]}
         #TelegramBot
         self.tokenBot = self.get_token()
-        self.bot = telepot.Bot(self.tokenBot)
+        self.bot = telepot.DelegatorBot(self.tokenBot, [pave_event_space()(
+            per_chat_id(), create_open, MessageHandler, timeout=50),])
         
         self.chat_active_list = []
         self.companyList = []
@@ -62,43 +114,6 @@ class IoTBot(GenericEndpoint):
 
     def get_companyID(self, chatID):
         pass
-
-    def on_chat_message(self, msg):
-        _, _, chat_ID = telepot.glance(msg)  # type: ignore
-        
-        message = msg['text']
-        if message == "/start" or message == "/help":
-            self.bot.sendMessage(chat_ID, text=HelpMessage)
-        elif message == "/insert_company":
-            self.chat_active_list.append(InsertNewCompany(chat_ID, self.bot, self.ResourceCatalog_url, self.companyList))
-        elif message == "/register_user":
-            if self.companyList == []:
-                self.bot.sendMessage(chat_ID, text="No company registered")
-            else:
-                self.chat_active_list.append(RegisterNewUser(chat_ID, self.bot, self.ResourceCatalog_url, self.companyList))
-        elif message == "/users":
-            pass
-        elif message == "/devices":
-            pass
-        else:
-            for chat in self.chat_active_list:
-                if chat.chatID == chat_ID:
-                    chat.update(message) 
-                    if chat.completed:
-                        self.chat_active_list.remove(chat)                                          
-                    return
-            self.bot.sendMessage(chat_ID, text="Command not found")
-
-    def on_callback_query(self,msg):
-        _ , chat_ID , query_data = telepot.glance(msg,flavor='callback_query') # type: ignore
-
-        for chat in self.chat_active_list:
-            if chat.chatID == chat_ID:
-                chat.update(query_data)
-                if chat.completed:
-                    self.chat_active_list.remove(chat)
-                return        
-        self.bot.sendMessage(chat_ID, text="Error\nThis chat is not active")
 
     def notify(self, topic, msg):
         try:

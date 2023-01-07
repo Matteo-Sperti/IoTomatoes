@@ -12,7 +12,7 @@ class IoTDevice(GenericEndpoint):
         super().__init__(DeviceInfo, isResource=True)
         self._Ambient = Ambient
         self._SendThread = MyThread(self.run, self.ID, measureTimeInterval)
-
+        
         self._message={
             "companyName" : getCompanyName(self._CompanyInfo),
             "bn" : 0,
@@ -26,11 +26,12 @@ class IoTDevice(GenericEndpoint):
         }
 
     def start(self):
+        self.start()
         self._SendThread.start()
-        self._Ambient.start()
 
     def close(self):
         self._SendThread.stop()
+        self.stop()
 
     def notify(self, topic, msg):
         print(f"{self.ID} received {msg} on topic {topic}")

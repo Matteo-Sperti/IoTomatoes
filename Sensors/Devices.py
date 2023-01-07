@@ -8,12 +8,14 @@ from AmbientSimulator import AmbientSimulator
 from IoTDevice import IoTDevice
 sys.path.append("../SupportClasses/")
 from MyIDGenerator import IDs
+from TerminalQuery import *
 
 HelpMessage = """
 Devices Simulator.
+
 Commands:
-help: print this help message
-insert: insert a new device
+insertCompany: insert a company
+addDevices: populate a field
 kill: remove a device
 exit: exit the program
 """
@@ -27,12 +29,44 @@ class SimDevices_Manager():
         self._actuatorsType = settings["ActuatorsType"]
         self.DevicesIDs = IDs(1)
 
-        self.Sensor = []
+        self.FieldsList = []
 
-    def createDevice(self, field : int, device : int):
-        ID = IDs.getNewID()
-        IPport = 10000 + j*NumberOfDevicesPerField + i
-        measures = random.sample(settings["MeasuresType"], random.randint(0, len(settings["MeasuresType"])))
+    def insertCompany(self):
+        companyName = input("Insert Company Name: ")
+        companyToken = input("Insert Company Token: ")
+        numberOfFields = query_int("Insert number of fields: ")
+        for i in range(numberOfFields):
+            field = {
+                "CompanyName" : companyName,
+                "CompanyToken" : companyToken,
+                "field" : i+1,
+                "Ambient" : AmbientSimulator(companyName, i+1),
+                "DevicesList" : []
+            }
+            self.FieldsList.append(field)
+
+    def populateField(self, number : int = 10):
+        CompanyName = input("Insert Company Name: ")
+        fieldNumber = query_int("Insert field number: ")
+
+        field = self.getField(CompanyName, fieldNumber)
+        if field == None:
+            print("Field not found")
+            return
+
+        for i in range(number):
+            field["DevicesList"].append(self.createDevice(field))
+
+    def getField(self, CompanyName : str, fieldNumber : int):
+        for field in self.FieldsList:
+            if field["CompanyName"] == CompanyName and field["field"] == fieldNumber:
+                return field
+        return None
+
+    def createDevice(self, field : dict):
+        ID = self.DevicesIDs.get_ID()
+        IPport = 10000 + ID
+        measures = random.sample(self._measuresType, random.randint(0, len(self._measuresType)))
         if len(measures) == 0:
             isSensor = False
         else:
@@ -44,12 +78,12 @@ class SimDevices_Manager():
             PowerConsumption_kW = 0
         else:
             isActuator = True
-            actuators = random.sample(settings["ActuatorsType"], 1)
+            actuators = random.sample(self._actuatorsType, 1)
             PowerConsumption_kW = random.randint(5, 20)
 
         Device_information = {
-            "deviceName" : f"Device_{j*NumberOfDevicesPerField + i}",
-            "field" : j + 1,
+            "deviceName" : f"Device_{ID}",
+            "field" : field["field"],
             "IPport" : IPport,
             "IPaddress" : gethostbyname(gethostname()),
             "isSensor" : isSensor,
@@ -57,20 +91,57 @@ class SimDevices_Manager():
             "measureType" : measures,
             "actuatorType" : actuators,
             "PowerConsumption_kW" : PowerConsumption_kW,
-            "CompanyName" : company["CompanyName"],
-            "CompanyToken" : company["CompanyToken"],
-            "ServiceCatalog_url" : ServiceCatalog_url
+            "CompanyName" : field["CompanyName"],
+            "CompanyToken" : field["CompanyToken"],
+            "ServiceCatalog_url" : self._ServiceCatalog_url
         }
 
-        field["DevicesList"].append(IoTDevice(Device_information, field["Ambient"], measureTimeInterval))
+        return IoTDevice(Device_information, field["Ambient"], self._measureTimeInterval)
 
-
-
-    def getPosition(self, field : int, device : int):
+    def getCompanyPosition(self, Companyinfo : dict):
         pass
 
-    def stopDevice(self, field : int, device : int):
-        pass
+    def stopDevice(self):
+        CompanyName = input("Insert Company Name: ")
+        fieldNumber = query_int("Insert field number: ")
+        
+        field = self.getField(CompanyName, fieldNumber)
+        if field == None:
+            print("Field not found")
+            return
+
+        sensor = field.pop("DevicesList")
+        sensor.stop()
+        print("Device stopped\n")
+        print(json.dumps(sensor._EndpointInfo, indent=4))
+
+    def run(self) :
+        print("\nType 'help' for the list of available commands")
+        while True :
+            command = input(">> ").lower()
+            if command == "exit" :
+                self.exit()
+                return False
+            elif command == "help" :
+                print(HelpMessage)
+                return True
+            elif command == "insertcompany" :
+                self.insertCompany()
+                return True
+            elif command == "adddevices" :
+                self.populateField()
+                return True
+            elif command == "kill" :
+                self.stopDevice()
+                return True
+            else :
+                print("Command not found")
+                return True
+    
+    def exit(self):
+        for field in self.FieldsList:
+            for device in field["DevicesList"]:
+                device.stop()
 
 if __name__ == "__main__":
     settings = json.load(open("DevicesSettings.json", "r"))
@@ -78,15 +149,9 @@ if __name__ == "__main__":
     Simulator = SimDevices_Manager(settings)
 
     print(HelpMessage)
-    print("Press Ctrl+C to stop")
-    try:
-        for sensor in Sensors:
-            sensor.start()
-
-        while True:
-            for sensor in Sensors:
-                sensor.run()
-                time.sleep(measureTimeInterval)
-    except KeyboardInterrupt:
-        for sensor in Sensors:
-            sensor.stop()
+    while True:
+        run = Simulator.run()
+        if not run :
+            break   
+    
+    print("End of the simulator")

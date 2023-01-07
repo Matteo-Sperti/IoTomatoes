@@ -10,28 +10,11 @@ from ItemInfo import *
 from MyExceptions import *
 from MyIDGenerator import IDs
 from MyThread import MyThread
+from TerminalQuery import *
 
 companyList_name = "companiesList"
 devicesList_name = "devicesList"
 usersList_name = "usersList"
-
-def query_yes_no(question):
-    """Ask a yes/no question via input() and return their answer.
-
-    "question" is a string that is presented to the user.
-    The "answer" return value is True for "yes" or False for "no".
-    """
-    valid = {"yes": True, "y": True, "ye": True, "no": False, "n": False}
-
-
-    while True:
-        choice = input(question + " [Y/n] ").lower()
-        if choice == "":
-            return valid["yes"]
-        elif choice in valid:
-            return valid[choice]
-        else:
-            print(f"Please respond with 'yes' or 'no' (or 'y' or 'n').\n")
 
 class ResourceCatalogManager():
     def __init__(self, heading : dict, filename = "CompanyCatalog.json", autoDeleteTime = 120, 

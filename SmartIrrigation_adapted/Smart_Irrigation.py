@@ -105,7 +105,7 @@ class SmartIrrigation(GenericEndpoint):
                     #message["timestamp"]=time.time()
 
                     #for singleTopic in topicList:
-                        #self.myPublish(singleTopic,message) 
+                        #self.myPublish(self._baseTopic+singleTopic,message) 
                 else:
                     print(f"""
                     Average temperature={meanTemperature}
@@ -118,7 +118,7 @@ class SmartIrrigation(GenericEndpoint):
                     #message["command"]="OFF"
                     #message["timestamp"]=time.time()
                     #for singleTopic in topicList:
-                        #self.myPublish(singleTopic,message) 
+                        #self.myPublish(self._baseTopic+singleTopic,message) 
                     
                     
                 del information["companyList"][positionCompany]["fields"][fieldID-1]["lastMeasures"]["temperature"]["values"][0:-1] #delete all but one of the used temperature measures
@@ -160,11 +160,8 @@ class SmartIrrigation(GenericEndpoint):
         """It retrieves information about resource catalog (by means of genericEndpoint.py method) and then performs a 
         get request to obtain topics from a particulur company in a specified field."""
 
-        ####    CHIAMATA AL SOURCE CATALOG PER OTTENERE IL RESOURCE CATALOG URL ####
-        #resourceCatalogURL=self.get_ResourceCatalog_url()
-
         #####   CHAMATA AL RESOURCE CATALOG PER OTTENERE LA LISTA DI TOPIC  ####
-        # topics=json.load(requests.get(resourceCatalogURL+"/get/topic/pump",params={"companyName":company ,"field":field, "systemToken":token}))
+        # topics=json.load(requests.get(self.resourceCatalog_url+"/get/topic/pump",params={"companyName":company ,"field":field, "systemToken":token}))
         # return topics
 
 

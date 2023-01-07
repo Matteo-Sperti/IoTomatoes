@@ -19,6 +19,8 @@ class SmartIrrigation(GenericEndpoint):
         super().__init__(settings, isService=True)
 
         self.commandMessage={
+            "bn":"",
+            "field":"",
             "actuator":"pump",
             "command":None,
             "timestamp":""
@@ -136,21 +138,33 @@ class SmartIrrigation(GenericEndpoint):
         """It gets precipitations informations from weather forecast service and extract 
         the daily precipitation sum from the json file received """
 
-        #RICAVA LE INFORMAZIONI SUL WEATHER FORECAST SERVICE: 
-            #weatherServiceInfo=requests.get(self.ServiceCatalog_url+"/search/serviceName",params={"serviceName":ServiceToCall})
-            ### serviceToCall è la variabile globale definita all'inizio dello script che contiene il nome del weather forecast service
-
-        #ESTRAE L'URL DEL WEATHER FORECAST SERVICE:
-            #.... weatherForecastURL=weatherServiceInfo["serviceDetails"][0]["serviceIP"].... 
+        #RICAVA LE INFORMAZIONI SUL WEATHER FORECAST SERVICE:
+        # try:
+        #     weatherServiceInfo=requests.get(self.ServiceCatalog_url+"/search/serviceName",params={"serviceName":ServiceToCall})
+        #     ## serviceToCall è la variabile globale definita all'inizio dello script che contiene il nome del weather forecast service
+        #     weatherServiceInfo.raise_for_status()
+        # except requests.exceptions.HTTPError as err:
+        #     print(f"{err.response.status_code} : {err.response.reason}")
+        #     time.sleep(1)
+        # else:  
+            #-ESTRAE L'URL DEL WEATHER FORECAST SERVICE:
+            # weatherForecast_url=weatherServiceInfo["serviceDetails"][0]["serviceIP"].... 
             # non so se sia giusto il tipo di json che si ottiene eseguendo la ricerca tramite search (ho preso in considerazione
             # la struttura del dizionario relativo al generico servizio scritto sul file del drive )
-    
 
-        #ESEGUE LA GET AL WEATHER FORECAST SERVICE (da verificare come implementa Luca la gestione della chiamata):
-            #...weatherService_request=requests.get(weatherForecastURL+"    ")
-        
-        weatherServiceRequest=json.load(open("outputWeatherForecast.json")) #per ora i dati sono presi da un file json esempio (TEMPORANEO)
-        daily_precipitation_sum=weatherServiceRequest["daily"]["precipitation_sum"][0]
+            #-ESEGUE LA GET AL WEATHER FORECAST SERVICE (da verificare come implementa Luca la gestione della chiamata):
+            # try:
+            #     weatherService_request=requests.get(weatherForecast_url+"/Irrigation")
+            #     weatherService_request.raise_for_status()
+            # except requests.exceptions.HTTPError as err:
+            #     print(f"{err.response.status_code} : {err.response.reason}")
+            #     time.sleep(1)
+            # else:
+                    #daily_precipitation_sum=weatherService_request["daily"]["precipitation_sum"][0]
+                    #return daily_precipitation_sum
+
+        weatherService_request=json.load(open("outputWeatherForecast.json")) #per ora i dati sono presi da un file json esempio (TEMPORANEO)
+        daily_precipitation_sum=weatherService_request["daily"]["precipitation_sum"][0]
         return daily_precipitation_sum 
         
     
@@ -161,8 +175,14 @@ class SmartIrrigation(GenericEndpoint):
         get request to obtain topics from a particulur company in a specified field."""
 
         #####   CHAMATA AL RESOURCE CATALOG PER OTTENERE LA LISTA DI TOPIC  ####
-        # topics=json.load(requests.get(self.resourceCatalog_url+"/get/topic/pump",params={"companyName":company ,"field":field, "systemToken":token}))
-        # return topics
+        # try:
+        #     topics_request=requests.get(self.resourceCatalog_url+"/get/topic/pump",params={"companyName":company ,"field":field, "systemToken":token})
+        #     topics=json.load(topics_request)
+        #     return topics
+        # except requests.exceptions.HTTPError as err:
+        #     print(f"{err.response.status_code} : {err.response.reason}")
+        #     time.sleep(1)
+
 
 
 

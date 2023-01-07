@@ -6,9 +6,9 @@
     "servicesDetails": [
         {
             "serviceType": "REST",
-            "serviceIP": "http://192.168.1.102:8081"
+            "serviceIP": "http://172.20.10.3:8081"
         }
     ],
-    "lastUpdate": 1673003336.8907983,
+    "lastUpdate": 1673106580.703967,
     "companiesList": []
 }

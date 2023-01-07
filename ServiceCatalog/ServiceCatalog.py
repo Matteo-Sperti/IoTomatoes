@@ -121,11 +121,11 @@ class ServiceCatalogManager:
             raise web_exception(500, "Invalid key")
 
     def insert(self, item_dict : dict):
-        """Insert a new device in the catalog.
+        """Insert a new service in the catalog.
         Return a json with the status of the operation.
         
         Arguments:
-        `item_dict` is the item in json format to insert.
+        `item_dict` is the service in json format to insert.
         """
         try:
             ID = self.IDs.get_ID()
@@ -144,12 +144,12 @@ class ServiceCatalogManager:
             raise web_exception(500, "Invalid key")
 
     def update(self, ID : int, new_item : dict):
-        """Update a device in the catalog.
+        """Update a service in the catalog.
         Return a json with the status of the operation.
         
         Arguments:
-        `ID` is the ID of the item to update and
-        `new_item` is the item in json format to update.
+        `ID` is the ID of the service to update and
+        `new_item` is the service in json format to update.
         """
 
         item = self.find_item(ID)
@@ -167,11 +167,11 @@ class ServiceCatalogManager:
         return json.dumps(out, indent=4)
 
     def delete(self, IDvalue : int):
-        """Delete a item from the catalog.
+        """Delete a service from the catalog.
         Return a json with the status of the operation.
         
         Arguments:
-        `IDvalue` is the ID of the item to delete.
+        `IDvalue` is the ID of the service to delete.
         """
         try:
             item = self.find_item(IDvalue)
@@ -189,7 +189,7 @@ class ServiceCatalogManager:
 
 
     def find_item(self, IDvalue : int) :
-        """Return the item with the ID `IDvalue`."""
+        """Return the service with the ID `IDvalue`."""
 
         for item in self.catalog[serviceList_Name]:
             if item["ID"] == IDvalue:
@@ -197,11 +197,11 @@ class ServiceCatalogManager:
         return None
 
     def refreshItem(self, IDvalue : int):
-        """Refresh the lastUpdate field of a device.
+        """Refresh the lastUpdate field of a service.
         Return a json with the status of the operation.
 
         Arguments:
-        `IDvalue` is the ID of the item to refresh.
+        `IDvalue` is the ID of the service to refresh.
         """
 
         item = self.find_item(IDvalue)
@@ -215,7 +215,7 @@ class ServiceCatalogManager:
         return json.dumps(out, indent=4)
 
     def autoDeleteItems(self):
-        """Refresh the catalog removing the devices that are not online anymore."""
+        """Refresh the catalog removing the services that are not online anymore."""
 
         actualtime = time.time()
         for key in self.catalog:
@@ -250,7 +250,7 @@ class RESTServiceCatalog():
             "broker": settings["broker"],
             "telegramToken" : settings["telegramToken"],
             }
-
+        self._systemToken = settings["SystemToken"]
         self.ServiceCatalog = ServiceCatalogManager(heading, settings["filename"], settings["autoDeleteTime"])
 
     def GET(self, *uri, **params):
@@ -264,6 +264,9 @@ class RESTServiceCatalog():
         `/search/<info>?<info>=<value>` to search a service by info.
         """
         try:
+            if "SystemToken" not in params or params["SystemToken"] != self._systemToken:
+                raise web_exception(401, "Unauthorized")
+
             if len(uri) == 0:
                 raise web_exception(404, "No command received")
             elif len(uri) == 2 and uri[0] == "get" and uri[1] in ["REST", "MQTT"]:
@@ -302,6 +305,9 @@ class RESTServiceCatalog():
         `/refresh?ID=<ID>` to refresh the lastUpdate field of a service by ID.\n
         """
         try:
+            if "SystemToken" not in params or params["SystemToken"] != self._systemToken:
+                raise web_exception(401, "Unauthorized")
+            
             if len(uri) == 1 and uri[0] == "update":
                 body_dict = json.loads(cherrypy.request.body.read())
                 return self.ServiceCatalog.update(int(params["ID"]), body_dict)
@@ -329,6 +335,9 @@ class RESTServiceCatalog():
         The body of the request must contain the new service info.
         """
         try:
+            if "SystemToken" not in params or params["SystemToken"] != self._systemToken:
+                raise web_exception(401, "Unauthorized")
+
             if len(uri) == 1 and uri[0] == "save":
                 return self.ServiceCatalog.save()
             elif len(uri) == 1 and uri[0] == "insert":
@@ -351,6 +360,9 @@ class RESTServiceCatalog():
         `/delete?ID=<ID>` to delete a service by ID.
         """
         try:
+            if "SystemToken" not in params or params["SystemToken"] != self._systemToken:
+                raise web_exception(401, "Unauthorized")
+
             if len(uri) == 1 and uri[0] == "delete":
                 if "ID" in params:
                     return self.ServiceCatalog.delete(int(params["ID"]))

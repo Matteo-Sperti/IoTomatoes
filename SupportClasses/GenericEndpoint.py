@@ -8,7 +8,7 @@ from MyExceptions import InfoException
 from MyThread import MyThread
 
 class RefreshThread(MyThread):
-    def __init__(self, url : str, ID : int, interval=60, CompanyInfo : dict = {}):
+    def __init__(self, url : str, ID : int, interval=60, CompanyInfo : dict = {}, SystemToken : str = ""):
         """RefreshThread class. Refresh the Catalog every `interval` seconds.
         
         `url {str}`: Catalog URL.\n
@@ -16,9 +16,9 @@ class RefreshThread(MyThread):
         `interval {int}`: refresh interval in seconds (default = 60).\n
         `CompanyInfo {dict}`: Company information (default = {}), needed only if the item is a resource.
         """
-        super().__init__(self.refresh_item, (url, ID, CompanyInfo), interval)
+        super().__init__(self.refresh_item, (url, ID, CompanyInfo, SystemToken), interval)
 
-    def refresh_item(self, url : str, ID : int, CompanyInfo : dict = {}):
+    def refresh_item(self, url : str, ID : int, CompanyInfo : dict, SystemToken : str):
         """Refresh item `ID` in the Catalog at `url`."""
 
         refreshed = False
@@ -26,6 +26,8 @@ class RefreshThread(MyThread):
             try:
                 param = CompanyInfo.copy()
                 param.update({"ID": ID})
+                if SystemToken != "":
+                    param.update({"SystemToken": SystemToken})
                 res = requests.put(url + "/refresh", params=param)
                 res.raise_for_status()
             except requests.exceptions.HTTPError as err:
@@ -63,6 +65,11 @@ class GenericEndpoint():
             self._isService = isService
             self._isResource = isResource
             self._EndpointInfo, self._CompanyInfo = construct(settings, isService, isResource)
+            if isService :
+                if "SystemToken" in settings:
+                    self._SystemToken = settings["SystemToken"]
+                else:
+                    raise InfoException("The System Token is missing")
 
     def start(self):
         """Start the endpoint."""
@@ -92,7 +99,7 @@ class GenericEndpoint():
         It registers the service to the Service Catalog and starts the RefreshThread."""
 
         self.ID = self.register_service()
-        self._RefreshThread = RefreshThread(self.ServiceCatalog_url, self.ID)
+        self._RefreshThread = RefreshThread(self.ServiceCatalog_url, self.ID, SystemToken = self._SystemToken)
         if self._EndpointInfo["serviceName"] != "ResourceCatalog":
             self.ResourceCatalog_url = self.get_ResourceCatalog_url()
 
@@ -101,7 +108,8 @@ class GenericEndpoint():
 
         while True:
             try:
-                res = requests.post(self.ServiceCatalog_url + "/insert", json = self._EndpointInfo)
+                res = requests.post(self.ServiceCatalog_url + "/insert", 
+                                        params={"SystemToken": self._SystemToken}, json = self._EndpointInfo)
                 res.raise_for_status()
             except requests.exceptions.HTTPError as err:
                 print(f"{err.response.status_code} : {err.response.reason}")

@@ -518,9 +518,6 @@ if __name__ == "__main__":
         Catalog = RESTResourceCatalog(settings)
     except InfoException as e:
         print(e.message)
-    except KeyError as e:
-        print(e)
-        print("KeyError, Error while creating the catalog")
     except:
         print("Error while creating the catalog")
     else:

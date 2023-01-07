@@ -154,17 +154,17 @@ class SmartIrrigation(GenericEndpoint):
 
             #-ESEGUE LA GET AL WEATHER FORECAST SERVICE (da verificare come implementa Luca la gestione della chiamata):
             # try:
-            #     weatherService_request=requests.get(weatherForecast_url+"/Irrigation")
-            #     weatherService_request.raise_for_status()
+            #     weatherService_data=requests.get(weatherForecast_url+"/Irrigation")
+            #     weatherService_data.raise_for_status()
             # except requests.exceptions.HTTPError as err:
             #     print(f"{err.response.status_code} : {err.response.reason}")
             #     time.sleep(1)
             # else:
-                    #daily_precipitation_sum=weatherService_request["daily"]["precipitation_sum"][0]
+                    #daily_precipitation_sum=weatherService_data["daily"]["precipitation_sum"][0]
                     #return daily_precipitation_sum
 
-        weatherService_request=json.load(open("outputWeatherForecast.json")) #per ora i dati sono presi da un file json esempio (TEMPORANEO)
-        daily_precipitation_sum=weatherService_request["daily"]["precipitation_sum"][0]
+        weatherService_data=json.load(open("outputWeatherForecast.json")) #per ora i dati sono presi da un file json esempio (TEMPORANEO)
+        daily_precipitation_sum=weatherService_data["daily"]["precipitation_sum"][0]
         return daily_precipitation_sum 
         
     
@@ -176,8 +176,8 @@ class SmartIrrigation(GenericEndpoint):
 
         #####   CHAMATA AL RESOURCE CATALOG PER OTTENERE LA LISTA DI TOPIC  ####
         # try:
-        #     topics_request=requests.get(self.resourceCatalog_url+"/get/topic/pump",params={"companyName":company ,"field":field, "systemToken":token})
-        #     topics=json.load(topics_request)
+        #     topics_json=requests.get(self.resourceCatalog_url+"/get/topic/pump",params={"companyName":company ,"field":field, "systemToken":token})
+        #     topics=json.load(topics_json)
         #     return topics
         # except requests.exceptions.HTTPError as err:
         #     print(f"{err.response.status_code} : {err.response.reason}")

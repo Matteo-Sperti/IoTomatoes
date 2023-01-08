@@ -1,0 +1,23 @@
+{
+    "latitude": 52.5,
+    "longitude": 13.41,
+    "hourly": [
+        "shortwave_radiation",
+        "direct_radiation",
+        "diffuse_radiation",
+        "direct_normal_irradiance",
+        "terrestrial_radiation",
+        "shortwave_radiation_instant",
+        "direct_radiation_instant",
+        "diffuse_radiation_instant",
+        "direct_normal_irradiance_instant",
+        "terrestrial_radiation_instant",
+        "cloudcover"
+    ],
+    "daily": [
+        "sunrise",
+        "sunset",
+        "shortwave_radiation_sum"
+    ],
+    "timezone": "auto"
+}

@@ -499,13 +499,9 @@ if __name__ == "__main__":
 
     try:
         Catalog = RESTResourceCatalog(settings)
-    except InfoException as e:
-        print(e.message)
     except:
         print("Error while creating the catalog")
-    else:
-        Catalog.start()
-        
+    else:        
         conf = {
             '/': {
                 'request.dispatch': cherrypy.dispatch.MethodDispatcher(),

@@ -188,8 +188,8 @@ class ChatBox(telepot.DelegatorBot):
         self.sendMessage(chat_id, 'Hello!')
 
 
-TOKEN = sys.argv[1]
-OWNER_ID = int(sys.argv[2])
+TOKEN = "5984202488:AAH3lhHkkzN5ljF5DDx-3Z1_xpex5uvCCdY"
+OWNER_ID = 123456789
 
 bot = ChatBox(TOKEN, OWNER_ID)
 MessageLoop(bot).run_as_thread()

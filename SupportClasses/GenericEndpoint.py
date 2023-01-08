@@ -53,7 +53,7 @@ class GenericEndpoint():
         `settings {dict}`: dictionary containing the settings of the endpoint.\n
         `isService {bool}`: True if the endpoint is a service, False otherwise (default = False).\n
         `isResource {bool}`: True if the endpoint is a resource, False otherwise (default = False).
-        `isService {bool}` and `isResource {bool}` are mutually exclusive.
+        `isService` and `isResource` are mutually exclusive.
         """
 
         if "ServiceCatalog_url" not in settings:
@@ -70,6 +70,9 @@ class GenericEndpoint():
                     self._SystemToken = settings["SystemToken"]
                 else:
                     raise InfoException("The System Token is missing")
+            
+            self.start()
+
 
     def start(self):
         """Start the endpoint."""
@@ -181,8 +184,8 @@ class GenericEndpoint():
 
         while True:
             try:
-                res = requests.get(self.ServiceCatalog_url + "/search/serviceName", 
-                                    params = {"serviceName": "ResourceCatalog"})
+                params = {"SystemToken": self._SystemToken, "serviceName": "ResourceCatalog"}
+                res = requests.get(self.ServiceCatalog_url + "/search/serviceName", params = params)
                 res.raise_for_status()
             except:
                 print(f"Connection Error\nRetrying connection\n")
@@ -203,7 +206,8 @@ class GenericEndpoint():
 
         while True:
             try:
-                res = requests.get(self.ServiceCatalog_url + "/broker")
+                params = {"SystemToken": self._SystemToken}
+                res = requests.get(self.ServiceCatalog_url + "/broker", params=params)
                 res.raise_for_status()
             except:
                 print(f"Connection Error\nRetrying connection\n")

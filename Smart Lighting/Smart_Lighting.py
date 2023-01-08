@@ -88,7 +88,7 @@ class SmartLighting:
                 fieldID=field["fieldID"]    #indicates position index of the field inside the list of all field for a single company 
                 plant=field["plantType"]
                 print(f"campo={fieldID}")
-                idealLight=field["lux"]      #extract the ideal value of light for the given plant from the json file
+                idealLight=field["idealLight"]      #extract the ideal value of light for the given plant from the json file
 
                 try:
                     meanLight=mean(field["lightMeasures"]["values"])    #compute the mean value of received light measures
@@ -96,6 +96,8 @@ class SmartLighting:
                     print("MeanError: necessario almeno un dato per il calcolo della media")
                 
                 #CONTROL ALGORITHM:
+                isLightIncreasing=bool()
+
                 if (meanLight<idealLight):
                     print(f"""
                     Average light={meanLight}

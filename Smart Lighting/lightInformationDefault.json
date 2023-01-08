@@ -11,8 +11,8 @@
                 {
                     "fieldID": 1,
                     "plantType": "tomatoes",
-                    "lux": 4100,
-                    "light": [
+                    "idealLight": 41000,
+                    "idealForecast": [
                         "pieno sole",
                         "sole parziale"
                     ],
@@ -24,6 +24,8 @@
                             4003,
                             4384
                         ],
+                        "unit":"lx",
+                        "previousMeanValue":"",
                         "lastUpdate": 1672352950.996713
                     }
                 }
@@ -36,8 +38,8 @@
                 {
                     "fieldID": 1,
                     "plantType": "potatoes",
-                    "lux": 4500,
-                    "light": [
+                    "idealLight": 45000,
+                    "idealForecast": [
                         "pieno sole",
                         "sole parziale"
                     ],
@@ -49,14 +51,16 @@
                             4463,
                             4579
                         ],
+                        "unit":"lx",
+                        "previousMeanValue":"",
                         "lastUpdate": 1672352952.386986
                     }
                 },
                 {
                     "fieldID": 2,
                     "plantType": "tomatoes",
-                    "lux": 4100,
-                    "light": [
+                    "idealLight": 41000,
+                    "idealForecast": [
                         "pieno sole",
                         "sole parziale"
                     ],
@@ -64,6 +68,8 @@
                         "values": [
                             54
                         ],
+                        "unit":"lx",
+                        "previousMeanValue":"",
                         "lastUpdate": ""
                     }
                 }

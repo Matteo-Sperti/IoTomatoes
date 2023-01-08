@@ -15,7 +15,13 @@ class SmartIrrigation:
         self.sensor_topic="IoTomatoes/+/+/+/measure" #IoTomatoes/companyName/field/deviceID/measure
         self.broker="test.mosquitto.org"
         self.port=1883
-
+        self.commandMessage={
+            "bn":"",
+            "field":"",
+            "actuator":"pump",
+            "command":None,
+            "timestamp":""
+            }
         
         self.service_mqtt=mqtt.Client(self.serviceID,True)
 
@@ -110,6 +116,7 @@ class SmartIrrigation:
                 if dailyPrecipitationSum>precipitationLimit:
                     print("NON HA SENSO IRRIGARE")
                     print("pompe OFF")
+                    message["command"]="OFF"
                 else:
                     print("HA SENSO IRRIGARE")
 
@@ -119,13 +126,16 @@ class SmartIrrigation:
                     print(f"limite OFF={soilMoistureOFF}")
                     print(f"limite ON={soilMoistureON}")
                     print(f"current value soil moisture={currentSoilMoisture}")
-                    
+                    message=self.commandMessage
+
                     if currentSoilMoisture<minSoilMoisture:
                         print("umidità sotto la soglia minima assoluta, necessario irrigare")
                         print("POMPE ACCESE")
+                        message["command"]="ON"
                     elif currentSoilMoisture>maxSoilMoisture:
                         print("umidità oltre la soglia massima assoluta, neccessario non irrigare e lasciare asciugare")
                         print("POMPE SPENTE")
+                        message["command"]="OFF"
                         #possibile implementazione chiamata al lighting service per accendere le luci, riscaldare le piante e 
                         #e velocizzare la riduzione dell'umidità
                     else:
@@ -136,22 +146,35 @@ class SmartIrrigation:
                                 print(f"""visto che il soil moisture corrente:
                                 {currentSoilMoisture}>={soilMoistureOFF}""")
                                 print("POMPE SPENTE")
+                                message["command"]="OFF"
                             else:
                                 print(f"""visto che il soil moisture corrente:
                                 {currentSoilMoisture}<{soilMoistureOFF}""")
                                 print("POMPE ACCESE")
+                                message["command"]="ON"
                         elif currentSoilMoisture<previousMeanSoilMoisture:
                             print("soilMoisture sta diminuendo")
                             if currentSoilMoisture<=soilMoistureON:
                                 print(f"""visto che il soil moisture corrente:
                                 {currentSoilMoisture}<={soilMoistureON}""")
                                 print("POMPE ACCESE")
+                                message["command"]="ON"
                             else:
                                 print(f"""visto che il soil moisture corrente:
                                 {currentSoilMoisture}>{soilMoistureON}""")
                                 print("POMPE SPENTE")
+                                message["command"]="OFF"
                         else:
                             print("soil moisture costante")
+                
+                # message["bn"]=companyName
+                # message["timestamp"]=time.time()
+                # message["field"]=fieldID
+
+                #for singleTopic in topicList:
+                        #self.myPublish(self._baseTopic+singleTopic,message) 
+
+
 
                 # if (meanTemperature<=maxTemperature and meanTemperature>=minTemperature)and(meanSoilMoisture<=maxSoilMoisture and meanSoilMoisture>=minSoilMoisture)and(dailyPrecipitationSum<=precipitationLimit):
                 #     print(f"""

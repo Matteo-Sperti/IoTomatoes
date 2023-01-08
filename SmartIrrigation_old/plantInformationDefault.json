@@ -11,26 +11,35 @@
                 {
                     "fieldID": 1,
                     "plantType": "tomatoes",
-                    "temperature": [
-                        15,
-                        30
-                    ],
-                    "soilMoisture": [
-                        65,
-                        75
-                    ],
-                    "precipitationLimit": 2,
+                    "temperatureLimit": {
+                        "min": 15,
+                        "max": 30,
+                        "unit": "\u00c2\u00b0C"
+                    },
+                    "soilMoistureLimit": {
+                        "min": 65,
+                        "max": 75,
+                        "unit": "%"
+                    },
+                    "precipitationLimit": {
+                        "max": 2,
+                        "unit": "mm"
+                    },
                     "lastMeasures": {
                         "temperature": {
                             "values": [
-                                28
+                                29
                             ],
-                            "lastUpdate": 1672959834.955249
+                            "unit": "\u00c2\u00b0C",
+                            "previousValue": 29,
+                            "lastUpdate": 1673105056.8094418
                         },
                         "soilMoisture": {
                             "values": [
-                                59
+                                67
                             ],
+                            "unit": "%",
+                            "previousValue": 67,
                             "lastUpdate": 1672959835.5233257
                         }
                     }
@@ -44,26 +53,35 @@
                 {
                     "fieldID": 1,
                     "plantType": "potatoes",
-                    "temperature": [
-                        15,
-                        30
-                    ],
-                    "soilMoisture": [
-                        70,
-                        80
-                    ],
-                    "precipitationLimit": 3,
+                    "temperatureLimit": {
+                        "min": 15,
+                        "max": 30,
+                        "unit": "\u00c2\u00b0C"
+                    },
+                    "soilMoistureLimit": {
+                        "min": 70,
+                        "max": 80,
+                        "unit": "%"
+                    },
+                    "precipitationLimit": {
+                        "max": 3,
+                        "unit": "mm"
+                    },
                     "lastMeasures": {
                         "temperature": {
                             "values": [
-                                24
+                                28
                             ],
-                            "lastUpdate": 1672959831.2678316
+                            "unit": "\u00c2\u00b0C",
+                            "previousValue": 28,
+                            "lastUpdate": 1673105057.846859
                         },
                         "soilMoisture": {
                             "values": [
                                 78
                             ],
+                            "unit": "%",
+                            "previousValue": 78,
                             "lastUpdate": 1672959835.5935006
                         }
                     }
@@ -71,26 +89,35 @@
                 {
                     "fieldID": 2,
                     "plantType": "tomatoes",
-                    "temperature": [
-                        15,
-                        30
-                    ],
-                    "soilMoisture": [
-                        65,
-                        75
-                    ],
-                    "precipitationLimit": 2,
+                    "temperatureLimit": {
+                        "min": 15,
+                        "max": 30,
+                        "unit": "\u00c2\u00b0C"
+                    },
+                    "soilMoistureLimit": {
+                        "min": 65,
+                        "max": 75,
+                        "unit": "%"
+                    },
+                    "precipitationLimit": {
+                        "max": 2,
+                        "unit": "mm"
+                    },
                     "lastMeasures": {
                         "temperature": {
                             "values": [
                                 54
                             ],
+                            "unit": "\u00c2\u00b0C",
+                            "previousValue": 54,
                             "lastUpdate": ""
                         },
                         "soilMoisture": {
                             "values": [
                                 44
                             ],
+                            "unit": "%",
+                            "previousValue": 44,
                             "lastUpdate": ""
                         }
                     }

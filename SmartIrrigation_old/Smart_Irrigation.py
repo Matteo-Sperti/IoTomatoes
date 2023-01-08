@@ -2,6 +2,7 @@ import paho.mqtt.client as mqtt
 import cherrypy
 import time
 import json
+import datetime
 from statistics import mean
 import requests
 
@@ -73,6 +74,11 @@ class SmartIrrigation:
             print("WARNING: file opening error. The file doesn't exist")
         
 
+
+
+
+
+
     def control(self):
         """Extracts measures from the json file, compute the mean value of each type of measure
         and perform the control law"""
@@ -92,24 +98,27 @@ class SmartIrrigation:
                 fieldID=field["fieldID"]    #indicates position index of the field inside the list of all field for a single company 
                 plant=field["plantType"]
                 print(f"campo={fieldID}")
-                minTemperature=field["temperatureLimit"]["min"]      #extract the ideal min value of temperature for the given plant from the json file
-                maxTemperature=field["temperatureLimit"]["max"]      #extract the ideal max value of temperature from the given plant json file
+                # minTemperature=field["temperatureLimit"]["min"]      #extract the ideal min value of temperature for the given plant from the json file
+                # maxTemperature=field["temperatureLimit"]["max"]      #extract the ideal max value of temperature from the given plant json file
                 minSoilMoisture=field["soilMoistureLimit"]["min"]    #extract the ideal min value of soil moisture for the given plant from the json file 
                 maxSoilMoisture=field["soilMoistureLimit"]["max"]    #extract the ideal max value of soil moisture for the given plant from the json file
                 precipitationLimit=field["precipitationLimit"]["max"]
 
-                previousMeanTemperature=field["lastMeasures"]["temperature"]["previousValue"]
-                previousMeanSoilMoisture=field["lastMeasures"]["soilMoisture"]["previousValue"]
+                # previousTemperature=field["lastMeasures"]["temperature"]["previousValue"]
+                previousSoilMoisture=field["lastMeasures"]["soilMoisture"]["previousValue"]
                 try:
-                    currentTemperature=mean(field["lastMeasures"]["temperature"]["values"])    #compute the mean value of received temperature measures
+                    # currentTemperature=mean(field["lastMeasures"]["temperature"]["values"])    #compute the mean value of received temperature measures
                     currentSoilMoisture=mean(field["lastMeasures"]["soilMoisture"]["values"])  #compute the mean value of received soil Moisture measures
                 except:
                     print("MeanError: necessario almeno un dato per il calcolo della media")
             
 
                 #CONTROL ALGORITHM:
-                dailyPrecipitationSum=self.callWeatherService()
+                dailyPrecipitationSum=self.callWeatherService()[0]
+                forecastSoilMoisture=self.callWeatherService()[1]
 
+                #INTEGRAZIONE PREVISIONE SOILMOISTURE CON NOSTRE MISURE
+                currentSoilMoisture=round((currentSoilMoisture*3+forecastSoilMoisture)/4,2) #3/4 dato dalle nostre misure e 1/4 dato dalle previsioni
 
 
                 #TENTATIVO 1) CONTROL LAW CON SOLO SOILMOISTURE
@@ -140,7 +149,7 @@ class SmartIrrigation:
                         #e velocizzare la riduzione dell'umidità
                     else:
                         print("siamo all'interno del range ideale per la pianta")
-                        if currentSoilMoisture>previousMeanSoilMoisture:
+                        if currentSoilMoisture>previousSoilMoisture:
                             print("soilMoisture sta aumentando")
                             if currentSoilMoisture>=soilMoistureOFF:
                                 print(f"""visto che il soil moisture corrente:
@@ -152,7 +161,7 @@ class SmartIrrigation:
                                 {currentSoilMoisture}<{soilMoistureOFF}""")
                                 print("POMPE ACCESE")
                                 message["command"]="ON"
-                        elif currentSoilMoisture<previousMeanSoilMoisture:
+                        elif currentSoilMoisture<previousSoilMoisture:
                             print("soilMoisture sta diminuendo")
                             if currentSoilMoisture<=soilMoistureON:
                                 print(f"""visto che il soil moisture corrente:
@@ -192,10 +201,10 @@ class SmartIrrigation:
                 #     #self.service_mqtt.publish(topic_attuatori)
                     
                 #AGGIORNA L'ULTIMO VALORE DI MEDIA OTTENUTO:
-                information["companyList"][positionCompany]["fields"][fieldID-1]["lastMeasures"]["temperature"]["previousValue"]=currentTemperature
+                # information["companyList"][positionCompany]["fields"][fieldID-1]["lastMeasures"]["temperature"]["previousValue"]=currentTemperature
                 information["companyList"][positionCompany]["fields"][fieldID-1]["lastMeasures"]["soilMoisture"]["previousValue"]=currentSoilMoisture
 
-                del information["companyList"][positionCompany]["fields"][fieldID-1]["lastMeasures"]["temperature"]["values"][0:-1] #delete all but one of the used temperature measures
+                # del information["companyList"][positionCompany]["fields"][fieldID-1]["lastMeasures"]["temperature"]["values"][0:-1] #delete all but one of the used temperature measures
                 del information["companyList"][positionCompany]["fields"][fieldID-1]["lastMeasures"]["soilMoisture"]["values"][0:-1] #delete all but one of the used soil moisture measures
 
                 try:
@@ -232,7 +241,8 @@ class SmartIrrigation:
         # print(get_weatherService_request.json())
         get_weatherService_request=json.load(open("outputWeatherForecast.json")) #per ora i dati sono presi da un file json esempio (ma in seguito saranno ricevuti tramite get_request)
         daily_precipitation_sum=get_weatherService_request["daily"]["precipitation_sum"][0]
-        return daily_precipitation_sum 
+        forecastSoilMoisture=get_weatherService_request["hourly"]["soil_moisture_3_9cm"][datetime.datetime.now().hour]*100
+        return [daily_precipitation_sum,forecastSoilMoisture]
         #E' NECESSARIO PREVEDERE UN MODO NEL WEATHER FORECAST DI INDICARE LE ZONE DEI CAMPI DI CIASCUNA COMPANY IN MODO DA AVERE INFORMAZIONI
         #PIU' SPECIFICHE
 

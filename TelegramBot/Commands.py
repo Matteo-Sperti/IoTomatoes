@@ -2,64 +2,115 @@ import json
 import requests
 from telepot.namedtuple import InlineKeyboardMarkup, InlineKeyboardButton
 
+keyboardYESNO = InlineKeyboardMarkup(inline_keyboard=[[
+                InlineKeyboardButton(text='YES ✅', callback_data='yes'),
+                InlineKeyboardButton(text='NO ❌', callback_data='no'),
+            ]])
+
 class InsertNewCompany():
-    def __init__(self, chatID, bot, ResourceCatalog_url, companyList):
+    def __init__(self, chatID, sender, ResourceCatalog_url):
         self.chatID = chatID
         self.completed = False
         self.ResourceCatalog_url = ResourceCatalog_url
-        self.companyList = companyList
-        self.bot = bot
+        self.sender = sender
         self._status = 0
-        self._coordSTD = 44.969741, 7.464239
-
-        self.request = {"CompanyName" : "", "Name" : "", "Surname" : "", 
-                            "CompanyToken" : "", "CompanyLocation" : ""}
-        self.bot.sendMessage(self.chatID, f"Insert your {list(self.request.keys())[0]}")
-
-    def __eq__(self, __o: object) -> bool:
-        if isinstance(__o, InsertNewCompany):
-            return self.chatID == __o.chatID
-        return False
+        self.response = {}
+        self.update("")
 
     @property
     def adminInfo(self):
-        return {"Name" : self.request["Name"], "Surname" : self.request["Surname"], "telegramID" : self.chatID}
+        return {"Name" : self.response["Name"], 
+                "Surname" : self.response["Surname"], 
+                "telegramID" : self.chatID}
 
     @property
     def company(self):
-        return {"CompanyName": self.request["CompanyName"], "CompanyToken": self.request["CompanyToken"]}
+        return {"CompanyName": self.response["CompanyName"], 
+                "CompanyToken": self.response["CompanyToken"]}
+
+    @property
+    def location(self):
+        return self.response["Location"]
 
     def update(self, message): 
-        if self._status < len(self.request):
-            actualKey = list(self.request.keys())[self._status]
-            print(message)
-            self.request[actualKey] = message
+        if self._status == 0:
+            self.sender.sendMessage("Insert your Company Name")
             self._status += 1
-            if self._status < len(self.request):
-                self.bot.sendMessage(self.chatID, f"Insert your {list(self.request.keys())[self._status]}")
-                if self._status == len(self.request) - 1:
-                    self.bot.sendMessage(self.chatID, "Insert your location:")
-                    self.bot.sendLocation(self.chatID, self._coordSTD)
-            else:
-                question = f"Your Token is {message}\nConfirm your registration?"
-                buttons = buttons = [[InlineKeyboardButton(text=f'YES ✅', callback_data='yes'), 
-                        InlineKeyboardButton(text=f'NO ❌', callback_data='no')]]
-                keyboards = InlineKeyboardMarkup(inline_keyboard=buttons)
-                self.bot.sendMessage(self.chatID, question, reply_markup=keyboards)
+        
+        elif self._status == 1:
+            self.response["CompanyName"] = message
+            self.sender.sendMessage("Insert your Name")
+            self._status += 1
+
+        elif self._status == 2:
+            self.response["Name"] = message
+            self.sender.sendMessage("Insert your Surname")
+            self._status += 1
+        
+        elif self._status == 3:
+            self.response["Surname"] = message
+            self.sender.sendMessage("Insert your Company Token")
+            self._status += 1
+
+        elif self._status == 4:
+            self.response["CompanyToken"] = message
+            self.sender.sendMessage(f"Your Company Token is: {message}\nProceed with the registration?",
+                                    reply_markup=keyboardYESNO)
+            self._status += 1
+
+        elif self._status == 5:
+            if message == "yes":
+                self.sender.sendMessage("Insert your location as couple of coordinates:")
                 self._status += 1
-        else:
+            else:
+                self.sender.sendMessage("Insert your Company Token")
+                self._status = 4
+
+        elif self._status == 6:
+            try:
+                message.replace(" ", "")
+                latitude, longitude = message.split(",")
+                self.response["Location"] = {
+                    "longitude" : float(longitude),
+                    "latitude" : float(latitude)
+                }           
+                self.sender.sendLocation(self.location["latitude"], self.location["longitude"])
+            except:
+                self.sender.sendMessage("Invalid location")
+                self.sender.sendMessage("Insert your location as couple of coordinates:")
+                self._status = 6
+            else:
+                self.sender.sendMessage(f"Is this your location?", reply_markup=keyboardYESNO)
+                self._status += 1
+
+        elif self._status == 7:
+            if message == "yes":
+                summary = (f"You are going to register the following company:\n"
+                            f"Company Name: {self.response['CompanyName']}\n"
+                            f"Company Token: {self.response['CompanyToken']}\n"
+                            f"Location: {self.location['latitude']}, {self.location['longitude']}\n\n"
+                            f"{self.response['Name']} {self.response['Surname']}) will be the admin of this company\n")
+                self.sender.sendMessage(summary)
+                self.sender.sendMessage("Confirm your registration?", reply_markup=keyboardYESNO)
+                self._status += 1
+            else:
+                self.sender.sendMessage("Insert your location as couple coordinates:")
+                self._status = 6
+
+        elif self._status == 8:
             if message == "yes":
                 if not self.insert_company():
-                    self.bot.sendMessage(self.chatID, "Registration failed")
+                    self.sender.sendMessage("Registration failed")
                 else:
-                    self.companyList.append(self.company["CompanyName"])
+                    self.sender.sendMessage("Registration completed")
             else:
-                self.bot.sendMessage(self.chatID, "Registration canceled")
+                self.sender.sendMessage("Registration canceled")
             self.completed = True
             
     def insert_company(self):   
         try:
-            res = requests.post(self.ResourceCatalog_url + "/insertCompany", params=self.company, data= json.dumps(self.adminInfo))
+            res = requests.post(self.ResourceCatalog_url + "/insertCompany", params=self.company, 
+                                    data= json.dumps(self.adminInfo))
             res.raise_for_status()
         except requests.exceptions.HTTPError as err:
             print(f"{err.response.status_code} : {err.response.reason}")
@@ -77,7 +128,7 @@ class InsertNewCompany():
                             "Welcome to IoTomatoes Platform\n\n"
                             f"CompanyID: {CompanyID}\n"
                             f"CompanyToken: {CompanyToken}")
-                    self.bot.sendMessage(self.chatID, text=message)
+                    self.sender.sendMessage(self.chatID, text=message)
                     return True
             except:
                 print(f"Error in the information\n")
@@ -157,3 +208,11 @@ class RegisterNewUser():
             except:
                 print(f"Error in the information\n")
                 return False
+
+class GetUsers():
+    def __init__(self) -> None:
+        pass
+
+class GetDevices():
+    def __init__(self) -> None:
+        pass

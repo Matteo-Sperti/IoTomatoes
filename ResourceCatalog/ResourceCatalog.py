@@ -76,6 +76,25 @@ class ResourceCatalogManager():
         else:
             return False
 
+    def systemAuthorize(self, credentials : dict):
+        """Check if the credentials are correct for the system.
+        
+        Arguments:\n
+        `credentials` -- the credentials to access the system.\n
+        
+        Return:\n
+        `True` if the credentials are correct.
+        Raise an exception is the `SystemToken` is not correct.
+        """
+
+        if "SystemToken" not in credentials:
+            raise web_exception(400, "Missing credentials")
+
+        if self.catalog["SystemToken"] == credentials["SystemToken"]:
+            return True
+        else:
+            raise web_exception(401, "Wrong credentials")
+
     def accessInfo(self, params : dict):
         """Return the access info of a device.
 
@@ -133,16 +152,25 @@ class ResourceCatalogManager():
                         return item
         return None
     
-    def get_all(self, SystemToken : str):
+    def getAll(self, credential : dict):
         """Return a json with the list of all the companies in the catalog.
 
         Arguments:\n
-        `SystemToken` -- the token of the system to authorize the request.
+        `credential` -- dictionary with `SystemToken`, the token of the system to authorize the request.
         """
-        try:
+
+        if self.systemAuthorize(credential):
             return json.dumps(self.catalog[companyList_name], indent=4)
-        except KeyError:
-            raise web_exception(404, "List not found")
+
+    def getCompanyNameList(self, credential : dict):
+        """Return a json with the list of names of all the companies in the catalog.
+
+        Arguments:\n
+        `credential` -- dictionary with `SystemToken`, the token of the system to authorize the request.
+        """
+
+        if self.systemAuthorize(credential):
+            return json.dumps([company["CompanyName"] for company in self.catalog[companyList_name]], indent=4)
 
     def getItem(self, CompanyInfo : dict, ID : int):
         """Return the information of item `ID` in json format.
@@ -220,33 +248,38 @@ class ResourceCatalogManager():
         Return:\n
         JSON with the status of the operation.
         """
-        out = {"Status": False}
-        if all(key in CompanyInfo for key in ["CompanyName", "CompanyToken"]):
-            ID = self._IDs.get_ID()
-            AdminID = self._IDs.get_ID()
-            if ID == -1 or AdminID == -1:
-                raise web_exception(500, "No more IDs available")
+        out = {}
+        if self.systemAuthorize(CompanyInfo):
+            if self.findCompany(CompanyInfo) != None:
+                out["Status"] = False
+                out["Error"] = "Company already present"
             else:
-                print(f"\nNew company: {CompanyInfo['CompanyName']}\n"
-                        f"CompanyToken: {CompanyInfo['CompanyToken']}\n"
-                        f"Admin information: \n"
-                        f"{json.dumps(AdminInfo, indent=4)}\n")
-                if query_yes_no(f"Are you sure you want to add the company {CompanyInfo['CompanyName']}?"):
-                    NewCompany = {
-                        "ID": ID,
-                        "CompanyName": CompanyInfo["CompanyName"],
-                        "CompanyToken": str(CompanyInfo["CompanyToken"]),
-                        "adminID": AdminID,
-                        usersList_name: [],
-                        devicesList_name: []
-                    }
-                    new_item = AdminInfo
-                    new_item["ID"] = AdminID
-                    new_item["lastUpdate"] =  time.time()
-                    NewCompany[usersList_name].append(new_item)
-                    self.catalog[companyList_name].append(NewCompany)
-                    self.catalog["lastUpdate"] =  time.time() 
-                    out = {"Status": True, "CompanyID": ID, "CompanyToken": CompanyInfo["CompanyToken"]}
+                if all(key in CompanyInfo for key in ["CompanyName", "CompanyToken"]):
+                    ID = self._IDs.get_ID()
+                    AdminID = self._IDs.get_ID()
+                    if ID == -1 or AdminID == -1:
+                        raise web_exception(500, "No more IDs available")
+                    else:
+                        print(f"\nNew company: {CompanyInfo['CompanyName']}\n"
+                                f"CompanyToken: {CompanyInfo['CompanyToken']}\n"
+                                f"Admin information: \n"
+                                f"{json.dumps(AdminInfo, indent=4)}\n")
+                        if query_yes_no(f"Are you sure you want to add the company {CompanyInfo['CompanyName']}?"):
+                            NewCompany = {
+                                "ID": ID,
+                                "CompanyName": CompanyInfo["CompanyName"],
+                                "CompanyToken": str(CompanyInfo["CompanyToken"]),
+                                "adminID": AdminID,
+                                usersList_name: [],
+                                devicesList_name: []
+                            }
+                            new_item = AdminInfo
+                            new_item["ID"] = AdminID
+                            new_item["lastUpdate"] =  time.time()
+                            NewCompany[usersList_name].append(new_item)
+                            self.catalog[companyList_name].append(NewCompany)
+                            self.catalog["lastUpdate"] =  time.time() 
+                            out = {"Status": True, "CompanyID": ID, "CompanyToken": CompanyInfo["CompanyToken"]}
         
         return json.dumps(out, indent=4)
 
@@ -414,6 +447,10 @@ class RESTResourceCatalog(GenericEndpoint):
                 if len(uri) == 1 and uri[0] == "getCompany":
                     CompanyInfo = self.catalog.accessInfo(params)
                     return self.catalog.getCompany(CompanyInfo)
+                elif len(uri) == 1 and uri[0] == "companiesName":
+                    return self.catalog.getCompanyNameList(params)    
+                elif len(uri) == 1 and uri[0] == "all":
+                    return self.catalog.getAll(params)
                 elif len(uri) == 1 and uri[0] == "get":
                     if "ID" in params:
                         CompanyInfo = self.catalog.accessInfo(params)

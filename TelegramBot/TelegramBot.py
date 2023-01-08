@@ -2,7 +2,8 @@ import telepot
 from telepot.loop import MessageLoop
 from telepot.namedtuple import InlineKeyboardMarkup, InlineKeyboardButton
 from telepot.delegate import (
-    per_chat_id, create_open, pave_event_space, call)
+    per_chat_id_in, create_open, pave_event_space, call,
+    include_callback_query_chat_id)
 import json
 import time
 import requests
@@ -51,35 +52,36 @@ class MessageHandler(telepot.helper.ChatHandler):
         content_type, _, chat_ID = telepot.glance(msg)  # type: ignore
         
         if content_type != 'text':
-            self.sender.sendMessage(chat_ID, text="I don't understand") 
+            self.sender.sendMessage("I don't understand") 
             return
 
         message = msg['text']
-        if message == "/help":
+        if self.command is not None:
+            completed = self.command.update(message)
+            if completed:
+                self.close()
+        elif message in ["/help", "/start"]:
             self.bot.sendMessage(chat_ID, text=HelpMessage)
         elif message == "/insert_company":
-            self.command = InsertNewCompany(chat_ID, self.bot, self._ResourceCatalog_url, self._companyList)
+            self.command = InsertNewCompany(chat_ID, self.sender, self._ResourceCatalog_url)
         elif message == "/register_user":
-            self.command = RegisterNewUser(chat_ID, self.bot, self._ResourceCatalog_url, self._companyList)
+            self.command = RegisterNewUser(chat_ID, self.sender, self._ResourceCatalog_url, self._companyList)
         elif message == "/users":
-            self.command = RegisterNewUser(chat_ID, self.bot, self._ResourceCatalog_url, self._companyList)
+            self.command = GetUsers(chat_ID, self.sender, self._ResourceCatalog_url, self._companyList)
         elif message == "/devices":
-            self.command = RegisterNewUser(chat_ID, self.bot, self._ResourceCatalog_url, self._companyList)
+            self.command = GetDevices(chat_ID, self.sender, self._ResourceCatalog_url, self._companyList)
         else:
-            if self.command is not None:
-                self.command.update(message)
-            else:
-                self.sender.sendMessage(chat_ID, text="Command not found")
+            self.sender.sendMessage("Command not found")
 
     def on_callback_query(self,msg):
-        _ , chat_ID , query_data = telepot.glance(msg,flavor='callback_query') # type: ignore
-        
+        _ , chat_ID , query_data = telepot.glance(msg,flavor='callback_query')
+
         if self.command is not None:
             completed = self.command.update(query_data)
             if completed:
                 self.close()
         else:
-            self.sender.sendMessage(chat_ID, text="Command not found")
+            self.sender.sendMessage("Command not found")
 
     def on__idle(self, event):
         self.sender.sendMessage("You have been idle for too long. Closing section.")
@@ -111,9 +113,11 @@ class ChatBox(telepot.DelegatorBot):
         self._companyList = []
 
         super(ChatBox, self).__init__(token, [
-            # Here is a delegate to specially handle owner commands.
-            pave_event_space()(
-                per_chat_id(types='private'), create_open, MessageHandler, self._companyList, ResourceCatalog_url, timeout=60),
+            # Distribute all messages to all chat_ids, via `per_chat_id_in()`.
+            include_callback_query_chat_id(
+                pave_event_space())(
+                    per_chat_id_in(self._seen, types='private'), create_open, MessageHandler, 
+                                    self._companyList, ResourceCatalog_url, timeout=60),
 
             # For senders never seen before, send him a welcome message.
             (self._is_newcomer, custom_thread(call(self._send_welcome))),
@@ -121,8 +125,10 @@ class ChatBox(telepot.DelegatorBot):
 
     # seed-calculating function: use returned value to indicate whether to spawn a delegate
     def _is_newcomer(self, msg):
-        print("stiamo controllando se il mittente è nuovo")
         if telepot.is_event(msg):
+            return None
+
+        if "chat" not in msg:
             return None
 
         chat_id = msg['chat']['id']
@@ -133,7 +139,6 @@ class ChatBox(telepot.DelegatorBot):
         return []  # non-hashable ==> delegates are independent, no seed association is made.
 
     def _send_welcome(self, seed_tuple):
-        print("stiamo inviando il messaggio di benvenuto")
         chat_id = seed_tuple[1]['chat']['id']
         self.sendMessage(chat_id, WelcomeMessage)
 
@@ -206,6 +211,7 @@ if __name__ == "__main__":
         print(e)
         print("Error in the initialization of the IoTBot")
     else:
+        time.sleep(1)
         print("IoTBot started")
 
         while True:

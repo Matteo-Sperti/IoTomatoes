@@ -6,9 +6,26 @@
     "servicesDetails": [
         {
             "serviceType": "REST",
-            "serviceIP": "http://172.20.10.3:8081"
+            "serviceIP": "http://192.168.1.102:8081"
         }
     ],
-    "lastUpdate": 1673176333.9807098,
-    "companiesList": []
+    "lastUpdate": 1673200056.3957405,
+    "companiesList": [
+        {
+            "ID": 100,
+            "CompanyName": "s",
+            "CompanyToken": "s",
+            "adminID": 101,
+            "usersList": [
+                {
+                    "Name": "s",
+                    "Surname": "s",
+                    "telegramID": 615608459,
+                    "ID": 101,
+                    "lastUpdate": 1673200056.3957405
+                }
+            ],
+            "devicesList": []
+        }
+    ]
 }

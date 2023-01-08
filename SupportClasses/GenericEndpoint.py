@@ -236,6 +236,7 @@ class GenericEndpoint():
         # manage connection to broker
         self._paho_mqtt.connect(self._broker, self._port)
         self._paho_mqtt.loop_start()
+        time.sleep(1)
         # subscribe the topics
         for topic in self._subscribedTopics:
             self.mySubscribe(self._baseTopic + topic)
@@ -268,7 +269,6 @@ class GenericEndpoint():
         """It subscribes to `topic`"""
 
         # subscribe for a topic
-        print(topic)
         self._paho_mqtt.subscribe(topic, 2)
         # just to remember that it works also as a subscriber
         self._isSubscriber = True

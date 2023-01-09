@@ -222,12 +222,6 @@ class SmartIrrigation:
     # def GET(self, *uri,**params):
     ### PER POTER FORNIRE EVENTUALMENTE INFORMAZIONI AD ALTRI SERVIZI###
 
-#DA INTEGRARE
-    #def POST(self):
-    #exposed=True
-    ### PER POTER AGGIORNARE IL JSON CON NUOVE PIANTE SECONDO I BISGONI DELL'UTENTE ###
-
-
 
 
     def callWeatherService(self):
@@ -235,13 +229,94 @@ class SmartIrrigation:
         the daily precipitation sum from the json file received """
         #get_serviceCatalog_request=requests.get("")
         # get_weatherService_request=requests.get("http://127.0.0.1:8099/Irrigation")  #URL DA MODIFICARE CON QUELLO CHE SI OTTIENE DAL CATALOG
-        # print("ciao")
         # print(get_weatherService_request.json())
         get_weatherService_request=json.load(open("outputWeatherForecast.json")) #per ora i dati sono presi da un file json esempio (ma in seguito saranno ricevuti tramite get_request)
         daily_precipitation_sum=get_weatherService_request["daily"]["precipitation_sum"][0]
         return daily_precipitation_sum 
         #E' NECESSARIO PREVEDERE UN MODO NEL WEATHER FORECAST DI INDICARE LE ZONE DEI CAMPI DI CIASCUNA COMPANY IN MODO DA AVERE INFORMAZIONI
         #PIU' SPECIFICHE
+    
+
+    exposed=True
+    def POST(self, *uri,**params):
+        """POST Rest method to insert a new company o field
+        Allowed commands:
+        /addField=Name=<companyName> to add a new 
+        
+        EXAMPLE OF BODY MESSAGE:
+        {
+            "companyName":"Andrea",
+            "plantType":"carote",
+            "soilMoistureLimit":{"max":60, "min":45, "unit":"%"},
+            "precipitationLimit":{"max":4,"unit":"mm"}
+            }"""
+
+    
+        if len(uri)!=0:
+            if uri[0]=="addField":
+                with open("plantInformation.json") as outfile:
+                    info=json.load(outfile)
+                
+                newField={
+                    "companyName": "",
+                    "fieldsNumber": None,
+                    "fields": [
+                        {
+                            "fieldID": None,
+                            "plantType": "",
+                            "soilMoistureLimit": {},
+                            "precipitationLimit": {},
+                            "lastMeasures": {
+                                "soilMoisture": {
+                                    "values": [
+                                            1
+                                            ],
+                                    "unit": "%",
+                                    "previousValue": 1,
+                                    "lastUpdate": ""
+                                            }
+                                        }
+                    }
+                ]
+            }
+                newFieldInfo=json.loads(cherrypy.request.body.read())
+
+                if newFieldInfo["companyName"] in info["company"]: #la company è già presente
+                    # index=info["company"].index()
+                    # info["companyList"].append(newField)
+                    print("NOOOOOU")
+
+                else:   #la company non è ancora presente
+                    
+                    #aggiungo il nome della company nella lista dei nomi
+                    info["company"].append(newFieldInfo["companyName"]) 
+
+                    #aggiorno la struttura del nuovo campo con i dati ricevuti
+                    newField["companyName"]=newFieldInfo["companyName"]
+                    newField["fieldsNumber"]=1
+
+                    newField["fields"][0]["fieldID"]=1
+                    newField["fields"][0]["plantType"]=newFieldInfo["plantType"]
+                    newField["fields"][0]["soilMoistureLimit"]=newFieldInfo["soilMoistureLimit"]
+                    newField["fields"][0]["precipitationLimit"]=newFieldInfo["precipitationLimit"]
+                    newField["fields"][0]["lastMeasures"]["soilMoisture"]["lastUpdate"]=time.time()
+
+
+                    info["companyList"].append(newField)
+
+                try:
+                    with open("plantInformation.json","w") as outfile:
+                        json.dump(info,outfile,indent=4)                
+                except FileNotFoundError:
+                    print("ERROR: file not found")
+
+        else:
+            raise cherrypy.HTTPError(400,"Please specify a valid URI")
+            
+
+        
+
+        
 
 
 
@@ -265,5 +340,5 @@ if __name__=="__main__":
             time.sleep(20)
         except KeyboardInterrupt:
             irrigation.stop()
-            cherrypy.engine.stop()
+            cherrypy.engine.block()
             break

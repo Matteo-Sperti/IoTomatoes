@@ -1,7 +1,8 @@
 {
     "company": [
         "Andrea",
-        "Federico"
+        "Federico",
+        "Luca"
     ],
     "companyList": [
         {
@@ -23,14 +24,10 @@
                     "lastMeasures": {
                         "soilMoisture": {
                             "values": [
-                                56,
-                                52,
-                                52,
-                                50,
                                 50
                             ],
                             "unit": "%",
-                            "previousValue": 59.2,
+                            "previousValue": 50,
                             "lastUpdate": 1673262327.3564186
                         }
                     }
@@ -56,14 +53,10 @@
                     "lastMeasures": {
                         "soilMoisture": {
                             "values": [
-                                56,
-                                52,
-                                52,
-                                50,
                                 50
                             ],
                             "unit": "%",
-                            "previousValue": 59.2,
+                            "previousValue": 50,
                             "lastUpdate": 1673262327.2680411
                         }
                     }
@@ -88,6 +81,35 @@
                             "unit": "%",
                             "previousValue": 44,
                             "lastUpdate": ""
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "companyName": "Luca",
+            "fieldsNumber": 1,
+            "fields": [
+                {
+                    "fieldID": 1,
+                    "plantType": "carote",
+                    "soilMoistureLimit": {
+                        "max": 60,
+                        "min": 45,
+                        "unit": "%"
+                    },
+                    "precipitationLimit": {
+                        "max": 4,
+                        "unit": "mm"
+                    },
+                    "lastMeasures": {
+                        "soilMoisture": {
+                            "values": [
+                                1
+                            ],
+                            "unit": "%",
+                            "previousValue": 1,
+                            "lastUpdate": 1673284497.4760137
                         }
                     }
                 }

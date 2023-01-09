@@ -238,10 +238,10 @@ class SmartIrrigation:
     
 
     exposed=True
-    def POST(self, *uri,**params):
+    def POST(self, *uri, **params):
         """POST Rest method to insert a new company o field
         Allowed commands:
-        /addField=Name=<companyName> to add a new 
+        /addField  to add a new field for the company 
         
         EXAMPLE OF BODY MESSAGE:
         {
@@ -314,17 +314,54 @@ class SmartIrrigation:
 
                     info["companyList"].append(newField)
 
-
                 try:
                     with open("plantInformation.json","w") as outfile:
                         json.dump(info,outfile,indent=4)                
                 except FileNotFoundError:
                     print("ERROR: file not found")
-
+            else:
+                raise cherrypy.HTTPError(404, "NOT FOUND: Please specify a valid URI")
         else:
-            raise cherrypy.HTTPError(400,"Please specify a valid URI")
-            
+            raise cherrypy.HTTPError(400,"BAD REQUEST: Please specify at least one URI")
 
+    def PUT(self, *uri, **params):
+          """REST Method to update a field with new a new crop or soil moisture and precipitation limits
+          Allowed commands:
+        /updateField to add a new field for the company 
+
+          EXAMPLE OF BODY MESSAGE:
+        {
+            "companyName":"Andrea",
+            "
+            "plantType":"carote",
+            "soilMoistureLimit":{"max":60, "min":45, "unit":"%"}, 
+            "precipitationLimit":{"max":4,"unit":"mm"}
+            }"""
+
+        #stabilire in base a cosa cercare per aggiornare il campo
+
+    
+
+    def GET(self, *uri, **params):
+        """GET REST Method to provide information to the user about his own fields.
+        Allowed commands:
+        /getAll?company=<companyName> to retrieve information about all the field of a single company"""
+        #AGGIORNARE CONSIDERANDO ANCHE I SISTEMI DI AUTORIZZAZIONE
+
+        if len(uri)!=0:  
+            if uri[0]=="getAll":    #AGGIUNGERE CONTROLLO ANCHE SUI PARAMETRI???????
+                with open("plantInformation.json") as outfile:
+                    info=json.load(outfile)
+                if params["company"] in info["company"]:
+                    index=info["company"].index(params["company"])
+                    return json.dumps(info["companyList"][index], indent=4)
+                else:
+                    print("nessuna company trovata")
+                    return "nessuna company trovata"
+            else:
+                raise cherrypy.HTTPError(404, "NOT FOUND: Please specify a valid URI")
+        else:
+            raise cherrypy.HTTPError(400,"BAD REQUEST: Please specify at least one URI")
         
 
         

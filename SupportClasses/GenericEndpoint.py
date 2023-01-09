@@ -3,12 +3,13 @@ import time
 import json
 import paho.mqtt.client as PahoMQTT
 
+
 from ItemInfo import * 
 from MyExceptions import InfoException
 from MyThread import MyThread
 
 class RefreshThread(MyThread):
-    def __init__(self, url : str, ID : int, interval=60, CompanyInfo : dict = {}, SystemToken : str = ""):
+    def __init__(self, url : str, ID : int, interval=60, **kwargs):
         """RefreshThread class. Refresh the Catalog every `interval` seconds.
         
         `url {str}`: Catalog URL.\n
@@ -16,19 +17,24 @@ class RefreshThread(MyThread):
         `interval {int}`: refresh interval in seconds (default = 60).\n
         `CompanyInfo {dict}`: Company information (default = {}), needed only if the item is a resource.
         """
-        super().__init__(self.refresh_item, (url, ID, CompanyInfo, SystemToken), interval)
+        print("RefreshThread init")
 
-    def refresh_item(self, url : str, ID : int, CompanyInfo : dict, SystemToken : str):
+        self._url = url
+        self._ID = ID
+        super().__init__(self.refresh_item, interval, **kwargs)
+
+
+    def refresh_item(self, **kwargs):
         """Refresh item `ID` in the Catalog at `url`."""
-
         refreshed = False
         while not refreshed :
             try:
-                param = CompanyInfo.copy()
-                param.update({"ID": ID})
-                if SystemToken != "":
-                    param.update({"SystemToken": SystemToken})
-                res = requests.put(url + "/refresh", params=param)
+                param = {"ID": self._ID}
+                if "CompanyInfo" in kwargs:
+                    param.update(kwargs["CompanyInfo"])
+                elif "SystemToken" in kwargs:
+                    param.update({"SystemToken" : kwargs["SystemToken"]})
+                res = requests.put(self._url + "/refresh", params=param)
                 res.raise_for_status()
             except requests.exceptions.HTTPError as err:
                 print(f"{err.response.status_code} : {err.response.reason}")
@@ -40,7 +46,7 @@ class RefreshThread(MyThread):
                 stat = res.json()
                 if "Status" in stat and stat["Status"] == True:
                     refreshed = True
-                    print(f"Refreshed correctly to the Catalog; myID = {ID}\n")
+                    print(f"Refreshed correctly to the Catalog; myID = {self._ID}\n")
                 else:
                     print(stat)
                     time.sleep(1)
@@ -68,24 +74,16 @@ class GenericEndpoint():
             if isService :
                 if "SystemToken" in settings:
                     self._SystemToken = settings["SystemToken"]
+                    self.start_as_a_service()
                 else:
                     raise InfoException("The System Token is missing")
-            
-            self.start()
+            elif isResource :
+                self.start_as_a_resource()
 
-
-    def start(self):
-        """Start the endpoint."""
-
-        if self._isService:
-            self.start_as_a_service()
-        elif self._isResource:
-            self.start_as_a_resource()
-
-        self._MQTTclient = isMQTT(self._EndpointInfo)
-        if self._MQTTclient:
-            self._subscribedTopics = subscribedTopics(self._EndpointInfo)
-            self.start_MQTTclient()
+            self._MQTTclient = isMQTT(self._EndpointInfo)
+            if self._MQTTclient:
+                self._subscribedTopics = subscribedTopics(self._EndpointInfo)
+                self.start_MQTTclient()
 
     def stop(self):
         """Stop the endpoint."""
@@ -102,7 +100,7 @@ class GenericEndpoint():
         It registers the service to the Service Catalog and starts the RefreshThread."""
 
         self.ID = self.register_service()
-        self._RefreshThread = RefreshThread(self.ServiceCatalog_url, self.ID, SystemToken = self._SystemToken)
+        self._RefreshThread = RefreshThread(self.ServiceCatalog_url, self.ID, SystemToken=self._SystemToken)
         if self._EndpointInfo["serviceName"] != "ResourceCatalog":
             self.ResourceCatalog_url = self.get_ResourceCatalog_url()
 
@@ -111,8 +109,9 @@ class GenericEndpoint():
 
         while True:
             try:
+                params = {"SystemToken": self._SystemToken}
                 res = requests.post(self.ServiceCatalog_url + "/insert", 
-                                        params={"SystemToken": self._SystemToken}, json = self._EndpointInfo)
+                                        params=params, json = self._EndpointInfo)
                 res.raise_for_status()
             except requests.exceptions.HTTPError as err:
                 print(f"{err.response.status_code} : {err.response.reason}")
@@ -136,7 +135,7 @@ class GenericEndpoint():
         #Register
         self.ID = self.register_device()
         self._EndpointInfo = self.get_device_info()
-        self._RefreshThread = RefreshThread(self.ResourceCatalog_url, self.ID, CompanyInfo = self._CompanyInfo)
+        self._RefreshThread = RefreshThread(self.ResourceCatalog_url, self.ID, CompanyInfo=self._CompanyInfo)
 
 
     def register_device(self) -> int:
@@ -184,7 +183,8 @@ class GenericEndpoint():
 
         while True:
             try:
-                params = {"SystemToken": self._SystemToken, "serviceName": "ResourceCatalog"}
+                params = {"SystemToken": self._SystemToken, 
+                        "serviceName": "ResourceCatalog"}
                 res = requests.get(self.ServiceCatalog_url + "/search/serviceName", params = params)
                 res.raise_for_status()
             except:

@@ -2,7 +2,7 @@ import threading
 import time
 
 class MyThread(threading.Thread):
-    def __init__(self, target, args = (), interval = 1):
+    def __init__(self, target, interval = 1, *args, **kwargs):
         """MyThread class. Run a function in a daemon thread every interval seconds.
         
         ``target {function}``: function to be executed in the thread,
@@ -12,6 +12,7 @@ class MyThread(threading.Thread):
         super().__init__()
         self.target = target
         self.args = args
+        self.kwargs = kwargs
         self.interval = interval
         self.stop_event = threading.Event()
         self.daemon = True
@@ -31,5 +32,5 @@ class MyThread(threading.Thread):
         """Run the thread."""
         
         while not self.is_stopped():
-            self.target(*self.args)
+            self.target(*self.args, **self.kwargs)
             time.sleep(self.interval)

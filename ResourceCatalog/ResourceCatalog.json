@@ -9,20 +9,25 @@
             "serviceIP": "http://192.168.1.102:8081"
         }
     ],
-    "lastUpdate": 1673200056.3957405,
+    "lastUpdate": 1673266077.7211092,
     "companiesList": [
         {
             "ID": 100,
-            "CompanyName": "s",
-            "CompanyToken": "s",
+            "CompanyName": "e",
+            "CompanyToken": "r",
+            "Location": [
+                "longitude",
+                "latitude"
+            ],
+            "NumberOfFields": 3,
             "adminID": 101,
             "usersList": [
                 {
-                    "Name": "s",
-                    "Surname": "s",
+                    "Name": "r",
+                    "Surname": "r",
                     "telegramID": 615608459,
                     "ID": 101,
-                    "lastUpdate": 1673200056.3957405
+                    "lastUpdate": 1673266077.7211092
                 }
             ],
             "devicesList": []

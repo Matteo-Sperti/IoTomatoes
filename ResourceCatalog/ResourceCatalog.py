@@ -17,7 +17,7 @@ devicesList_name = "devicesList"
 usersList_name = "usersList"
 
 class ResourceCatalogManager():
-    def __init__(self, heading : dict, filename = "CompanyCatalog.json", autoDeleteTime = 120, 
+    def __init__(self, heading : dict, SystemToken : str, filename = "CompanyCatalog.json", autoDeleteTime = 120, 
                     IDs = IDs(100)):
         """Initialize the catalog manager.
     
@@ -31,7 +31,8 @@ class ResourceCatalogManager():
         self.catalog = heading.copy()
         self.catalog["lastUpdate"] = time.time()
         self.catalog[companyList_name] = []
-
+        
+        self._SystemToken = SystemToken
         self._filename = filename
         self._IDs = IDs
         self._autoDeleteTime = autoDeleteTime
@@ -65,12 +66,20 @@ class ResourceCatalogManager():
         """
 
         if "CompanyName" not in credentials or not ("CompanyToken" in credentials 
-                and "SystemToken" in credentials):
+                or "SystemToken" in credentials):
             raise web_exception(400, "Missing credentials")
 
         if company["CompanyName"] == credentials["CompanyName"]:
-            if company["CompanyToken"] == credentials["CompanyToken"]:
-                return True
+            if "SystemToken" in credentials:
+                if credentials["SystemToken"] == self._SystemToken:
+                    return True
+                else:
+                    raise web_exception(401, "Wrong credentials")
+            elif "CompanyToken" in credentials:
+                if company["CompanyToken"] == credentials["CompanyToken"]:
+                    return True
+                else:
+                    raise web_exception(401, "Wrong credentials")
             else:
                 raise web_exception(401, "Wrong credentials")
         else:
@@ -84,13 +93,13 @@ class ResourceCatalogManager():
         
         Return:\n
         `True` if the credentials are correct.
-        Raise an exception is the `SystemToken` is not correct.
+        Raise an exception is the `SystemToken` is not correct or is not present.
         """
 
         if "SystemToken" not in credentials:
             raise web_exception(400, "Missing credentials")
 
-        if self.catalog["SystemToken"] == credentials["SystemToken"]:
+        if self._SystemToken == credentials["SystemToken"]:
             return True
         else:
             raise web_exception(401, "Wrong credentials")
@@ -269,6 +278,8 @@ class ResourceCatalogManager():
                                 "ID": ID,
                                 "CompanyName": CompanyInfo["CompanyName"],
                                 "CompanyToken": str(CompanyInfo["CompanyToken"]),
+                                "Location": CompanyInfo["Location"],
+                                "NumberOfFields" : int(CompanyInfo["NumberOfFields"]),
                                 "adminID": AdminID,
                                 usersList_name: [],
                                 devicesList_name: []
@@ -295,6 +306,9 @@ class ResourceCatalogManager():
                     new_item = constructResource(ID, CompanyInfo, deviceInfo)
                 except InfoException as e:
                     raise web_exception(500, e.message)
+
+                if not (new_item["field"] > 1 and new_item["field"] <= company["NumberOfFields"]) :
+                    raise web_exception(400, "Field number not valid")
                 company[devicesList_name].append(new_item)
                 out = {"ID": ID}
                 return json.dumps(out, indent=4)
@@ -422,7 +436,7 @@ class RESTResourceCatalog(GenericEndpoint):
         filename = settings["filename"]
         autoDeleteTime = settings["autoDeleteTime"]
         super().__init__(settings, isService=True)
-        self.catalog = ResourceCatalogManager(self._EndpointInfo, filename, autoDeleteTime)
+        self.catalog = ResourceCatalogManager(self._EndpointInfo, self._SystemToken, filename, autoDeleteTime)
 
     def close(self):
         """Close the endpoint and save the catalog."""

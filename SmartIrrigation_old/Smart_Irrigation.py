@@ -128,6 +128,7 @@ class SmartIrrigation:
                     if dailyPrecipitationSum>precipitationLimit:
                         print("NON HA SENSO IRRIGARE")
                         print("pompe OFF")
+                        message["command"]="OFF"
                     else:
                         print("HA SENSO IRRIGARE")
                         

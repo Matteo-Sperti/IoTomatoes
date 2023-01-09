@@ -1,0 +1,68 @@
+{
+    "company": [
+        "Andrea",
+        "Federico"
+    ],
+    "companyList": [
+        {
+            "companyName": "Andrea",
+            "fieldsNumber": 1,
+            "fields": [
+                {
+                    "fieldID": 1,
+                    "plantType": "tomatoes",
+                    "idealLight": {
+                        "min": 41000,
+                        "max": 60000
+                    },
+                    "light": {
+                        "values": [
+                            43840
+                        ],
+                        "unit": "lx",
+                        "previousValue": "",
+                        "lastUpdate": 1672352950.996713
+                    }
+                }
+            ]
+        },
+        {
+            "companyName": "Federico",
+            "fieldsNumber": 2,
+            "fields": [
+                {
+                    "fieldID": 1,
+                    "plantType": "potatoes",
+                    "idealLight": {
+                        "min": 45000,
+                        "max": 75000
+                    },
+                    "light": {
+                        "values": [
+                            45790
+                        ],
+                        "unit": "lx",
+                        "previousValue": "",
+                        "lastUpdate": 1672352952.386986
+                    }
+                },
+                {
+                    "fieldID": 2,
+                    "plantType": "tomatoes",
+                    "idealLight": {
+                        "min": 41000,
+                        "max": 60000
+                    },
+                    "light": {
+                        "values": [
+                            54000
+                        ],
+                        "unit": "lx",
+                        "previousValue": "",
+                        "lastUpdate": ""
+                    }
+                }
+            ]
+        }
+    ]
+}

@@ -2,9 +2,9 @@ import paho.mqtt.client as mqtt
 import cherrypy
 import time
 import json
-import datetime
 from statistics import mean
 import requests
+import datetime
 
 
 class SmartIrrigation:
@@ -14,15 +14,16 @@ class SmartIrrigation:
 
         self.serviceID="Irrigation"
         self.sensor_topic="IoTomatoes/+/+/+/measure" #IoTomatoes/companyName/field/deviceID/measure
+        self.commandTopic="IoTomatoes/"
         self.broker="test.mosquitto.org"
         self.port=1883
-        self.commandMessage={
+
+        self.message={
             "bn":"",
             "field":"",
-            "actuator":"pump",
-            "command":None,
-            "timestamp":""
-            }
+            "command":"",
+            "timeStamp":""
+        }
         
         self.service_mqtt=mqtt.Client(self.serviceID,True)
 
@@ -57,16 +58,17 @@ class SmartIrrigation:
         fieldID=self.payload["field"]
         name=self.payload["e"]["name"]
         measure=self.payload["e"]["value"] #extract the measure vale from MQTT message
-
+        unit=self.payload["e"]["unit"]
         with open("plantInformation.json") as outfile:
             information=json.load(outfile)
         
+
+
         if companyName in information["company"]:
             position=information["company"].index(companyName)
 
             information["companyList"][position]["fields"][fieldID-1]["lastMeasures"][name]["values"].append(measure) #insert the measure value in the json file
             information["companyList"][position]["fields"][fieldID-1]["lastMeasures"][name]["lastUpdate"]=time.time() #update the lastUpdate value in the json file
-        
         try:    
             with open("plantInformation.json","w") as outfile:
                 json.dump(information, outfile, indent=4)
@@ -75,13 +77,11 @@ class SmartIrrigation:
         
 
 
-
-
-
-
     def control(self):
         """Extracts measures from the json file, compute the mean value of each type of measure
         and perform the control law"""
+
+        message=self.message
 
         try:
             with open("plantInformation.json") as outfile:
@@ -92,119 +92,114 @@ class SmartIrrigation:
         for company in information["companyList"]:
             companyName=company["companyName"]
             positionCompany=information["company"].index(companyName)   #indicates position index of the single company inside the list of all companies
-            print(f"company={positionCompany}")
+            print(f"company={positionCompany+1}")
 
             for field in company["fields"]:
+                message["command"]="" #per ogni field il messaggio deve essere vuoto, altrimenti si considera di default il messaggio arrivato al campo precedente
+
                 fieldID=field["fieldID"]    #indicates position index of the field inside the list of all field for a single company 
-                plant=field["plantType"]
                 print(f"campo={fieldID}")
-                # minTemperature=field["temperatureLimit"]["min"]      #extract the ideal min value of temperature for the given plant from the json file
-                # maxTemperature=field["temperatureLimit"]["max"]      #extract the ideal max value of temperature from the given plant json file
+                
                 minSoilMoisture=field["soilMoistureLimit"]["min"]    #extract the ideal min value of soil moisture for the given plant from the json file 
                 maxSoilMoisture=field["soilMoistureLimit"]["max"]    #extract the ideal max value of soil moisture for the given plant from the json file
                 precipitationLimit=field["precipitationLimit"]["max"]
-
-                # previousTemperature=field["lastMeasures"]["temperature"]["previousValue"]
+                
+                
                 previousSoilMoisture=field["lastMeasures"]["soilMoisture"]["previousValue"]
+
+                #MODIFICA: DA FAR ESEGUIRE A MONGODB
                 try:
-                    # currentTemperature=mean(field["lastMeasures"]["temperature"]["values"])    #compute the mean value of received temperature measures
                     currentSoilMoisture=mean(field["lastMeasures"]["soilMoisture"]["values"])  #compute the mean value of received soil Moisture measures
                 except:
                     print("MeanError: necessario almeno un dato per il calcolo della media")
-            
+                
 
+                
+                
                 #CONTROL ALGORITHM:
-                dailyPrecipitationSum=self.callWeatherService()[0]
-                forecastSoilMoisture=self.callWeatherService()[1]
-
-                #INTEGRAZIONE PREVISIONE SOILMOISTURE CON NOSTRE MISURE
-                currentSoilMoisture=round((currentSoilMoisture*3+forecastSoilMoisture)/4,2) #3/4 dato dalle nostre misure e 1/4 dato dalle previsioni
-
-
-                #TENTATIVO 1) CONTROL LAW CON SOLO SOILMOISTURE
-                if dailyPrecipitationSum>precipitationLimit:
-                    print("NON HA SENSO IRRIGARE")
-                    print("pompe OFF")
-                    message["command"]="OFF"
-                else:
-                    print("HA SENSO IRRIGARE")
-
-                    soilMoistureON=minSoilMoisture*1.05
-                    soilMoistureOFF=maxSoilMoisture*0.95
-
-                    print(f"limite OFF={soilMoistureOFF}")
-                    print(f"limite ON={soilMoistureON}")
-                    print(f"current value soil moisture={currentSoilMoisture}")
-                    message=self.commandMessage
-
-                    if currentSoilMoisture<minSoilMoisture:
-                        print("umidità sotto la soglia minima assoluta, necessario irrigare")
-                        print("POMPE ACCESE")
-                        message["command"]="ON"
-                    elif currentSoilMoisture>maxSoilMoisture:
-                        print("umidità oltre la soglia massima assoluta, neccessario non irrigare e lasciare asciugare")
-                        print("POMPE SPENTE")
-                        message["command"]="OFF"
-                        #possibile implementazione chiamata al lighting service per accendere le luci, riscaldare le piante e 
-                        #e velocizzare la riduzione dell'umidità
+                dailyPrecipitationSum=self.callWeatherService()
+                
+                #controllo schedulato per la sera (quindi sappiamo già complessivamente se durante il giorno ha piovuto)
+                
+                currentHour=datetime.datetime.now().hour
+                if currentHour in list(range(00,24,1)): ###### MODIFICARE RANGE IN [21,24]
+                    
+                    #CONTROLLO PRECIPITAZIONI:
+                    if dailyPrecipitationSum>precipitationLimit:
+                        print("NON HA SENSO IRRIGARE")
+                        print("pompe OFF")
                     else:
-                        print("siamo all'interno del range ideale per la pianta")
+                        print("HA SENSO IRRIGARE")
+                        
+                        # HYSTERESIS CONTROL LAW (SOILMOISTURE):
+                        # DOPO IL CONTROLLO DELLA PIOGGIA O MENO, SI ASSUME CHE L'INCREMENTO DELL'UMIDITA' SIA
+                        # LEGATA SOLO ALLA NOSTRA IRRIGAZIONE E NON A FENOMENI ESTERNI
+        
+                        
+
+                        print(f"limite OFF={maxSoilMoisture}")
+                        print(f"limite ON={minSoilMoisture}")
+                        print(f"current value soil moisture={currentSoilMoisture}")
+                        
                         if currentSoilMoisture>previousSoilMoisture:
                             print("soilMoisture sta aumentando")
-                            if currentSoilMoisture>=soilMoistureOFF:
+                            if currentSoilMoisture>=maxSoilMoisture:
                                 print(f"""visto che il soil moisture corrente:
-                                {currentSoilMoisture}>={soilMoistureOFF}""")
+                                {currentSoilMoisture}>={maxSoilMoisture}""")
                                 print("POMPE SPENTE")
                                 message["command"]="OFF"
+                                
                             else:
                                 print(f"""visto che il soil moisture corrente:
-                                {currentSoilMoisture}<{soilMoistureOFF}""")
+                                {currentSoilMoisture}<{maxSoilMoisture}""")
                                 print("POMPE ACCESE")
                                 message["command"]="ON"
+                               
+
                         elif currentSoilMoisture<previousSoilMoisture:
-                            print("soilMoisture sta diminuendo")
-                            if currentSoilMoisture<=soilMoistureON:
+                            print(f"soilMoisture sta diminuendo, previousValue={previousSoilMoisture}")
+                            if currentSoilMoisture<=minSoilMoisture:
                                 print(f"""visto che il soil moisture corrente:
-                                {currentSoilMoisture}<={soilMoistureON}""")
+                                {currentSoilMoisture}<={minSoilMoisture}""")
                                 print("POMPE ACCESE")
                                 message["command"]="ON"
+                                
                             else:
                                 print(f"""visto che il soil moisture corrente:
-                                {currentSoilMoisture}>{soilMoistureON}""")
+                                {currentSoilMoisture}>{minSoilMoisture}""")
                                 print("POMPE SPENTE")
                                 message["command"]="OFF"
+                                
                         else:
                             print("soil moisture costante")
-                
-                # message["bn"]=companyName
-                # message["timestamp"]=time.time()
-                # message["field"]=fieldID
+                            if currentSoilMoisture>maxSoilMoisture:
+                                print("POMPE SPENTE")
+                                message["command"]="OFF"
+                                
+                            elif currentSoilMoisture<minSoilMoisture:
+                                print("POMPE ACCESE")
+                                message["command"]="ON"
+                                  
+                            
+                else:
+                    print("non è tempo di irrigare")
+                    print("POMPE SPENTE")
+                    message["command"]="OFF"
 
-                #for singleTopic in topicList:
-                        #self.myPublish(self._baseTopic+singleTopic,message) 
+                message["bn"]=companyName
+                message["field"]=fieldID
+                message["timeStamp"]=time.time()
+                print("")
+                print(f"{message}")
+                print("")
 
-
-
-                # if (meanTemperature<=maxTemperature and meanTemperature>=minTemperature)and(meanSoilMoisture<=maxSoilMoisture and meanSoilMoisture>=minSoilMoisture)and(dailyPrecipitationSum<=precipitationLimit):
-                #     print(f"""
-                #     Average temperature={meanTemperature}
-                #     Average soil moisture={meanSoilMoisture}
-                #     Daily precipitation sum={dailyPrecipitationSum}
-                #     Accendi pompe campo {fieldID} ({plant}) di {companyName}""")
-                #         #self.service_mqtt.publish(topic_attuatori) 
-                # else:
-                #     print(f"""
-                #     Average temperature={meanTemperature}
-                #     Average soil moisture={meanSoilMoisture}
-                #     Daily precipitation sum={dailyPrecipitationSum}
-                #     Spegni pompe campo {fieldID} ({plant}) di {companyName}""")
-                #     #self.service_mqtt.publish(topic_attuatori)
-                    
+                commandTopic=self.commandTopic+str(companyName)+"/"+str(fieldID)+"/1/pump"
+                print(commandTopic)
+                self.service_mqtt.publish(commandTopic,json.dumps(message)) 
                 #AGGIORNA L'ULTIMO VALORE DI MEDIA OTTENUTO:
-                # information["companyList"][positionCompany]["fields"][fieldID-1]["lastMeasures"]["temperature"]["previousValue"]=currentTemperature
-                information["companyList"][positionCompany]["fields"][fieldID-1]["lastMeasures"]["soilMoisture"]["previousValue"]=currentSoilMoisture
-
-                # del information["companyList"][positionCompany]["fields"][fieldID-1]["lastMeasures"]["temperature"]["values"][0:-1] #delete all but one of the used temperature measures
+                information["companyList"][positionCompany]["fields"][fieldID-1]["lastMeasures"]["soilMoisture"]["previousValue"]=currentSoilMoisture 
+                
+                #CANCELLA GLI ULTIMI DATI ADOPERATI PER IL CALCOLO DELLA MEDIA LASCIANDONE PER SICUREZZA SOLO 1
                 del information["companyList"][positionCompany]["fields"][fieldID-1]["lastMeasures"]["soilMoisture"]["values"][0:-1] #delete all but one of the used soil moisture measures
 
                 try:
@@ -228,7 +223,9 @@ class SmartIrrigation:
 
 #DA INTEGRARE
     #def POST(self):
+    #exposed=True
     ### PER POTER AGGIORNARE IL JSON CON NUOVE PIANTE SECONDO I BISGONI DELL'UTENTE ###
+
 
 
 
@@ -241,8 +238,7 @@ class SmartIrrigation:
         # print(get_weatherService_request.json())
         get_weatherService_request=json.load(open("outputWeatherForecast.json")) #per ora i dati sono presi da un file json esempio (ma in seguito saranno ricevuti tramite get_request)
         daily_precipitation_sum=get_weatherService_request["daily"]["precipitation_sum"][0]
-        forecastSoilMoisture=get_weatherService_request["hourly"]["soil_moisture_3_9cm"][datetime.datetime.now().hour]*100
-        return [daily_precipitation_sum,forecastSoilMoisture]
+        return daily_precipitation_sum 
         #E' NECESSARIO PREVEDERE UN MODO NEL WEATHER FORECAST DI INDICARE LE ZONE DEI CAMPI DI CIASCUNA COMPANY IN MODO DA AVERE INFORMAZIONI
         #PIU' SPECIFICHE
 
@@ -260,11 +256,12 @@ if __name__=="__main__":
     irrigation.start()
     cherrypy.tree.mount(irrigation, "/Irrigation", conf)
     cherrypy.engine.start()
+
     
     while True:
         try:
             irrigation.control()
-            time.sleep(30)
+            time.sleep(20)
         except KeyboardInterrupt:
             irrigation.stop()
             cherrypy.engine.stop()

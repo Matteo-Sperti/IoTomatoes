@@ -72,7 +72,7 @@ class SmartLighting:
             json.dump(information, outfile, indent=4)
 
 
-    def control(self):
+    def controlAlgorithm(self):
         """Extracts measures from the json file, compute the mean value of each type of measure
         and perform the control function"""
 
@@ -91,23 +91,23 @@ class SmartLighting:
                 idealLight=field["idealLight"]      #extract the ideal value of light for the given plant from the json file
 
                 try:
-                    meanLight=mean(field["lightMeasures"]["values"])    #compute the mean value of received light measures
+                    currentLight=mean(field["lightMeasures"]["values"])    #compute the mean value of received light measures
                 except:
                     print("MeanError: necessario almeno un dato per il calcolo della media")
                 
                 #CONTROL ALGORITHM:
-                isLightIncreasing=bool()
+                
 
-                if (meanLight<idealLight):
-                    print(f"""
-                    Average light={meanLight}
-                    Accendi luci campo {fieldID} ({plant}) di {companyName}""")
-                        #self.service_mqtt.publish(topic_attuatori) 
-                else:
-                    print(f"""
-                    Average light={meanLight}
-                    Spegni luci campo {fieldID} ({plant}) di {companyName}""")
-                    #self.service_mqtt.publish(topic_attuatori)
+                # if (currentLight<idealLight):
+                #     print(f"""
+                #     Average light={currentLight}
+                #     Accendi luci campo {fieldID} ({plant}) di {companyName}""")
+                #         #self.service_mqtt.publish(topic_attuatori) 
+                # else:
+                #     print(f"""
+                #     Average light={currentLight}
+                #     Spegni luci campo {fieldID} ({plant}) di {companyName}""")
+                #     #self.service_mqtt.publish(topic_attuatori)
                     
                 del information["companyList"][positionCompany]["fields"][fieldID-1]["lightMeasures"]["values"][0:-1] #delete all but one of the used light measures
 
@@ -122,24 +122,7 @@ class SmartLighting:
         self.service_mqtt.disconnect()
 
 
-    # def sendCommand(self):
-    #     message=self.actuator_message
-    #     if len(self.measure)>=12:
-    #         self.media=mean(self.measure)
-    #         if self.media<65:
-    #             message["e"]["command"]="ON"
-    #         else:
-    #             message["e"]["command"]="OFF"
-
-    #         self.service_mqtt.publish(self.actuator_topic,json.dumps(message),2)
-    #         print(f"Published\n {message}")
-    #         self.measure=[]
-
-    # def callResourceCatalog(self):
-    #     parameters={"deviceIdToSearch":self.sensorID}
-    #     get_device_request=requests.get(f"URL resource catalog", parameters)
-    #     print(get_device_request.json())
-    #     topic=get_device_request.json()[""]
+    
 
 #DA CAPIRE ANCORA COME IMPLEMENTARE LA CHIAMATA AL RESOURCE CATALOG PER OTTENERE I TOPIC DI OGNI LUCE E SENSORE CREPUSCOLARE
     # def callWeatherService(self):
@@ -169,5 +152,5 @@ if __name__=="__main__":
     cherrypy.engine.start()
     
     while True:
-        lighting.control()
+        lighting.controlA()
         time.sleep(30)

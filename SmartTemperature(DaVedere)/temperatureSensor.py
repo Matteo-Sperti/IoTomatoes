@@ -50,10 +50,10 @@ class Sensor:
              
         print(dic[str(rc)])
 
-    def senData(self):
+    def senData(self,measure):
         """Fake light sensor publishes random data to the broker"""
         message=self.message
-        message["e"]["value"]=numpy.randint(20,30)
+        message["e"]["value"]=measure
         message["e"]["timestamp"]=time.time()
         self.sensor_mqtt.publish(self.topic,json.dumps(message),2)
         print(f"Published\n {message}")
@@ -85,6 +85,9 @@ if __name__=="__main__":
 
 
     while True:
-        for i in sensorList:
-            i.senData()
-        time.sleep(10)
+        lista1=range(5,40)
+        lista2=range(40,5,-1)
+        for measure in lista2:
+            for i in sensorList:
+                i.senData(measure)
+            time.sleep(1)

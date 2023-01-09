@@ -18,11 +18,11 @@
                     ],
                     "lightMeasures": {
                         "values": [
-                            4465,
-                            4705,
-                            4354,
-                            4003,
-                            4384
+                            44650,
+                            47050,
+                            43540,
+                            40030,
+                            43840
                         ],
                         "unit":"lx",
                         "previousMeanValue":"",
@@ -45,11 +45,11 @@
                     ],
                     "lightMeasures": {
                         "values": [
-                            4484,
-                            4823,
-                            4373,
-                            4463,
-                            4579
+                            44840,
+                            48230,
+                            43730,
+                            44630,
+                            45790
                         ],
                         "unit":"lx",
                         "previousMeanValue":"",
@@ -66,7 +66,7 @@
                     ],
                     "lightMeasures": {
                         "values": [
-                            54
+                            54000
                         ],
                         "unit":"lx",
                         "previousMeanValue":"",

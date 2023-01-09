@@ -91,14 +91,14 @@ class SmartLighting:
                 
                 fieldID=field["fieldID"]    #indicates position index of the field inside the list of all field for a single company 
                 print(f"campo={fieldID}")
-                minIdealLighti=field["idealLight"]["min"]
+                minIdealLight=field["idealLight"]["min"]
                 maxIdealLight=field["idealLight"]["max"]
 
                 previousLight=field["light"]["previousValue"]
 
                 #MODIFICA: DA FAR ESEGUIRE A MONGODB (IMPLEMENTARE GET PER RICEVERE LA MEDIA)
                 try:
-                    currentLight=mean(field["light"]["values"])    #compute the mean value of received light measures
+                    currentLight=round(mean(field["light"]["values"]),2)    #compute the mean value of received light measures
                 except:
                     print("MeanError: necessario almeno un dato per il calcolo della media")
                 
@@ -111,7 +111,50 @@ class SmartLighting:
                 
                 #CONTROLLO CONTINUO DURANTE TUTTA LA GIORNATA
 
-                    
+                print(f"limite OFF={maxIdealLight}")
+                print(f"limite ON={minIdealLight}")
+                print(f"current value light={currentLight} lux")
+                
+                if currentLight>previousLight:
+                    print("light sta aumentando")
+                    if currentLight>=maxIdealLight:
+                        print(f"""visto che light corrente:
+                        {currentLight}>={maxIdealLight}""")
+                        print("LUCI SPENTE")
+                        message["command"]="OFF"
+                        
+                    else:
+                        print(f"""visto che light corrente:
+                        {currentLight}<{maxIdealLight}""")
+                        print("LUCI ACCESE")
+                        message["command"]="ON"
+                        
+
+                elif currentLight<previousLight:
+                    print(f"light sta diminuendo, previousValue={previousLight}")
+                    if currentLight<=minIdealLight:
+                        print(f"""visto che il light corrente:
+                        {currentLight}<={minIdealLight}""")
+                        print("LUCI ACCESE")
+                        message["command"]="ON"
+                        
+                    else:
+                        print(f"""visto che light corrente:
+                        {currentLight}>{minIdealLight}""")
+                        print("LUCI SPENTE")
+                        message["command"]="OFF"
+                        
+                else:
+                    print("light costante")
+                    if currentLight>maxIdealLight:
+                        print("LUCI SPENTE")
+                        message["command"]="OFF"
+                        
+                    elif currentLight<minIdealLight:
+                        print("LUCI ACCESE")
+                        message["command"]="ON"
+
+                print("\n")   
                 del information["companyList"][positionCompany]["fields"][fieldID-1]["light"]["values"][0:-1] #delete all but one of the used light measures
 
                 with open("lightInformation.json","w") as outfile:
@@ -147,4 +190,4 @@ if __name__=="__main__":
     
     while True:
         lighting.control()
-        time.sleep(30)
+        time.sleep(15)

@@ -282,9 +282,20 @@ class SmartIrrigation:
                 newFieldInfo=json.loads(cherrypy.request.body.read())
 
                 if newFieldInfo["companyName"] in info["company"]: #la company è già presente
-                    # index=info["company"].index()
-                    # info["companyList"].append(newField)
-                    print("NOOOOOU")
+                    index=info["company"].index(newFieldInfo["companyName"])
+                    #aggiorno numero di campi presenti per la singola company:
+                    info["companyList"][index]["fieldsNumber"]+=1
+
+                    #aggiorno le informazioni del new field che mi interessano
+                    newField["fields"][0]["fieldID"]=info["companyList"][index]["fieldsNumber"]
+                    newField["fields"][0]["plantType"]=newFieldInfo["plantType"]
+                    newField["fields"][0]["soilMoistureLimit"]=newFieldInfo["soilMoistureLimit"]
+                    newField["fields"][0]["precipitationLimit"]=newFieldInfo["precipitationLimit"]
+                    newField["fields"][0]["lastMeasures"]["soilMoisture"]["lastUpdate"]=time.time()
+
+
+                    #inserisco le informazioni relativa al nuovo campo:
+                    info["companyList"][index]["fields"].append(newField["fields"][0])
 
                 else:   #la company non è ancora presente
                     
@@ -301,8 +312,8 @@ class SmartIrrigation:
                     newField["fields"][0]["precipitationLimit"]=newFieldInfo["precipitationLimit"]
                     newField["fields"][0]["lastMeasures"]["soilMoisture"]["lastUpdate"]=time.time()
 
-
                     info["companyList"].append(newField)
+
 
                 try:
                     with open("plantInformation.json","w") as outfile:

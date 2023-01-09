@@ -2,7 +2,8 @@
     "company": [
         "Andrea",
         "Federico",
-        "Luca"
+        "Luca",
+        "Matteo"
     ],
     "companyList": [
         {
@@ -110,6 +111,58 @@
                             "unit": "%",
                             "previousValue": 1,
                             "lastUpdate": 1673284497.4760137
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "companyName": "Matteo",
+            "fieldsNumber": 2,
+            "fields": [
+                {
+                    "fieldID": 1,
+                    "plantType": "potatoes",
+                    "soilMoistureLimit": {
+                        "max": 60,
+                        "min": 45,
+                        "unit": "%"
+                    },
+                    "precipitationLimit": {
+                        "max": 4,
+                        "unit": "mm"
+                    },
+                    "lastMeasures": {
+                        "soilMoisture": {
+                            "values": [
+                                1
+                            ],
+                            "unit": "%",
+                            "previousValue": 1,
+                            "lastUpdate": 1673285215.2330308
+                        }
+                    }
+                },
+                {
+                    "fieldID": 2,
+                    "plantType": "carote",
+                    "soilMoistureLimit": {
+                        "max": 60,
+                        "min": 45,
+                        "unit": "%"
+                    },
+                    "precipitationLimit": {
+                        "max": 4,
+                        "unit": "mm"
+                    },
+                    "lastMeasures": {
+                        "soilMoisture": {
+                            "values": [
+                                1
+                            ],
+                            "unit": "%",
+                            "previousValue": 1,
+                            "lastUpdate": 1673285226.862303
                         }
                     }
                 }

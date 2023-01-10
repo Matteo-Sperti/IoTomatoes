@@ -1,43 +1,98 @@
 {
-    "company": [
-        "Andrea",
-        "Federico",
-        "Luca",
-        "Matteo"
-    ],
-    "companyList": [
-        {
-            "companyName": "Andrea",
-            "fieldsNumber": 1,
+    "companyList": {
+        "Andrea": {
+            "fieldsNumber": 4,
+            "fieldIDList": [
+                1,
+                2,
+                3,
+                4
+            ],
             "fields": [
                 {
                     "fieldID": 1,
                     "plantType": "tomatoes",
                     "soilMoistureLimit": {
-                        "min": 65,
-                        "max": 75,
+                        "min": 70,
+                        "max": 80,
                         "unit": "%"
                     },
                     "precipitationLimit": {
-                        "max": 2,
+                        "max": 3,
                         "unit": "mm"
                     },
-                    "lastMeasures": {
-                        "soilMoisture": {
-                            "values": [
-                                50
-                            ],
-                            "unit": "%",
-                            "previousValue": 50,
-                            "lastUpdate": 1673262327.3564186
-                        }
+                    "soilMoistureMeasures": {
+                        "currentValue": 25,
+                        "previousValue": 47.3,
+                        "unit": "%",
+                        "lastUpdate": 1673262327.2680411
+                    }
+                },
+                {
+                    "fieldID": 2,
+                    "plantType": "melanzane",
+                    "soilMoistureLimit": {
+                        "min": 20,
+                        "max": 65,
+                        "unit": "%"
+                    },
+                    "precipitationLimit": {
+                        "max": 1,
+                        "unit": "mm"
+                    },
+                    "soilMoistureMeasures": {
+                        "currentValue": null,
+                        "previousValue": 47.3,
+                        "unit": "%",
+                        "lastUpdate": 1673358374.8591306
+                    }
+                },
+                {
+                    "fieldID": 3,
+                    "plantType": "melanzane",
+                    "soilMoistureLimit": {
+                        "min": 20,
+                        "max": 65,
+                        "unit": "%"
+                    },
+                    "precipitationLimit": {
+                        "max": 1,
+                        "unit": "mm"
+                    },
+                    "soilMoistureMeasures": {
+                        "currentValue": null,
+                        "previousValue": 47.3,
+                        "unit": "%",
+                        "lastUpdate": 1673358440.0018563
+                    }
+                },
+                {
+                    "fieldID": 4,
+                    "plantType": "melanzane",
+                    "soilMoistureLimit": {
+                        "min": 20,
+                        "max": 65,
+                        "unit": "%"
+                    },
+                    "precipitationLimit": {
+                        "max": 1,
+                        "unit": "mm"
+                    },
+                    "soilMoistureMeasures": {
+                        "currentValue": null,
+                        "previousValue": 47.3,
+                        "unit": "%",
+                        "lastUpdate": 1673358588.5564919
                     }
                 }
             ]
         },
-        {
-            "companyName": "Federico",
+        "Federico": {
             "fieldsNumber": 2,
+            "fieldIDList": [
+                1,
+                2
+            ],
             "fields": [
                 {
                     "fieldID": 1,
@@ -51,15 +106,11 @@
                         "max": 3,
                         "unit": "mm"
                     },
-                    "lastMeasures": {
-                        "soilMoisture": {
-                            "values": [
-                                50
-                            ],
-                            "unit": "%",
-                            "previousValue": 50,
-                            "lastUpdate": 1673262327.2680411
-                        }
+                    "soilMoistureMeasures": {
+                        "currentValue": 25,
+                        "previousValue": 47.3,
+                        "unit": "%",
+                        "lastUpdate": 1673262327.2680411
                     }
                 },
                 {
@@ -74,22 +125,20 @@
                         "max": 2,
                         "unit": "mm"
                     },
-                    "lastMeasures": {
-                        "soilMoisture": {
-                            "values": [
-                                44
-                            ],
-                            "unit": "%",
-                            "previousValue": 44,
-                            "lastUpdate": ""
-                        }
+                    "soilMoistureMeasures": {
+                        "currentValue": 25,
+                        "previousValue": 47.3,
+                        "unit": "%",
+                        "lastUpdate": ""
                     }
                 }
             ]
         },
-        {
-            "companyName": "Luca",
+        "Luca": {
             "fieldsNumber": 1,
+            "fieldIDList": [
+                1
+            ],
             "fields": [
                 {
                     "fieldID": 1,
@@ -103,70 +152,61 @@
                         "max": 4,
                         "unit": "mm"
                     },
-                    "lastMeasures": {
-                        "soilMoisture": {
-                            "values": [
-                                1
-                            ],
-                            "unit": "%",
-                            "previousValue": 1,
-                            "lastUpdate": 1673284497.4760137
-                        }
+                    "soilMoistureMeasures": {
+                        "currentValue": 25,
+                        "previousValue": 47.3,
+                        "unit": "%",
+                        "lastUpdate": ""
                     }
                 }
             ]
         },
-        {
-            "companyName": "Matteo",
+        "Gianluca": {
             "fieldsNumber": 2,
+            "fieldIDList": [
+                1,
+                4
+            ],
             "fields": [
                 {
-                    "fieldID": 1,
-                    "plantType": "potatoes",
+                    "fieldID": 4,
+                    "plantType": "melanzane",
                     "soilMoistureLimit": {
-                        "max": 60,
-                        "min": 45,
+                        "min": 20,
+                        "max": 65,
                         "unit": "%"
                     },
                     "precipitationLimit": {
-                        "max": 4,
+                        "max": 1,
                         "unit": "mm"
                     },
-                    "lastMeasures": {
-                        "soilMoisture": {
-                            "values": [
-                                1
-                            ],
-                            "unit": "%",
-                            "previousValue": 1,
-                            "lastUpdate": 1673285215.2330308
-                        }
+                    "soilMoistureMeasures": {
+                        "currentValue": null,
+                        "previousValue": 47.3,
+                        "unit": "%",
+                        "lastUpdate": 1673359750.177601
                     }
                 },
                 {
-                    "fieldID": 2,
-                    "plantType": "carote",
+                    "fieldID": 1,
+                    "plantType": "melanzane",
                     "soilMoistureLimit": {
-                        "max": 60,
-                        "min": 45,
+                        "min": 20,
+                        "max": 65,
                         "unit": "%"
                     },
                     "precipitationLimit": {
-                        "max": 4,
+                        "max": 1,
                         "unit": "mm"
                     },
-                    "lastMeasures": {
-                        "soilMoisture": {
-                            "values": [
-                                1
-                            ],
-                            "unit": "%",
-                            "previousValue": 1,
-                            "lastUpdate": 1673285226.862303
-                        }
+                    "soilMoistureMeasures": {
+                        "currentValue": null,
+                        "previousValue": 47.3,
+                        "unit": "%",
+                        "lastUpdate": 1673359822.7676942
                     }
                 }
             ]
         }
-    ]
+    }
 }

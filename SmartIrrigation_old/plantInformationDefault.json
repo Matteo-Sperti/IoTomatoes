@@ -1,45 +1,98 @@
 {
-    "company": [
-        "Andrea",
-        "Federico"
-    ],
-    "companyList": [
-        {
-            "companyName": "Andrea",
-            "fieldsNumber": 1,
+    "companyList": {
+        "Andrea": {
+            "fieldsNumber": 4,
+            "fieldIDList": [
+                1,
+                2,
+                3,
+                4
+            ],
             "fields": [
                 {
                     "fieldID": 1,
                     "plantType": "tomatoes",
                     "soilMoistureLimit": {
-                        "min": 65,
-                        "max": 75,
+                        "min": 70,
+                        "max": 80,
                         "unit": "%"
                     },
                     "precipitationLimit": {
-                        "max": 2,
+                        "max": 3,
                         "unit": "mm"
                     },
-                    "lastMeasures": {
-                        "soilMoisture": {
-                            "values": [
-                                56,
-                                52,
-                                52,
-                                50,
-                                50
-                            ],
-                            "unit": "%",
-                            "previousValue": 59.2,
-                            "lastUpdate": 1673262327.3564186
-                        }
+                    "soilMoistureMeasures": {
+                        "currentValue": 25,
+                        "previousValue": 25,
+                        "unit": "%",
+                        "lastUpdate": 1673262327.2680411
+                    }
+                },
+                {
+                    "fieldID": 2,
+                    "plantType": "melanzane",
+                    "soilMoistureLimit": {
+                        "min": 20,
+                        "max": 65,
+                        "unit": "%"
+                    },
+                    "precipitationLimit": {
+                        "max": 1,
+                        "unit": "mm"
+                    },
+                    "soilMoistureMeasures": {
+                        "currentValue": null,
+                        "previousValue": null,
+                        "unit": "%",
+                        "lastUpdate": 1673358374.8591306
+                    }
+                },
+                {
+                    "fieldID": 3,
+                    "plantType": "melanzane",
+                    "soilMoistureLimit": {
+                        "min": 20,
+                        "max": 65,
+                        "unit": "%"
+                    },
+                    "precipitationLimit": {
+                        "max": 1,
+                        "unit": "mm"
+                    },
+                    "soilMoistureMeasures": {
+                        "currentValue": null,
+                        "previousValue": null,
+                        "unit": "%",
+                        "lastUpdate": 1673358440.0018563
+                    }
+                },
+                {
+                    "fieldID": 4,
+                    "plantType": "melanzane",
+                    "soilMoistureLimit": {
+                        "min": 20,
+                        "max": 65,
+                        "unit": "%"
+                    },
+                    "precipitationLimit": {
+                        "max": 1,
+                        "unit": "mm"
+                    },
+                    "soilMoistureMeasures": {
+                        "currentValue": null,
+                        "previousValue": null,
+                        "unit": "%",
+                        "lastUpdate": 1673358588.5564919
                     }
                 }
             ]
         },
-        {
-            "companyName": "Federico",
+        "Federico": {
             "fieldsNumber": 2,
+            "fieldIDList": [
+                1,
+                2
+            ],
             "fields": [
                 {
                     "fieldID": 1,
@@ -53,19 +106,11 @@
                         "max": 3,
                         "unit": "mm"
                     },
-                    "lastMeasures": {
-                        "soilMoisture": {
-                            "values": [
-                                56,
-                                52,
-                                52,
-                                50,
-                                50
-                            ],
-                            "unit": "%",
-                            "previousValue": 59.2,
-                            "lastUpdate": 1673262327.2680411
-                        }
+                    "soilMoistureMeasures": {
+                        "currentValue": 25,
+                        "previousValue": 25,
+                        "unit": "%",
+                        "lastUpdate": 1673262327.2680411
                     }
                 },
                 {
@@ -80,18 +125,88 @@
                         "max": 2,
                         "unit": "mm"
                     },
-                    "lastMeasures": {
-                        "soilMoisture": {
-                            "values": [
-                                44
-                            ],
-                            "unit": "%",
-                            "previousValue": 44,
-                            "lastUpdate": ""
-                        }
+                    "soilMoistureMeasures": {
+                        "currentValue": 25,
+                        "previousValue": 25,
+                        "unit": "%",
+                        "lastUpdate": ""
+                    }
+                }
+            ]
+        },
+        "Luca": {
+            "fieldsNumber": 1,
+            "fieldIDList": [
+                1
+            ],
+            "fields": [
+                {
+                    "fieldID": 1,
+                    "plantType": "carote",
+                    "soilMoistureLimit": {
+                        "max": 60,
+                        "min": 45,
+                        "unit": "%"
+                    },
+                    "precipitationLimit": {
+                        "max": 4,
+                        "unit": "mm"
+                    },
+                    "soilMoistureMeasures": {
+                        "currentValue": 25,
+                        "previousValue": 25,
+                        "unit": "%",
+                        "lastUpdate": ""
+                    }
+                }
+            ]
+        },
+        "Gianluca": {
+            "fieldsNumber": 2,
+            "fieldIDList": [
+                1,
+                4
+            ],
+            "fields": [
+                {
+                    "fieldID": 4,
+                    "plantType": "melanzane",
+                    "soilMoistureLimit": {
+                        "min": 20,
+                        "max": 65,
+                        "unit": "%"
+                    },
+                    "precipitationLimit": {
+                        "max": 1,
+                        "unit": "mm"
+                    },
+                    "soilMoistureMeasures": {
+                        "currentValue": null,
+                        "previousValue": null,
+                        "unit": "%",
+                        "lastUpdate": 1673359750.177601
+                    }
+                },
+                {
+                    "fieldID": 1,
+                    "plantType": "melanzane",
+                    "soilMoistureLimit": {
+                        "min": 20,
+                        "max": 65,
+                        "unit": "%"
+                    },
+                    "precipitationLimit": {
+                        "max": 1,
+                        "unit": "mm"
+                    },
+                    "soilMoistureMeasures": {
+                        "currentValue": null,
+                        "previousValue": null,
+                        "unit": "%",
+                        "lastUpdate": 1673359822.7676942
                     }
                 }
             ]
         }
-    ]
+    }
 }

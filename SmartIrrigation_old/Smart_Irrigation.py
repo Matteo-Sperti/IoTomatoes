@@ -385,16 +385,23 @@ class SmartIrrigation:
             except FileNotFoundError:
                 print("ERROR: file not found")
 
+            companyList=list(fileInfo["companyList"].keys())
             parameters=list(params.values())
             if uri[0]=="delete" and uri[1]=="all":
                 if len(parameters)==1:
                     companyToDelete=parameters[0]
-                      #
-                      # 
-                      #
-                      # 
-                      #      
+                    if companyToDelete in companyList:
+                        #cancello tutto il dizionario legato alla singola company
+                        fileInfo["companyList"].pop(companyToDelete)
 
+                        try:
+                            with open("plantInformation.json","w") as outfile:
+                                json.dump(fileInfo, outfile, indent=4)
+                            return "Succesfull company deleted"
+                        except FileNotFoundError:
+                            print("ERROR: file not found")
+                    else:
+                        return "No company found"      
                 else:
                     raise cherrypy.HTTPError(400, "BAD REQUEST: Please specify companyName as single parameter")
                     
@@ -402,15 +409,36 @@ class SmartIrrigation:
                 if len(parameters)==2:
                     companyToDelete=parameters[0]
                     fieldIDToDelete=int(parameters[1])
-                      #
-                      # 
-                      #
-                      # 
-                      # 
                     
+                    if companyToDelete in companyList:
+                        if fieldIDToDelete in fileInfo["companyList"][companyToDelete]["fieldIDList"]:
+                            if len(fileInfo["companyList"][companyToDelete]["fieldIDList"])>1: #c'è pù di un field per la singola company, per cui cancello solo quel field
+                                for field in fileInfo["companyList"][companyToDelete]["fields"]:
+                                    if field["fieldID"]==fieldIDToDelete:
+                                        #ricavo l'indice corrispondente al fieldID nella lista dei campi
+                                        fieldIndex=fileInfo["companyList"][companyToDelete]["fields"].index(field)
+                                        #elimino il field specifico
+                                        fileInfo["companyList"][companyToDelete]["fields"].pop(fieldIndex)
+                                        #aggiorno il numero dei campi presenti e la lista
+                                        fileInfo["companyList"][companyToDelete]["fieldsNumber"]-=1
+                                        fileInfo["companyList"][companyToDelete]["fieldIDList"].remove(fieldIDToDelete)
+                                        break
+                            else:   #c'è un unico field per la company. Per cui cancello direttamente tutta la company
+                                fileInfo["companyList"].pop(companyToDelete)
+
+                            try:
+                                with open("plantInformation.json","w") as outfile:
+                                    json.dump(fileInfo, outfile, indent=4)
+                                return "Succesfull field deleted"
+                            except FileNotFoundError:
+                                print("ERROR: file not found") 
+                        
+                        else:
+                            return "No fieldID found for the specified company"
+                    else:
+                        return "No company found"
                 else:
-                    raise cherrypy.HTTPError(400, "BAD REQUEST: Please specify companyName and fieldID as parameters")
-                
+                    raise cherrypy.HTTPError(400, "BAD REQUEST: Please specify companyName and fieldID as two only parameters")      
         
             else:
                 raise cherrypy.HTTPError(404, "NOT FOUND: Please specify a valid URI")

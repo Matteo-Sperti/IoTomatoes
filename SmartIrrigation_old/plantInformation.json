@@ -23,7 +23,7 @@
                     },
                     "soilMoistureMeasures": {
                         "currentValue": 25,
-                        "previousValue": 47.3,
+                        "previousValue": 25,
                         "unit": "%",
                         "lastUpdate": 1673262327.2680411
                     }
@@ -42,7 +42,7 @@
                     },
                     "soilMoistureMeasures": {
                         "currentValue": null,
-                        "previousValue": 47.3,
+                        "previousValue": null,
                         "unit": "%",
                         "lastUpdate": 1673358374.8591306
                     }
@@ -61,7 +61,7 @@
                     },
                     "soilMoistureMeasures": {
                         "currentValue": null,
-                        "previousValue": 47.3,
+                        "previousValue": null,
                         "unit": "%",
                         "lastUpdate": 1673358440.0018563
                     }
@@ -80,7 +80,7 @@
                     },
                     "soilMoistureMeasures": {
                         "currentValue": null,
-                        "previousValue": 47.3,
+                        "previousValue": null,
                         "unit": "%",
                         "lastUpdate": 1673358588.5564919
                     }
@@ -108,7 +108,7 @@
                     },
                     "soilMoistureMeasures": {
                         "currentValue": 25,
-                        "previousValue": 47.3,
+                        "previousValue": 25,
                         "unit": "%",
                         "lastUpdate": 1673262327.2680411
                     }
@@ -127,7 +127,7 @@
                     },
                     "soilMoistureMeasures": {
                         "currentValue": 25,
-                        "previousValue": 47.3,
+                        "previousValue": 25,
                         "unit": "%",
                         "lastUpdate": ""
                     }
@@ -154,56 +154,9 @@
                     },
                     "soilMoistureMeasures": {
                         "currentValue": 25,
-                        "previousValue": 47.3,
+                        "previousValue": 25,
                         "unit": "%",
                         "lastUpdate": ""
-                    }
-                }
-            ]
-        },
-        "Gianluca": {
-            "fieldsNumber": 2,
-            "fieldIDList": [
-                1,
-                4
-            ],
-            "fields": [
-                {
-                    "fieldID": 4,
-                    "plantType": "melanzane",
-                    "soilMoistureLimit": {
-                        "min": 20,
-                        "max": 65,
-                        "unit": "%"
-                    },
-                    "precipitationLimit": {
-                        "max": 1,
-                        "unit": "mm"
-                    },
-                    "soilMoistureMeasures": {
-                        "currentValue": null,
-                        "previousValue": 47.3,
-                        "unit": "%",
-                        "lastUpdate": 1673359750.177601
-                    }
-                },
-                {
-                    "fieldID": 1,
-                    "plantType": "melanzane",
-                    "soilMoistureLimit": {
-                        "min": 20,
-                        "max": 65,
-                        "unit": "%"
-                    },
-                    "precipitationLimit": {
-                        "max": 1,
-                        "unit": "mm"
-                    },
-                    "soilMoistureMeasures": {
-                        "currentValue": null,
-                        "previousValue": 47.3,
-                        "unit": "%",
-                        "lastUpdate": 1673359822.7676942
                     }
                 }
             ]

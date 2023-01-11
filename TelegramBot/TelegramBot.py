@@ -45,7 +45,9 @@ class MessageHandler(telepot.helper.ChatHandler):
     def __init__(self, seed_tuple, connector, **kwargs):
         super(MessageHandler, self).__init__(seed_tuple, **kwargs)
         self._connector = connector
-        self.command = None
+        self._command = None
+        self._chat_id = seed_tuple[1]['chat']['id']
+        self._CompanyName = self._connector.isRegistered(self._chat_id)
 
     def on_chat_message(self, msg):
         content_type, _, chat_ID = telepot.glance(msg)  # type: ignore
@@ -55,30 +57,35 @@ class MessageHandler(telepot.helper.ChatHandler):
             return
 
         message = msg['text']
-        if self.command is not None:
-            completed = self.command.update(message)
+        if self._command is not None:
+            completed = self._command.update(message)
             if completed:
                 self.close()
         elif message in ["/help", "/start"]:
             self.bot.sendMessage(chat_ID, text=HelpMessage)
-        elif message == "/insert_company":
-            self.command = InsertNewCompany(chat_ID, self.sender, self._connector)
-        elif message == "/register_user":
-            self.command = RegisterNewUser(chat_ID, self.sender, self._connector)
-        elif message == "/users":
-            self.command = GetUsers(chat_ID, self.sender, self._connector)
-        elif message == "/devices":
-            self.command = GetDevices(chat_ID, self.sender, self._connector)
-        elif message == "/delete_company":
-            self.command = DeleteCompany(chat_ID, self.sender, self._connector)
         else:
-            self.sender.sendMessage("Command not found")
+            if self._CompanyName == "":
+                if message == "/insert_company":
+                    self._command = InsertNewCompany(chat_ID, self.sender, self._connector)
+                elif message == "/register_user":
+                    self._command = RegisterNewUser(chat_ID, self.sender, self._connector)
+                else:
+                    self.sender.sendMessage("Command not found")
+            else:
+                if message == "/users":
+                    self._command = GetUsers(self._CompanyName, self.sender, self._connector)
+                elif message == "/devices":
+                    self._command = GetDevices(self._CompanyName, self.sender, self._connector)
+                elif message == "/delete_company":
+                    self._command = DeleteCompany(self._CompanyName, self.sender, self._connector)
+                else:
+                    self.sender.sendMessage("Command not found")
 
     def on_callback_query(self,msg):
         _ , chat_ID , query_data = telepot.glance(msg,flavor='callback_query')
 
-        if self.command is not None:
-            completed = self.command.update(query_data)
+        if self._command is not None:
+            completed = self._command.update(query_data)
             if completed:
                 self.close()
         else:
@@ -87,6 +94,10 @@ class MessageHandler(telepot.helper.ChatHandler):
     def on__idle(self, event):
         self.sender.sendMessage("You have been idle for too long. Closing section.")
         self.close()
+
+    def on_close(self, ex):
+        self._command = None
+        print("Closing delegate")
 
 class CustomThread(threading.Thread):
     def start(self):
@@ -119,7 +130,7 @@ class ChatBox(telepot.DelegatorBot):
             include_callback_query_chat_id(
                 pave_event_space())(
                     per_chat_id_in(self._seen, types='private'), create_open, MessageHandler, 
-                                    self._connector, timeout=60),
+                                    self._connector, timeout=30),
 
             # For senders never seen before, send him a welcome message.
             (self._is_newcomer, custom_thread(call(self._send_welcome))),
@@ -197,6 +208,21 @@ class IoTBot(GenericEndpoint):
                 if user["chatID"] != 0:
                     return user["chatID"]
             return 0
+
+    def isRegistered(self, chatID : int):
+        try:
+            params = {"SystemToken": self._SystemToken, "telegramID": chatID}
+            res = requests.get(self.ResourceCatalog_url + "/isRegistered", params=params)
+            res.raise_for_status()
+        except:
+            print("Connection Error\nImpossibile to reach the ResourceCatalog")
+            return ""
+        else:
+            res_dict = res.json()
+            if "CompanyName" in res_dict and res_dict["CompanyName"] != "":
+                return res_dict["CompanyName"]
+            else:
+                return ""
 
     def notify(self, topic, msg):
         try:

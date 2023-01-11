@@ -10,7 +10,6 @@ keyboardYESNO = InlineKeyboardMarkup(inline_keyboard=[[
 class InsertNewCompany():
     def __init__(self, chatID, sender, connector):
         self.chatID = chatID
-        self.completed = False
         self._connector = connector
         self._bot = sender
         self._status = 0
@@ -112,13 +111,13 @@ class InsertNewCompany():
 
         elif self._status == 9:
             if message == "yes":
-                if not self.insert_company():
-                    self._bot.sendMessage("Registration failed")
-                else:
+                if self.insert_company():
                     self._bot.sendMessage("Registration completed")
+                else:
+                    self._bot.sendMessage("Registration failed")
             else:
                 self._bot.sendMessage("Registration canceled")
-            self.completed = True
+            return True
             
     def insert_company(self):   
         try:
@@ -146,6 +145,9 @@ class InsertNewCompany():
                     self._bot.sendMessage(message)
                     return True
                 else:
+                    if "Error" in res_dict:
+                        if res_dict["Error"] == "Company already registered":
+                            self._bot.sendMessage("Company already registered")
                     print(f"Denied by the Resource Catalog\n")
                     return False
             except:
@@ -153,12 +155,11 @@ class InsertNewCompany():
                 return False
 
 class RegisterNewUser():
-    def __init__(self, chatID, sender, ResourceCatalog_url):
+    def __init__(self, chatID, sender, connector):
         self.chatID = chatID
-        self.ResourceCatalog_url = ResourceCatalog_url
+        self._connector = connector
         self._bot = sender
         self._status = 0
-        self._completed = False
         self.response = {}
         
         self.update("")
@@ -181,13 +182,33 @@ class RegisterNewUser():
             self._status += 1
 
         elif self._status == 1:
-            CompanyName = message
+            self.response["CompanyName"] = message
+            self._bot.sendMessage("Insert your Name")
+            self._status += 1
 
+        elif self._status == 2:
+            self.response["Name"] = message
+            self._bot.sendMessage("Insert your Surname")
+            self._status += 1
+        
+        elif self._status == 3:
+            self.response["Surname"] = message
+            self._bot.sendMessage("Insert your Company Token")
+            self._status += 1
 
+        elif self._status == 4:
+            self.response["CompanyToken"] = message
+
+            if self.insert_user():
+                return True
+            else:
+                self._bot.sendMessage("Registration failed")
+                return True
 
     def insert_user(self):
         try:
-            res = requests.post(self.ResourceCatalog_url + f"""/insert/user""", params=self.company, json=self.UserInfo)
+            res = requests.post(self._connector._ResourceCatalog_url + f"""/insert/user""", 
+                                    params=self.company, json=self.UserInfo)
             res.raise_for_status()
         except :
             print(f"Error in the connection with the Resource Catalog\n")

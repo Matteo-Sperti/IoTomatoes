@@ -246,6 +246,33 @@ class ResourceCatalogManager():
                         return json.dumps(publishedTopics(item), indent=4)
         raise web_exception(404, "Company not found")
 
+    def isRegistered(self, params : dict):
+        """Return True if the company specified in `CompanyInfo` is registered in the catalog.
+
+        Arguments: \n
+        `params {dict}` -- must contain the `SystemToken` and `telegramID`.
+        """
+        
+        out = {"CompanyName": ""}
+        if self.systemAuthorize(params):
+            if "telegramID" in params:
+                CompanyName = self.findUserByTelegramID(params["telegramID"])
+                if CompanyName != None:
+                    out["CompanyName"] = CompanyName
+                    return json.dumps(out, indent=4)
+                else:
+                    out["CompanyName"] = ""
+                    return json.dumps(out, indent=4)
+            else:
+                raise web_exception(400, "Missing telegramID")
+
+    def findUserByTelegramID(self, telegramID : str):
+        for company in self.catalog[companyList_name]:
+            for user in company[usersList_name]:
+                if user["telegramID"] == telegramID:
+                    return company["CompanyName"]
+        return None
+
     def insertCompany(self, CompanyInfo : dict, AdminInfo : dict):
         """Insert a new company in the catalog.
 
@@ -261,7 +288,7 @@ class ResourceCatalogManager():
         if self.systemAuthorize(CompanyInfo):
             if self.findCompany(CompanyInfo) != None:
                 out["Status"] = False
-                out["Error"] = "Company already present"
+                out["Error"] = "Company already registered"
             else:
                 if all(key in CompanyInfo for key in ["CompanyName", "CompanyToken"]):
                     ID = self._IDs.get_ID()
@@ -328,6 +355,13 @@ class ResourceCatalogManager():
         """
         company = self.findCompany(CompanyInfo)
         if company != None:
+            if "telegramID" not in userInfo:
+                raise web_exception(400, "Missing telegramID")
+
+            CompanyName = self.findUserByTelegramID(userInfo["telegramID"])
+            if CompanyName != None:
+                raise web_exception(500, f"User already registered in {CompanyName}")
+
             ID = self._IDs.get_ID()
             if ID == -1:
                 raise web_exception(500, "No more IDs available")
@@ -463,6 +497,8 @@ class RESTResourceCatalog(GenericEndpoint):
                     return self.catalog.getCompany(CompanyInfo)
                 elif len(uri) == 1 and uri[0] == "companiesName":
                     return self.catalog.getCompanyNameList(params)    
+                elif len(uri) == 1 and uri[0] == "isRegistered":
+                    return self.catalog.isRegistered(params)
                 elif len(uri) == 1 and uri[0] == "all":
                     return self.catalog.getAll(params)
                 elif len(uri) == 1 and uri[0] == "get":

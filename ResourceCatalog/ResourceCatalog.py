@@ -246,6 +246,18 @@ class ResourceCatalogManager():
                         return json.dumps(publishedTopics(item), indent=4)
         raise web_exception(404, "Company not found")
 
+    def getCompanyToken(self, dict_ : dict):
+        """Return the token of the company specified by `CompanyName` in json format.
+
+        Arguments: \n
+        `dict_` -- the information about the company.
+        Must contain the `CompanyName` and `SystemToken`.
+        """
+        company = self.findCompany(dict_)
+        if company != None:
+            return json.dumps({"CompanyToken": company["CompanyToken"]}, indent=4)
+        raise web_exception(404, "Company not found")
+
     def isRegistered(self, params : dict):
         """Return True if the company specified in `CompanyInfo` is registered in the catalog.
 
@@ -334,7 +346,7 @@ class ResourceCatalogManager():
                 except InfoException as e:
                     raise web_exception(500, e.message)
 
-                if not (new_item["field"] > 1 and new_item["field"] <= company["NumberOfFields"]) :
+                if not (new_item["field"] > 0 and new_item["field"] <= company["NumberOfFields"]) :
                     raise web_exception(400, "Field number not valid")
                 company[devicesList_name].append(new_item)
                 out = {"ID": ID}
@@ -500,6 +512,8 @@ class RESTResourceCatalog(GenericEndpoint):
                     return self.catalog.getCompany(CompanyInfo)
                 elif len(uri) == 1 and uri[0] == "companiesName":
                     return self.catalog.getCompanyNameList(params)    
+                elif len(uri) == 1 and uri[0] == "CompanyToken":
+                    return self.catalog.getCompanyToken(params)
                 elif len(uri) == 1 and uri[0] == "isRegistered":
                     return self.catalog.isRegistered(params)
                 elif len(uri) == 1 and uri[0] == "all":

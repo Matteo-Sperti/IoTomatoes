@@ -2,6 +2,7 @@ import json
 import cherrypy
 import time
 import sys
+import requests
 from socket import gethostname, gethostbyname
 
 sys.path.append("../SupportClasses/")
@@ -74,6 +75,21 @@ class ServiceCatalogManager:
             return json.dumps({"telegramToken": self.catalog["telegramToken"]}, indent=4)
         except KeyError:
             raise web_exception(404, "Telegram token not found")
+
+    @property
+    def ResourceCatalog_url(self):
+        """Return the ResourceCatalog url in json format."""
+
+        try:
+            for service in self.catalog[serviceList_Name]:
+                if service["serviceName"] == "ResourceCatalog":
+                    url = getIPaddress(service)
+                    if url != "":
+                        return url
+        except KeyError:
+            raise web_exception(404, "ResourceCatalog url not found")
+        else:
+            raise web_exception(404, "ResourceCatalog url not found")
 
     def get_all(self):
         """Return a json with all the services"""
@@ -253,6 +269,27 @@ class RESTServiceCatalog():
         self._systemToken = settings["SystemToken"]
         self.ServiceCatalog = ServiceCatalogManager(heading, settings["filename"], settings["autoDeleteTime"])
 
+    def isAuthorize(self, credential : dict):
+        if "SystemToken" in credential:
+            if credential["SystemToken"] == self._systemToken:
+                return True
+
+        if "CompanyName" in credential and "CompanyToken" in credential:
+            try:
+                param = {"CompanyName": credential["CompanyName"], "SystemToken": self._systemToken}
+                url = self.ServiceCatalog.ResourceCatalog_url
+                res = requests.get(url +"/CompanyToken", params=param)
+                res.raise_for_status()
+                res_dict = res.json()
+            except:
+                return False
+            else:
+                if "CompanyToken" in res_dict:
+                    if res_dict["CompanyToken"] == credential["CompanyToken"]:
+                        return True
+
+        return False
+
     def GET(self, *uri, **params):
         """REST GET method.
 
@@ -264,7 +301,7 @@ class RESTServiceCatalog():
         `/search/<info>?<info>=<value>` to search a service by info.
         """
         try:
-            if "SystemToken" not in params or params["SystemToken"] != self._systemToken:
+            if not self.isAuthorize(params):
                 raise web_exception(401, "Unauthorized")
 
             if len(uri) == 0:
@@ -280,6 +317,9 @@ class RESTServiceCatalog():
                 return self.ServiceCatalog.broker
             elif len(uri) == 1 and uri[0] == "telegram":
                 return self.ServiceCatalog.telegramToken
+            elif len(uri) == 1 and uri[0] == "ResourceCatalog_url":
+                out = {"ResourceCatalog_url": self.ServiceCatalog.ResourceCatalog_url}
+                return json.dumps(out, indent=4)
             elif len(uri) == 2 and uri[0] == "search":
                 if uri[1] in params:
                     return self.ServiceCatalog.search(uri[1], params[uri[1]])
@@ -305,7 +345,7 @@ class RESTServiceCatalog():
         `/refresh?ID=<ID>` to refresh the lastUpdate field of a service by ID.\n
         """
         try:
-            if "SystemToken" not in params or params["SystemToken"] != self._systemToken:
+            if not self.isAuthorize(params):
                 raise web_exception(401, "Unauthorized")
             
             if len(uri) == 1 and uri[0] == "update":
@@ -335,7 +375,7 @@ class RESTServiceCatalog():
         The body of the request must contain the new service info.
         """
         try:
-            if "SystemToken" not in params or params["SystemToken"] != self._systemToken:
+            if not self.isAuthorize(params):
                 raise web_exception(401, "Unauthorized")
 
             if len(uri) == 1 and uri[0] == "save":
@@ -360,7 +400,7 @@ class RESTServiceCatalog():
         `/delete?ID=<ID>` to delete a service by ID.
         """
         try:
-            if "SystemToken" not in params or params["SystemToken"] != self._systemToken:
+            if not self.isAuthorize(params):
                 raise web_exception(401, "Unauthorized")
 
             if len(uri) == 1 and uri[0] == "delete":

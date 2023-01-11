@@ -46,7 +46,12 @@ class MessageHandler(telepot.helper.ChatHandler):
         super(MessageHandler, self).__init__(seed_tuple, **kwargs)
         self._connector = connector
         self._command = None
-        self._chat_id = seed_tuple[1]['chat']['id']
+
+        try:
+            self._chat_id = seed_tuple[1]['chat']['id']
+        except:
+            self._chat_id = 0
+            
         self._CompanyName = self._connector.isRegistered(self._chat_id)
         print(self._CompanyName)
 
@@ -131,7 +136,7 @@ class ChatBox(telepot.DelegatorBot):
             include_callback_query_chat_id(
                 pave_event_space())(
                     per_chat_id_in(self._seen, types='private'), create_open, MessageHandler, 
-                                    self._connector, timeout=30),
+                                    self._connector, timeout=300),
 
             # For senders never seen before, send him a welcome message.
             (self._is_newcomer, custom_thread(call(self._send_welcome))),

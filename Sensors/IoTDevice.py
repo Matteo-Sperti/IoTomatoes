@@ -11,8 +11,7 @@ class IoTDevice(GenericEndpoint):
     def __init__(self, DeviceInfo : dict, Ambient : AmbientSimulator, measureTimeInterval : int = 3):
         super().__init__(DeviceInfo, isResource=True)
         self._Ambient = Ambient
-        self._SendThread = MyThread(self.run, self.ID, measureTimeInterval)
-        
+        print("sono qui")
         self._message={
             "companyName" : getCompanyName(self._CompanyInfo),
             "bn" : 0,
@@ -24,6 +23,8 @@ class IoTDevice(GenericEndpoint):
                 "timestamp": None
             }]
         }
+        print(self._message)
+        self._SendThread = MyThread(self.run, measureTimeInterval)
 
     def start(self):
         self.start()
@@ -39,33 +40,33 @@ class IoTDevice(GenericEndpoint):
     def run(self):
         for topic in publishedTopics(self._EndpointInfo):
             message = eval(f"self.get_{topic.split('/')[-1]}()")
-            self.myPublish(topic, message)
+            self.myPublish(self._baseTopic+topic, message)
     
     def construct_message(self, measure : str, unit : str) :
         message=self._message
         message["bn"]=self.ID
-        message["e"][1]["name"] = measure
-        message["e"]["value"] = 0
-        message["e"]["timestamp"] = time.time()
-        message["e"]["unit"] = unit
+        message["e"][-1]["name"] = measure
+        message["e"][-1]["value"] = 0
+        message["e"][-1]["timestamp"] = time.time()
+        message["e"][-1]["unit"] = unit
         return message
 
     def get_temperature(self):
         message = self.construct_message("temperature", "°C")
-        message["e"]["value"] = self._Ambient.get_temperature()
+        message["e"][-1]["value"] = self._Ambient.get_temperature()
         return message
 
     def get_humidity(self):
         message = self.construct_message("humidity", "%")
-        message["e"]["value"] = self._Ambient.get_humidity()
+        message["e"][-1]["value"] = self._Ambient.get_humidity()
         return message
 
     def get_light(self):
         message = self.construct_message("light", "lx") #1 lux = 1 lumen/m2
-        message["e"]["value"] = self._Ambient.get_light()
+        message["e"][-1]["value"] = self._Ambient.get_light()
         return message
 
     def get_soilMoisture(self):
         message = self.construct_message("soilMoisture", "%")
-        message["e"]["value"] = self._Ambient.get_soilMoisture()
+        message["e"][-1]["value"] = self._Ambient.get_soilMoisture()
         return message

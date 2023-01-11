@@ -17,7 +17,6 @@ class RefreshThread(MyThread):
         `interval {int}`: refresh interval in seconds (default = 60).\n
         `CompanyInfo {dict}`: Company information (default = {}), needed only if the item is a resource.
         """
-        print("RefreshThread init")
 
         self._url = url
         self._ID = ID
@@ -184,20 +183,19 @@ class GenericEndpoint():
 
         while True:
             try:
-                params = {"SystemToken": self._SystemToken, 
-                        "serviceName": "ResourceCatalog"}
-                res = requests.get(self.ServiceCatalog_url + "/search/serviceName", params = params)
+                if self._isService:
+                    params = {"SystemToken": self._SystemToken}
+                else:
+                    params = self._CompanyInfo
+                res = requests.get(self.ServiceCatalog_url + "/ResourceCatalog_url", params = params)
                 res.raise_for_status()
             except:
                 print(f"Connection Error\nRetrying connection\n")
                 time.sleep(1)
             else:
                 try:
-                    res_dict = res.json()[0]
-                    serviceDetails = res_dict["servicesDetails"]
-                    for services in serviceDetails:
-                        if services["serviceType"] == "REST":
-                            return services["serviceIP"]
+                    res_dict = res.json()
+                    return res_dict["ResourceCatalog_url"]
                 except:
                     print(f"Error in the Resource information\nRetrying connection\n")
                     time.sleep(1)
@@ -207,7 +205,10 @@ class GenericEndpoint():
 
         while True:
             try:
-                params = {"SystemToken": self._SystemToken}
+                if self._isService:
+                    params = {"SystemToken": self._SystemToken}
+                else:
+                    params = self._CompanyInfo
                 res = requests.get(self.ServiceCatalog_url + "/broker", params=params)
                 res.raise_for_status()
             except:

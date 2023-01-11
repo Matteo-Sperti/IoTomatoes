@@ -36,8 +36,7 @@ def getDevicesList(ResourceCatalog_url : str, SystemToken: str, isActuator : boo
 		print("Error, Resource Catalog not reachable")
 		return []
 	else:
-		CompanyList = r.json()   
-		print(CompanyList)      
+		CompanyList = r.json()      
 		deviceList = createDeviceList(CompanyList, isActuator)
 
 		return deviceList

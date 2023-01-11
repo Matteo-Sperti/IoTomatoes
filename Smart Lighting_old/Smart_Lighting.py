@@ -107,21 +107,21 @@ class SmartLighting:
                 
                 sunriseHour=int(Sunrise.split(":")[0]) #retrieves sunrise hour
                 sunriseMinutes=int(Sunrise.split(":")[1]) #retrieves sunrise minutes
-                sunriseTotMinutes=sunriseHour*60+sunriseMinutes
+                sunrise=datetime.time(sunriseHour,sunriseMinutes,0)
 
                 sunsetHour=int(Sunset.split(":")[0]) #retrieves sunset hour
                 sunsetMinutes=int(Sunset.split(":")[1])#retrieves sunset minutes
-                sunsetTotMinutes=sunsetHour*60+sunsetMinutes
+                sunset=datetime.time(sunsetHour,sunsetMinutes,0)
 
-                currentHour=int(datetime.datetime.now().hour)
-                currentMinutes=int(datetime.datetime.now().minute)
-                currentToTMinutes=currentHour*60+currentMinutes
+                #currentTime=datetime.datetime.now().time
+                currentTime=datetime.time(16,0,0) #per fare le prove
+                
 
                 
                 #CONTROL ALGORITHM:
                 #controllo DA SCHEDULARE dall'inizio dell'alba al tramonto (LA NOTTE NO, COSI SI LASCIA UN
                 # CICLO LUCE/BUIO ALLE PIANTE PER LA FOTOSINTESI)
-                if (currentToTMinutes)>=sunriseTotMinutes and (currentToTMinutes)<=sunsetTotMinutes:
+                if currentTime>=sunrise and currentTime<=sunset:
 
                     if cloudCover>=60:  #cosi se temporaneamente passa una nuvola che abbassa troppo il valore di luce non si accendono comunque
                         print("LIGHTING MAKE SENSE")

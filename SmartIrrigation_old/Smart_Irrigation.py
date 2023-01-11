@@ -102,17 +102,19 @@ class SmartIrrigation:
                 previousSoilMoisture=float(rValues[0])
                 currentSoilMoisture=float(rValues[1])
                 
-                currentHour=datetime.datetime.now().hour
-                forecast=self.callWeatherService(currentHour)
+                currentTime=datetime.datetime.now().time()
+                forecast=self.callWeatherService(currentTime.hour)
                 soilMoistureForecast=forecast[0]
                 dailyPrecipitationSum=forecast[1]
                 
                 currentSoilMoisture=round((3*currentSoilMoisture+soilMoistureForecast)/4,2) #integration sensor measure with the weather forecast one
-
+                maxLimitTemp=datetime.time(23,59,0)
+                minLimitTemp=datetime.time(20,0,0)
+                
                 #CONTROL ALGORITHM:
                 #controllo schedulato per la sera (quindi sappiamo già complessivamente se durante il giorno ha piovuto)
         
-                if currentHour in list(range(00,24,1)): ###### MODIFICA: PORRE IL RANGE IN [21,24]
+                if currentTime>=minLimitTemp and currentTime<=maxLimitTemp:
 
                     #PRECIPITATIONS CONTROL:
                     if dailyPrecipitationSum>precipitationLimit:    #soil too moist

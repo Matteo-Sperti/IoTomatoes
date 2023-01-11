@@ -1,7 +1,7 @@
 {
     "potatoes":{
         "lightLimit": {
-            "min":57000,
+            "min":20000,
             "max":60000
         }
     },

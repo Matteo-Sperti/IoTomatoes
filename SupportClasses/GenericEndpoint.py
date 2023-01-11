@@ -83,6 +83,7 @@ class GenericEndpoint():
             self._MQTTclient = isMQTT(self._EndpointInfo)
             if self._MQTTclient:
                 self._subscribedTopics = subscribedTopics(self._EndpointInfo)
+                self._publishedTopics = publishedTopics(self._EndpointInfo)
                 self.start_MQTTclient()
 
     def stop(self):

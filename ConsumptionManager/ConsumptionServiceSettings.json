@@ -1,0 +1,16 @@
+{
+    "ServiceCatalog_url" : "http://127.0.0.1:8080",
+    "SystemToken": "IoTomatoes_1234567890",
+    "serviceName" : "Consumption Management",
+    "IPport" : 8085,
+    "availableServices" : [
+        "MQTT"
+    ],
+    "servicesDetails" : [
+        {
+            "serviceType": "MQTT",
+            "subscribedTopics": ["+/+/+/led", "+/+/+/pump"],
+            "publishedTopics": ["TelegramBot/ErrorReported", "TelegramBot/deviceUpdate"]
+        }
+    ]
+}

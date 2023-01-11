@@ -2,6 +2,7 @@ import cherrypy
 import requests
 from statistics import mean
 import numpy.random as numpy
+import json
 
 #WEBSERVICE VELOCE SOLO PER TESTARE LA RICEZIONE DELLA MEDIA SMART IRRIGATION
 class mongoDB():
@@ -10,8 +11,20 @@ class mongoDB():
         pass
 
     def GET(self,*uri,**params):
-        lista=[25, 65, 48, 27, 84, 65, 46, 12, 23, 78]
-        return f"{mean(lista)}"
+        if uri[0]=="increasing":
+            currentValue=numpy.randint(55,70)
+            previousValue=currentValue-5
+        elif uri[0]=="decreasing":
+            currentValue=numpy.randint(55,70)
+            previousValue=currentValue-5
+        elif uri[0]=="equal":
+            currentValue=numpy.randint(55,70)
+            previousValue=currentValue
+        dictionary={
+            "previousValue":previousValue,
+            "currentValue":currentValue
+        }
+        return json.dumps(dictionary)
         
 
 if __name__=="__main__":
@@ -22,8 +35,7 @@ if __name__=="__main__":
                 'tool.session.on': True
             }
         }
-    mongolo=mongoDB()
-    cherrypy.tree.mount(mongolo, "/", conf)
-    cherrypy.config.update({'server.socket_port': 8081})
+    mongo=mongoDB()
+    cherrypy.tree.mount(mongo, "/", conf)
     cherrypy.engine.start()
     cherrypy.engine.block()

@@ -1,0 +1,50 @@
+{
+    "potatoes":{
+        "lightLimit": {
+            "min":57000,
+            "max":60000
+        }
+    },
+    "tomatoes":{
+        "lightLimit": {
+            "min":29000,
+            "max":68000
+        }
+    },
+    "carrots":{
+        "lightLimit": {
+            "min":35000,
+            "max":70000
+        }
+    },
+    "eggplant":{
+        "lightLimit": {
+            "min":36000,
+            "max":62000
+        }
+    },
+    "corn":{
+        "lightLimit": {
+            "min":22000,
+            "max":47000
+        }
+    },
+    "garlic":{
+        "lightLimit": {
+            "min":35000,
+            "max":60000
+        }
+    },
+    "onion":{
+        "lightLimit": {
+            "min":20000,
+            "max":55000
+        }
+    },
+    "lettuce":{
+        "lightLimit": {
+            "min":30000,
+            "max":65000
+        }
+    }
+}

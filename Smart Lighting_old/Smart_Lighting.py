@@ -1,37 +1,39 @@
 import paho.mqtt.client as mqtt
-import cherrypy
 import time
 from statistics import mean
 import requests
 import json
+import datetime
+
+
 
 class SmartLighting:
 
-    def __init__(self,serviceID="Smart Irrigation"):
+    def __init__(self):
         """Inizializzazione della classe del servizio (da adattare in seguito)"""
-        self.serviceID=serviceID
-        self.sensor_topic="IoTomatoes/+/+/light/+/measure" #IoTomatoes/companyName/field/typeMeasure/deviceID/measure
+        self.serviceID="Lighting"
+        self.commandTopic="IoTomatoes/"
         self.broker="test.mosquitto.org"
         self.port=1883
 
         self.message={
             "bn":"",
-            "field":"",
-            "command":"",
-            "timeStamp":""
+            "e":{
+                "field":"",
+                "command":"",
+                "timeStamp":""
+            }
         }
         
-        self.service_mqtt=mqtt.Client(serviceID,True)
+        self.service_mqtt=mqtt.Client(self.serviceID,True)
 
         #CALL BACK
         self.service_mqtt.on_connect=self.myOnConnect
-        self.service_mqtt.on_message=self.myOnMessage
 
     def start(self):
         """Connects and subscribes the sensor to the broker"""
         self.service_mqtt.connect(self.broker,self.port)
         self.service_mqtt.loop_start()
-        self.service_mqtt.subscribe(self.sensor_topic,2)
     
     def myOnConnect(self,client,userdata,flags,rc):
         """It provides information about Connection result with the broker"""
@@ -43,124 +45,161 @@ class SmartLighting:
         }
              
         print(dic[str(rc)])
-    
-    def myOnMessage(self,client,userdata,message):
-        """Riceives measures from a specific topic and temporary storeS them in a
-         json file for processing"""
-        self.payload=json.loads(message.payload)
-        #print(self.payload)
-        
-        companyName=self.payload["companyName"]
-        fieldID=self.payload["field"]
-        measure=self.payload["e"]["value"] #extract the measure value from MQTT message
-
-        with open("lightInformation.json") as outfile:
-            information=json.load(outfile)
-
-        if companyName in information["company"]:
-            position=information["company"].index(companyName)
-
-            information["companyList"][position]["fields"][fieldID-1]["light"]["values"].append(measure) #insert the measure value in the json file
-            information["companyList"][position]["fields"][fieldID-1]["light"]["lastUpdate"]=time.time() #update the lastUpdate value in the json file
-        try:
-            with open("lightInformation.json","w") as outfile:
-                json.dump(information, outfile, indent=4)
-        except FileNotFoundError:
-            print("ERROR: file not found")
 
 
     def control(self):
-        """Extracts measures from the json file, compute the mean value of each type of measure
-        and perform the control function"""
+        """It performs:
+        - Call to resource catalog -> to retrieve information about each field for each company
+        - Call to MongoDB to retrieve information about last hour measures (currentLigh) and previous hour measures 
+          (previousLight)
+        - Call to Weather forecast service to retrieve information about current cloudcover percentage, sunrise hour and sunset hour
+        With these information it performs a simple control strategy to check if the light is under a fixed threshold"""
 
         message=self.message
+        ####MODIFICA: inserire chiamata al resource catalog per ottenere le informazioni relative a
+        #   -COMPANY
+        #   -FIELD ID
+        #   -TIPO DI PIANTA
+        company="Andrea"
+        fieldID=1
+        plant="potatoes"
+        message["e"]["command"]="" #per ogni field il messaggio deve essere vuoto
+
 
         try:
-            with open("lightInformation.json") as outfile:
-                information=json.load(outfile)          #extract all the information from the json
+            with open("lightThreshold.json") as outfile:
+                lightInfo=json.load(outfile)          
         except FileNotFoundError:
             print("ERROR: file not found")
 
-        for company in information["companyList"]:
-            companyName=company["companyName"]
-            positionCompany=information["company"].index(companyName)   #indicates position index of the single company inside the list of all companies
-            print(f"company={positionCompany+1}")
 
-            for field in company["fields"]:
-                message["command"]=""   #per ogni field il messaggio deve essere vuoto, altrimenti si considera di default il messaggio arrivato al campo precedente
+        if plant in list(lightInfo.keys()):
+            limits=lightInfo[plant]
+            minLight=limits["lightLimit"]["min"]    #extract the ideal min value of light for the given plant from the json file 
+            maxLight=limits["lightLimit"]["max"]    #extract the ideal max value of light for the given plant from the json file
+
+        #IN FUTURO:
+            # richiesta al service catalog per url mongodb e poi:
+            # r=requests.get("URL_MONGODB/media?hour=1") ESPRIMERE BENE L'URL E I PARAMETRI IN RELAZIONE A COME COSTRUISCE IL SERVIZIO LUCA
+            try:
+                r=requests.get("http://127.0.0.1:8080/decreasing") #richiesta al MongoDBSimulator, da sostituire con il vero mongoDB
+                r.raise_for_status()
+            except requests.exceptions.InvalidURL as errURL:
+                print(errURL)
+            except requests.exceptions.HTTPError as errHTTP:
+                print(errHTTP)
+            except requests.exceptions.ConnectionError:
+                print("503: Connection error. Server unavailable ")
+            
+            else:
+                rValues=list((r.json()).values())
+                previousLight=float(rValues[0])
+                currentLight=float(rValues[1])
                 
-                fieldID=field["fieldID"]    #indicates position index of the field inside the list of all field for a single company 
-                print(f"campo={fieldID}")
-                minIdealLight=field["idealLight"]["min"]
-                maxIdealLight=field["idealLight"]["max"]
-
-                previousLight=field["light"]["previousValue"]
-
-                #MODIFICA: DA FAR ESEGUIRE A MONGODB (IMPLEMENTARE GET PER RICEVERE LA MEDIA)
-                try:
-                    currentLight=round(mean(field["light"]["values"]),2)    #compute the mean value of received light measures
-                except:
-                    print("MeanError: necessario almeno un dato per il calcolo della media")
+                currentHour=datetime.datetime.now().hour
+                forecast=self.callWeatherService(currentHour)
+                cloudCover=forecast[0]
+                lightForecast=forecast[1]
+                Sunrise=forecast[2]
+                Sunset=forecast[3]
                 
-                #AGGIUNGERE INTEGRAZIONE CURRENTLIGHT CON QUELLA OTTENUTA DAL WEATHER FORECAST
+                currentLight=round((3*currentLight+lightForecast)/4,2) #integration sensor measure with the weather forecast one
                 
+                sunriseHour=int(Sunrise.split(":")[0]) #retrieves sunrise hour
+                sunriseMinutes=int(Sunrise.split(":")[1]) #retrieves sunrise minutes
+                sunriseTotMinutes=sunriseHour*60+sunriseMinutes
 
+                sunsetHour=int(Sunset.split(":")[0]) #retrieves sunset hour
+                sunsetMinutes=int(Sunset.split(":")[1])#retrieves sunset minutes
+                sunsetTotMinutes=sunsetHour*60+sunsetMinutes
 
+                currentHour=int(datetime.datetime.now().hour)
+                currentMinutes=int(datetime.datetime.now().minute)
+                currentToTMinutes=currentHour*60+currentMinutes
 
+                
                 #CONTROL ALGORITHM:
-                
-                #CONTROLLO CONTINUO DURANTE TUTTA LA GIORNATA
+                #controllo DA SCHEDULARE dall'inizio dell'alba al tramonto (LA NOTTE NO, COSI SI LASCIA UN
+                # CICLO LUCE/BUIO ALLE PIANTE PER LA FOTOSINTESI)
+                if (currentToTMinutes)>=sunriseTotMinutes and (currentToTMinutes)<=sunsetTotMinutes:
 
-                print(f"limite OFF={maxIdealLight}")
-                print(f"limite ON={minIdealLight}")
-                print(f"current value light={currentLight} lux")
-                
-                if currentLight>previousLight:
-                    print("light sta aumentando")
-                    if currentLight>=maxIdealLight:
-                        print(f"""visto che light corrente:
-                        {currentLight}>={maxIdealLight}""")
-                        print("LUCI SPENTE")
-                        message["command"]="OFF"
+                    if cloudCover>=60:  #cosi se temporaneamente passa una nuvola che abbassa troppo il valore di luce non si accendono comunque
+                        print("LIGHTING MAKE SENSE")
+                        print(f"OFF threshold={maxLight}")
+                        print(f"ON threshold={minLight}")
+                        print(f"current value light={currentLight}")
+                        print(f"previous value light={previousLight}")
                         
-                    else:
-                        print(f"""visto che light corrente:
-                        {currentLight}<{maxIdealLight}""")
-                        print("LUCI ACCESE")
-                        message["command"]="ON"
-                        
+                        #1) POSSIBILE CONTROL LAW IPOTIZZANDO CHE LE MISURE DEI SENSORI DI LUCE NON VENGANO INFLUENZATE DALLE LUCI ARTIFICIALI: 
+                        # if currentLight>previousLight:
+                        #     print("light is increasing")
+                        #     if currentLight>=maxLight:
+                        #         print(f"""current light over/on the OFF limit: {currentLight}>={maxLight}""")
+                        #         print("light set to OFF")
+                        #         message["e"]["command"]="OFF"
+                                
+                        #     else:
+                        #         print(f"""current light under the OFF limit: {currentLight}<{maxLight}""")
+                        #         print("light set to ON")
+                        #         message["e"]["command"]="ON"
+                                
 
-                elif currentLight<previousLight:
-                    print(f"light sta diminuendo, previousValue={previousLight}")
-                    if currentLight<=minIdealLight:
-                        print(f"""visto che il light corrente:
-                        {currentLight}<={minIdealLight}""")
-                        print("LUCI ACCESE")
-                        message["command"]="ON"
+                        # elif currentLight<previousLight:
+                        #     print("light is decreasing")
+                        #     if currentLight<=minLight:
+                        #         print(f"""current light under/on the ON limit: {currentLight}<={minLight}""")
+                        #         print("light set to ON")
+                        #         message["e"]["command"]="ON"
+                                
+                        #     else:
+                        #         print(f"current light over the ON limit: {currentLight}>{minLight}""")
+                        #         print("light set to OFF")
+                        #         message["e"]["command"]="OFF"
+                                
+                        # else:
+                        #     print("costant light")
+                        #     if currentLight>maxLight:
+                        #         print("light set to OFF")
+                        #         message["e"]["command"]="OFF"
+                                
+                        #     elif currentLight<minLight:
+                        #         print("light set to ON")
+                        #         message["e"]["command"]="ON"
+                        #
+                        #2) CONTROL LAW MONOSOGLIA:
+                        if currentLight<=minLight:
+                            print("light set to ON")
+                            message["e"]["command"]="ON"
                         
+                        else:
+                            print("light set to OFF")
+                            message["e"]["command"]="OFF"
+
                     else:
-                        print(f"""visto che light corrente:
-                        {currentLight}>{minIdealLight}""")
-                        print("LUCI SPENTE")
-                        message["command"]="OFF"
-                        
+                        print("LIGHTING DOES NOT MAKE SENSE")
+                        print("light set to OFF")
+                        message["e"]["command"]="OFF"
+
                 else:
-                    print("light costante")
-                    if currentLight>maxIdealLight:
-                        print("LUCI SPENTE")
-                        message["command"]="OFF"
-                        
-                    elif currentLight<minIdealLight:
-                        print("LUCI ACCESE")
-                        message["command"]="ON"
+                    print("IT'S NIGHT")
+                    print("light set to OFF")
+                    message["e"]["command"]="OFF"
+                
+                message["bn"]=company
+                message["e"]["field"]=fieldID
+                message["e"]["timeStamp"]=time.time()
+                
+                print(f"message= {message}\n")
 
-                print("\n")   
-                del information["companyList"][positionCompany]["fields"][fieldID-1]["light"]["values"][0:-1] #delete all but one of the used light measures
+                #MODIFICA: INVIO MESSAGGIO A OGNI TOPIC DEL CAMPO
+                commandTopic=self.commandTopic+str(company)+"/"+str(fieldID)+"/1/light"
+                print(f"command Topic={commandTopic}\n\n")
+                self.service_mqtt.publish(commandTopic,json.dumps(message))
+        else:
+            print("No crop with the specified name")
 
-                with open("lightInformation.json","w") as outfile:
-                    json.dump(information, outfile, indent=4)       #update the json file
 
-    
+
     def stop(self):
         """Unsubscribes and disconnects the sensor from the broker"""
         self.service_mqtt.unsubscribe(self.sensor_topic)
@@ -168,26 +207,61 @@ class SmartLighting:
         self.service_mqtt.disconnect()
 
 
-    
 
+    def callWeatherService(self,hour):
+        """It gets precipitations informations from weather forecast service and extract:
+            - daily precipitation sum
+            - soil moisture forecast
+            from the received json file"""
+        ####MODIFICA: RICAVARE I DATI DAL WEATHER FORECAST ATTRAVERSO LA CHIAMATA AL SERVICE CATALOG
+        # try:
+        #     serviceCatalog_r=requests.get("") #richiesta al serviceCatalog per URL weather forecast
+        #     serviceCatalog_r.raise_for_status()
 
+        # except requests.exceptions.InvalidURL as errURL:
+        #     print(errURL)
+        # except requests.exceptions.HTTPError as errHTTP:
+        #     print(errHTTP)
+        # except requests.exceptions.ConnectionError:
+        #     print("503: Connection error. Server unavailable ")
 
+        # else:
+        #     try:
+        #         weatherService_r=requests.get("") #richiesta al weather forecast per le informazioni, restituisce un file json
+        # except requests.exceptions.InvalidURL as errURL:
+        #     print(errURL)
+        # except requests.exceptions.HTTPError as errHTTP:
+        #     print(errHTTP)
+        # except requests.exceptions.ConnectionError:
+        #     print("503: Connection error. Server unavailable ")
+
+        #     else:
+        #         weatherService_r=weatherService_r.json()
+        
+        #PER ORA I DATI SONO PRESI SEMPLICEMENTE DA UN FILE
+        weatherService_r=json.load(open("outputLighting.json"))
+        light=weatherService_r["hourly"]["sunLight"][hour]
+        sunrise=weatherService_r["daily"]["sunrise"][0]
+        sunset=weatherService_r["daily"]["sunset"][0]
+        sunrise=sunrise.split("T")[1]
+        sunset=sunset.split("T")[1]
+        cloudCover=weatherService_r["hourly"]["cloudcover"][hour]
+        
+        return [cloudCover,light,sunrise,sunset] 
+        
 
 
 
 if __name__=="__main__":
 
-    conf={
-        "/":{
-                'request.dispatch': cherrypy.dispatch.MethodDispatcher(),
-                'tool.session.on': True
-            }
-        }
     lighting=SmartLighting()
     lighting.start()
-    cherrypy.tree.mount(lighting, "/SmartLighting", conf)
-    cherrypy.engine.start()
+
     
     while True:
-        lighting.control()
-        time.sleep(15)
+        try:
+            lighting.control()
+            time.sleep(20)
+        except KeyboardInterrupt:
+            lighting.stop()
+            break

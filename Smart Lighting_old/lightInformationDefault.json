@@ -1,76 +1,63 @@
 {
-    "company": [
-        "Andrea",
-        "Federico"
-    ],
-    "companyList": [
-        {
-            "companyName": "Andrea",
+    "companyList": {
+        "Andrea": {
             "fieldsNumber": 1,
+            "fieldIDList": [
+                1
+            ],
             "fields": [
                 {
                     "fieldID": 1,
                     "plantType": "tomatoes",
-                    "idealLight": {
+                    "lightLimit": {
                         "min":41000,
                         "max":60000
                     },
-                    "light": {
-                        "values": [
-                            44650,
-                            47050,
-                            43540,
-                            40030,
-                            43840
-                        ],
-                        "unit":"lx",
+                    "lightMeasures": {
+                        "currentValues":25000,
                         "previousValue":45000,
+                        "unit":"lx",
                         "lastUpdate": 1672352950.996713
                     }
                 }
             ]
         },
-        {
-            "companyName": "Federico",
+        "Federico": {
             "fieldsNumber": 2,
+            "fieldIDList": [
+                1,
+                2
+            ],
             "fields": [
                 {
                     "fieldID": 1,
                     "plantType": "potatoes",
-                    "idealLight":{
-                        "min":45000,
-                        "max":75000
+                    "lightLimit": {
+                        "min":41000,
+                        "max":60000
                     },
-                    "light": {
-                        "values": [
-                            44840,
-                            48230,
-                            43730,
-                            44630,
-                            45790
-                        ],
+                    "lightMeasures": {
+                        "currentValues":25000,
+                        "previousValue":45000,
                         "unit":"lx",
-                        "previousValue":50000,
-                        "lastUpdate": 1672352952.386986
+                        "lastUpdate": 1672352950.996713
                     }
                 },
                 {
                     "fieldID": 2,
                     "plantType": "tomatoes",
-                    "idealLight": {
+                    "lightLimit": {
                         "min":41000,
                         "max":60000
                     },
-                    "light": {
-                        "values": [
-                            54000
-                        ],
+                    "lightMeasures": {
+                        "currentValues":25000,
+                        "previousValue":45000,
                         "unit":"lx",
-                        "previousValue":50000,
-                        "lastUpdate": ""
+                        "lastUpdate": 1672352950.996713
                     }
                 }
             ]
         }
-    ]
+    }
 }

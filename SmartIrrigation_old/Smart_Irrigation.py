@@ -65,7 +65,8 @@ class SmartIrrigation:
         #   -TIPO DI PIANTA
         company="Andrea"
         fieldID=1
-        plant="potatoes"    
+        plant="potatoes"   
+        message["e"]["command"]=""  #per ogni field il messaggio dovrà essere vuoto
 
         try:
             with open("plantThreshold.json") as outfile:
@@ -204,21 +205,21 @@ class SmartIrrigation:
         #     serviceCatalog_r.raise_for_status()
 
         # except requests.exceptions.InvalidURL as errURL:
-        #     raise SystemExit(errURL)
+        #     print(errURL)
         # except requests.exceptions.HTTPError as errHTTP:
-        #     raise SystemExit(errHTTP)
+        #     print(errHTTP)
         # except requests.exceptions.ConnectionError:
-        #       print("503: Connection error. Server unavailable ")
+        #     print("503: Connection error. Server unavailable ")
 
         # else:
         #     try:
         #         weatherService_r=requests.get("") #richiesta al weather forecast per le informazioni, restituisce un file json
-        #     except requests.exceptions.InvalidURL as errURL:
-        #         raise SystemExit(errURL)
-        #     except requests.exceptions.HTTPError as errHTTP:
-        #         raise SystemExit(errHTTP)
-        #     except requests.exceptions.ConnectionError:
-        #         print("503: Connection error. Server unavailable ")
+        # except requests.exceptions.InvalidURL as errURL:
+        #     print(errURL)
+        # except requests.exceptions.HTTPError as errHTTP:
+        #     print(errHTTP)
+        # except requests.exceptions.ConnectionError:
+        #     print("503: Connection error. Server unavailable ")
 
         #     else:
         #         weatherService_r=weatherService_r.json()

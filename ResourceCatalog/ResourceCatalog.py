@@ -267,9 +267,14 @@ class ResourceCatalogManager():
                 raise web_exception(400, "Missing telegramID")
 
     def findUserByTelegramID(self, telegramID : str):
+        try:
+            chatID = int(telegramID)
+        except:
+            return None
+
         for company in self.catalog[companyList_name]:
             for user in company[usersList_name]:
-                if user["telegramID"] == telegramID:
+                if user["telegramID"] == chatID:
                     return company["CompanyName"]
         return None
 
@@ -296,28 +301,23 @@ class ResourceCatalogManager():
                     if ID == -1 or AdminID == -1:
                         raise web_exception(500, "No more IDs available")
                     else:
-                        print(f"\nNew company: {CompanyInfo['CompanyName']}\n"
-                                f"CompanyToken: {CompanyInfo['CompanyToken']}\n"
-                                f"Admin information: \n"
-                                f"{json.dumps(AdminInfo, indent=4)}\n")
-                        if query_yes_no(f"Are you sure you want to add the company {CompanyInfo['CompanyName']}?"):
-                            NewCompany = {
-                                "ID": ID,
-                                "CompanyName": CompanyInfo["CompanyName"],
-                                "CompanyToken": str(CompanyInfo["CompanyToken"]),
-                                "Location": CompanyInfo["Location"],
-                                "NumberOfFields" : int(CompanyInfo["NumberOfFields"]),
-                                "adminID": AdminID,
-                                usersList_name: [],
-                                devicesList_name: []
-                            }
-                            new_item = AdminInfo
-                            new_item["ID"] = AdminID
-                            new_item["lastUpdate"] =  time.time()
-                            NewCompany[usersList_name].append(new_item)
-                            self.catalog[companyList_name].append(NewCompany)
-                            self.catalog["lastUpdate"] =  time.time() 
-                            out = {"Status": True, "CompanyID": ID, "CompanyToken": CompanyInfo["CompanyToken"]}
+                        NewCompany = {
+                            "ID": ID,
+                            "CompanyName": CompanyInfo["CompanyName"],
+                            "CompanyToken": str(CompanyInfo["CompanyToken"]),
+                            "Location": CompanyInfo["Location"],
+                            "NumberOfFields" : int(CompanyInfo["NumberOfFields"]),
+                            "adminID": AdminID,
+                            usersList_name: [],
+                            devicesList_name: []
+                        }
+                        new_item = AdminInfo
+                        new_item["ID"] = AdminID
+                        new_item["lastUpdate"] =  time.time()
+                        NewCompany[usersList_name].append(new_item)
+                        self.catalog[companyList_name].append(NewCompany)
+                        self.catalog["lastUpdate"] =  time.time() 
+                        out = {"Status": True, "CompanyID": ID, "CompanyToken": CompanyInfo["CompanyToken"]}
         
         return json.dumps(out, indent=4)
 
@@ -354,13 +354,16 @@ class ResourceCatalogManager():
         JSON with the ID of the user, or an error message.
         """
         company = self.findCompany(CompanyInfo)
+        print(company)
         if company != None:
+            print(userInfo)
             if "telegramID" not in userInfo:
                 raise web_exception(400, "Missing telegramID")
 
             CompanyName = self.findUserByTelegramID(userInfo["telegramID"])
+            print(CompanyName)
             if CompanyName != None:
-                raise web_exception(500, f"User already registered in {CompanyName}")
+                raise web_exception(403, f"User already registered in {CompanyName}")
 
             ID = self._IDs.get_ID()
             if ID == -1:

@@ -9,6 +9,35 @@
             "serviceIP": "http://127.0.1.1:8081"
         }
     ],
-    "lastUpdate": 1673432079.0917096,
-    "companiesList": []
+    "lastUpdate": 1673440214.1287675,
+    "companiesList": [
+        {
+            "ID": 100,
+            "CompanyName": "PatataNovella",
+            "CompanyToken": "123",
+            "Location": [
+                "longitude",
+                "latitude"
+            ],
+            "NumberOfFields": 5,
+            "adminID": 101,
+            "usersList": [
+                {
+                    "Name": "ec",
+                    "Surname": "ece",
+                    "telegramID": 615608459,
+                    "ID": 101,
+                    "lastUpdate": 1673439905.8254454
+                },
+                {
+                    "Name": "gfds",
+                    "Surname": "gfds",
+                    "telegramID": 897274399,
+                    "ID": 102,
+                    "lastUpdate": 1673440183.6497822
+                }
+            ],
+            "devicesList": []
+        }
+    ]
 }

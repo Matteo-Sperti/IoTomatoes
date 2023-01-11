@@ -198,45 +198,70 @@ class RegisterNewUser():
 
         elif self._status == 4:
             self.response["CompanyToken"] = message
+            summary = (f"You are going to register {self.completeName} as a new user of {self.response['CompanyName']}\n"
+                        f"Company Token: {self.response['CompanyToken']}\n")
+            self._bot.sendMessage("Confirm your registration?", reply_markup=keyboardYESNO)
+            self._status += 1
 
-            if self.insert_user():
-                return True
+        elif self._status == 5:
+            if message == "yes":
+                if self.insert_user():
+                    self._bot.sendMessage("Registration completed")
+                else:
+                    self._bot.sendMessage("Registration failed")
             else:
-                self._bot.sendMessage("Registration failed")
-                return True
+                self._bot.sendMessage("Registration canceled")
+            return True
 
     def insert_user(self):
         try:
-            res = requests.post(self._connector._ResourceCatalog_url + f"""/insert/user""", 
+            res = requests.post(self._connector.ResourceCatalog_url + f"/insert/user", 
                                     params=self.company, json=self.UserInfo)
             res.raise_for_status()
-        except :
+        except requests.exceptions.HTTPError as err:
+            if err.response.status_code == 404:
+                self._bot.sendMessage("Company not registered")
+            elif err.response.status_code == 401:
+                self._bot.sendMessage("CompanyToken not valid")
+            else:
+                print(f"{err.response.status_code} : {err.response.reason}")
+            return False
+        except:
             print(f"Error in the connection with the Resource Catalog\n")
             return False
         else:
             try:
                 res_dict = res.json()
-                if res_dict["Status"] == "OK":
-                    UserID = res_dict["ID"]
-                    message = (f"""User {self.completeName} registered in company {self.company["CompanyName"]}\n"""
-                            "Welcome to IoTomatoes Platform\n\n"
-                            f"UserID: {UserID}\n")
-                    self._bot.sendMessage(message)
-                    return True
-                elif res_dict["Status"] == "CompanyToken not valid":
-                    self._bot.sendMessage("CompanyToken not valid\n")
-                    return False
+                UserID = res_dict["ID"]
+                message = (f"""User {self.completeName} registered in company {self.company["CompanyName"]}\n"""
+                        "Welcome to IoTomatoes Platform\n\n"
+                        f"UserID: {UserID}\n")
+                self._bot.sendMessage(message)
+                return True
             except:
                 print(f"Error in the information\n")
                 return False
 
-class GetUsers():
-    def __init__(self) -> None:
-        pass
+def getUsers(CompanyName : str, bot, connector) -> None:
+    try:
+        res = requests.get(connector.ResourceCatalog_url + f"/get/users", params={"CompanyName" : CompanyName})
+        res.raise_for_status()
+    except requests.exceptions.HTTPError as err:
+        if err.response.status_code == 404:
+            bot.sendMessage("Company not registered")
+        elif err.response.status_code == 401:
+            bot.sendMessage("CompanyToken not valid")
+        else:
+            print(f"{err.response.status_code} : {err.response.reason}")
+    except:
+        print(f"Error in the connection with the Resource Catalog\n")
+        bot.sendMessage("Error in the connection with the Resource Catalog")
+    else:
+        res_dict = res.json()
+        
 
-class GetDevices():
-    def __init__(self) -> None:
-        pass
+def getDevices(CompanyName : str, bot, connector) -> None:
+    pass
 
 class DeleteCompany():
     def __init__(self) -> None:

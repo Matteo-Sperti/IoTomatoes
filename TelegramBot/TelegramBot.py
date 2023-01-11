@@ -48,6 +48,7 @@ class MessageHandler(telepot.helper.ChatHandler):
         self._command = None
         self._chat_id = seed_tuple[1]['chat']['id']
         self._CompanyName = self._connector.isRegistered(self._chat_id)
+        print(self._CompanyName)
 
     def on_chat_message(self, msg):
         content_type, _, chat_ID = telepot.glance(msg)  # type: ignore
@@ -73,11 +74,11 @@ class MessageHandler(telepot.helper.ChatHandler):
                     self.sender.sendMessage("Command not found")
             else:
                 if message == "/users":
-                    self._command = GetUsers(self._CompanyName, self.sender, self._connector)
+                    self._command = getUsers(self._CompanyName, self.sender, self._connector)
                 elif message == "/devices":
-                    self._command = GetDevices(self._CompanyName, self.sender, self._connector)
+                    self._command = getDevices(self._CompanyName, self.sender, self._connector)
                 elif message == "/delete_company":
-                    self._command = DeleteCompany(self._CompanyName, self.sender, self._connector)
+                    self._command = DeleteCompany(self._chat_id, self._CompanyName, self.sender, self._connector)
                 else:
                     self.sender.sendMessage("Command not found")
 

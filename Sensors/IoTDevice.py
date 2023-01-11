@@ -17,12 +17,12 @@ class IoTDevice(GenericEndpoint):
             "companyName" : getCompanyName(self._CompanyInfo),
             "bn" : 0,
             "field" : getField(self._EndpointInfo),
-            "e" : {
+            "e" : [{
                 "name": "",
                 "value": None,
                 "unit": "",       
                 "timestamp": None
-            }
+            }]
         }
 
     def start(self):
@@ -44,7 +44,7 @@ class IoTDevice(GenericEndpoint):
     def construct_message(self, measure : str, unit : str) :
         message=self._message
         message["bn"]=self.ID
-        message["e"]["name"] = measure
+        message["e"][1]["name"] = measure
         message["e"]["value"] = 0
         message["e"]["timestamp"] = time.time()
         message["e"]["unit"] = unit

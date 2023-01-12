@@ -79,8 +79,9 @@ class SmartIrrigation:
                 actuatorsForField=[]
                 fieldID=field["fieldID"]
                 for device in company["devicesList"]:
-                    if fieldID == device["field"]:
+                    if fieldID == device["field"] and device["isActuator"]==True and device["actuatorType"][0]=="pump":
                         actuatorsForField.append(device["ID"])
+                print(actuatorsForField)
                 
                 try:
                     with open("plantThreshold.json") as outfile:

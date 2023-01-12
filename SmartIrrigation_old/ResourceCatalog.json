@@ -101,8 +101,10 @@
                         "Longitude": -1
                     },
                     "PowerConsumption_kW": 0,
-                    "isActuator": false,
-                    "actuatorType": [],
+                    "isActuator": true,
+                    "actuatorType": [
+                        "pump"
+                    ],
                     "isSensor": true,
                     "measureType": [
                         "temperature",
@@ -165,8 +167,10 @@
                         "Longitude": -1
                     },
                     "PowerConsumption_kW": 0,
-                    "isActuator": false,
-                    "actuatorType": [],
+                    "isActuator": true,
+                    "actuatorType": [
+                        "pump"
+                    ],
                     "isSensor": false,
                     "measureType": [],
                     "lastUpdate": 1673521090.997039
@@ -196,7 +200,7 @@
                     "PowerConsumption_kW": 12,
                     "isActuator": true,
                     "actuatorType": [
-                        "led"
+                        "pump"
                     ],
                     "isSensor": true,
                     "measureType": [
@@ -227,8 +231,10 @@
                         "Longitude": -1
                     },
                     "PowerConsumption_kW": 0,
-                    "isActuator": false,
-                    "actuatorType": [],
+                    "isActuator": true,
+                    "actuatorType": [
+                        "pump"
+                    ],
                     "isSensor": true,
                     "measureType": [
                         "temperature",
@@ -261,8 +267,10 @@
                         "Longitude": -1
                     },
                     "PowerConsumption_kW": 0,
-                    "isActuator": false,
-                    "actuatorType": [],
+                    "isActuator": true,
+                    "actuatorType": [
+                        "pump"
+                    ],
                     "isSensor": true,
                     "measureType": [
                         "humidity",

@@ -10,7 +10,7 @@ class Pump:
         """Inizializzazione della classe del servizio (da adattare in seguito)"""
 
         self.serviceID="pump"
-        self.topic="IoTomatoes/Andrea/1/1/pump" #IoTomatoes/companyName/field/actuatorID/actuatorType
+        self.topic="IoTomatoes/+/+/+/pump" #IoTomatoes/companyName/field/actuatorID/actuatorType
         self.broker="test.mosquitto.org"
         self.port=1883
 
@@ -45,7 +45,7 @@ class Pump:
 
     def stop(self):
         """Unsubscribes and disconnects the sensor from the broker"""
-        self.service_mqtt.unsubscribe(self.sensor_topic)
+        self.service_mqtt.unsubscribe(self.topic)
         self.service_mqtt.loop_stop()
         self.service_mqtt.disconnect()
 
@@ -56,5 +56,9 @@ if __name__=="__main__":
     pompa.start()
 
     while True:
-        time.sleep(1)
+        try:
+            time.sleep(1)
+        except KeyboardInterrupt:
+            pompa.stop()
+            break
     

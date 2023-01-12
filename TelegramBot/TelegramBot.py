@@ -16,18 +16,16 @@ sys.path.append("../SupportClasses/")
 from MyExceptions import *
 from GenericEndpoint import GenericEndpoint
 
-HelpMessage = """Welcome to the IoTomatoesBot!
+HelpMessage = """Help message to the IoTomatoesBot!
 
 This bot will help you to manage your IoT devices for your company.
 
-To start, you need to register your company and your admin account.
+You are currently registered in the company {0}.
 
-To register your company, type /insert_company.
-Then you can add your devices and users.
-
-/register_user to add a new user to your company.
+You can use the following commands:
 /users to see all the users of your company.
 /devices to see all the active devices of your company.
+/delete_company to delete your company and all the data related to it.
 """
 
 WelcomeMessage = """Welcome to the IoTomatoesBot!
@@ -59,7 +57,7 @@ class MessageHandler(telepot.helper.ChatHandler):
         content_type, _, chat_ID = telepot.glance(msg)  # type: ignore
         
         if content_type != 'text':
-            self.sender.sendMessage("I don't understand") 
+            self.sender.sendMessage("I don't understand non-text messages.") 
             return
 
         message = msg['text']
@@ -67,25 +65,29 @@ class MessageHandler(telepot.helper.ChatHandler):
             completed = self._command.update(message)
             if completed:
                 self.close()
-        elif message in ["/help", "/start"]:
-            self.bot.sendMessage(chat_ID, text=HelpMessage)
         else:
             if self._CompanyName == "":
                 if message == "/insert_company":
                     self._command = InsertNewCompany(chat_ID, self.sender, self._connector)
                 elif message == "/register_user":
                     self._command = RegisterNewUser(chat_ID, self.sender, self._connector)
+                elif message in ["/help", "/start"]:
+                    self.sender.sendMessage(WelcomeMessage)                    
                 else:
-                    self.sender.sendMessage("Command not found")
+                    self.sender.sendMessage(f"You need to register your company first or register yourself in an existing company.\n"
+                                            f"Type /insert_company to register your company or /help for more info.")
             else:
                 if message == "/users":
                     self._command = getUsers(self._CompanyName, self.sender, self._connector)
                 elif message == "/devices":
                     self._command = getDevices(self._CompanyName, self.sender, self._connector)
                 elif message == "/delete_company":
-                    self._command = DeleteCompany(self._chat_id, self._CompanyName, self.sender, self._connector)
+                    self._command = DeleteCompany(self._CompanyName, self._chat_id, self.sender, self._connector)
+                elif message in ["/help", "/start"]:
+                    self.sender.sendMessage(HelpMessage.format(self._CompanyName))      
                 else:
-                    self.sender.sendMessage("Command not found")
+                    self.sender.sendMessage(f"Command not found or not permitted.\n"
+                                            f"Type /help for more info.")
 
     def on_callback_query(self,msg):
         _ , chat_ID , query_data = telepot.glance(msg,flavor='callback_query')
@@ -190,31 +192,6 @@ class IoTBot(GenericEndpoint):
                     print(f"Error in the broker information\nRetrying connection\n")
                     time.sleep(1)
 
-    def get_CompanyName_list(self):
-        try:
-            response = requests.get(self.ResourceCatalog_url + "/companiesName", 
-                                        params={"SystemToken": self._SystemToken})
-            response.raise_for_status()
-            out = response.json()
-        except:
-            raise ConnectionError("Unable to connect to the Resource Catalog")
-        else:
-            return out
-    
-    def get_chatID(self, CompanyName : str) :
-        try : 
-            params = {"SystemToken": self._SystemToken, "CompanyName": CompanyName}
-            res = requests.get(self.ResourceCatalog_url + "users", params=params)
-            res.raise_for_status()
-        except:
-            print("Connection Error\nImpossibile to reach the ResourceCatalog")
-            return 0
-        else:
-            for user in res.json():
-                if user["chatID"] != 0:
-                    return user["chatID"]
-            return 0
-
     def isRegistered(self, chatID : int):
         try:
             params = {"SystemToken": self._SystemToken, "telegramID": chatID}
@@ -233,16 +210,13 @@ class IoTBot(GenericEndpoint):
     def notify(self, topic, msg):
         try:
             timestamp = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(msg["timestamp"]))
-            message = (f"Alert from {msg['bn']} at {timestamp}:\n"
-                    f"ALERT : {msg['alert']}.\n"
-                    f"DO: {msg['action']}")
-            chat_ID = self.get_chatID(msg["bn"])
-        except KeyError:
+            message = (f"Message from {msg['bn']} at {timestamp}:\n\n{msg['message']}")
+            chat_ID = int(msg["telegramID"])
+        except:
             print("Invalid message")
         else:
             if chat_ID != 0:
                 self.bot.sendMessage(chat_ID, text=message)
-
 
 if __name__ == "__main__":
     settings = json.load(open("TelegramSettings.json"))

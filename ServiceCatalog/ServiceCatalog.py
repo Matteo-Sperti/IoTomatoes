@@ -345,7 +345,7 @@ class RESTServiceCatalog():
         `/refresh?ID=<ID>` to refresh the lastUpdate field of a service by ID.\n
         """
         try:
-            if not self.isAuthorize(params):
+            if "SystemToken" not in params or params["SystemToken"] != self._systemToken:
                 raise web_exception(401, "Unauthorized")
             
             if len(uri) == 1 and uri[0] == "update":
@@ -375,7 +375,7 @@ class RESTServiceCatalog():
         The body of the request must contain the new service info.
         """
         try:
-            if not self.isAuthorize(params):
+            if "SystemToken" not in params or params["SystemToken"] != self._systemToken:
                 raise web_exception(401, "Unauthorized")
 
             if len(uri) == 1 and uri[0] == "save":
@@ -400,7 +400,7 @@ class RESTServiceCatalog():
         `/delete?ID=<ID>` to delete a service by ID.
         """
         try:
-            if not self.isAuthorize(params):
+            if "SystemToken" not in params or params["SystemToken"] != self._systemToken:
                 raise web_exception(401, "Unauthorized")
 
             if len(uri) == 1 and uri[0] == "delete":

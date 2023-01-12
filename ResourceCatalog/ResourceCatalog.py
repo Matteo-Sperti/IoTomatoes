@@ -15,6 +15,7 @@ from TerminalQuery import *
 companyList_name = "companiesList"
 devicesList_name = "devicesList"
 usersList_name = "usersList"
+fieldsList_name = "fieldsList"
 
 class ResourceCatalogManager():
     def __init__(self, heading : dict, SystemToken : str, filename = "CompanyCatalog.json", autoDeleteTime = 120, 
@@ -231,6 +232,18 @@ class ResourceCatalogManager():
             return json.dumps(company[usersList_name], indent=4)
         raise web_exception(404, "Company not found")
 
+    def getFields(self, dict_ : dict):
+        """Return the list of fields of the company specified in `CompanyInfo` in json format.
+
+        Arguments: \n
+        `CompanyInfo` -- the information about the company.
+        Must contain the `CompanyName` and `CompanyToken`.
+        """
+        company = self.findCompany(dict_)
+        if company != None:
+            return json.dumps([getField(item) for item in company[devicesList_name]], indent=4)
+        raise web_exception(404, "Company not found")
+
     def getTopics(self, CompanyInfo : dict, field : str, ResourceType : str):
         """Return the list of topics of the company specified in `CompanyInfo` in json format.
 
@@ -321,7 +334,8 @@ class ResourceCatalogManager():
                             "NumberOfFields" : int(CompanyInfo["NumberOfFields"]),
                             "adminID": AdminID,
                             usersList_name: [],
-                            devicesList_name: []
+                            devicesList_name: [],
+                            fieldsList_name: []
                         }
                         new_item = AdminInfo
                         new_item["ID"] = AdminID
@@ -414,6 +428,45 @@ class ResourceCatalogManager():
             out = {"Status": False}
         return json.dumps(out, indent=4)
 
+    def deleteCompany(self, dict_info : dict):
+        """Delete a company from the catalog. """
+
+        if "CompanyName" not in dict_info or "CompanyToken" not in dict_info:
+            raise web_exception(400, "Missing CompanyName or CompanyToken")
+        else:
+            CompanyInfo = {
+                "CompanyName": dict_info["CompanyName"],
+                "CompanyToken": dict_info["CompanyToken"]
+            }
+
+        if "telegramID" not in dict_info:
+            raise web_exception(400, "Missing telegramID")
+        try:
+            chatID = int(dict_info["telegramID"])
+        except ValueError:
+            raise web_exception(400, "Invalid telegramID")
+
+        company = self.findCompany(CompanyInfo)
+        if company == None:
+            raise web_exception(404, "Company not found")
+
+        AdminID = company["adminID"]
+        for user in company[usersList_name]:
+            if user["telegramID"] == chatID:
+                if user["ID"] == AdminID:
+                    for device in company[devicesList_name]:
+                        self._IDs.free_ID(device["ID"])
+                    for user in company[usersList_name]:
+                        self._IDs.free_ID(user["ID"])
+                    self._IDs.free_ID(company["ID"])
+                    self.catalog[companyList_name].remove(company)
+                    out = {"Status": True}
+                    return json.dumps(out, indent=4)
+                else:
+                    raise web_exception(403, "You are not the admin of this company")
+
+
+
     def deleteItem(self, CompanyInfo : dict, IDvalue : int):
         """Delete a item from the catalog.
         Return a json with the status of the operation.
@@ -472,7 +525,6 @@ class ResourceCatalogManager():
                     company[devicesList_name].remove(device)
         self.catalog["lastUpdate"] = actualtime
 
-
 class RESTResourceCatalog(GenericEndpoint):
     exposed = True
 
@@ -528,6 +580,9 @@ class RESTResourceCatalog(GenericEndpoint):
                 elif len(uri) == 1 and uri[0] == "users":
                     CompanyInfo = self.catalog.accessInfo(params)
                     return self.catalog.getUsers(CompanyInfo)
+                elif len(uri) == 1 and uri[0] == "fields":
+                    CompanyInfo = self.catalog.accessInfo(params)
+                    return self.catalog.getFields(CompanyInfo)
                 elif len(uri) == 2 and uri[0] == "topics":
                     if "field" in params:
                         CompanyInfo = self.catalog.accessInfo(params)
@@ -589,10 +644,18 @@ class RESTResourceCatalog(GenericEndpoint):
         """DELETE method for the REST API.
 
         Allowed commands:
-        `/deleteCompany`: delete the company from the platform. 
+        `/company`: delete the company from the platform. 
         The parameters are `telegramID`, `CompanyName` and `CompanyToken`.\n
         """
-        pass
+        
+        try:
+            if len(uri) == 1 and uri[0] == "company":
+                return self.catalog.deleteCompany(params)
+            raise web_exception(400, "Unrecognized command.")
+        except web_exception as e:
+            return cherrypy.HTTPError(e.code, e.message)
+        except:
+            return cherrypy.HTTPError(500, "Internal Server Error.")
 
 if __name__ == "__main__":
     settings = json.load(open("ResourceCatalogSettings.json"))

@@ -244,25 +244,123 @@ class RegisterNewUser():
 
 def getUsers(CompanyName : str, bot, connector) -> None:
     try:
-        res = requests.get(connector.ResourceCatalog_url + f"/get/users", params={"CompanyName" : CompanyName})
+        params = {"CompanyName" : CompanyName, "SystemToken" : connector._SystemToken}
+        res = requests.get(connector.ResourceCatalog_url + f"/users", params=params)
         res.raise_for_status()
+        res_list = res.json()
     except requests.exceptions.HTTPError as err:
         if err.response.status_code == 404:
             bot.sendMessage("Company not registered")
         elif err.response.status_code == 401:
-            bot.sendMessage("CompanyToken not valid")
+            bot.sendMessage("Not authorized")
         else:
             print(f"{err.response.status_code} : {err.response.reason}")
     except:
         print(f"Error in the connection with the Resource Catalog\n")
         bot.sendMessage("Error in the connection with the Resource Catalog")
     else:
-        res_dict = res.json()
+        if len(res_list) == 0:
+            bot.sendMessage(f"No users registered in {CompanyName}")
+        else:
+            if res_list != None:
+                message = (f"Users in {CompanyName}:\n\n")
+                bot.sendMessage(message)
+                for user in res_list:
+                    message = (f"Name: {user['Name']}\n"
+                                        f"Surname: {user['Surname']}\n"
+                                        f"UserID: {user['ID']}\n\n")
+                    bot.sendMessage(message)
         
 
 def getDevices(CompanyName : str, bot, connector) -> None:
-    pass
+    try:
+        params = {"CompanyName" : CompanyName, "SystemToken" : connector._SystemToken}
+        res = requests.get(connector.ResourceCatalog_url + f"/devices", params=params)
+        res.raise_for_status()
+        res_list = res.json()
+    except requests.exceptions.HTTPError as err:
+        if err.response.status_code == 404:
+            bot.sendMessage("Company not registered")
+        elif err.response.status_code == 401:
+            bot.sendMessage("Not authorized")
+        else:
+            print(f"{err.response.status_code} : {err.response.reason}")
+    except:
+        print(f"Error in the connection with the Resource Catalog\n")
+        bot.sendMessage("Error in the connection with the Resource Catalog")
+    else:
+        if len(res_list) == 0:
+            bot.sendMessage(f"No devices registered in {CompanyName}")
+        else:
+            if res_list != None:
+                message = (f"Devices in {CompanyName}:\n\n")
+                bot.sendMessage(message)
+                for device in res_list:
+                    message = (f"Device Name: {device['deviceName']}\n"
+                                f"DeviceID: {device['ID']}\n"
+                                f"Location: {device['Location']['Latitude']}, {device['Location']['Longitude']}\n")
+                    if device["isActuator"]:
+                        act_msg = f"Actuators: " + ", ".join(device["actuatorType"])
+                        message = message + act_msg +"\n"
+                    if device["isSensor"]:
+                        sens_msg = f"Sensors: " + ", ".join(device["measureType"])
+                        message = message + sens_msg +"\n"
+                    bot.sendMessage(message)
 
 class DeleteCompany():
-    def __init__(self) -> None:
-        pass
+    def __init__(self, CompanyName : str, chatID, sender, connector):
+        self.chatID = chatID
+        self.CompanyName = CompanyName
+        self.CompanyToken = ""
+        self._connector = connector
+        self._bot = sender
+        self._status = 0
+
+        self.update("")
+
+    def update(self, message):
+        if self._status == 0:
+            self._bot.sendMessage("You are going to delete company " + self.CompanyName)
+            self._bot.sendMessage("Insert your Company Token")
+            self._status += 1
+        
+        elif self._status == 1:
+            self.CompanyToken = message
+            self._bot.sendMessage("Confirm your deletion?", reply_markup=keyboardYESNO)
+            self._status += 1
+
+        elif self._status == 2:
+            if message == "yes":
+                if self.delete_company():
+                    self._bot.sendMessage("Deletion completed")
+                else:
+                    self._bot.sendMessage("Deletion failed")
+            else:
+                self._bot.sendMessage("Deletion canceled")
+            return True
+
+    def delete_company(self):
+        try:
+            params = {"CompanyName" : self.CompanyName, "CompanyToken" : self.CompanyToken}
+            res = requests.delete(self._connector.ResourceCatalog_url + "/company", 
+                                    params=params)
+            res.raise_for_status()
+            dict_ = res.json()
+        except requests.exceptions.HTTPError as err:
+            if err.response.status_code == 404:
+                self._bot.sendMessage("Company not registered")
+            elif err.response.status_code == 401:
+                self._bot.sendMessage("CompanyToken not valid")
+            elif err.response.status_code == 403:
+                self._bot.sendMessage("You are not authorized to delete this company.\nContact your administrator.")
+            else:
+                print(f"{err.response.status_code} : {err.response.reason}")
+            return False
+        except:
+            self._bot.sendMessage("Error in the connection with the Resource Catalog")
+            return False
+        else:
+            if "Status" in dict_ and dict_["Status"]:
+                return True
+            else:
+                return False

@@ -203,6 +203,19 @@ def _makeResource(EInfo : dict, CompInfo : dict, info : dict = {}):
         info["field"] = EInfo["field"]
     else: 
         info["field"] = 1 
+
+    if "Latitude" in EInfo and "Longitude" in EInfo:
+        info["Location"] = {
+            "Latitude" : EInfo["Latitude"],
+            "Longitude" : EInfo["Longitude"]
+        }
+    elif "Location" in EInfo and "Latitude" in EInfo["Location"] and "Longitude" in EInfo["Location"]:
+        info["Location"] = EInfo["Location"]
+    else:
+        info["Location"] = {
+            "Latitude" : -1,
+            "Longitude" : -1
+        }
     
     if "PowerConsumption_kW" in EInfo:
         info["PowerConsumption_kW"] = EInfo["PowerConsumption_kW"]

@@ -1,9 +1,9 @@
 import paho.mqtt.client as mqtt
-import cherrypy
 import requests
+import cherrypy
 import time
+import datetime
 import json
-from statistics import mean
 from socket import gethostname, gethostbyname
 import sys
 
@@ -18,154 +18,244 @@ class SmartIrrigation(GenericEndpoint):
         """Inizializzazione della classe del servizio (da adattare in seguito)"""
         super().__init__(settings, isService=True)
 
-        self.commandMessage={
+        self.message={
             "bn":"",
-            "field":"",
-            "actuator":"pump",
-            "command":None,
-            "timestamp":""
+            "e":{
+                "field":"",
+                "command":"",
+                "timestamp":""
             }
-
-    def notify(self,topic,message):
-        """Riceives measures from a specific topic and temporary store them in a
-         json file for processing"""
-        self.payload=json.loads(message.payload)
-        # print(self.payload)
+        }
+    #### ORMAI E' SOLO PUBLISHER PER CUI NON RICEVE PIU' LE MISURE DAI SENSORI 
+    # def notify(self,topic,message):
+    #     """Riceives measures from a specific topic and temporary store them in a
+    #      json file for processing"""
+    #     self.payload=json.loads(message.payload)
+    #     # print(self.payload)
     
-        companyName=self.payload["companyName"]
-        fieldID=self.payload["field"]
-        name=self.payload["e"]["name"]
-        measure=self.payload["e"]["value"] #extract the measure vale from MQTT message
+    #     companyName=self.payload["companyName"]
+    #     fieldID=self.payload["field"]
+    #     name=self.payload["e"]["name"]
+    #     measure=self.payload["e"]["value"] #extract the measure vale from MQTT message
 
-        try:
-            with open("plantInformation.json") as outfile:
-                information=json.load(outfile)
-        except FileNotFoundError:
-            print("WARNING: file opening error. The file doesn't exist")
+    #     try:
+    #         with open("plantInformation.json") as outfile:
+    #             information=json.load(outfile)
+    #     except FileNotFoundError:
+    #         print("WARNING: file opening error. The file doesn't exist")
         
-        if companyName in information["company"]:
-            position=information["company"].index(companyName)
+    #     if companyName in information["company"]:
+    #         position=information["company"].index(companyName)
 
-            information["companyList"][position]["fields"][fieldID-1]["lastMeasures"][name]["values"].append(measure) #insert the measure value in the json file
-            information["companyList"][position]["fields"][fieldID-1]["lastMeasures"][name]["lastUpdate"]=time.time() #update the lastUpdate value in the json file
+    #         information["companyList"][position]["fields"][fieldID-1]["lastMeasures"][name]["values"].append(measure) #insert the measure value in the json file
+    #         information["companyList"][position]["fields"][fieldID-1]["lastMeasures"][name]["lastUpdate"]=time.time() #update the lastUpdate value in the json file
         
-        try:
-            with open("plantInformation.json","w") as outfile:
-                json.dump(information, outfile, indent=4)
-        except FileNotFoundError:
-            print("WARNING: file opening error. The file doesn't exist")
-        
+    #     try:
+    #         with open("plantInformation.json","w") as outfile:
+    #             json.dump(information, outfile, indent=4)
+    #     except FileNotFoundError:
+    #         print("WARNING: file opening error. The file doesn't exist")
+
 
     def control(self):
-        """Extracts measures from the json file, compute the mean value of each type of measure
-        and perform the control law"""
+        """It performs:
+        - Call to resource catalog -> to retrieve information about each field for each company
+        - Call to MongoDB to retrieve information about last hour measures (currentSoilMoisture) and previoius hour measures 
+          (previousSoilMoisture)
+        - Call to Weather forecast service to retrieve information about precipitation during the day
+        With these information it performs a control strategy with an hysteresis law in order to send the command ON when the 
+        soil moisture mesaure decrease and is under a specific low threshold and to send command OFF in the opposite case"""
+
+        message=self.message
+        ####MODIFICA: inserire chiamata al resource catalog per ottenere le informazioni relative a
+        #   -COMPANY
+        #   -FIELD ID
+        #   -TIPO DI PIANTA
+        company="Andrea"
+        fieldID=1
+        plant="potatoes"   
+        message["e"]["command"]=""  #per ogni field il messaggio dovrà essere vuoto
 
         try:
-            with open("plantInformation.json") as outfile:
-                information=json.load(outfile)          #extract all the information from the json
+            with open("plantThreshold.json") as outfile:
+                plantInfo=json.load(outfile)          
         except FileNotFoundError:
-            print("WARNING: file opening error. The file doesn't exist")
+            print("ERROR: file not found")
+        
 
-        for company in information["companyList"]:
-            companyName=company["companyName"]
-            positionCompany=information["company"].index(companyName)   #indicates position index of the single company inside the list of all companies
-            print(f"company={positionCompany}")
+        
+        if plant in list(plantInfo.keys()):
+            limits=plantInfo[plant]
+            minSoilMoisture=limits["soilMoistureLimit"]["min"]    #extract the ideal min value of soil moisture for the given plant from the json file 
+            maxSoilMoisture=limits["soilMoistureLimit"]["max"]    #extract the ideal max value of soil moisture for the given plant from the json file
+            precipitationLimit=limits["precipitationLimit"]["max"]
+        else:
+            print("No crop with the specified name. \nDefault limits will be used") 
+            limits=plantInfo["default"]
+            minSoilMoisture=limits["soilMoistureLimit"]["min"]    
+            maxSoilMoisture=limits["soilMoistureLimit"]["max"]  
+            precipitationLimit=limits["precipitationLimit"]["max"]  
+    
+        #IN FUTURO:
+        # richiesta al service catalog per url mongodb 
+        # r=requests.get("URL_MONGODB/media?hour=1") ESPRIMERE BENE L'URL E I PARAMETRI IN RELAZIONE A COME COSTRUISCE IL SERVIZIO LUCA
+        
+        #PER ORA I DATI VENGONO OTTENUTI DA UNA SORTA DI SIMULATORE MONGODB:
+        try:
+            r=requests.get("http://127.0.0.1:8080/increasing") #richiesta al MongoDBSimulator, da sostituire con il vero mongoDB
+            r.raise_for_status()
+        except requests.exceptions.InvalidURL as errURL:
+            print(f"ERROR: invalid URL for MongoDB service!\n\n{errURL}")
+            time.sleep(1)
+        except requests.exceptions.HTTPError as errHTTP:
+            print(f"ERROR: something went wrong with MongoDB service!\n\n{errHTTP}")
+            time.sleep(1)
+        except requests.exceptions.ConnectionError:
+            print("503: Connection error. MongoDB service unavailable")
+            time.sleep(1)
+        
+        
+            
+        else:
+            rValues=list((r.json()).values())
+            previousSoilMoisture=float(rValues[0])
+            currentSoilMoisture=float(rValues[1])
+            
+            currentTime=datetime.datetime.now().time()
+            forecast=self.callWeatherService(currentTime.hour)
+            soilMoistureForecast=forecast[0]
+            dailyPrecipitationSum=forecast[1]
+            
+            currentSoilMoisture=round((3*currentSoilMoisture+soilMoistureForecast)/4,2) #integration sensor measure with the weather forecast one
+            maxLimitTemp=datetime.time(23,59,0)
+            minLimitTemp=datetime.time(20,0,0)
+            
+            #CONTROL ALGORITHM:
+            #controllo schedulato per la sera dalle 20 alle 24(quindi sappiamo già complessivamente se durante il giorno ha piovuto)
+    
+            if currentTime>=minLimitTemp and currentTime<=maxLimitTemp:
 
-            for field in company["fields"]:
-                fieldID=field["fieldID"]    #indicates position index of the field inside the list of all field for a single company 
-                plant=field["plantType"]
-                print(f"campo={fieldID}")
-                minTemperature=field["temperatureLimit"]["min"]      #extract the ideal min value of temperature for the given plant from the json file
-                maxTemperature=field["temperatureLimit"]["max"]      #extract the ideal max value of temperature from the given plant json file
-                minSoilMoisture=field["soilMoistureLimit"]["min"]    #extract the ideal min value of soil moisture for the given plant from the json file 
-                maxSoilMoisture=field["soilMoistureLimit"]["max"]    #extract the ideal max value of soil moisture for the given plant from the json file
-                precipitationLimit=field["precipitationLimit"]["max"]   #extract the ideal max value of total precipitations for the given plant from the json file
-                try:
-                    meanTemperature=mean(field["lastMeasures"]["temperature"]["values"])    #compute the mean value of received temperature measures
-                    meanSoilMoisture=mean(field["lastMeasures"]["soilMoisture"]["values"])  #compute the mean value of received soil Moisture measures
-                except:
-                    print("MeanError: necessario almeno un dato per il calcolo della media")
+                #PRECIPITATIONS CONTROL:
+                if dailyPrecipitationSum>precipitationLimit:    #soil too moist
+                    print("IRRIGATION DOES NOT MAKE SENSE")
+                    print("pumps set to OFF")
+                    message["e"]["command"]="OFF"
+                else:
+                    print("IRRIGATION MAKE SENSE")
+                    
+                    # HYSTERESIS CONTROL LAW (SOILMOISTURE):
+                    # After the precipitations control, we assume that soilMoisture increasing is related
+                    # only to our irrigation and not also to possible external phenomena
+
+                    print(f"OFF threshold={maxSoilMoisture}")
+                    print(f"ON threshold={minSoilMoisture}")
+                    print(f"current value soil moisture={currentSoilMoisture}")
+                    print(f"previous value soil moisture={previousSoilMoisture}")
+                    
+                    if currentSoilMoisture>previousSoilMoisture:
+                        print("soilMoisture is increasing")
+                        if currentSoilMoisture>=maxSoilMoisture:
+                            print(f"""current soil moisture over/on the OFF limit: {currentSoilMoisture}>={maxSoilMoisture}""")
+                            print("pumps set to OFF")
+                            message["e"]["command"]="OFF"
+                            
+                        else:
+                            print(f"""current soil moisture under the OFF limit: {currentSoilMoisture}<{maxSoilMoisture}""")
+                            print("pumps set to ON")
+                            message["e"]["command"]="ON"
+                            
+                    elif currentSoilMoisture<previousSoilMoisture:
+                        print(f"soilMoisture is decreasing")
+                        if currentSoilMoisture<=minSoilMoisture:
+                            print(f"""current soil moisture under/on the ON limit: {currentSoilMoisture}<={minSoilMoisture}""")
+                            print("pumps set to ON")
+                            message["e"]["command"]="ON"
+                            
+                        else:
+                            print(f"""current soil moisture over the ON limit: {currentSoilMoisture}>{minSoilMoisture}""")
+                            print("pumps set to OFF")
+                            message["e"]["command"]="OFF"
+                            
+                    else:
+                        print("costant soil moisture")
+                        if currentSoilMoisture>maxSoilMoisture:
+                            print("pumps set to OFF")
+                            message["e"]["command"]="OFF"
+                            
+                        elif currentSoilMoisture<minSoilMoisture:
+                            print("pumps set to ON")
+                            message["e"]["command"]="ON"
+                                
+                        
+            else:
+                print("NO IRRIGATION TIME")
+                print("pumps set to OFF")
+                message["e"]["command"]="OFF"
+
+            message["bn"]=company
+            message["e"]["field"]=fieldID
+            message["e"]["timeStamp"]=time.time()
+            
+            print(f"message= {message}\n")
+            
+            #topicList=self.getTopics(company["companyName"],fieldID, ? ) #da aggiungere il systemToken
+            #for singleTopic in topicList:
+                    #self.myPublish(self._baseTopic+singleTopic,json.dumps(message))  
             
 
-                #CONTROL ALGORITHM:
-
-                dailyPrecipitationSum=self.getPrecipitationSum()
-                ############
-                #topicList=self.getTopics(company["companyName"],fieldID, ? ) #da aggiungere il systemToken
-                ############
-
-                if (meanTemperature<=maxTemperature and meanTemperature>=minTemperature)and(meanSoilMoisture<=maxSoilMoisture and meanSoilMoisture>=minSoilMoisture)and(dailyPrecipitationSum<=precipitationLimit):
-                    print(f"""
-                    Average temperature={meanTemperature}
-                    Average soil moisture={meanSoilMoisture}
-                    Daily precipitation sum={dailyPrecipitationSum}
-                    Accendi pompe campo {fieldID} ({plant}) di {companyName}""") #per ora il comando è una semplice print
-                    
-                    #### INVIO COMANDO A OGNI TOPIC DI CIASCUN ATTUATORE NEL CAMPO ####
-                    #message=self.commandMessage
-                    #message["command"]="ON"
-                    #message["timestamp"]=time.time()
-
-                    #for singleTopic in topicList:
-                        #self.myPublish(self._baseTopic+singleTopic,message) 
-                else:
-                    print(f"""
-                    Average temperature={meanTemperature}
-                    Average soil moisture={meanSoilMoisture}
-                    Daily precipitation sum={dailyPrecipitationSum}
-                    Spegni pompe campo {fieldID} ({plant}) di {companyName}""") #per ora il comando è una semplice print
-                    
-                    #### INVIO COMANDO A OGNI TOPIC DI CIASCUN ATTUATORE NEL CAMPO####
-                    #message=self.commandMessage
-                    #message["command"]="OFF"
-                    #message["timestamp"]=time.time()
-                    #for singleTopic in topicList:
-                        #self.myPublish(self._baseTopic+singleTopic,message) 
                     
                     
-                del information["companyList"][positionCompany]["fields"][fieldID-1]["lastMeasures"]["temperature"]["values"][0:-1] #delete all but one of the used temperature measures
-                del information["companyList"][positionCompany]["fields"][fieldID-1]["lastMeasures"]["soilMoisture"]["values"][0:-1] #delete all but one of the used soil moisture measures
-
-                try:
-                    with open("plantInformation.json","w") as outfile:
-                        json.dump(information, outfile, indent=4)       #update the json file
-                except FileNotFoundError:
-                    print("WARNING: file opening error. The file doesn't exist")
-
-
-
-    def getPrecipitationSum(self):
-        """It gets precipitations informations from weather forecast service and extract 
-        the daily precipitation sum from the json file received """
-
-        #RICAVA LE INFORMAZIONI SUL WEATHER FORECAST SERVICE:
+                
+    def callWeatherService(self,hour):
+        """It gets precipitations informations from weather forecast service and extract:
+            - daily precipitation sum
+            - soil moisture forecast
+            from the received json file"""
+        ####MODIFICA: RICAVARE I DATI DAL WEATHER FORECAST ATTRAVERSO LA CHIAMATA AL SERVICE CATALOG
         # try:
         #     weatherServiceInfo=requests.get(self.ServiceCatalog_url+"/search/serviceName",params={"serviceName":ServiceToCall})
         #     ## serviceToCall è la variabile globale definita all'inizio dello script che contiene il nome del weather forecast service
         #     weatherServiceInfo.raise_for_status()
-        # except requests.exceptions.HTTPError as err:
-        #     print(f"{err.response.status_code} : {err.response.reason}")
+
+        # except requests.exceptions.InvalidURL as errURL:
+        #     print(f"ERROR: invalid URL for the Service Catalog!\n\n{errURL})
         #     time.sleep(1)
-        # else:  
-            #-ESTRAE L'URL DEL WEATHER FORECAST SERVICE:
-            # weatherForecast_url=weatherServiceInfo["serviceDetails"][0]["serviceIP"].... 
-            # non so se sia giusto il tipo di json che si ottiene eseguendo la ricerca tramite search (ho preso in considerazione
-            # la struttura del dizionario relativo al generico servizio scritto sul file del drive )
+        # except requests.exceptions.HTTPError as errHTTP:
+        #     print(f"ERROR: something went wrong with the Service Catalog!\n\n{errHTTP}")
+        #     time.sleep(1)
+        # except requests.exceptions.ConnectionError:
+        #     print("503: Connection error. Service Catalog unavailable")
+        #     time.sleep(1)
 
-            #-ESEGUE LA GET AL WEATHER FORECAST SERVICE (da verificare come implementa Luca la gestione della chiamata):
-            # try:
-            #     weatherService_data=requests.get(weatherForecast_url+"/Irrigation")
-            #     weatherService_data.raise_for_status()
-            # except requests.exceptions.HTTPError as err:
-            #     print(f"{err.response.status_code} : {err.response.reason}")
-            #     time.sleep(1)
-            # else:
-                    #daily_precipitation_sum=weatherService_data["daily"]["precipitation_sum"][0]
-                    #return daily_precipitation_sum
+        # else:
+        #-ESTRAE L'URL DEL WEATHER FORECAST SERVICE DALLE INFORMAZIONI RICEVUTE DAL CATALOG:
+        #     weatherForecast_url=weatherServiceInfo["serviceDetails"][0]["serviceIP"].... 
+        #     non so se sia giusto il tipo di json che si ottiene eseguendo la ricerca tramite search (ho preso in considerazione
+        #     la struttura del dizionario relativo al generico servizio scritto sul file del drive )
+        #
+        #-ESEGUE LA GET AL WEATHER FORECAST SERVICE (da verificare come implementa Luca la gestione della chiamata):
+        #     try:
+        #         weatherService_data=requests.get(weatherForecast_url+"/Irrigation")
+        #         weatherService_data.raise_for_status()
+        #     except requests.exceptions.InvalidURL as errURL:
+        #         print(f"ERROR: invalid URL for Weather Forecast service!\n\n{errURL})
+        #         time.sleep(1)
+        #     except requests.exceptions.HTTPError as errHTTP:
+        #         print(f"ERROR: something went wrong with Weather Forecast service!\n\n{errHTTP}")
+        #         time.sleep(1)
+        #     except requests.exceptions.ConnectionError:
+        #         print("503: Connection error. Weather Forecast service unavailable")
+        #         time.sleep(1)
 
-        weatherService_data=json.load(open("outputWeatherForecast.json")) #per ora i dati sono presi da un file json esempio (TEMPORANEO)
-        daily_precipitation_sum=weatherService_data["daily"]["precipitation_sum"][0]
-        return daily_precipitation_sum 
+        #     else:
+        #         weatherService_r=weatherService_data.json()
+        
+        #PER ORA I DATI SONO PRESI SEMPLICEMENTE DA UN FILE
+        weatherService_r=json.load(open("outputWeatherForecast.json"))
+        daily_precipitation_sum=weatherService_r["daily"]["precipitation_sum"][0]
+        soil_moisture_forecast=weatherService_r["hourly"]["soil_moisture_3_9cm"][hour]
+        return [soil_moisture_forecast,daily_precipitation_sum]               
+                     
         
     
 
@@ -179,22 +269,16 @@ class SmartIrrigation(GenericEndpoint):
         #     topics_json=requests.get(self.resourceCatalog_url+"/get/topic/pump",params={"companyName":company ,"field":field, "systemToken":token})
         #     topics=json.load(topics_json)
         #     return topics
-        # except requests.exceptions.HTTPError as err:
-        #     print(f"{err.response.status_code} : {err.response.reason}")
+        # except requests.exceptions.InvalidURL as errURL:
+        #     print(f"ERROR: invalid URL for the Resource Catalog!\n\n{errURL}")
+        #     time.sleep(1)
+        # except requests.exceptions.HTTPError as errHTTP:
+        #     print(f"ERROR: something went wrong with Resource catalog!\n\n{errHTTP}")
+        #     time.sleep(1)
+        # except requests.exceptions.ConnectionError:
+        #     print("503: Connection error. Resource catalog unavailable")
         #     time.sleep(1)
 
-
-
-
-
-#DA INTEGRARE   
-    # exposed=True
-    # def GET(self, *uri,**params):
-    ### PER POTER FORNIRE EVENTUALMENTE INFORMAZIONI AD ALTRI SERVIZI###
-
-#DA INTEGRARE
-    #def POST(self):
-    ### PER POTER AGGIORNARE IL JSON CON NUOVE PIANTE SECONDO I BISGONI DELL'UTENTE ###
 
 
 
@@ -215,6 +299,7 @@ if __name__=="__main__":
     irrigation=SmartIrrigation(settings)
     irrigation.start()
 
+    ####visto che ormai il servizio è solo un publisher MQTT ha senso definire le caratteristiche di un servizio REST?
     cherrypy.tree.mount(irrigation, "/", conf)
     cherrypy.config.update({'server.socket_host': ip_address})
     cherrypy.config.update({'server.socket_port': port})

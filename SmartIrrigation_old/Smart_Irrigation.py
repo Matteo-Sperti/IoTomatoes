@@ -1,8 +1,6 @@
 import paho.mqtt.client as mqtt
-import cherrypy
 import time
 import json
-from statistics import mean
 import requests
 import datetime
 
@@ -81,110 +79,121 @@ class SmartIrrigation:
             minSoilMoisture=limits["soilMoistureLimit"]["min"]    #extract the ideal min value of soil moisture for the given plant from the json file 
             maxSoilMoisture=limits["soilMoistureLimit"]["max"]    #extract the ideal max value of soil moisture for the given plant from the json file
             precipitationLimit=limits["precipitationLimit"]["max"]
+        else:
+            print("No crop with the specified name. \nDefault limits will be used") 
+            limits=plantInfo["default"]
+            minSoilMoisture=limits["soilMoistureLimit"]["min"]    #extract the ideal min value of soil moisture for the given plant from the json file 
+            maxSoilMoisture=limits["soilMoistureLimit"]["max"]    #extract the ideal max value of soil moisture for the given plant from the json file
+            precipitationLimit=limits["precipitationLimit"]["max"]
             
     
-            #IN FUTURO:
-            # richiesta al service catalog per url mongodb e poi:
-            # r=requests.get("URL_MONGODB/media?hour=1") ESPRIMERE BENE L'URL E I PARAMETRI IN RELAZIONE A COME COSTRUISCE IL SERVIZIO LUCA
-            try:
-                r=requests.get("http://127.0.0.1:8080/increasing") #richiesta al MongoDBSimulator, da sostituire con il vero mongoDB
-                r.raise_for_status()
-            except requests.exceptions.InvalidURL as errURL:
-                print(errURL)
-            except requests.exceptions.HTTPError as errHTTP:
-                print(errHTTP)
-            except requests.exceptions.ConnectionError:
-                print("503: Connection error. Server unavailable ")
-                
-                
-            else:
-                rValues=list((r.json()).values())
-                previousSoilMoisture=float(rValues[0])
-                currentSoilMoisture=float(rValues[1])
-                
-                currentTime=datetime.datetime.now().time()
-                forecast=self.callWeatherService(currentTime.hour)
-                soilMoistureForecast=forecast[0]
-                dailyPrecipitationSum=forecast[1]
-                
-                currentSoilMoisture=round((3*currentSoilMoisture+soilMoistureForecast)/4,2) #integration sensor measure with the weather forecast one
-                maxLimitTemp=datetime.time(23,59,0)
-                minLimitTemp=datetime.time(20,0,0)
-                
-                #CONTROL ALGORITHM:
-                #controllo schedulato per la sera (quindi sappiamo già complessivamente se durante il giorno ha piovuto)
+        #IN FUTURO:
+        # richiesta al service catalog per url mongodb e poi:
+        # r=requests.get("URL_MONGODB/media?hour=1") ESPRIMERE BENE L'URL E I PARAMETRI IN RELAZIONE A COME COSTRUISCE IL SERVIZIO LUCA
         
-                if currentTime>=minLimitTemp and currentTime<=maxLimitTemp:
+        #PER ORA I DATI VENGONO OTTENUTI DA UNA SORTA DI SIMULATORE MONGODB:
 
-                    #PRECIPITATIONS CONTROL:
-                    if dailyPrecipitationSum>precipitationLimit:    #soil too moist
-                        print("IRRIGATION DOES NOT MAKE SENSE")
-                        print("pumps set to OFF")
-                        message["e"]["command"]="OFF"
-                    else:
-                        print("IRRIGATION MAKE SENSE")
-                        
-                        # HYSTERESIS CONTROL LAW (SOILMOISTURE):
-                        # After the precipitations control, we assume that soilMoisture increasing is related
-                        # only to our irrigation and not also to possible external phenomena
+        try:
+            r=requests.get("http://127.0.0.1:8080/increasing") #richiesta al MongoDBSimulator, da sostituire con il vero mongoDB
+            r.raise_for_status()
+        except requests.exceptions.InvalidURL as errURL:
+            print(errURL)
+            time.sleep(1)
+        except requests.exceptions.HTTPError as errHTTP:
+            print(errHTTP)
+            time.sleep(1)
+        except requests.exceptions.ConnectionError:
+            print("503: Connection error. Server unavailable ")
+            time.sleep(1)
+            
+            
+        else:
+            rValues=list((r.json()).values())
+            previousSoilMoisture=float(rValues[0])
+            currentSoilMoisture=float(rValues[1])
+            
+            currentTime=datetime.datetime.now().time()
+            forecast=self.callWeatherService(currentTime.hour)
+            soilMoistureForecast=forecast[0]
+            dailyPrecipitationSum=forecast[1]
+            
+            currentSoilMoisture=round((3*currentSoilMoisture+soilMoistureForecast)/4,2) #integration sensor measure with the weather forecast one
+            maxLimitTemp=datetime.time(23,59,0)
+            minLimitTemp=datetime.time(20,0,0)
+            
+            #CONTROL ALGORITHM:
+            #controllo schedulato per la sera (quindi sappiamo già complessivamente se durante il giorno ha piovuto)
+    
+            if currentTime>=minLimitTemp and currentTime<=maxLimitTemp:
 
-                        print(f"OFF threshold={maxSoilMoisture}")
-                        print(f"ON threshold={minSoilMoisture}")
-                        print(f"current value soil moisture={currentSoilMoisture}")
-                        print(f"previous value soil moisture={previousSoilMoisture}")
-                        
-                        if currentSoilMoisture>previousSoilMoisture:
-                            print("soilMoisture is increasing")
-                            if currentSoilMoisture>=maxSoilMoisture:
-                                print(f"""current soil moisture over/on the OFF limit: {currentSoilMoisture}>={maxSoilMoisture}""")
-                                print("pumps set to OFF")
-                                message["e"]["command"]="OFF"
-                                
-                            else:
-                                print(f"""current soil moisture under the OFF limit: {currentSoilMoisture}<{maxSoilMoisture}""")
-                                print("pumps set to ON")
-                                message["e"]["command"]="ON"
-                                
-                        elif currentSoilMoisture<previousSoilMoisture:
-                            print(f"soilMoisture is decreasing")
-                            if currentSoilMoisture<=minSoilMoisture:
-                                print(f"""current soil moisture under/on the ON limit: {currentSoilMoisture}<={minSoilMoisture}""")
-                                print("pumps set to ON")
-                                message["e"]["command"]="ON"
-                                
-                            else:
-                                print(f"""current soil moisture over the ON limit: {currentSoilMoisture}>{minSoilMoisture}""")
-                                print("pumps set to OFF")
-                                message["e"]["command"]="OFF"
-                                
-                        else:
-                            print("costant soil moisture")
-                            if currentSoilMoisture>maxSoilMoisture:
-                                print("pumps set to OFF")
-                                message["e"]["command"]="OFF"
-                                
-                            elif currentSoilMoisture<minSoilMoisture:
-                                print("pumps set to ON")
-                                message["e"]["command"]="ON"
-                                    
-                            
-                else:
-                    print("NO IRRIGATION TIME")
+                #PRECIPITATIONS CONTROL:
+                if dailyPrecipitationSum>precipitationLimit:    #soil too moist
+                    print("IRRIGATION DOES NOT MAKE SENSE")
                     print("pumps set to OFF")
                     message["e"]["command"]="OFF"
+                else:
+                    print("IRRIGATION MAKE SENSE")
+                    
+                    # HYSTERESIS CONTROL LAW (SOILMOISTURE):
+                    # After the precipitations control, we assume that soilMoisture increasing is related
+                    # only to our irrigation and not also to possible external phenomena
 
-                message["bn"]=company
-                message["e"]["field"]=fieldID
-                message["e"]["timeStamp"]=time.time()
-                
-                print(f"message= {message}\n")
-                
-                #MODIFICA: INVIO MESSAGGIO A OGNI TOPIC DEL CAMPO
-                commandTopic=self.commandTopic+str(company)+"/"+str(fieldID)+"/1/pump"
-                print(f"command Topic={commandTopic}\n\n")
-                self.service_mqtt.publish(commandTopic,json.dumps(message)) 
-        else:
-            print("No crop with the specified name")      
+                    print(f"OFF threshold={maxSoilMoisture}")
+                    print(f"ON threshold={minSoilMoisture}")
+                    print(f"current value soil moisture={currentSoilMoisture}")
+                    print(f"previous value soil moisture={previousSoilMoisture}")
+                    
+                    if currentSoilMoisture>previousSoilMoisture:
+                        print("soilMoisture is increasing")
+                        if currentSoilMoisture>=maxSoilMoisture:
+                            print(f"""current soil moisture over/on the OFF limit: {currentSoilMoisture}>={maxSoilMoisture}""")
+                            print("pumps set to OFF")
+                            message["e"]["command"]="OFF"
+                            
+                        else:
+                            print(f"""current soil moisture under the OFF limit: {currentSoilMoisture}<{maxSoilMoisture}""")
+                            print("pumps set to ON")
+                            message["e"]["command"]="ON"
+                            
+                    elif currentSoilMoisture<previousSoilMoisture:
+                        print(f"soilMoisture is decreasing")
+                        if currentSoilMoisture<=minSoilMoisture:
+                            print(f"""current soil moisture under/on the ON limit: {currentSoilMoisture}<={minSoilMoisture}""")
+                            print("pumps set to ON")
+                            message["e"]["command"]="ON"
+                            
+                        else:
+                            print(f"""current soil moisture over the ON limit: {currentSoilMoisture}>{minSoilMoisture}""")
+                            print("pumps set to OFF")
+                            message["e"]["command"]="OFF"
+                            
+                    else:
+                        print("costant soil moisture")
+                        if currentSoilMoisture>maxSoilMoisture:
+                            print("pumps set to OFF")
+                            message["e"]["command"]="OFF"
+                            
+                        elif currentSoilMoisture<minSoilMoisture:
+                            print("pumps set to ON")
+                            message["e"]["command"]="ON"
+                                
+                        
+            else:
+                print("NO IRRIGATION TIME")
+                print("pumps set to OFF")
+                message["e"]["command"]="OFF"
+
+            message["bn"]=company
+            message["e"]["field"]=fieldID
+            message["e"]["timeStamp"]=time.time()
+            
+            print(f"message= {message}\n")
+            
+            #MODIFICA: INVIO MESSAGGIO A OGNI TOPIC DEL CAMPO
+            commandTopic=self.commandTopic+str(company)+"/"+str(fieldID)+"/1/pump"
+            print(f"command Topic={commandTopic}\n\n")
+            self.service_mqtt.publish(commandTopic,json.dumps(message)) 
+              
 
 
     def stop(self):
@@ -247,3 +256,6 @@ if __name__=="__main__":
         except KeyboardInterrupt:
             irrigation.stop()
             break
+
+
+

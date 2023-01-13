@@ -1,9 +1,7 @@
 import requests
-import cherrypy
 import time
 import datetime
 import json
-from socket import gethostname, gethostbyname
 import sys
 
 sys.path.append("../SupportClasses/")
@@ -13,7 +11,6 @@ from MyExceptions import *
 
 weatherToCall="WeatherForecast" #Global variable: name of the service that Smart Irrigation must search in the catalog thorugh a get request
 mongoToCall="MongoDB" #Global variable: name of the service that provides previous hour and current measures of each field
-
 
 class SmartIrrigation(GenericEndpoint):
 
@@ -34,8 +31,7 @@ class SmartIrrigation(GenericEndpoint):
             }
         }
       
-
-
+      
     def control(self):
         """It performs:
         - Call to resource catalog -> to retrieve information about each field for each company

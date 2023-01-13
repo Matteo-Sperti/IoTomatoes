@@ -5,6 +5,8 @@ import time
 import cherrypy
 from GenericEndpoint import GenericEndpoint
 import requests
+from MyExceptions import *
+
 
 class MongoConnection():
     def __init__(self):
@@ -115,7 +117,7 @@ class MongoConnection():
                     result={"result":f"No data available for {measure} in field {CollectionName} of company {CompanyName}"}
                 else:
                     result={"Company":CompanyName,"Field":CollectionName,"Measure":measure,"Average":sum(lst)/len(lst),"Unit":dict[0]["e"][j]["unit"],"Timestamp":time.ctime()}
-                return result
+                return json.dumps(result)
             else:
                 print("Collection does not exist")
         else:
@@ -136,38 +138,36 @@ class MongoConnection():
                         unit = result["Unit"]
             
             resultDict = {"Company":CompanyName,"Measure":measure,"Average":sum(lst)/len(lst),"Unit":unit,"Timestamp":time.ctime()}                       
-                        
-            
-            return resultDict
+            return json.dumps(resultDict)
         else:
             print("Database does not exist")
-    def insertConsumptionData(self):
+    def insertConsumptionData(self,CompanyName,CollectionName,ID):
         '''insert data coming from the consumption service\n
         Arguments:\n
         str: str coming from the consumption service\n'''
         # da sistemare con fede- capire come arrivano i dati non in csv
-        db = self.client["Google" ]
-        collection = db["Lighting"]
+        db = self.client[CompanyName]
+        collection = db[CollectionName]
         dict2={"consumption_value":2,"timestamp":time.ctime(),"unit":"kWh"}
         dict = list(collection.find()) 
         try:
-            for i in range(len(dict)):
-                dict[i]["consumption"].append(dict2)
-                collection.update_one({"_id":i}, {"$set": dict[i]})
+            dict[ID]["consumption"].append(dict2)
+            collection.update_one({"_id":ID}, {"$set": dict[ID]})
+            return True
         except KeyError:
             print("its not an actuator")
-            dict[i]["consumption"]=[]   
-            dict[i]["consumption"].append(dict2)
-            collection.update_one({"_id":i}, {"$set": dict[i]})
+            dict[ID]["consumption"]=[]   
+            dict[ID]["consumption"].append(dict2)
+            collection.update_one({"_id":ID}, {"$set": dict[ID]})
         except AttributeError:
-            dict[i]["consumption"]=[dict[i]["consumption"]]
-            dict[i]["consumption"].append(dict2)
-            collection.update_one({"_id":i}, {"$set": dict[i]})
+            dict[ID]["consumption"]=[dict[ID]["consumption"]]
+            dict[ID]["consumption"].append(dict2)
+            collection.update_one({"_id":ID}, {"$set": dict[ID]})
 
         
     
     # def GetBotGrafici
-class WebPage(GenericEndpoint):
+class RESTApi(GenericEndpoint):
     exposed = True
     def __init__(self):
         super().__init__()
@@ -177,11 +177,37 @@ class WebPage(GenericEndpoint):
         '''GET method for the REST API\n
         Returns a JSON with the requested information\n
         Allowed URI:\n
-        `/Avg` -- returns the average of the measures requested. The parameters are "CompanyName", "Field" and "measure"\n'''
+        `/Avg` -- returns the average of the measures requested. The parameters are "CompanyName", "Field" and "measure"\n
+        if `params["CompanyName"]` == "all" returns the average of all field of corresponding company\n'''
         try:
             if len(uri) > 0:
-                if len(uri) == 1 and uri[0] == "avg":
-                    return self.mongo.GetAvg
+                if len(uri) == 1 and uri[0] == "avg" and params["CompanyName"] != "all":
+                    return self.mongo.GetAvg(params["CompanyName"],params["Field"],params["measure"])
+                elif len(uri) == 1 and uri[0] == "avg" and params["CompanyName"] == "all":                    
+                    return self.mongo.getAvgAll(params["CompanyName"],params["measure"])
+                else:
+                    raise web_exception(404, "Resource not found.")
+        except web_exception as e:
+            raise cherrypy.HTTPError(e.code, e.message)
+        except:
+            raise cherrypy.HTTPError(500, "Internal Server Error")
+    # def POST(self,*uri,**params):
+    #     '''POST method for the REST API\n
+    #     Returns a JSON with the operation's status\n
+    #     Allowed URI:\n
+    #     `/insertConsumptionData` -- Insert the consumption data of the actuators of a field.\n 
+    #     \tThe parameters are "CompanyName", "Field". \n
+    #     '''
+    #     try:
+    #         if len(uri) > 0:
+    #             if len(uri) == 1 and uri[0] == "insertConsumptionData":
+    #                 #da capire come mi arrivano i dati
+    #             else:
+    #                 raise web_exception(404, "Resource not found.")
+    #     except web_exception as e:
+    #         raise cherrypy.HTTPError(e.code, e.message)
+    #     except:
+    #         raise cherrypy.HTTPError(500, "Internal Server Error")
                     
         
         
@@ -189,12 +215,13 @@ class WebPage(GenericEndpoint):
     
     
 if __name__ == '__main__':
-    mongo = MongoConnection()
-    #mongo.insertDataBase("Google")
-    #print(mongo.client.list_database_names())
-    #mongo.insertCollection("Google","Lighting",json.load(open("provajson.json","r")))
-   # mongo.insertDataSensors("Google","Lighting",0,json.load(open("provajson.json","r")))
-   # print(mongo.GetMedia("Google","Lighting","temperature"))
-   # print(list(mongo.client[company]["Lighting"].find()))
-    mongo.insertConsumptionData()
-   
+    conf =  {
+            '/': {
+                 'request.dispatch': cherrypy.dispatch.MethodDispatcher(),
+                 'tools.sessions.on': True,
+        }
+    }
+    webService = RESTApi()
+    cherrypy.tree.mount(webService, '/', conf)
+    cherrypy.engine.start()
+    cherrypy.engine.block()     

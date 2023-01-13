@@ -4,7 +4,7 @@ import json
 from statistics import mean
 import datetime
 
-class Pump:
+class Led:
 
     def __init__(self):
         """Inizializzazione della classe del servizio (da adattare in seguito)"""
@@ -39,7 +39,7 @@ class Pump:
         print(dic[str(rc)])
 
     def myOnMessage(self,client,userdata,message):
-        """Riceives command from smart irrigation"""
+        """Riceives command from smart lighting"""
         self.payload=json.loads(message.payload)
         print(self.payload)
 
@@ -52,8 +52,8 @@ class Pump:
 if __name__=="__main__":
 
     
-    pompa=Pump()
-    pompa.start()
+    led=Led()
+    led.start()
 
     while True:
         time.sleep(1)

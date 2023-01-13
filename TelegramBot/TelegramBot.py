@@ -84,7 +84,11 @@ class MessageHandler(telepot.helper.ChatHandler):
                 elif message == "/delete_company":
                     self._command = DeleteCompany(self._CompanyName, self._chat_id, self.sender, self._connector)
                 elif message in ["/help", "/start"]:
-                    self.sender.sendMessage(HelpMessage.format(self._CompanyName))      
+                    self.sender.sendMessage(HelpMessage.format(self._CompanyName))   
+                elif message == "/change_plant":
+                    self._command = ChangePlant(self._CompanyName, self.sender, self._connector)
+                elif message == "plot":
+                    self._command = CustomPlot(self._CompanyName, self.sender, self._connector)   
                 else:
                     self.sender.sendMessage(f"Command not found or not permitted.\n"
                                             f"Type /help for more info.")

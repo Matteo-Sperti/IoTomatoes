@@ -100,6 +100,26 @@ class InsertNewCompany():
                 self._bot.sendMessage("How many indipendent fields do you have in your company?")
                 self._status = 8
             else:
+                self._bot.sendMessage("Insert the colture of your fields, separated by a comma")
+                self._status += 1
+
+        elif self._status == 9:
+            try:
+                fields = message.split(",")
+                if len(fields) != self.response["NumberOfFields"]:
+                    raise ValueError
+
+                self.response["fieldsList"] = []
+                for i in range(len(fields)):
+                    self.response["fieldsList"].append({
+                        "fieldNumber" : i+1,
+                        "plant" : fields[i].lower().strip()
+                    })
+            except:
+                self._bot.sendMessage("Invalid input")
+                self._bot.sendMessage("Insert the colture of your fields, separated by a comma")
+                self._status = 9
+            else:
                 summary = (f"You are going to register the following company:\n"
                             f"Company Name: {self.response['CompanyName']}\n"
                             f"Company Token: {self.response['CompanyToken']}\n"
@@ -109,7 +129,7 @@ class InsertNewCompany():
                 self._bot.sendMessage("Confirm your registration?", reply_markup=keyboardYESNO)
                 self._status += 1
 
-        elif self._status == 9:
+        elif self._status == 10:
             if message == "yes":
                 if self.insert_company():
                     self._bot.sendMessage("Registration completed")
@@ -123,8 +143,9 @@ class InsertNewCompany():
         try:
             params = self.company
             params.update({"SystemToken" : self._connector._SystemToken})
+            body = {"AdminInfo" : self.adminInfo, "fieldsList" : self.response["fieldsList"]}
             res = requests.post(self._connector.ResourceCatalog_url + "/insertCompany", params=params, 
-                                    data= json.dumps(self.adminInfo))
+                                    data= json.dumps(body))
             res.raise_for_status()
         except requests.exceptions.HTTPError as err:
             print(f"{err.response.status_code} : {err.response.reason}")
@@ -341,7 +362,7 @@ class DeleteCompany():
 
     def delete_company(self):
         try:
-            params = {"CompanyName" : self.CompanyName, "CompanyToken" : self.CompanyToken}
+            params = {"CompanyName" : self.CompanyName, "CompanyToken" : self.CompanyToken, "telegramID" : self.chatID}
             res = requests.delete(self._connector.ResourceCatalog_url + "/company", 
                                     params=params)
             res.raise_for_status()
@@ -364,3 +385,73 @@ class DeleteCompany():
                 return True
             else:
                 return False
+
+class ChangePlant():
+    def __init__(self, CompanyName : str, sender, connector):
+        self.CompanyName = CompanyName
+        self.CompanyToken = ""
+        self._connector = connector
+        self._bot = sender
+        self._status = 0
+
+        self.update("")
+
+    def update(self, message):
+        if self._status == 0:
+            self._bot.sendMessage(f"Which field of company {self.CompanyName} do you want to change?")
+            self._bot.sendMessage("Insert your Company Token")
+            self._status += 1
+        
+        elif self._status == 1:
+            self.CompanyToken = message
+            self._bot.sendMessage("Confirm your deletion?", reply_markup=keyboardYESNO)
+            self._status += 1
+
+        elif self._status == 2:
+            if message == "yes":
+                if self.change_plant():
+                    self._bot.sendMessage("Deletion completed")
+                else:
+                    self._bot.sendMessage("Deletion failed")
+            else:
+                self._bot.sendMessage("Deletion canceled")
+            return True
+
+    def change_plant(self):
+        try:
+            params = {"CompanyName" : self.CompanyName, "CompanyToken" : self.CompanyToken, "telegramID" : self.chatID}
+            res = requests.delete(self._connector.ResourceCatalog_url + "/company", 
+                                    params=params)
+            res.raise_for_status()
+            dict_ = res.json()
+        except requests.exceptions.HTTPError as err:
+            if err.response.status_code == 404:
+                self._bot.sendMessage("Company not registered")
+            elif err.response.status_code == 401:
+                self._bot.sendMessage("CompanyToken not valid")
+            elif err.response.status_code == 403:
+                self._bot.sendMessage("You are not authorized to delete this company.\nContact your administrator.")
+            else:
+                print(f"{err.response.status_code} : {err.response.reason}")
+            return False
+        except:
+            self._bot.sendMessage("Error in the connection with the Resource Catalog")
+            return False
+        else:
+            if "Status" in dict_ and dict_["Status"]:
+                return True
+            else:
+                return False
+
+class CustomPlot():
+    def __init__(self, CompanyName : str, sender, connector):
+        self.CompanyName = CompanyName
+        self.CompanyToken = ""
+        self._connector = connector
+        self._bot = sender
+        self._status = 0
+
+        self._bot.sendMessage("not implemented yet")
+
+    def update(self, message):
+        return True

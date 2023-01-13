@@ -9,7 +9,7 @@
             "serviceIP": "http://127.0.1.1:8081"
         }
     ],
-    "lastUpdate": 1673523117.3901188,
+    "lastUpdate": 1673608725.5478103,
     "companiesList": [
         {
             "ID": 100,
@@ -19,19 +19,28 @@
                 "longitude",
                 "latitude"
             ],
-            "NumberOfFields": 5,
+            "NumberOfFields": 2,
             "adminID": 101,
             "usersList": [
                 {
-                    "Name": "MAtteo",
-                    "Surname": "Sperti",
+                    "Name": "av",
+                    "Surname": "sdv",
                     "telegramID": 615608459,
                     "ID": 101,
-                    "lastUpdate": 1673523117.3901186
+                    "lastUpdate": 1673608725.5478098
                 }
             ],
             "devicesList": [],
-            "fieldsList": []
+            "fieldsList": [
+                {
+                    "fieldNumber": 1,
+                    "plant": "to"
+                },
+                {
+                    "fieldNumber": 2,
+                    "plant": "ma"
+                }
+            ]
         }
     ]
 }

@@ -303,13 +303,14 @@ class ResourceCatalogManager():
                     return company["CompanyName"]
         return None
 
-    def insertCompany(self, CompanyInfo : dict, AdminInfo : dict):
+    def insertCompany(self, CompanyInfo : dict, AdminInfo : dict, Fieldlist : list):
         """Insert a new company in the catalog.
 
         Arguments:\n
         `CompanyInfo` -- the information about the company.
         Must contain the `CompanyName` and `CompanyToken`.\n
         `AdminInfo` -- the information about the admin of the company.\n
+        `Fieldlist` -- the list of fields of the company.\n
 
         Return:\n
         JSON with the status of the operation.
@@ -335,7 +336,7 @@ class ResourceCatalogManager():
                             "adminID": AdminID,
                             usersList_name: [],
                             devicesList_name: [],
-                            fieldsList_name: []
+                            fieldsList_name: Fieldlist
                         }
                         new_item = AdminInfo
                         new_item["ID"] = AdminID
@@ -431,6 +432,7 @@ class ResourceCatalogManager():
     def deleteCompany(self, dict_info : dict):
         """Delete a company from the catalog. """
 
+        print(dict_info)
         if "CompanyName" not in dict_info or "CompanyToken" not in dict_info:
             raise web_exception(400, "Missing CompanyName or CompanyToken")
         else:
@@ -438,7 +440,7 @@ class ResourceCatalogManager():
                 "CompanyName": dict_info["CompanyName"],
                 "CompanyToken": dict_info["CompanyToken"]
             }
-
+        print("Sto convertendo telegramID")
         if "telegramID" not in dict_info:
             raise web_exception(400, "Missing telegramID")
         try:
@@ -446,10 +448,11 @@ class ResourceCatalogManager():
         except ValueError:
             raise web_exception(400, "Invalid telegramID")
 
+        print("Sto cercando la company")
         company = self.findCompany(CompanyInfo)
         if company == None:
             raise web_exception(404, "Company not found")
-
+        print("SIUUUUus")
         AdminID = company["adminID"]
         for user in company[usersList_name]:
             if user["telegramID"] == chatID:
@@ -464,6 +467,8 @@ class ResourceCatalogManager():
                     return json.dumps(out, indent=4)
                 else:
                     raise web_exception(403, "You are not the admin of this company")
+        
+        raise web_exception(403, "You are not a user of this company")
 
 
 
@@ -608,7 +613,8 @@ class RESTResourceCatalog(GenericEndpoint):
             if len(uri) > 0:
                 if len(uri) == 1 and uri[0] == "insertCompany":
                     body_dict = json.loads(cherrypy.request.body.read())
-                    return self.catalog.insertCompany(params, body_dict)
+                    if "AdminInfo" in body_dict and "fieldsList" in body_dict:
+                        return self.catalog.insertCompany(params, body_dict["AdminInfo"], body_dict["fieldsList"])
                 elif len(uri) == 2 and uri [0] == "insert":
                     body_dict = json.loads(cherrypy.request.body.read())
                     if uri[1] == "user":

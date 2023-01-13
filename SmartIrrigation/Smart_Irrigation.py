@@ -1,4 +1,3 @@
-import paho.mqtt.client as mqtt
 import requests
 import cherrypy
 import time
@@ -22,41 +21,15 @@ class SmartIrrigation(GenericEndpoint):
 
         self.message={
             "bn":"",
+            "CompanyName":"",
+            "fieldNumber":"",
             "e":{
-                "field":"",
-                "command":"",
+                "n" : "pump",
+                "u" : "/",
+                "v" : 0,
                 "timestamp":""
             }
         }
-    ####### ORMAI E' SOLO PUBLISHER PER CUI NON RICEVE PIU' LE MISURE DAI SENSORI 
-    # def notify(self,topic,message):
-    #     """Riceives measures from a specific topic and temporary store them in a
-    #      json file for processing"""
-    #     self.payload=json.loads(message.payload)
-    #     # print(self.payload)
-    
-    #     companyName=self.payload["companyName"]
-    #     fieldID=self.payload["field"]
-    #     name=self.payload["e"]["name"]
-    #     measure=self.payload["e"]["value"] #extract the measure vale from MQTT message
-
-    #     try:
-    #         with open("plantInformation.json") as outfile:
-    #             information=json.load(outfile)
-    #     except FileNotFoundError:
-    #         print("WARNING: file opening error. The file doesn't exist")
-        
-    #     if companyName in information["company"]:
-    #         position=information["company"].index(companyName)
-
-    #         information["companyList"][position]["fields"][fieldID-1]["lastMeasures"][name]["values"].append(measure) #insert the measure value in the json file
-    #         information["companyList"][position]["fields"][fieldID-1]["lastMeasures"][name]["lastUpdate"]=time.time() #update the lastUpdate value in the json file
-        
-    #     try:
-    #         with open("plantInformation.json","w") as outfile:
-    #             json.dump(information, outfile, indent=4)
-    #     except FileNotFoundError:
-    #         print("WARNING: file opening error. The file doesn't exist")
 
 
     def control(self):
@@ -322,40 +295,19 @@ class SmartIrrigation(GenericEndpoint):
         #     time.sleep(1)
 
 
-
-
 if __name__=="__main__":
     try:
-        with open(open("SmartIrrigationSettings.json")) as outfile:
-            settings=json.load(outfile)
+        settings=json.load(open("SmartIrrigationSettings.json", 'r'))
     except FileNotFoundError:
         print("ERROR: file 'SmartiIrrigationSettings.json' not found")
+    else:
+        irrigation = SmartIrrigation(settings)
 
-    ip_address = gethostbyname(gethostname())
-    port = settings["IPport"]
-    settings["IPaddress"] = ip_address
-
-    conf = {
-        "/":{
-                'request.dispatch': cherrypy.dispatch.MethodDispatcher(),
-                'tool.session.on': True
-            }
-        }
-
-    irrigation=SmartIrrigation(settings)
-    irrigation.start()
-
-    ####visto che ormai il servizio è solo un publisher MQTT ha senso definire le caratteristiche di un servizio REST?
-    cherrypy.tree.mount(irrigation, "/", conf)
-    cherrypy.config.update({'server.socket_host': ip_address})
-    cherrypy.config.update({'server.socket_port': port})
-    cherrypy.engine.start()
-
-    try:
-        while True:
-            irrigation.control()
-            time.sleep(30)
-    except KeyboardInterrupt:
-        irrigation.stop()
-        cherrypy.engine.block()
-        print("SmartIrrigation stopped")
+        controlTimeInterval = settings["controlTimeInterval"]
+        try:
+            while True:
+                irrigation.control()
+                time.sleep(controlTimeInterval)
+        except KeyboardInterrupt:
+            irrigation.stop()
+            print("SmartIrrigation stopped")

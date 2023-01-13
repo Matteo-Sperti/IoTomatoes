@@ -170,7 +170,8 @@ class MongoConnection():
 class RESTApi(GenericEndpoint):
     exposed = True
     def __init__(self):
-        super().__init__()
+        settings = json.load(open("settings.json","r"))
+        super().__init__(settings,True,False)
         self.mongo = MongoConnection()
         
     def GET(self, *uri, **params):

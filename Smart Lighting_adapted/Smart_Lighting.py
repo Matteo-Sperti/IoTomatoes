@@ -252,9 +252,11 @@ class SmartLighting(GenericEndpoint):
                 
                 
     def callWeatherService(self,hour):
-        """It gets precipitations informations from weather forecast service and extract:
-            - daily precipitation sum
-            - soil moisture forecast
+        """It gets informations from weather forecast service and extract:
+            - cloudCover percentage
+            - light
+            - sunrise time
+            - sunset time
             from the received json file"""
         ####MODIFICA: RICAVARE I DATI DAL WEATHER FORECAST ATTRAVERSO LA CHIAMATA AL SERVICE CATALOG
         # try:
@@ -372,4 +374,4 @@ if __name__=="__main__":
     except KeyboardInterrupt:
         lighting.stop()
         cherrypy.engine.block()
-        print("SmartIrrigation stopped")
+        print("SmartLighting stopped")

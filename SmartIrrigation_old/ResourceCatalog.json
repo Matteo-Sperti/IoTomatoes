@@ -86,7 +86,9 @@
                     "servicesDetails": [
                         {
                             "serviceType": "MQTT",
-                            "subscribedTopics": [],
+                            "subscribedTopics": [
+                                "Patata/1/103/pump"
+                            ],
                             "publishedTopics": [
                                 "Patata/1/103/temperature",
                                 "Patata/1/103/soilMoisture",
@@ -156,7 +158,9 @@
                     "servicesDetails": [
                         {
                             "serviceType": "MQTT",
-                            "subscribedTopics": [],
+                            "subscribedTopics": [
+                                "Patata/1/105/pump"
+                            ],
                             "publishedTopics": []
                         }
                     ],
@@ -184,7 +188,7 @@
                         {
                             "serviceType": "MQTT",
                             "subscribedTopics": [
-                                "Patata/1/106/led"
+                                "Patata/1/106/pump"
                             ],
                             "publishedTopics": [
                                 "Patata/1/106/soilMoisture"
@@ -216,7 +220,9 @@
                     "servicesDetails": [
                         {
                             "serviceType": "MQTT",
-                            "subscribedTopics": [],
+                            "subscribedTopics": [
+                                "Patata/1/107/pump"
+                            ],
                             "publishedTopics": [
                                 "Patata/1/107/temperature",
                                 "Patata/1/107/humidity",
@@ -251,7 +257,9 @@
                     "servicesDetails": [
                         {
                             "serviceType": "MQTT",
-                            "subscribedTopics": [],
+                            "subscribedTopics": [
+                                "Patata/1/108/pump"
+                            ],
                             "publishedTopics": [
                                 "Patata/1/108/humidity",
                                 "Patata/1/108/temperature",
@@ -317,7 +325,9 @@
                     "servicesDetails": [
                         {
                             "serviceType": "MQTT",
-                            "subscribedTopics": [],
+                            "subscribedTopics": [
+                                "Patata/2/110/pump"
+                            ],
                             "publishedTopics": []
                         }
                     ],
@@ -344,7 +354,8 @@
                     "servicesDetails": [
                         {
                             "serviceType": "MQTT",
-                            "subscribedTopics": [],
+                            "subscribedTopics": [
+                            ],
                             "publishedTopics": [
                                 "Patata/1/111/light",
                                 "Patata/1/111/temperature"
@@ -413,7 +424,7 @@
                         {
                             "serviceType": "MQTT",
                             "subscribedTopics": [
-                                "Patata/1/102/led"
+                                "Carota/1/122/led"
                             ],
                             "publishedTopics": [
                                 "Patata/1/102/light",
@@ -451,7 +462,9 @@
                     "servicesDetails": [
                         {
                             "serviceType": "MQTT",
-                            "subscribedTopics": [],
+                            "subscribedTopics": [
+                                "Carota/1/123/pump"
+                            ],
                             "publishedTopics": [
                                 "Patata/1/103/temperature",
                                 "Patata/1/103/soilMoisture",
@@ -487,7 +500,7 @@
                         {
                             "serviceType": "MQTT",
                             "subscribedTopics": [
-                                "Patata/1/104/led"
+                                "Carota/2/124/led"
                             ],
                             "publishedTopics": [
                                 "Patata/1/104/humidity",
@@ -521,7 +534,9 @@
                     "servicesDetails": [
                         {
                             "serviceType": "MQTT",
-                            "subscribedTopics": [],
+                            "subscribedTopics": [
+                                "Carota/2/125/pump"
+                            ],
                             "publishedTopics": []
                         }
                     ],
@@ -549,7 +564,7 @@
                         {
                             "serviceType": "MQTT",
                             "subscribedTopics": [
-                                "Patata/1/106/led"
+                                "Patata/3/126/led"
                             ],
                             "publishedTopics": [
                                 "Patata/1/106/soilMoisture"
@@ -581,7 +596,9 @@
                     "servicesDetails": [
                         {
                             "serviceType": "MQTT",
-                            "subscribedTopics": [],
+                            "subscribedTopics": [
+                                "Carota/3/127/pump"
+                            ],
                             "publishedTopics": [
                                 "Patata/1/107/temperature",
                                 "Patata/1/107/humidity",
@@ -651,7 +668,9 @@
                     "servicesDetails": [
                         {
                             "serviceType": "MQTT",
-                            "subscribedTopics": [],
+                            "subscribedTopics": [
+                                "Carota/3/129/pump"
+                            ],
                             "publishedTopics": [
                                 "Patata/1/109/humidity"
                             ]
@@ -682,7 +701,9 @@
                     "servicesDetails": [
                         {
                             "serviceType": "MQTT",
-                            "subscribedTopics": [],
+                            "subscribedTopics": [
+                                "Carota/4/130/led"
+                            ],
                             "publishedTopics": []
                         }
                     ],
@@ -695,7 +716,7 @@
                     "PowerConsumption_kW": 0,
                     "isActuator": true,
                     "actuatorType": [
-                        "pump"
+                        "led"
                     ],
                     "isSensor": false,
                     "measureType": [],
@@ -709,7 +730,44 @@
                     "servicesDetails": [
                         {
                             "serviceType": "MQTT",
-                            "subscribedTopics": [],
+                            "subscribedTopics": [
+                                "Carota/4/131/led"
+                            ],
+                            "publishedTopics": [
+                                "Patata/1/111/light",
+                                "Patata/1/111/temperature"
+                            ]
+                        }
+                    ],
+                    "deviceName": "Device_10",
+                    "field": 4,
+                    "Location": {
+                        "Latitude": -1,
+                        "Longitude": -1
+                    },
+                    "PowerConsumption_kW": 0,
+                    "isActuator": true,
+                    "actuatorType": [
+                        "led"
+                    ],
+                    "isSensor": true,
+                    "measureType": [
+                        "light",
+                        "temperature"
+                    ],
+                    "lastUpdate": 1673521099.4690788
+                },
+                {
+                    "ID": 132,
+                    "availableServices": [
+                        "MQTT"
+                    ],
+                    "servicesDetails": [
+                        {
+                            "serviceType": "MQTT",
+                            "subscribedTopics": [
+                                "Carota/4/132/pump"
+                            ],
                             "publishedTopics": [
                                 "Patata/1/111/light",
                                 "Patata/1/111/temperature"

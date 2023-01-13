@@ -10,5 +10,6 @@
             "serviceType": "MQTT",
             "publishedTopics": []
         }
-    ]
+    ],
+    "controlTimeInterval": 30
 }

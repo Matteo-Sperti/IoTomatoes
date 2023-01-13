@@ -1,0 +1,25 @@
+{
+    "companyName" : "ciao",
+    "bn" : 0,
+    "field" : "getField(self._EndpointInfo)",
+    "e" : [{
+        "name": "humidity",
+        "value": 222,
+        "unit": "C",       
+        "timestamp": "None"
+        },
+        {
+        "name": "temperature",
+        "value": 1000000000,
+        "unit": "C",
+        "timestamp": "None"
+        }],
+    "consumption" : [{
+        "consumption_value": 0,
+        "timestamp": "None",
+        "unit": "kWh"
+    }]
+    
+
+
+}

@@ -46,9 +46,8 @@ class WebPage(object):
 				weather = WeatherApp()
 				return json.dumps(weather.LightingData())
 			elif uri[0] == "Custom":
-				bodyAsString = cherrypy.request.body.read()
-				bodyAsDict = json.loads(bodyAsString)
-				data = json.dumps(bodyAsDict)
+				weather = WeatherApp()
+				data = json.dumps(weather.CustomData())
 				if data == "Null":
 					raise cherrypy.HTTPError(400, "Wrong request")
 				elif validateJSON(data) == False:

@@ -20,6 +20,8 @@ class AmbientSimulator():
         self._humidity = 50
         self._light = 100
         self._soilMoisture = 50
+        self._led = False
+        self._pump = False
 
     def start(self):
         self.start_MQTTclient()
@@ -80,7 +82,15 @@ class AmbientSimulator():
         """When a message is received, it is processed by this callback. 
         It redirects the message to the notify method (which must be implemented by the user)"""
 
-        pass
+        topic, msg_dict = msg.topic, json.loads(msg.payload)
+        topic_list = topic.split("/")
+        actuator = topic_list[-1]
+
+        if actuator == "led":
+            self._light = msg_dict["value"]
+        elif actuator == "pump":
+            self._soilMoisture = msg_dict["value"]
+
 
     def mySubscribe(self, topic):
         """It subscribes to `topic`"""

@@ -51,7 +51,6 @@ class MessageHandler(telepot.helper.ChatHandler):
             self._chat_id = 0
             
         self._CompanyName = self._connector.isRegistered(self._chat_id)
-        print(self._CompanyName)
 
     def on_chat_message(self, msg):
         content_type, _, chat_ID = telepot.glance(msg)  # type: ignore
@@ -61,11 +60,7 @@ class MessageHandler(telepot.helper.ChatHandler):
             return
 
         message = msg['text']
-        if self._command is not None:
-            completed = self._command.update(message)
-            if completed:
-                self.close()
-        else:
+        if self._command is None:
             if self._CompanyName == "":
                 if message == "/insert_company":
                     self._command = InsertNewCompany(chat_ID, self.sender, self._connector)
@@ -78,9 +73,11 @@ class MessageHandler(telepot.helper.ChatHandler):
                                             f"Type /insert_company to register your company or /help for more info.")
             else:
                 if message == "/users":
-                    self._command = getUsers(self._CompanyName, self.sender, self._connector)
+                    getUsers(self._CompanyName, self.sender, self._connector)
                 elif message == "/devices":
-                    self._command = getDevices(self._CompanyName, self.sender, self._connector)
+                    getDevices(self._CompanyName, self.sender, self._connector)
+                elif message == "/fields":
+                    getFields(self._CompanyName, self.sender, self._connector)
                 elif message == "/delete_company":
                     self._command = DeleteCompany(self._CompanyName, self._chat_id, self.sender, self._connector)
                 elif message in ["/help", "/start"]:
@@ -92,6 +89,14 @@ class MessageHandler(telepot.helper.ChatHandler):
                 else:
                     self.sender.sendMessage(f"Command not found or not permitted.\n"
                                             f"Type /help for more info.")
+        
+        if self._command is not None:
+            completed = self._command.update(message)
+            if completed:
+                self.close()
+        else:
+            self.close()
+            
 
     def on_callback_query(self,msg):
         _ , chat_ID , query_data = telepot.glance(msg,flavor='callback_query')
@@ -211,16 +216,45 @@ class IoTBot(GenericEndpoint):
             else:
                 return ""
 
+    def getList(self, CompanyName : str, listType : str):
+        if listType not in ["users", "devices", "fields"]:
+            return None
+
+        try:
+            params = {"SystemToken": self._SystemToken, "CompanyName": CompanyName}
+            res = requests.get(self.ResourceCatalog_url + "/" + listType, params=params)
+            res.raise_for_status()
+            res_dict = res.json()
+        except:
+            return None
+        else:
+            if len(res_dict) > 0:
+                return res_dict
+            else:
+                return []
+
     def notify(self, topic, msg):
         try:
             timestamp = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(msg["timestamp"]))
             message = (f"Message from {msg['bn']} at {timestamp}:\n\n{msg['message']}")
-            chat_ID = int(msg["telegramID"])
         except:
             print("Invalid message")
         else:
-            if chat_ID != 0:
-                self.bot.sendMessage(chat_ID, text=message)
+            if "telegramID" in msg:
+                try:
+                    chatID = int(msg["telegramID"])
+                    self.bot.sendMessage(chatID, text=message)
+                except:
+                    print("Invalid chatID")
+            else:
+                users = self.getList(msg["bn"], "users")
+                if users is not None:
+                    for user in users:
+                        try:
+                            chatID = int(user["telegramID"])
+                            self.bot.sendMessage(chatID, text=message)
+                        except:
+                            print("Invalid chatID")
 
 if __name__ == "__main__":
     settings = json.load(open("TelegramSettings.json"))

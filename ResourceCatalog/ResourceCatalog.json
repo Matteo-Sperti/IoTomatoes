@@ -9,38 +9,6 @@
             "serviceIP": "http://127.0.1.1:8081"
         }
     ],
-    "lastUpdate": 1673608725.5478103,
-    "companiesList": [
-        {
-            "ID": 100,
-            "CompanyName": "Patata",
-            "CompanyToken": "123",
-            "Location": [
-                "longitude",
-                "latitude"
-            ],
-            "NumberOfFields": 2,
-            "adminID": 101,
-            "usersList": [
-                {
-                    "Name": "av",
-                    "Surname": "sdv",
-                    "telegramID": 615608459,
-                    "ID": 101,
-                    "lastUpdate": 1673608725.5478098
-                }
-            ],
-            "devicesList": [],
-            "fieldsList": [
-                {
-                    "fieldNumber": 1,
-                    "plant": "to"
-                },
-                {
-                    "fieldNumber": 2,
-                    "plant": "ma"
-                }
-            ]
-        }
-    ]
+    "lastUpdate": 1673618847.7364836,
+    "companiesList": []
 }

@@ -208,40 +208,18 @@ class ResourceCatalogManager():
             return json.dumps(company, indent=4)
         raise web_exception(404, "Company not found")
 
-    def getDevices(self, CompanyInfo : dict):
-        """Return the list of devices of the company specified in `CompanyInfo` in json format.
+    def getList(self, CompanyInfo : dict, listName : str):
+        """Return the list of items of the company specified in `CompanyInfo` in json format.
 
         Arguments: \n
         `CompanyInfo` -- the information about the company.
-        Must contain the `CompanyName` and `CompanyToken`.
+        Must contain the `CompanyName` and `CompanyToken`.\n
+        `listName` -- the name of the list to return.
         """
+
         company = self.findCompany(CompanyInfo)
         if company != None:
-            return json.dumps(company[devicesList_name], indent=4)
-        raise web_exception(404, "Company not found")
-
-    def getUsers(self, CompanyInfo : dict):
-        """Return the list of users of the company specified in `CompanyInfo` in json format.
-
-        Arguments: \n
-        `CompanyInfo` -- the information about the company.
-        Must contain the `CompanyName` and `CompanyToken`.
-        """
-        company = self.findCompany(CompanyInfo)
-        if company != None:
-            return json.dumps(company[usersList_name], indent=4)
-        raise web_exception(404, "Company not found")
-
-    def getFields(self, dict_ : dict):
-        """Return the list of fields of the company specified in `CompanyInfo` in json format.
-
-        Arguments: \n
-        `CompanyInfo` -- the information about the company.
-        Must contain the `CompanyName` and `CompanyToken`.
-        """
-        company = self.findCompany(dict_)
-        if company != None:
-            return json.dumps([getField(item) for item in company[devicesList_name]], indent=4)
+            return json.dumps(company[listName], indent=4)
         raise web_exception(404, "Company not found")
 
     def getTopics(self, CompanyInfo : dict, field : str, ResourceType : str):
@@ -429,6 +407,36 @@ class ResourceCatalogManager():
             out = {"Status": False}
         return json.dumps(out, indent=4)
 
+    def updateField(self, params : dict) : 
+        """Update a field in the catalog.
+
+        Arguments:\n
+        `params` -- the parameters of the request.\n
+        Must contain the `CompanyName`, `CompanyToken`, `fieldNumber` and `plant`.\n
+
+        Return:\n
+        JSON with the status of the operation.
+        """
+        company = self.findCompany(params)
+        if company == None:
+            raise web_exception(404, "No Company found")
+        
+        if "fieldNumber" not in params or "plant" not in params:
+            raise web_exception(400, "Missing fieldNumber or plant")
+        
+        try:
+            fieldNumber = int(params["fieldNumber"])
+        except ValueError:
+            raise web_exception(400, "fieldNumber must be an integer")
+
+        for field in company[fieldsList_name]:
+            if field["fieldNumber"] == fieldNumber:
+                field["plant"] = params["plant"]
+                self.catalog["lastUpdate"] = time.time()
+                return json.dumps({"Status": True}, indent=4)
+
+        raise web_exception(404, "Field not found")
+
     def deleteCompany(self, dict_info : dict):
         """Delete a company from the catalog. """
 
@@ -581,13 +589,13 @@ class RESTResourceCatalog(GenericEndpoint):
                         return self.catalog.getItem(CompanyInfo, int(params["ID"]))
                 elif len(uri) == 1 and uri[0] == "devices":
                     CompanyInfo = self.catalog.accessInfo(params)
-                    return self.catalog.getDevices(CompanyInfo)
+                    return self.catalog.getList(CompanyInfo, devicesList_name)
                 elif len(uri) == 1 and uri[0] == "users":
                     CompanyInfo = self.catalog.accessInfo(params)
-                    return self.catalog.getUsers(CompanyInfo)
+                    return self.catalog.getList(CompanyInfo, usersList_name)
                 elif len(uri) == 1 and uri[0] == "fields":
                     CompanyInfo = self.catalog.accessInfo(params)
-                    return self.catalog.getFields(CompanyInfo)
+                    return self.catalog.getList(CompanyInfo, fieldsList_name)
                 elif len(uri) == 2 and uri[0] == "topics":
                     if "field" in params:
                         CompanyInfo = self.catalog.accessInfo(params)
@@ -640,6 +648,8 @@ class RESTResourceCatalog(GenericEndpoint):
                     if all(key in params for key in ["ID", "CompanyName", "CompanyToken"]):
                         CompanyInfo = {"CompanyName": params["CompanyName"], "CompanyToken": params["CompanyToken"]}
                         return self.catalog.refreshItem(CompanyInfo, int(params["ID"]))
+                if len(uri) == 1 and uri[0] == "field":
+                    return self.catalog.updateField(params)
             raise web_exception(404, "Resource not found.")
         except web_exception as e:
             return cherrypy.HTTPError(e.code, e.message)

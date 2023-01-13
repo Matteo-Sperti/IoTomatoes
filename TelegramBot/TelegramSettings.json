@@ -9,7 +9,7 @@
     "servicesDetails" : [
         {
             "serviceType": "MQTT",
-            "subscribedTopics": ["+/TelegramBot/#"]
+            "subscribedTopics": ["+/Users/#"]
         }
     ]
 }

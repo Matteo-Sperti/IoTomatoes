@@ -96,7 +96,7 @@ class SmartIrrigation(GenericEndpoint):
                     with open("plantThreshold.json") as outfile:
                         plantInfo=json.load(outfile)          
                 except FileNotFoundError:
-                    print("ERROR: file not found")
+                    print("ERROR: file 'plantThreshold.json' not found")
         
 
                 #Check if the crop is in our json file:
@@ -325,7 +325,11 @@ class SmartIrrigation(GenericEndpoint):
 
 
 if __name__=="__main__":
-    settings = json.load(open("SmartIrrigationSettings.json"))
+    try:
+        with open(open("SmartIrrigationSettings.json")) as outfile:
+            settings=json.load(outfile)
+    except FileNotFoundError:
+        print("ERROR: file 'SmartiIrrigationSettings.json' not found")
 
     ip_address = gethostbyname(gethostname())
     port = settings["IPport"]

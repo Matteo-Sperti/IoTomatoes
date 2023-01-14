@@ -31,7 +31,6 @@ class SmartIrrigation(GenericEndpoint):
             }
         }
       
-      
     def control(self):
         """It performs:
         - Call to resource catalog -> to retrieve information about each field for each company
@@ -40,8 +39,6 @@ class SmartIrrigation(GenericEndpoint):
         - Call to Weather forecast service to retrieve information about precipitation during the day
         With these information it performs a control strategy with an hysteresis law in order to send the command ON when the 
         soil moisture mesaure decrease and is under a specific low threshold and to send command OFF in the opposite case"""
-
-        message=self._message.copy()
 
         companyList = self.getCompaniesList()
 
@@ -64,29 +61,39 @@ class SmartIrrigation(GenericEndpoint):
                 previousSoilMoisture, currentSoilMoisture = self.getMongoDB()
                 if previousSoilMoisture == None or currentSoilMoisture == None:
                     print("No previous or current soil moisture measure")
+                    self.sendCommand(companyName, fieldID, actuatorTopicsForField, 0)
                     continue
                     
-                currentTime=datetime.datetime.now().time()
-                forecast=self.callWeatherService(currentTime.hour)
-                soilMoistureForecast=forecast[0]    #soilMoisture value provided by the weather forecast
-                dailyPrecipitationSum=forecast[1]   #sum of the daily precipitations provided by the weather forecast
+                currentTime = datetime.datetime.now().time()
+                forecast = self.callWeatherService(currentTime.hour)
+                if forecast == None:
+                    print("No weather forecast available")
+                    self.sendCommand(companyName, fieldID, actuatorTopicsForField, 0)
+                    continue
+
+                soilMoistureForecast = forecast[0]    #soilMoisture value provided by the weather forecast
+                dailyPrecipitationSum = forecast[1]   #sum of the daily precipitations provided by the weather forecast
                 
-                currentSoilMoisture=round((3*currentSoilMoisture+soilMoistureForecast)/4,2) #integration sensor measure with the weather forecast one
-                maxLimitTemp=datetime.time(23,59,0)
-                minLimitTemp=datetime.time(20,0,0)  #da cambiare per poter eseguire le prove sul controllo
+                currentSoilMoisture = round((3*currentSoilMoisture+soilMoistureForecast)/4,2) #integration sensor measure with the weather forecast one
+                maxLimitTemp = datetime.time(23,59,0)
+                minLimitTemp = datetime.time(20,0,0)  #da cambiare per poter eseguire le prove sul controllo
                 
                 #CONTROL ALGORITHM:
                 #controllo schedulato per la sera dalle 20 alle 24(quindi sappiamo già complessivamente se durante il giorno ha piovuto)
                 print(f"Performing control on: Company={companyName} field={fieldID}")
-                if currentTime>=minLimitTemp and currentTime<=maxLimitTemp:
+                if currentTime < minLimitTemp or currentTime > maxLimitTemp:
+                    print("NO IRRIGATION TIME")
+                    print("pumps set to OFF")
+                    self.sendCommand(companyName, fieldID, actuatorTopicsForField, 0)
+                else:
                     #PRECIPITATIONS CONTROL:
-                    if dailyPrecipitationSum>precipitationLimit:    #soil too moist
+                    if dailyPrecipitationSum > precipitationLimit:    #soil too moist
                         print("IRRIGATION DOES NOT MAKE SENSE")
                         print("pumps set to OFF")
-                        message["e"]["command"]="OFF"
+                        self.sendCommand(companyName, fieldID, actuatorTopicsForField, 0)
                     else:
                         print("IRRIGATION MAKE SENSE")
-                        
+                        command = 0
                         # HYSTERESIS CONTROL LAW (SOILMOISTURE):
                         # After the precipitations control, we assume that soilMoisture increasing is related
                         # only to our irrigation and not also to possible external phenomena
@@ -96,57 +103,59 @@ class SmartIrrigation(GenericEndpoint):
                         print(f"current value soil moisture={currentSoilMoisture}")
                         print(f"previous value soil moisture={previousSoilMoisture}")
                         
-                        if currentSoilMoisture>previousSoilMoisture:
+                        if currentSoilMoisture > previousSoilMoisture:
                             print("soilMoisture is increasing")
-                            if currentSoilMoisture>=maxSoilMoisture:
+                            if currentSoilMoisture >= maxSoilMoisture:
                                 print(f"""current soil moisture over/on the OFF limit: {currentSoilMoisture}>={maxSoilMoisture}""")
                                 print("pumps set to OFF")
-                                message["e"]["command"]="OFF"
+                                command = 0
                                 
                             else:
                                 print(f"""current soil moisture under the OFF limit: {currentSoilMoisture}<{maxSoilMoisture}""")
                                 print("pumps set to ON")
-                                message["e"]["command"]="ON"
+                                command = 1
                                 
                         elif currentSoilMoisture<previousSoilMoisture:
                             print(f"soilMoisture is decreasing")
-                            if currentSoilMoisture<=minSoilMoisture:
+                            if currentSoilMoisture <= minSoilMoisture:
                                 print(f"""current soil moisture under/on the ON limit: {currentSoilMoisture}<={minSoilMoisture}""")
                                 print("pumps set to ON")
-                                message["e"]["command"]="ON"
+                                command = 1
                                 
                             else:
                                 print(f"""current soil moisture over the ON limit: {currentSoilMoisture}>{minSoilMoisture}""")
                                 print("pumps set to OFF")
-                                message["e"]["command"]="OFF"
+                                command = 0
                                 
                         else:
                             print("costant soil moisture")
-                            if currentSoilMoisture>maxSoilMoisture:
+                            if currentSoilMoisture > maxSoilMoisture:
                                 print("pumps set to OFF")
-                                message["e"]["command"]="OFF"
+                                command = 0
                                 
-                            elif currentSoilMoisture<minSoilMoisture:
+                            elif currentSoilMoisture < minSoilMoisture:
                                 print("pumps set to ON")
-                                message["e"]["command"]="ON"
+                                command = 1
+
+                        self.sendCommand(companyName, fieldID, actuatorTopicsForField, command)
                                     
                             
-                else:
-                    print("NO IRRIGATION TIME")
-                    print("pumps set to OFF")
-                    message["e"]["command"]="OFF"
+    def sendCommand(self, companyName : str, fieldID : int, topicList : list, command : int):
+        message=self._message.copy()
 
-                print(f"\nActuators topics list= {actuatorTopicsForField}\n")
-                for singleTopic in actuatorTopicsForField:    
-                    message["bn"]=companyName
-                    message["e"]["field"]=fieldID
-                    message["e"]["timeStamp"]=time.time()
-                
-                    print(f"message= {message}\n")
-                    commandTopic=self._baseTopic+str(singleTopic)
-                    print(f"command Topic={commandTopic}\n\n")
-                    self.myPublish(commandTopic,json.dumps(message))
-  
+        print(f"\nActuators topics list= {topicList}\n")
+        for singleTopic in topicList:    
+            message["bn"] = self._EndpointInfo["serviceName"]
+            message["CompanyName"] = companyName
+            message["fieldNumber"] = fieldID
+            message["e"]["v"] = command
+            message["e"]["timestamp"]=time.time()
+        
+            print(f"message = {message}\n")
+            commandTopic = self._baseTopic + str(singleTopic)
+            print(f"command Topic={commandTopic}\n\n")
+            self.myPublish(commandTopic, json.dumps(message))
+
     def getCompaniesList(self):
         """Return the list of the companies from the Resource Catalog""" 
         try:
@@ -282,8 +291,6 @@ class SmartIrrigation(GenericEndpoint):
         soil_moisture_forecast=weatherService_r["hourly"]["soil_moisture_3_9cm"][hour]
         return [soil_moisture_forecast,daily_precipitation_sum]               
                      
-
-
 
 if __name__=="__main__":
     try:

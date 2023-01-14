@@ -156,18 +156,6 @@ class SmartIrrigation(GenericService):
             print(f"command Topic={commandTopic}\n\n")
             self.myPublish(commandTopic, json.dumps(message))
 
-    def getCompaniesList(self):
-        """Return the list of the companies from the Resource Catalog""" 
-        try:
-            r=requests.get(self.ResourceCatalog_url+"/all")
-            r.raise_for_status()
-            companyList = r.json()
-        except:
-            print("ERROR: Resource Catalog not reachable!")
-            return []
-        else:
-            return companyList
-
     def getTopics(self, company, fieldNumber : int): 
         """Return the list of the subscribed topics for a field in the company"""
         topics = []

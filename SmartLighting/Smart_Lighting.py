@@ -1,4 +1,3 @@
-import paho.mqtt.client as mqtt
 import requests
 import cherrypy
 import time
@@ -16,47 +15,22 @@ mongoToCall="MongoDB" #Global variable: name of the service that provides previo
 
 class SmartLighting(GenericEndpoint):
 
-    def __init__(self, settings : dict):
-        """Inizializzazione della classe del servizio (da adattare in seguito)"""
+    def __init__(self, settings : dict, plantInfo : dict):
+        """Inizializzazione della classe del servizio """
         super().__init__(settings, isService=True)
 
-        self.message={
+        self.plantInfo = plantInfo   
+        self._message = {
             "bn":"",
+            "CompanyName":"",
+            "fieldNumber":"",
             "e":{
-                "field":"",
-                "command":"",
+                "n" : "led",
+                "u" : "/",
+                "v" : 0,
                 "timestamp":""
             }
         }
-    ####### ORMAI E' SOLO PUBLISHER PER CUI NON RICEVE PIU' LE MISURE DAI SENSORI 
-    # def notify(self,topic,message):
-    #     """Riceives measures from a specific topic and temporary store them in a
-    #      json file for processing"""
-    #     self.payload=json.loads(message.payload)
-    #     # print(self.payload)
-    
-    #     companyName=self.payload["companyName"]
-    #     fieldID=self.payload["field"]
-    #     name=self.payload["e"]["name"]
-    #     measure=self.payload["e"]["value"] #extract the measure vale from MQTT message
-
-    #     try:
-    #         with open("plantInformation.json") as outfile:
-    #             information=json.load(outfile)
-    #     except FileNotFoundError:
-    #         print("WARNING: file opening error. The file doesn't exist")
-        
-    #     if companyName in information["company"]:
-    #         position=information["company"].index(companyName)
-
-    #         information["companyList"][position]["fields"][fieldID-1]["lastMeasures"][name]["values"].append(measure) #insert the measure value in the json file
-    #         information["companyList"][position]["fields"][fieldID-1]["lastMeasures"][name]["lastUpdate"]=time.time() #update the lastUpdate value in the json file
-        
-    #     try:
-    #         with open("plantInformation.json","w") as outfile:
-    #             json.dump(information, outfile, indent=4)
-    #     except FileNotFoundError:
-    #         print("WARNING: file opening error. The file doesn't exist")
 
 
     def control(self):
@@ -249,7 +223,59 @@ class SmartLighting(GenericEndpoint):
                         print(f"command Topic={commandTopic}\n\n")
                         self.myPublish(commandTopic,json.dumps(message))
   
-                
+    def sendCommand(self, companyName : str, fieldID : int, topicList : list, command : int):
+        message=self._message.copy()
+
+        print(f"\nActuators topics list= {topicList}\n")
+        for singleTopic in topicList:    
+            message["bn"] = self._EndpointInfo["serviceName"]
+            message["CompanyName"] = companyName
+            message["fieldNumber"] = fieldID
+            message["e"]["v"] = command
+            message["e"]["timestamp"]=time.time()
+        
+            print(f"message = {message}\n")
+            commandTopic = self._baseTopic + str(singleTopic)
+            print(f"command Topic={commandTopic}\n\n")
+            self.myPublish(commandTopic, json.dumps(message))
+
+    def getCompaniesList(self):
+        """Return the list of the companies from the Resource Catalog""" 
+        try:
+            r=requests.get(self.ResourceCatalog_url+"/all")
+            r.raise_for_status()
+            companyList = r.json()
+        except:
+            print("ERROR: Resource Catalog not reachable!")
+            return []
+        else:
+            return companyList
+
+    def getTopics(self, company, fieldNumber : int): 
+        """Return the list of the subscribed topics for a field in the company"""
+        topics = []
+        for device in company["devicesList"]:
+            if fieldNumber == device["field"] and device["isActuator"]==True:
+                if "pump" in device["actuatorType"]:
+                    topics.append(subscribedTopics(device))
+
+        return topics
+
+    def getPlantLimit(self, plant : str) :
+        #Check if the crop is in our json file:
+        if plant in list(self.plantInfo.keys()):
+            limits=self.plantInfo[plant]
+            minSoilMoisture=limits["soilMoistureLimit"]["min"]    #extract the ideal min value of soil moisture for the given plant from the json file 
+            maxSoilMoisture=limits["soilMoistureLimit"]["max"]    #extract the ideal max value of soil moisture for the given plant from the json file
+            precipitationLimit=limits["precipitationLimit"]["max"]
+        else:
+            print("No crop with the specified name. \nDefault limits will be used") 
+            limits=self.plantInfo["default"]
+            minSoilMoisture=limits["soilMoistureLimit"]["min"]    
+            maxSoilMoisture=limits["soilMoistureLimit"]["max"]  
+            precipitationLimit=limits["precipitationLimit"]["max"] 
+
+        return minSoilMoisture, maxSoilMoisture, precipitationLimit                
                 
     def callWeatherService(self,hour):
         """It gets informations from weather forecast service and extract:
@@ -337,44 +363,22 @@ class SmartLighting(GenericEndpoint):
         cloudCover=weatherService_r["hourly"]["cloudcover"][hour]
         return [cloudCover,light,sunrise,sunset]               
                      
-        
-
-
+    
 
 if __name__=="__main__":
     try:
-        with open("SmartLightingSettings.json") as outfile:
-            settings=json.load(outfile)
+        settings = json.load(open("SmartLightingSettings.json", 'r'))
+        plantDatabase = json.load(open("lightThreshold.json", 'r'))
     except FileNotFoundError:
-        print("ERROR: file 'SmartLightingSettings.json' not found")
+        print("ERROR: files not found")
+    else:
+        lighting = SmartLighting(settings, plantDatabase)
 
-    ip_address = gethostbyname(gethostname())
-    port = settings["IPport"]
-    settings["IPaddress"] = ip_address
-
-    conf = {
-        "/":{
-                'request.dispatch': cherrypy.dispatch.MethodDispatcher(),
-                'tool.session.on': True
-            }
-        }
-
-    lighting=SmartLighting(settings)
-    lighting.start()
-
-    ####visto che ormai il servizio è solo un publisher MQTT ha senso definire le caratteristiche di un servizio REST?
-    cherrypy.tree.mount(lighting, "/", conf)
-    cherrypy.config.update({'server.socket_host': ip_address})
-    cherrypy.config.update({'server.socket_port': port})
-    cherrypy.engine.start()
-
-    try:
-        while True:
-            lighting.control()
-            time.sleep(30)
-    except KeyboardInterrupt:
-        lighting.stop()
-        cherrypy.engine.block()
-
-        print("SmartLighting stopped")
-
+        controlTimeInterval = settings["controlTimeInterval"]
+        try:
+            while True:
+                lighting.control()
+                time.sleep(controlTimeInterval)
+        except KeyboardInterrupt:
+            lighting.stop()
+            print("SmartLighting stopped")

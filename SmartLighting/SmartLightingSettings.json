@@ -1,5 +1,6 @@
 {
     "ServiceCatalog_url" : "http://127.0.0.1:8080",
+    "SystemToken": "IoTomatoes_1234567890",
     "serviceName" : "Smart Lighting",
     "IPport" : 8087,
     "availableServices" : [
@@ -9,7 +10,8 @@
         {
             "serviceType": "MQTT",
             "subscribedTopics": [],
-            "publishedTopics": []
+            "publishedTopics": [-1]
         }
-    ]
+    ],
+    "controlTimeInterval": 30
 }

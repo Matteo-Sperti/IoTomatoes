@@ -1,0 +1,14 @@
+{
+    "serviceName": "ResourceCatalog",
+    "availableServices": [
+        "REST"
+    ],
+    "servicesDetails": [
+        {
+            "serviceType": "REST",
+            "serviceIP": "http://127.0.1.1:8081"
+        }
+    ],
+    "lastUpdate": 1673618847.7364836,
+    "companiesList": []
+}

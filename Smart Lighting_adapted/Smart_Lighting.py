@@ -257,6 +257,7 @@ class SmartLighting(GenericEndpoint):
             - light
             - sunrise time
             - sunset time
+
             from the received json file"""
         ####MODIFICA: RICAVARE I DATI DAL WEATHER FORECAST ATTRAVERSO LA CHIAMATA AL SERVICE CATALOG
         # try:
@@ -374,4 +375,6 @@ if __name__=="__main__":
     except KeyboardInterrupt:
         lighting.stop()
         cherrypy.engine.block()
+
         print("SmartLighting stopped")
+

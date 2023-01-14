@@ -70,14 +70,8 @@ class GenericEndpoint():
             self._isService = isService
             self._isResource = isResource
             self._EndpointInfo, self._CompanyInfo = construct(settings, isService, isResource)
-            if isService :
-                if "SystemToken" in settings:
-                    self._SystemToken = settings["SystemToken"]
-                    self.start_as_a_service()
-                else:
-                    raise InfoException("The System Token is missing")
-            elif isResource :
-                self.start_as_a_resource()
+            
+            self._start()
 
             self._MQTTclient = isMQTT(self._EndpointInfo)
             if self._MQTTclient:
@@ -93,90 +87,7 @@ class GenericEndpoint():
         if self._MQTTclient:
             self.unsubscribe_all()
             self._paho_mqtt.loop_stop()
-            self._paho_mqtt.disconnect()
-
-    def start_as_a_service(self) :
-        """ Start the endpoint as a service.
-        It registers the service to the Service Catalog and starts the RefreshThread."""
-
-        self.ID = self.register_service()
-        self._RefreshThread = RefreshThread(self.ServiceCatalog_url, self.ID, SystemToken=self._SystemToken)
-        if self._EndpointInfo["serviceName"] != "ResourceCatalog":
-            self.ResourceCatalog_url = self.get_ResourceCatalog_url()
-
-    def register_service(self) -> int:
-        """Register the service to the Service Catalog."""
-
-        while True:
-            try:
-                params = {"SystemToken": self._SystemToken}
-                res = requests.post(self.ServiceCatalog_url + "/insert", 
-                                        params=params, json = self._EndpointInfo)
-                res.raise_for_status()
-            except requests.exceptions.HTTPError as err:
-                print(f"{err.response.status_code} : {err.response.reason}")
-                time.sleep(1)
-            except:
-                print(f"Connection Error\nRetrying connection\n")
-                time.sleep(1)
-            else:
-                try:                    
-                    ID = res.json()["ID"]
-                    print(f"Registered correctly to the ServiceCatalog.\nID: {ID}\n")
-                    return ID
-                except:
-                    print(f"Error in the response\n")
-
-    def start_as_a_resource(self) :        
-        """ Start the endpoint as a resource.
-        It registers the resource to the Resource Catalog and starts the RefreshThread."""
-
-        self.ResourceCatalog_url = self.get_ResourceCatalog_url()
-        #Register
-        self.ID = self.register_device()
-        self._EndpointInfo = self.get_device_info()
-        self._RefreshThread = RefreshThread(self.ResourceCatalog_url, self.ID, CompanyInfo=self._CompanyInfo)
-
-
-    def register_device(self) -> int:
-        """Register the resource to the Resource Catalog."""
-
-        while True:
-            try:
-                res = requests.post(self.ResourceCatalog_url + "/insert/device", 
-                                        params=self._CompanyInfo, json = self._EndpointInfo)
-                res.raise_for_status()
-            except requests.exceptions.HTTPError as err:
-                print(f"{err.response.status_code} : {err.response.reason}")
-                time.sleep(1)
-            except:
-                print(f"Connection Error\nRetrying connection\n")
-                time.sleep(1)
-            else:
-                try:                    
-                    ID = res.json()["ID"]
-                    print(f"Registered correctly to the ServiceCatalog.\nID: {ID}\n")
-                    return ID
-                except:
-                    print(f"Error in the response\n")
-
-    def get_device_info(self) -> dict:
-        """Get the information of the resource from the Resource Catalog."""
-
-        while True:
-            try:
-                res = requests.get(self.ResourceCatalog_url + "/get", 
-                                    params = {"ID": self.ID, **self._CompanyInfo})
-                res.raise_for_status()
-            except:
-                print(f"Connection Error\nRetrying connection\n")
-                time.sleep(1)
-            else:
-                try:
-                    return res.json()
-                except:
-                    print(f"Error in the Resource information\nRetrying connection\n")
-                    time.sleep(1)
+            self._paho_mqtt.disconnect()                             
 
     def get_ResourceCatalog_url(self) :
         """Get the URL of the Resource Catalog from the Service Catalog."""
@@ -283,3 +194,123 @@ class GenericEndpoint():
             # remember to unsuscribe if it is working also as subscriber
             for topic in self._subscribedTopics:
                 self._paho_mqtt.unsubscribe(self._baseTopic + topic)
+
+class GenericService(GenericEndpoint) :
+    def __init__(self, settings: dict):
+        """Initialize the GenericService class.
+        It gets the System Token from the settings and calls the GenericEndpoint constructor.
+        """
+        
+        if "SystemToken" in settings:
+                    self._SystemToken = settings["SystemToken"]
+        else:
+            raise InfoException("The System Token is missing")
+
+        super().__init__(settings, isService=True)
+
+    def getCompaniesList(self):
+        """Return the complete list of the companies from the Resource Catalog""" 
+
+        try:
+            r = requests.get(self.ResourceCatalog_url+"/all", params={"SystemToken": self._SystemToken})
+            r.raise_for_status()
+            companyList = r.json()
+        except:
+            print("ERROR: Resource Catalog not reachable!")
+            return []
+        else:
+            return companyList
+
+    def _start(self) :
+        """ Start the endpoint as a service.
+        It registers the service to the Service Catalog and starts the RefreshThread."""
+
+        self.ID = self.register_service()
+        self._RefreshThread = RefreshThread(self.ServiceCatalog_url, self.ID, SystemToken=self._SystemToken)
+        if self._EndpointInfo["serviceName"] != "ResourceCatalog":
+            self.ResourceCatalog_url = self.get_ResourceCatalog_url()
+
+    def register_service(self) -> int:
+        """Register the service to the Service Catalog."""
+
+        while True:
+            try:
+                params = {"SystemToken": self._SystemToken}
+                res = requests.post(self.ServiceCatalog_url + "/insert", 
+                                        params=params, json = self._EndpointInfo)
+                res.raise_for_status()
+            except requests.exceptions.HTTPError as err:
+                print(f"{err.response.status_code} : {err.response.reason}")
+                time.sleep(1)
+            except:
+                print(f"Connection Error\nRetrying connection\n")
+                time.sleep(1)
+            else:
+                try:                    
+                    ID = res.json()["ID"]
+                    print(f"Registered correctly to the ServiceCatalog.\nID: {ID}\n")
+                    return ID
+                except:
+                    print(f"Error in the response\n")  
+
+
+class GenericResource(GenericEndpoint) :
+    def __init__(self, settings: dict):
+        """Initialize the GenericResource class.
+        It checks if the Company Info is present in the settings and then it calls the GenericEndpoint constructor.
+        """
+
+        if "CompanyInfo" in settings:
+            super().__init__(settings, isResource=True)
+        else:
+            raise InfoException("The Company Info is missing")
+
+    def _start(self) :        
+        """ Start the endpoint as a resource.
+        It registers the resource to the Resource Catalog and starts the RefreshThread."""
+
+        self.ResourceCatalog_url = self.get_ResourceCatalog_url()
+        #Register
+        self.ID = self.register_device()
+        self._EndpointInfo = self.get_device_info()
+        self._RefreshThread = RefreshThread(self.ResourceCatalog_url, self.ID, CompanyInfo=self._CompanyInfo)
+
+    def register_device(self) -> int:
+        """Register the resource to the Resource Catalog."""
+
+        while True:
+            try:
+                res = requests.post(self.ResourceCatalog_url + "/insert/device", 
+                                        params=self._CompanyInfo, json = self._EndpointInfo)
+                res.raise_for_status()
+            except requests.exceptions.HTTPError as err:
+                print(f"{err.response.status_code} : {err.response.reason}")
+                time.sleep(1)
+            except:
+                print(f"Connection Error\nRetrying connection\n")
+                time.sleep(1)
+            else:
+                try:                    
+                    ID = res.json()["ID"]
+                    print(f"Registered correctly to the ServiceCatalog.\nID: {ID}\n")
+                    return ID
+                except:
+                    print(f"Error in the response\n")
+
+    def get_device_info(self) -> dict:
+        """Get the information of the resource from the Resource Catalog."""
+
+        while True:
+            try:
+                res = requests.get(self.ResourceCatalog_url + "/get", 
+                                    params = {"ID": self.ID, **self._CompanyInfo})
+                res.raise_for_status()
+            except:
+                print(f"Connection Error\nRetrying connection\n")
+                time.sleep(1)
+            else:
+                try:
+                    return res.json()
+                except:
+                    print(f"Error in the Resource information\nRetrying connection\n")
+                    time.sleep(1)

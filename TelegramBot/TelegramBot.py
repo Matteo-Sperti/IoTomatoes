@@ -8,13 +8,13 @@ import json
 import time
 import requests
 import sys
-import threading
 from socket import gethostname, gethostbyname
 
 from Commands import *
 sys.path.append("../SupportClasses/")
 from MyExceptions import *
-from GenericEndpoint import GenericEndpoint
+from GenericEndpoint import GenericService
+from MyThread import custom_thread
 
 HelpMessage = """Help message to the IoTomatoesBot!
 
@@ -116,25 +116,6 @@ class MessageHandler(telepot.helper.ChatHandler):
         self._command = None
         print("Closing delegate")
 
-class CustomThread(threading.Thread):
-    def start(self):
-        super(CustomThread, self).start()
-
-# Note how this function wraps around the `call()` function below to implement
-# a custom thread for delegation.
-def custom_thread(func):
-    def f(seed_tuple):
-        target = func(seed_tuple)
-
-        if type(target) is tuple:
-            run, args, kwargs = target
-            t = CustomThread(target=run, args=args, kwargs=kwargs)
-        else:
-            t = CustomThread(target=target)
-
-        return t
-    return f
-
 
 class ChatBox(telepot.DelegatorBot):
     def __init__(self, token, connector):
@@ -173,9 +154,9 @@ class ChatBox(telepot.DelegatorBot):
         self.sendMessage(chat_id, WelcomeMessage)
 
 
-class IoTBot(GenericEndpoint):
+class IoTBot(GenericService):
     def __init__(self, settings :dict):
-        super().__init__(settings, isService=True)
+        super().__init__(settings)
 
         self._message = {'bn': "", 'e': [{'n': "",'v': "", 'u': "", 't': ""}]}
         #TelegramBot

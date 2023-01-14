@@ -1,7 +1,4 @@
-import requests
-import sys
-sys.path.append('../')
-from SupportClasses.CheckResult import *
+from MyExceptions import CheckResult
 
 """Functions:\n
 	- createDeviceList (list of dict, bool) -> list of dict\n
@@ -25,25 +22,10 @@ def createDeviceList(companyList : list, isActuator: bool = False):
 				deviceList.append({**dev, **{'lastUpdate' : None}})
 	return deviceList
 
-def getDevicesList(ResourceCatalog_url : str, SystemToken: str, isActuator : bool) :
-	try:
-		r = requests.get(f'{ResourceCatalog_url}/all', params={"SystemToken": SystemToken})
-		r.raise_for_status()
-	except requests.exceptions.HTTPError as err:
-		print(f"{err.response.status_code} - {err.response.reason}")
-		return []
-	except:
-		print("Error, Resource Catalog not reachable")
-		return []
-	else:
-		CompanyList = r.json()      
-		deviceList = createDeviceList(CompanyList, isActuator)
-
-		return deviceList
-
 def checkUpdate(Connector, isActuator: bool):
 	"""Check if there are changes in the ResourceCatalog and update the device list"""
-	new_deviceList = getDevicesList(Connector.ResourceCatalog_url, Connector._SystemToken, isActuator)
+	new_companyList = Connector.getCompaniesList()
+	new_deviceList = createDeviceList(new_companyList, isActuator=isActuator)
 	for new_dev in new_deviceList:
 
 		old_dev_iter = filter(lambda d: d.get('ID') == new_dev['ID'], Connector.deviceList)

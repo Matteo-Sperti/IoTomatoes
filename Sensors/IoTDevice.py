@@ -3,13 +3,13 @@ import sys
 
 from AmbientSimulator import AmbientSimulator
 sys.path.append("../SupportClasses/")
-from GenericEndpoint import GenericEndpoint
+from GenericEndpoint import GenericResource
 from ItemInfo import *
 from MyThread import MyThread
 
-class IoTDevice(GenericEndpoint):
+class IoTDevice(GenericResource):
     def __init__(self, DeviceInfo : dict, Ambient : AmbientSimulator, measureTimeInterval : int = 3):
-        super().__init__(DeviceInfo, isResource=True)
+        super().__init__(DeviceInfo)
         self._Ambient = Ambient
         print("sono qui")
         self._message={

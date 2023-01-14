@@ -5,7 +5,7 @@ from socket import gethostname, gethostbyname
 import sys
 
 sys.path.append("../SupportClasses/")
-from GenericEndpoint import GenericEndpoint
+from GenericEndpoint import GenericService
 from ItemInfo import *
 from MyExceptions import *
 from MyIDGenerator import IDs
@@ -538,7 +538,7 @@ class ResourceCatalogManager():
                     company[devicesList_name].remove(device)
         self.catalog["lastUpdate"] = actualtime
 
-class RESTResourceCatalog(GenericEndpoint):
+class RESTResourceCatalog(GenericService):
     exposed = True
 
     def __init__(self, settings : dict): 
@@ -549,7 +549,7 @@ class RESTResourceCatalog(GenericEndpoint):
         """
         filename = settings["filename"]
         autoDeleteTime = settings["autoDeleteTime"]
-        super().__init__(settings, isService=True)
+        super().__init__(settings)
         self.catalog = ResourceCatalogManager(self._EndpointInfo, self._SystemToken, filename, autoDeleteTime)
 
     def close(self):

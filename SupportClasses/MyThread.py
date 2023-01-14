@@ -34,3 +34,23 @@ class MyThread(threading.Thread):
         while not self.is_stopped():
             self.target(*self.args, **self.kwargs)
             time.sleep(self.interval)
+
+        
+class CustomThread(threading.Thread):
+    def start(self):
+        super(CustomThread, self).start()
+
+# Note how this function wraps around the `call()` function below to implement
+# a custom thread for delegation.
+def custom_thread(func):
+    def f(seed_tuple):
+        target = func(seed_tuple)
+
+        if type(target) is tuple:
+            run, args, kwargs = target
+            t = CustomThread(target=run, args=args, kwargs=kwargs)
+        else:
+            t = CustomThread(target=target)
+
+        return t
+    return f

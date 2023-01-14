@@ -1,23 +1,23 @@
 import datetime
 import time
-import requests
 import json
 
 import sys
 sys.path.append('../SupportClasses/')
-from CheckResult import *
-from GenericEndpoint import GenericEndpoint
+from MyExceptions import CheckResult
+from GenericEndpoint import GenericService
 from DeviceManager import *
 
-class FaultDetector(GenericEndpoint):
+class FaultDetector(GenericService):
 	def __init__(self, settings):
 		"""Initialize the FaultDetector class"""
 
 		self.thresholds = settings['thresholds']
 
-		super().__init__(settings, isService=True)
+		super().__init__(settings)
 
-		self.deviceList = getDevicesList(self.ResourceCatalog_url, self._SystemToken, isActuator=False)
+		companyList = self.getCompaniesList()
+		self.deviceList = createDeviceList(companyList, isActuator=False)
 
 	def updateStatus(self, deviceID : int):
 		"""Update the status of a device in the deviceList\n
@@ -129,5 +129,6 @@ if __name__ == "__main__":
 						fd.myPublish(f"{fd._baseTopic}/{companyName}/{status.topic}", payload)
 		except KeyboardInterrupt:
 			fd.stop()
+			print("FaultDetection stopped")
 
 		

@@ -1,5 +1,3 @@
-import paho.mqtt.client as PahoMQTT
-import requests
 import datetime
 import time
 import json
@@ -7,18 +5,19 @@ import pandas as pd
 
 import sys
 sys.path.append('../SupportClasses/')
-from CheckResult import *
-from GenericEndpoint import GenericEndpoint
+from MyExceptions import CheckResult
+from GenericEndpoint import GenericService
 from DeviceManager import *
 
 
-class ConsumptionManager (GenericEndpoint):
+class ConsumptionManager (GenericService):
 	def __init__(self, settings):
 		"""Initialize the ConsumptionManager class"""
 
-		super().__init__(settings, isService=True)
+		super().__init__(settings)
 
-		self.deviceList = getDevicesList(self.ResourceCatalog_url, self._SystemToken, isActuator=True)
+		companyList = self.getCompaniesList()
+		self.deviceList = createDeviceList(companyList, isActuator=True)
 
 	def updateConsumption(self):
 		"""Calculate the consumption of the actuators for the passed hour and update the database"""
@@ -109,8 +108,13 @@ if __name__ == "__main__":
 		print(e)
 		print("Error, ConsumptionManager not initialized")
 	else:
-		while True:
-			checkUpdate(cm, True)
-			if datetime.datetime.now().second >= 59: #Update the consumption every hour
-				cm.updateConsumption()
-			time.sleep(60)
+		try:
+			while True:
+				checkUpdate(cm, True)
+				if datetime.datetime.now().second >= 59: #Update the consumption every hour
+					cm.updateConsumption()
+				time.sleep(60)
+		except KeyboardInterrupt:
+			cm.stop()
+			print("ConsumptionManager stopped")
+

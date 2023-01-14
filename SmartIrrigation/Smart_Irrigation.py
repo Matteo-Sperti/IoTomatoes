@@ -5,18 +5,18 @@ import json
 import sys
 
 sys.path.append("../SupportClasses/")
-from GenericEndpoint import GenericEndpoint
+from GenericEndpoint import GenericService
 from ItemInfo import *
 from MyExceptions import *
 
 weatherToCall="WeatherForecast" #Global variable: name of the service that Smart Irrigation must search in the catalog thorugh a get request
 mongoToCall="MongoDB" #Global variable: name of the service that provides previous hour and current measures of each field
 
-class SmartIrrigation(GenericEndpoint):
+class SmartIrrigation(GenericService):
 
     def __init__(self, settings : dict, plantInfo : dict):
         """Inizializzazione della classe del servizio (da adattare in seguito)"""
-        super().__init__(settings, isService=True)
+        super().__init__(settings)
 
         self.plantInfo = plantInfo   
         self._message={
@@ -58,7 +58,7 @@ class SmartIrrigation(GenericEndpoint):
                 
                 minSoilMoisture, maxSoilMoisture, precipitationLimit = self.getPlantLimit(plant)
             
-                previousSoilMoisture, currentSoilMoisture = self.getMongoDB()
+                previousSoilMoisture, currentSoilMoisture = self.getMongoDBdata()
                 if previousSoilMoisture == None or currentSoilMoisture == None:
                     print("No previous or current soil moisture measure")
                     self.sendCommand(companyName, fieldID, actuatorTopicsForField, 0)
@@ -194,7 +194,7 @@ class SmartIrrigation(GenericEndpoint):
 
         return minSoilMoisture, maxSoilMoisture, precipitationLimit
 
-    def getMongoDB(self):
+    def getMongoDBdata(self):
         #IN FUTURO:
         #POSSIBILE FORMA DELLA CHIAMATA AL SERVICE CATALOG PER OTTENERE L'URL DI MONGODB
         # try:

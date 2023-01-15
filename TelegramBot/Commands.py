@@ -175,9 +175,10 @@ class InsertNewCompany():
         `False` otherwise.\n
         """
         try:
-            params = self.company
-            params.update({"SystemToken" : self._connector._SystemToken})
-            body = {"AdminInfo" : self.adminInfo, "fieldsList" : self.response["fieldsList"]}
+            params = {"SystemToken" : self._connector._SystemToken}
+            body = {"CompanyInfo" : self.company,
+                    "AdminInfo" : self.adminInfo, 
+                    "fieldsList" : self.response["fieldsList"]}
             res = requests.post(self._connector.ResourceCatalog_url + "/insertCompany", params=params, 
                                     data= json.dumps(body))
             res.raise_for_status()

@@ -293,20 +293,28 @@ class ResourceCatalogManager():
                     return company["CompanyName"]
         return None
 
-    def insertCompany(self, CompanyInfo : dict, AdminInfo : dict, Fieldlist : list):
+    def insertCompany(self, credentials: dict, Info : dict):
         """Insert a new company in the catalog.
 
         Arguments:\n
-        `CompanyInfo` -- the information about the company.
-        Must contain the `CompanyName` and `CompanyToken`.\n
-        `AdminInfo` -- the information about the admin of the company.\n
-        `Fieldlist` -- the list of fields of the company.\n
+        `credentials (dict)`: dictionary with `SystemToken`, the token of the system to authorize the request.\n
+        `Info (dict)`: the information about the company.
+        Must contain the `CompanyInfo (dict)`: the information about the company.
+        `AdminInfo (dict)`: the information about the admin of the company.
+        `Fieldlist (dict)`: the list of fields of the company.\n
 
         Return:\n
         JSON with the status of the operation.
         """
+        try:
+            CompanyInfo = Info["CompanyInfo"]
+            AdminInfo = Info["AdminInfo"]
+            Fieldlist = Info["fieldsList"]
+        except:
+            raise web_exception(400, "Missing CompanyInfo, AdminInfo or fieldsList")
+
         out = {}
-        if self.systemAuthorize(CompanyInfo):
+        if self.systemAuthorize(credentials):
             if self.findCompany(CompanyInfo) != None:
                 out["Status"] = False
                 out["Error"] = "Company already registered"
@@ -628,7 +636,7 @@ class RESTResourceCatalog(GenericService):
         
         Allowed commands:
         `/insertCompany`: insert a new company in the catalog. 
-        The parameters are the company information and the Administrator information.\n
+        The body must contain the company information and the Administrator information.\n
         `/insert/device`: insert a new device in the catalog. The parameters are the device information.\n
         `/insert/user`: insert a new user in the catalog. The parameters are the user information.\n
         """
@@ -636,8 +644,7 @@ class RESTResourceCatalog(GenericService):
             if len(uri) > 0:
                 if len(uri) == 1 and uri[0] == "insertCompany":
                     body_dict = json.loads(cherrypy.request.body.read())
-                    if "AdminInfo" in body_dict and "fieldsList" in body_dict:
-                        return self.catalog.insertCompany(params, body_dict["AdminInfo"], body_dict["fieldsList"])
+                    return self.catalog.insertCompany(params, body_dict)
                 elif len(uri) == 2 and uri [0] == "insert":
                     body_dict = json.loads(cherrypy.request.body.read())
                     if uri[1] == "user":

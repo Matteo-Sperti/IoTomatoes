@@ -1,6 +1,8 @@
 import time
 import json
 import random
+import numpy as np
+import requests
 import sys
 from socket import gethostname, gethostbyname
 
@@ -28,18 +30,25 @@ class SimDevices_Manager():
         self.DevicesIDs = IDs(1)
 
         self.Sensors = []
+        self._ResourceCatalog_url = self.get_ResourceCatalog_url()
 
     def populateField(self, number : int = 5):
         CompanyName = input("Insert Company Name: ")
         CompanyToken = input("Insert Company Token: ")
         fieldNumber = query_int("Insert field number: ")
 
+        CompanyInfo = {
+            "CompanyName" : CompanyName,
+            "CompanyToken" : CompanyToken
+        }
+        latitude, longitude = self.getCompanyPosition(CompanyInfo)
         for i in range(number):
-            self.Sensors.append(self.createDevice(CompanyName, CompanyToken, fieldNumber))
+            self.Sensors.append(self.createDevice(CompanyInfo, fieldNumber, latitude, longitude))
 
-    def createDevice(self, CompanyName : str, CompanyToken : str, fieldNumber : int):
+    def createDevice(self, CompanyInfo : dict, fieldNumber : int, latitude : float, longitude : float):
         ID = self.DevicesIDs.get_ID()
         IPport = 10000 + ID
+
         if random.randint(0, 1) == 0:
             isActuator = False
             actuators = []
@@ -64,15 +73,68 @@ class SimDevices_Manager():
             "measureType" : measures,
             "actuatorType" : actuators,
             "PowerConsumption_kW" : PowerConsumption_kW,
-            "CompanyName" : CompanyName,
-            "CompanyToken" : CompanyToken,
+            "CompanyName" : CompanyInfo["CompanyName"],
+            "CompanyToken" : CompanyInfo["CompanyToken"],
             "ServiceCatalog_url" : self._ServiceCatalog_url
         }
-
+        
+        dev_latitude, dev_longitude = self.generatePosition(latitude, longitude, fieldNumber)
+        if dev_latitude != -1 and dev_longitude != -1:
+            Device_information["Latitude"] = dev_latitude
+            Device_information["Longitude"] = dev_longitude
         return IoTDevice(Device_information, self._measureTimeInterval)
 
+    def get_ResourceCatalog_url(self) :
+        """Get the URL of the Resource Catalog from the Service Catalog."""
+
+        while True:
+            try:
+                params = {"SystemToken": self._SystemToken}
+                res = requests.get(self._ServiceCatalog_url + "/ResourceCatalog_url", params = params)
+                res.raise_for_status()
+            except:
+                print(f"Connection Error\nRetrying connection\n")
+                time.sleep(1)
+            else:
+                try:
+                    res_dict = res.json()
+                    return res_dict["ResourceCatalog_url"]
+                except:
+                    print(f"Error in the Resource information\nRetrying connection\n")
+                    time.sleep(1)
+
     def getCompanyPosition(self, Companyinfo : dict):
-        pass
+        try:
+            response = requests.get(f"{self._ResourceCatalog_url}/location", params = Companyinfo)
+            response.raise_for_status()
+            r_dict = response.json()["Location"]
+            latitude = r_dict["latitude"]
+            longitude = r_dict["longitude"]
+        except:
+            print("Error in the Resource Catalog")
+            return -1, -1
+        else:
+            return latitude, longitude
+
+    def generatePosition(self, latitude : float, longitude : float, fieldNumber : int):
+        """Generate a random position inside a field"""
+        if fieldNumber == 1:
+            dev_latitude = latitude + random.uniform(0, 0.005)
+            dev_longitude = longitude + random.uniform(0, 0.005)
+        elif fieldNumber == 2:
+            dev_latitude = latitude + random.uniform(0, 0.005)
+            dev_longitude = longitude - random.uniform(0, 0.005)
+        elif fieldNumber == 3:
+            dev_latitude = latitude - random.uniform(0, 0.005)
+            dev_longitude = longitude + random.uniform(0, 0.005)
+        elif fieldNumber == 4:
+            dev_latitude = latitude - random.uniform(0, 0.005)
+            dev_longitude = longitude - random.uniform(0, 0.005)
+        else:
+            dev_latitude = latitude + random.uniform(0.005, 0.01)
+            dev_longitude = longitude + random.uniform(0, 0.01)
+
+        return dev_latitude, dev_longitude
 
     def stopDevice(self):
         pass

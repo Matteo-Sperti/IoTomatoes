@@ -1,5 +1,4 @@
 import time
-from MyExceptions import CheckResult
 
 """Functions:\n
 	- createDeviceList (list of dict, bool) -> list of dict\n
@@ -13,7 +12,8 @@ def createDeviceList(companyList : list, isActuator: bool = False):
 			- companyList (list of dict) - 'List of all companies and their devices'\n
 			- isActuator (bool) - 'True if the list should contain only actuators, False if the list should contain only sensors'\n
 	return: \n
-		- deviceList (list of dict) - 'List of all devices updated'"""
+		- deviceList (list of dict) - 'List of all devices updated'
+	"""
 	deviceList = []
 	for comp in companyList:
 		for dev in comp['devicesList']:
@@ -22,9 +22,10 @@ def createDeviceList(companyList : list, isActuator: bool = False):
 											'Datetime' : None, 
 											'status': 'OFF', 
 											'OnTime': 0, 
-											'control': False}})
+											'control': False,
+											'Consumption_kWh' : 0}})
 			elif dev['isSensor'] and not isActuator:
-				deviceList.append({**dev, **{'lastUpdate' : None, 
+				deviceList.append({**dev, **{'lastMeasure' : None, 
 											'CompanyName': comp['CompanyName']}})
 	return deviceList
 
@@ -33,36 +34,40 @@ def checkUpdate(Connector, isActuator: bool):
 	new_companyList = Connector.getCompaniesList()
 	new_deviceList = createDeviceList(new_companyList, isActuator=isActuator)
 	for new_dev in new_deviceList:
+		if new_dev['isActuator'] == isActuator:
+			old_dev_iter = filter(lambda d: d.get('ID') == new_dev['ID'], Connector.deviceList)
 
-		old_dev_iter = filter(lambda d: d.get('ID') == new_dev['ID'], Connector.deviceList)
+			not_present = True
+			for d in old_dev_iter:
+				not_present = False
+				if _different_dicts(d, new_dev, keys_to_ignore=['CompanyName', 'Datetime', 'Consumption_kWh'
+									'lastUpdate', 'lastMeasure', 'status', 'OnTime', 'control']):
+					d.update(new_dev)
+					payload = Connector._message.copy()
+					payload['cn'] = new_dev['CompanyName']
+					payload['msg'] = f"Device {new_dev['ID']} updated."
+					payload['msgType'] = 'Update'
+					payload['t'] = time.time()
+					Connector.myPublish(f"{new_dev['CompanyName']}/{Connector._publishedTopics[0]}", payload)
 
-		not_present = True
-		for d in old_dev_iter:
-			not_present = False
-			if _compare_dicts(d, new_dev, keys_to_ignore=['Datetime', 'lastUpdate', 'status', 'OnTime', 'control']):
-				d.update(new_dev)
-				payload = {'bn' : Connector._EndpointInfo["serviceName"],
-							'cn': new_dev['CompanyName'],
-							'msg': f"Device {new_dev['ID']} updated.",
-							't' : time.time()}
-				Connector.myPublish(f"{new_dev['CompanyName']}/{Connector._publishedTopics[3]}", payload)
-
-		if not_present:
-			Connector.deviceList.append(new_dev)
-			payload = {'bn' : Connector._EndpointInfo["serviceName"],
-						'cn': new_dev['CompanyName'],
-						'msg': f"Device {new_dev['ID']} added.",
-						't' : time.time()}
-			Connector.myPublish(f"{new_dev['CompanyName']}/{Connector._publishedTopics[3]}", payload)
+			if not_present:
+				Connector.deviceList.append(new_dev)
+				payload = Connector._message.copy()
+				payload['cn'] = new_dev['CompanyName']
+				payload['msg'] = f"Device {new_dev['ID']} added."
+				payload['msgType'] = 'Update'
+				payload['t'] = time.time()
+				Connector.myPublish(f"{new_dev['CompanyName']}/{Connector._publishedTopics[0]}", payload)
 
 	for old_dev in Connector.deviceList:
-		if old_dev['ID'] not in [d['ID'] for d in new_deviceList]:
+		if old_dev['ID'] not in [d['ID'] for d in new_deviceList] and old_dev['isActuator'] == isActuator:
 			Connector.deviceList.remove(old_dev)
-			payload = {'bn' : Connector._EndpointInfo["serviceName"],
-						'cn': old_dev['CompanyName'],
-						'msg': f"Device {old_dev['ID']} removed.",
-						't' : time.time()}
-			Connector.myPublish(f"{old_dev['CompanyName']}/{Connector._publishedTopics[3]}", payload)
+			payload = Connector._message.copy()
+			payload['cn'] = old_dev['CompanyName']
+			payload['msg'] = f"Device {old_dev['ID']} removed."
+			payload['msgType'] = 'Update'
+			payload['t'] = time.time()
+			Connector.myPublish(f"{old_dev['CompanyName']}/{Connector._publishedTopics[0]}", payload)
 
 def inList(deviceID : int, deviceList : list):
 	"""Check if an actuator is in the list of the actuators\n
@@ -77,10 +82,19 @@ def inList(deviceID : int, deviceList : list):
 	for dev in deviceList:
 		if dev['ID'] == deviceID:
 			return CheckResult(is_error = False)
-	return CheckResult(is_error=False, message="Error, Actuator not found", topic="ErrorReported")
+	return CheckResult(is_error=True, messageType="Error", message="Actuator not found")
 
-def _compare_dicts(dict1, dict2, keys_to_ignore=[]):
+def _different_dicts(dict1, dict2, keys_to_ignore=[]):
 	dict1_filtered = {k: v for k, v in dict1.items() if k not in keys_to_ignore}
 	dict2_filtered = {k: v for k, v in dict2.items() if k not in keys_to_ignore}
 	
-	return dict1_filtered == dict2_filtered
+	return dict1_filtered != dict2_filtered
+
+class CheckResult():
+	def __init__(self, is_error: bool = False, messageType : str = "", message: str = "", 
+					device_id: int = -1, measure_type: str = ""):
+		self.is_error = is_error
+		self.message = message
+		self.messageType = messageType
+		self.device_id = device_id
+		self.measure_type = measure_type

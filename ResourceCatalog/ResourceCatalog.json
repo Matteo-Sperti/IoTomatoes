@@ -9,6 +9,184 @@
             "serviceIP": "http://127.0.1.1:8081"
         }
     ],
-    "lastUpdate": 1673796553.225494,
-    "companiesList": []
+    "lastUpdate": 1673806235.6890798,
+    "companiesList": [
+        {
+            "ID": 100,
+            "CompanyName": "patata",
+            "CompanyToken": "123",
+            "Location": [
+                "longitude",
+                "latitude"
+            ],
+            "NumberOfFields": 2,
+            "adminID": 101,
+            "usersList": [
+                {
+                    "Name": "matteo",
+                    "Surname": "sperti",
+                    "telegramID": 615608459,
+                    "ID": 101,
+                    "lastUpdate": 1673806217.4304402
+                }
+            ],
+            "devicesList": [
+                {
+                    "ID": 102,
+                    "availableServices": [
+                        "MQTT"
+                    ],
+                    "servicesDetails": [
+                        {
+                            "serviceType": "MQTT",
+                            "subscribedTopics": [],
+                            "publishedTopics": [
+                                "patata/1/102/light"
+                            ]
+                        }
+                    ],
+                    "deviceName": "Device_1",
+                    "field": 1,
+                    "Location": {
+                        "Latitude": -1,
+                        "Longitude": -1
+                    },
+                    "PowerConsumption_kW": 0,
+                    "isActuator": false,
+                    "actuatorType": [],
+                    "isSensor": true,
+                    "measureType": [
+                        "light"
+                    ],
+                    "lastUpdate": 1673806230.5205889
+                },
+                {
+                    "ID": 103,
+                    "availableServices": [
+                        "MQTT"
+                    ],
+                    "servicesDetails": [
+                        {
+                            "serviceType": "MQTT",
+                            "subscribedTopics": [],
+                            "publishedTopics": [
+                                "patata/1/103/light"
+                            ]
+                        }
+                    ],
+                    "deviceName": "Device_2",
+                    "field": 1,
+                    "Location": {
+                        "Latitude": -1,
+                        "Longitude": -1
+                    },
+                    "PowerConsumption_kW": 0,
+                    "isActuator": false,
+                    "actuatorType": [],
+                    "isSensor": true,
+                    "measureType": [
+                        "light"
+                    ],
+                    "lastUpdate": 1673806231.7983136
+                },
+                {
+                    "ID": 104,
+                    "availableServices": [
+                        "MQTT"
+                    ],
+                    "servicesDetails": [
+                        {
+                            "serviceType": "MQTT",
+                            "subscribedTopics": [
+                                "patata/1/104/pump"
+                            ],
+                            "publishedTopics": []
+                        }
+                    ],
+                    "deviceName": "Device_3",
+                    "field": 1,
+                    "Location": {
+                        "Latitude": -1,
+                        "Longitude": -1
+                    },
+                    "PowerConsumption_kW": 13,
+                    "isActuator": true,
+                    "actuatorType": [
+                        "pump"
+                    ],
+                    "isSensor": false,
+                    "measureType": [],
+                    "lastUpdate": 1673806233.232612
+                },
+                {
+                    "ID": 105,
+                    "availableServices": [
+                        "MQTT"
+                    ],
+                    "servicesDetails": [
+                        {
+                            "serviceType": "MQTT",
+                            "subscribedTopics": [
+                                "patata/1/105/led"
+                            ],
+                            "publishedTopics": []
+                        }
+                    ],
+                    "deviceName": "Device_4",
+                    "field": 1,
+                    "Location": {
+                        "Latitude": -1,
+                        "Longitude": -1
+                    },
+                    "PowerConsumption_kW": 18,
+                    "isActuator": true,
+                    "actuatorType": [
+                        "led"
+                    ],
+                    "isSensor": false,
+                    "measureType": [],
+                    "lastUpdate": 1673806234.4384887
+                },
+                {
+                    "ID": 106,
+                    "availableServices": [
+                        "MQTT"
+                    ],
+                    "servicesDetails": [
+                        {
+                            "serviceType": "MQTT",
+                            "subscribedTopics": [],
+                            "publishedTopics": [
+                                "patata/1/106/light"
+                            ]
+                        }
+                    ],
+                    "deviceName": "Device_5",
+                    "field": 1,
+                    "Location": {
+                        "Latitude": -1,
+                        "Longitude": -1
+                    },
+                    "PowerConsumption_kW": 0,
+                    "isActuator": false,
+                    "actuatorType": [],
+                    "isSensor": true,
+                    "measureType": [
+                        "light"
+                    ],
+                    "lastUpdate": 1673806235.6890798
+                }
+            ],
+            "fieldsList": [
+                {
+                    "fieldNumber": 1,
+                    "plant": "tomatoes"
+                },
+                {
+                    "fieldNumber": 2,
+                    "plant": "potatoes"
+                }
+            ]
+        }
+    ]
 }

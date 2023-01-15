@@ -10,7 +10,7 @@
         {
             "serviceType": "MQTT",
             "subscribedTopics": ["+/+/+/led", "+/+/+/pump"],
-            "publishedTopics": ["Users/ErrorReported", "Users/deviceUpdate"]
+            "publishedTopics": ["Users"]
         }
     ]
 }

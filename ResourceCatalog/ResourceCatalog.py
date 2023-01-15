@@ -543,7 +543,7 @@ class ResourceCatalogManager():
                 try:
                     if actualtime - device["lastUpdate"] > self._autoDeleteTime:
                         self._IDs.free_ID(device["ID"])
-                        print(f"""DeviceID : {device["ID"]} removed""")
+                        print(f"DeviceID : {device['ID']} removed")
                         company[devicesList_name].remove(device)
                 except KeyError:
                     print("Device without lastUpdate field")

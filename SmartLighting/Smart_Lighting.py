@@ -65,8 +65,8 @@ class SmartLighting(GenericService):
                     self.sendCommand(companyName, fieldID, actuatorTopicsForField, 0)
                     continue 
 
-                previousLight, currentLight = self.getMongoDBdata()
-                if previousLight == None or currentLight == None:
+                currentLight = self.getMongoDBdata()
+                if currentLight == None:
                     print("No previous or current soil moisture measure")
                     self.sendCommand(companyName, fieldID, actuatorTopicsForField, 0)
                     continue   
@@ -101,45 +101,7 @@ class SmartLighting(GenericService):
                         #print(f"OFF threshold={maxLight}")
                         print(f"ON/OFF threshold={minLight}")
                         print(f"current value light={currentLight}")
-                        print(f"previous value light={previousLight}")
                         
-                        #1) POSSIBILE CONTROL LAW IPOTIZZANDO CHE LE MISURE DEI SENSORI DI LUCE NON VENGANO INFLUENZATE DALLE LUCI ARTIFICIALI: 
-                        # if currentLight>previousLight:
-                        #     print("light is increasing")
-                        #     if currentLight>=maxLight:
-                        #         print(f"""current light over/on the OFF limit: {currentLight}>={maxLight}""")
-                        #         print("light set to OFF")
-                        #         message["e"]["command"]="OFF"
-                                
-                        #     else:
-                        #         print(f"""current light under the OFF limit: {currentLight}<{maxLight}""")
-                        #         print("light set to ON")
-                        #         message["e"]["command"]="ON"
-                                
-
-                        # elif currentLight<previousLight:
-                        #     print("light is decreasing")
-                        #     if currentLight<=minLight:
-                        #         print(f"""current light under/on the ON limit: {currentLight}<={minLight}""")
-                        #         print("light set to ON")
-                        #         message["e"]["command"]="ON"
-                                
-                        #     else:
-                        #         print(f"current light over the ON limit: {currentLight}>{minLight}""")
-                        #         print("light set to OFF")
-                        #         message["e"]["command"]="OFF"
-                                
-                        # else:
-                        #     print("costant light")
-                        #     if currentLight>maxLight:
-                        #         print("light set to OFF")
-                        #         message["e"]["command"]="OFF"
-                                
-                        #     elif currentLight<minLight:
-                        #         print("light set to ON")
-                        #         message["e"]["command"]="ON"
-                        #
-                        #2) CONTROL LAW MONOSOGLIA:
                         if currentLight<=minLight:
                             print("light set to ON")
                             command = 1
@@ -217,12 +179,11 @@ class SmartLighting(GenericService):
             r=requests.get("http://127.0.0.1:8080/decreasing") #richiesta al MongoDBSimulator, da sostituire con il vero mongoDB
             r.raise_for_status()
             rValues=list((r.json()).values())
-            previousLight=float(rValues[0])
-            currentLight=float(rValues[1])
+            currentLight=float(rValues[0])
         except:
-            return None, None
+            return None,
         else:
-            return previousLight, currentLight        
+            return currentLight        
 
     def callWeatherService(self,hour):
         """It gets informations from weather forecast service and extract:

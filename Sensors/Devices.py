@@ -40,20 +40,19 @@ class SimDevices_Manager():
     def createDevice(self, CompanyName : str, CompanyToken : str, fieldNumber : int):
         ID = self.DevicesIDs.get_ID()
         IPport = 10000 + ID
-        measures = random.sample(self._measuresType, random.randint(0, len(self._measuresType)))
-        if len(measures) == 0:
-            isSensor = False
-        else:
-            isSensor = True
-
         if random.randint(0, 1) == 0:
             isActuator = False
             actuators = []
             PowerConsumption_kW = 0
+
+            measures = random.sample(self._measuresType, random.randint(1, len(self._measuresType)))
+            isSensor = True
         else:
             isActuator = True
             actuators = random.sample(self._actuatorsType, 1)
             PowerConsumption_kW = random.randint(5, 20)
+            isSensor = False
+            measures = []
 
         Device_information = {
             "deviceName" : f"Device_{ID}",

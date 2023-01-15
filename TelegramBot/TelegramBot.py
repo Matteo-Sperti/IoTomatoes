@@ -256,8 +256,7 @@ class IoTBot(GenericService):
             message = (f"\nMessage from {msg['bn']} at {timestamp}:\n")
             for key, value in msg.items():
                 if key not in ["bn", "t", "cn"]:
-                    message += (f"{key}: {value}")
-            message += (f"\n")
+                    message += (f"{key}: {value}\n")
         except:
             print("Invalid message")
         else:

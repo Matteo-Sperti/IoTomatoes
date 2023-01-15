@@ -4,7 +4,6 @@ import json
 
 import sys
 sys.path.append('../SupportClasses/')
-from MyExceptions import CheckResult
 from GenericEndpoint import GenericService
 from DeviceManager import *
 
@@ -15,7 +14,13 @@ class FaultDetector(GenericService):
 		self.thresholds = settings['thresholds']
 
 		super().__init__(settings)
-
+		self._message = {
+					'bn' : self._EndpointInfo['serviceName'],
+					'cn': "",
+					'msgType': '',
+					'msg': "", 
+					't' : ""
+					}
 		companyList = self.getCompaniesList()
 		self.deviceList = createDeviceList(companyList, isActuator=False)
 
@@ -27,7 +32,7 @@ class FaultDetector(GenericService):
 		
 		for dev in self.deviceList:
 			if dev['ID'] == deviceID:
-				dev['lastUpdate'] = datetime.datetime.now()
+				dev['lastMeasure'] = datetime.datetime.now()
 				break
 
 	def checkStatus(self, device : dict):
@@ -42,11 +47,12 @@ class FaultDetector(GenericService):
 		"""
 
 		currentTime = datetime.datetime.now()
-		if device['lastUpdate'] is not None:
-			elapsedTime = (currentTime - device['lastUpdate']).total_seconds()
+		if device['lastMeasure'] is not None:
+			elapsedTime = (currentTime - device['lastMeasure']).total_seconds()
 			if elapsedTime > 300:
-				message = f"Warning, Device {device['ID']} has not sent a message for more than 5 minutes, possible fault!"
-				return CheckResult(is_error=True, message=message, device_id=device['ID'], topic=self._publishedTopics[2])
+				message = f"Device {device['ID']} has not sent a message for more than 5 minutes, possible fault!"
+				return CheckResult(is_error=True, messageType="Warning", message=message, 
+										device_id=device['ID'])
 			else:
 				return CheckResult(is_error=False)
 		return CheckResult(is_error=False)
@@ -61,8 +67,8 @@ class FaultDetector(GenericService):
 		`CheckResult` object with:\n
 		`error (bool)`: ".is_error"\n
 		`message (str)`: ".message"\n
-		`topic (str)`: ".topic" """
-
+		`topic (str)`: ".topic" 
+		"""
 		device = None
 
 		for dev in self.deviceList:
@@ -70,19 +76,20 @@ class FaultDetector(GenericService):
 				device = dev
 				break
 		if not device:
-			return CheckResult(is_error=True, message="Error, Device not found", topic=self._publishedTopics[0]) 
+			return CheckResult(is_error=True, messageType="Error", message="Device not found") 
 		if measureType not in device['measureType']:
-			return CheckResult(is_error=True, message=f"Error, Measure type of device {deviceID} not recognized.", topic=self._publishedTopics[0]) 
+			return CheckResult(is_error=True, messageType="Error", message=f"Measure type of device {deviceID} not recognized.") 
 
 		min_value = self.thresholds[measureType]['min_value']
 		max_value = self.thresholds[measureType]['max_value']
 
 		if min_value is None or max_value is None:
-			return CheckResult(is_error=True, message="Error, Thresholds not configured", topic=self._publishedTopics[0])
+			return CheckResult(is_error=True, messageType="Error", message="Thresholds not configured")
 
 		if measure > max_value or measure < min_value:
-			message = f"Warning, Device {deviceID} has sent a measure out of the thresholds, possible fault!"
-			return CheckResult(is_error=True, message=message, device_id=deviceID, topic=self._publishedTopics[1])
+			message = f"Device {deviceID} has sent a measure out of the thresholds, possible fault! {measure}"
+			return CheckResult(is_error=True, messageType="Warning", message=message, 
+								device_id=deviceID)
 		return CheckResult(is_error=False)
 
 	def notify(self, topic, payload):
@@ -97,29 +104,46 @@ class FaultDetector(GenericService):
 		try:
 			measure = payload['e'][-1]['v']
 		except:
-			msg = {'bn' : self._EndpointInfo['serviceName'],
-					'cn': companyName,
-					'msg': "Error, measure not found", 
-					't' : time.time()}
+			msg = self._message.copy()
+			msg['t'] = time.time()
+			msg['cn'] = companyName
+			msg['msgType'] = "Error"
+			msg['msg'] = "Measure not found"
 			self.myPublish(f"{companyName}/{self._publishedTopics[0]}", msg)
 		else:
+			checkUpdate(self, False)
 			sensor_check = inList(deviceID, self.deviceList)
 			measure_check = self.checkMeasure(deviceID, measureType, measure)
 			if sensor_check.is_error:
-				msg = {'bn' : self._EndpointInfo['serviceName'],
-						'cn': companyName,
-						'msg': sensor_check.message, 
-						't' : time.time()}
-				self.myPublish(f"{companyName}/{sensor_check.topic}", msg)
+				msg = self._message.copy()
+				msg['t'] = time.time()
+				msg['cn'] = companyName
+				msg['msgType'] = sensor_check.messageType
+				msg['msg'] = sensor_check.message
+				self.myPublish(f"{companyName}/{self._publishedTopics[0]}", msg)
 			if measure_check.is_error:
-				msg = {'bn' : self._EndpointInfo['serviceName'],
-						'cn': companyName,
-						'msg': measure_check.message, 
-						't' : time.time()}
-				self.myPublish(f"{companyName}/{measure_check.topic}", msg)
+				msg = self._message.copy()
+				msg['t'] = time.time()
+				msg['cn'] = companyName
+				msg['msgType'] = measure_check.messageType
+				msg['msg'] = measure_check.message
+				self.myPublish(f"{companyName}/{self._publishedTopics[0]}", msg)
 			
 			if (measure_check.is_error and sensor_check.is_error) == False:
 				self.updateStatus(deviceID)
+
+	def checkDeviceStatus(self):
+		checkUpdate(self, isActuator=False)
+		for dev in self.deviceList:
+			status = self.checkStatus(dev)
+			if status.is_error:
+				companyName = dev['companyName']
+				msg = self._message.copy()
+				msg['t'] = time.time()
+				msg['cn'] = companyName
+				msg['msgType'] = status.messageType
+				msg['msg'] = status.message
+				self.myPublish(f"{companyName}/{self._publishedTopics[0]}", msg)
 
 if __name__ == "__main__":
 	try:
@@ -132,16 +156,7 @@ if __name__ == "__main__":
 		try:
 			while True:
 				time.sleep(60)
-				checkUpdate(fd, isActuator=False)
-				for dev in fd.deviceList:
-					status = fd.checkStatus(dev)
-					if status.is_error:
-						companyName = dev['companyName']
-						msg = {'bn': fd._EndpointInfo['serviceName'],
-								'cn': companyName,
-								'msg': status.message, 
-								't' : time.time()}
-						fd.myPublish(f"{companyName}/{status.topic}", msg)
+				fd.checkDeviceStatus()
 		except KeyboardInterrupt:
 			fd.stop()
 			print("FaultDetection stopped")

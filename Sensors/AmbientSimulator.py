@@ -110,12 +110,12 @@ class AmbientSimulator():
         actuator = topic_list[-1]
 
         if actuator == "led":
-            if msg_dict["e"]["v"] == 1:
+            if msg_dict["e"][-1]["v"] == 1:
                 self._led = True
             else:
                 self._led = False
         elif actuator == "pump":
-            if msg_dict["e"]["v"] == 1:
+            if msg_dict["e"][-1]["v"] == 1:
                 self._led = True
             else:
                 self._led = False

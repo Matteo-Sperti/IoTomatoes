@@ -92,27 +92,27 @@ class FaultDetector(GenericService):
 		deviceID = int(topic_list[-2])
 		companyName = topic_list[-4]
 		try:
-			measure = payload['e']['v']
+			measure = payload['e'][-1]['v']
 		except:
 			msg = {'bn' : self._EndpointInfo['serviceName'],
-					'CompanyName': companyName,
-					'message': "Error, measure not found", 
-					'timestamp' : time.time()}
+					'cn': companyName,
+					'msg': "Error, measure not found", 
+					't' : time.time()}
 			self.myPublish(f"{companyName}/{self._publishedTopics[0]}", msg)
 		else:
 			sensor_check = inList(deviceID, self.deviceList)
 			measure_check = self.checkMeasure(deviceID, measureType, measure)
 			if sensor_check.is_error:
 				msg = {'bn' : self._EndpointInfo['serviceName'],
-						'CompanyName': companyName,
-						'message': sensor_check.message, 
-						'timestamp' : time.time()}
+						'cn': companyName,
+						'msg': sensor_check.message, 
+						't' : time.time()}
 				self.myPublish(f"{companyName}/{sensor_check.topic}", msg)
 			if measure_check.is_error:
 				msg = {'bn' : self._EndpointInfo['serviceName'],
-						'CompanyName': companyName,
-						'message': measure_check.message, 
-						'timestamp' : time.time()}
+						'cn': companyName,
+						'msg': measure_check.message, 
+						't' : time.time()}
 				self.myPublish(f"{companyName}/{measure_check.topic}", msg)
 			
 			if (measure_check.is_error and sensor_check.is_error) == False:
@@ -135,9 +135,9 @@ if __name__ == "__main__":
 					if status.is_error:
 						companyName = dev['companyName']
 						msg = {'bn': fd._EndpointInfo['serviceName'],
-								'CompanyName': companyName,
-								'message': status.message, 
-								'timestamp' : time.time()}
+								'cn': companyName,
+								'msg': status.message, 
+								't' : time.time()}
 						fd.myPublish(f"{companyName}/{status.topic}", msg)
 		except KeyboardInterrupt:
 			fd.stop()

@@ -88,20 +88,20 @@ class ConsumptionManager (GenericService):
 		ActuatorID = int(topic_list[-2])
 		companyName = topic_list[-4]
 		try:
-			command = payload['e']['v']
+			command = payload['e'][-1]['v']
 		except:
 			msg = {'bn' : self._EndpointInfo["serviceName"],
-					'CompanyName': companyName,
-					'message': "Error, command not found", 
-					'timestamp' : time.time()}
+					'cn': companyName,
+					'msg': "Error, command not found", 
+					't' : time.time()}
 			self.myPublish(f"{self._publishedTopics[0]}", msg)
 		else:
 			check_actuator = inList(ActuatorID, self.deviceList)
 			if check_actuator.is_error:
 				msg = {'bn' : self._EndpointInfo["serviceName"],
-						'CompanyName': companyName,
-						'message': check_actuator.message, 
-						'timestamp' : time.time()}
+						'cn': companyName,
+						'msg': check_actuator.message, 
+						't' : time.time()}
 				self.myPublish(f"{companyName}/{self._publishedTopics[0]}", msg)
 			else:
 				self.updateStatus(ActuatorID, command)

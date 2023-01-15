@@ -24,14 +24,14 @@ class SmartIrrigation(GenericService):
         self.plantInfo = plantInfo   
         self._message={
             "bn":"",
-            "CompanyName":"",
-            "fieldNumber":"",
-            "e":{
+            "cn":"",
+            "field":"",
+            "e":[{
                 "n" : "pump",
                 "u" : "/",
                 "v" : 0,
-                "timestamp":""
-            }
+                "t":""
+            }]
         }
       
     def control(self):
@@ -146,10 +146,10 @@ class SmartIrrigation(GenericService):
         print(f"\nActuators topics list= {topicList}\n")
         for singleTopic in topicList:    
             message["bn"] = self._EndpointInfo["serviceName"]
-            message["CompanyName"] = companyName
-            message["fieldNumber"] = fieldID
-            message["e"]["v"] = command
-            message["e"]["timestamp"]=time.time()
+            message["cn"] = companyName
+            message["field"] = fieldID
+            message["e"][-1]["v"] = command
+            message["e"][-1]["t"]=time.time()
         
             print(f"message = {message}\n")
             commandTopic = str(singleTopic)

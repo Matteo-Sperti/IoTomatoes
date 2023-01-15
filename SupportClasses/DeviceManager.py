@@ -42,26 +42,26 @@ def checkUpdate(Connector, isActuator: bool):
 			if _compare_dicts(d, new_dev, keys_to_ignore=['Datetime', 'lastUpdate', 'status', 'OnTime', 'control']):
 				d.update(new_dev)
 				payload = {'bn' : Connector._EndpointInfo["serviceName"],
-							'CompanyName': new_dev['CompanyName'],
-							'message': f"Device {new_dev['ID']} updated.",
-							'timestamp' : time.time()}
+							'cn': new_dev['CompanyName'],
+							'msg': f"Device {new_dev['ID']} updated.",
+							't' : time.time()}
 				Connector.myPublish(f"{new_dev['CompanyName']}/{Connector._publishedTopics[3]}", payload)
 
 		if not_present:
 			Connector.deviceList.append(new_dev)
 			payload = {'bn' : Connector._EndpointInfo["serviceName"],
-						'CompanyName': new_dev['CompanyName'],
-						'message': f"Device {new_dev['ID']} added.",
-						'timestamp' : time.time()}
+						'cn': new_dev['CompanyName'],
+						'msg': f"Device {new_dev['ID']} added.",
+						't' : time.time()}
 			Connector.myPublish(f"{new_dev['CompanyName']}/{Connector._publishedTopics[3]}", payload)
 
 	for old_dev in Connector.deviceList:
 		if old_dev['ID'] not in [d['ID'] for d in new_deviceList]:
 			Connector.deviceList.remove(old_dev)
 			payload = {'bn' : Connector._EndpointInfo["serviceName"],
-						'CompanyName': old_dev['CompanyName'],
-						'message': f"Device {old_dev['ID']} removed.",
-						'timestamp' : time.time()}
+						'cn': old_dev['CompanyName'],
+						'msg': f"Device {old_dev['ID']} removed.",
+						't' : time.time()}
 			Connector.myPublish(f"{old_dev['CompanyName']}/{Connector._publishedTopics[3]}", payload)
 
 def inList(deviceID : int, deviceList : list):

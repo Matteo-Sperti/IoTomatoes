@@ -9,7 +9,7 @@
             "serviceIP": "http://127.0.1.1:8081"
         }
     ],
-    "lastUpdate": 1673779891.4103959,
+    "lastUpdate": 1673781705.145045,
     "companiesList": [
         {
             "ID": 100,
@@ -27,107 +27,10 @@
                     "Surname": "sperti",
                     "telegramID": 615608459,
                     "ID": 101,
-                    "lastUpdate": 1673778846.5116649
+                    "lastUpdate": 1673781192.9292974
                 }
             ],
             "devicesList": [
-                {
-                    "ID": 102,
-                    "availableServices": [
-                        "MQTT"
-                    ],
-                    "servicesDetails": [
-                        {
-                            "serviceType": "MQTT",
-                            "subscribedTopics": [],
-                            "publishedTopics": [
-                                "patata/1/102/humidity",
-                                "patata/1/102/temperature",
-                                "patata/1/102/soilMoisture"
-                            ]
-                        }
-                    ],
-                    "deviceName": "Device_1",
-                    "field": 1,
-                    "Location": {
-                        "Latitude": -1,
-                        "Longitude": -1
-                    },
-                    "PowerConsumption_kW": 0,
-                    "isActuator": false,
-                    "actuatorType": [],
-                    "isSensor": true,
-                    "measureType": [
-                        "humidity",
-                        "temperature",
-                        "soilMoisture"
-                    ],
-                    "lastUpdate": 1673779821.6623204
-                },
-                {
-                    "ID": 103,
-                    "availableServices": [
-                        "MQTT"
-                    ],
-                    "servicesDetails": [
-                        {
-                            "serviceType": "MQTT",
-                            "subscribedTopics": [
-                                "patata/1/103/pump"
-                            ],
-                            "publishedTopics": [
-                                "patata/1/103/soilMoisture",
-                                "patata/1/103/light",
-                                "patata/1/103/humidity",
-                                "patata/1/103/temperature"
-                            ]
-                        }
-                    ],
-                    "deviceName": "Device_2",
-                    "field": 1,
-                    "Location": {
-                        "Latitude": -1,
-                        "Longitude": -1
-                    },
-                    "PowerConsumption_kW": 9,
-                    "isActuator": true,
-                    "actuatorType": [
-                        "pump"
-                    ],
-                    "isSensor": true,
-                    "measureType": [
-                        "soilMoisture",
-                        "light",
-                        "humidity",
-                        "temperature"
-                    ],
-                    "lastUpdate": 1673779822.9281967
-                },
-                {
-                    "ID": 104,
-                    "availableServices": [
-                        "MQTT"
-                    ],
-                    "servicesDetails": [
-                        {
-                            "serviceType": "MQTT",
-                            "subscribedTopics": [],
-                            "publishedTopics": []
-                        }
-                    ],
-                    "deviceName": "Device_3",
-                    "field": 1,
-                    "Location": {
-                        "Latitude": -1,
-                        "Longitude": -1
-                    },
-                    "PowerConsumption_kW": 0,
-                    "isActuator": false,
-                    "actuatorType": [],
-                    "isSensor": false,
-                    "measureType": [],
-                    "lastUpdate": 1673779824.1462345
-                },
                 {
                     "ID": 105,
                     "availableServices": [
@@ -136,11 +39,13 @@
                     "servicesDetails": [
                         {
                             "serviceType": "MQTT",
-                            "subscribedTopics": [],
+                            "subscribedTopics": [
+                                "patata/1/105/pump"
+                            ],
                             "publishedTopics": [
-                                "patata/1/105/light",
+                                "patata/1/105/soilMoisture",
                                 "patata/1/105/humidity",
-                                "patata/1/105/soilMoisture"
+                                "patata/1/105/temperature"
                             ]
                         }
                     ],
@@ -150,80 +55,18 @@
                         "Latitude": -1,
                         "Longitude": -1
                     },
-                    "PowerConsumption_kW": 0,
-                    "isActuator": false,
-                    "actuatorType": [],
-                    "isSensor": true,
-                    "measureType": [
-                        "light",
-                        "humidity",
-                        "soilMoisture"
-                    ],
-                    "lastUpdate": 1673779825.2691545
-                },
-                {
-                    "ID": 106,
-                    "availableServices": [
-                        "MQTT"
-                    ],
-                    "servicesDetails": [
-                        {
-                            "serviceType": "MQTT",
-                            "subscribedTopics": [],
-                            "publishedTopics": [
-                                "patata/1/106/light",
-                                "patata/1/106/soilMoisture"
-                            ]
-                        }
-                    ],
-                    "deviceName": "Device_5",
-                    "field": 1,
-                    "Location": {
-                        "Latitude": -1,
-                        "Longitude": -1
-                    },
-                    "PowerConsumption_kW": 0,
-                    "isActuator": false,
-                    "actuatorType": [],
-                    "isSensor": true,
-                    "measureType": [
-                        "light",
-                        "soilMoisture"
-                    ],
-                    "lastUpdate": 1673779826.5175529
-                },
-                {
-                    "ID": 107,
-                    "availableServices": [
-                        "MQTT"
-                    ],
-                    "servicesDetails": [
-                        {
-                            "serviceType": "MQTT",
-                            "subscribedTopics": [
-                                "patata/1/107/led"
-                            ],
-                            "publishedTopics": [
-                                "patata/1/107/temperature"
-                            ]
-                        }
-                    ],
-                    "deviceName": "Device_6",
-                    "field": 1,
-                    "Location": {
-                        "Latitude": -1,
-                        "Longitude": -1
-                    },
-                    "PowerConsumption_kW": 17,
+                    "PowerConsumption_kW": 14,
                     "isActuator": true,
                     "actuatorType": [
-                        "led"
+                        "pump"
                     ],
                     "isSensor": true,
                     "measureType": [
+                        "soilMoisture",
+                        "humidity",
                         "temperature"
                     ],
-                    "lastUpdate": 1673779827.5983279
+                    "lastUpdate": 1673781455.8011777
                 },
                 {
                     "ID": 109,
@@ -235,10 +78,10 @@
                             "serviceType": "MQTT",
                             "subscribedTopics": [],
                             "publishedTopics": [
-                                "patata/1/109/temperature",
-                                "patata/1/109/soilMoisture",
                                 "patata/1/109/humidity",
-                                "patata/1/109/light"
+                                "patata/1/109/light",
+                                "patata/1/109/temperature",
+                                "patata/1/109/soilMoisture"
                             ]
                         }
                     ],
@@ -253,47 +96,12 @@
                     "actuatorType": [],
                     "isSensor": true,
                     "measureType": [
-                        "temperature",
-                        "soilMoisture",
                         "humidity",
-                        "light"
-                    ],
-                    "lastUpdate": 1673779769.9145715
-                },
-                {
-                    "ID": 111,
-                    "availableServices": [
-                        "MQTT"
-                    ],
-                    "servicesDetails": [
-                        {
-                            "serviceType": "MQTT",
-                            "subscribedTopics": [
-                                "patata/1/111/pump"
-                            ],
-                            "publishedTopics": [
-                                "patata/1/111/temperature",
-                                "patata/1/111/humidity"
-                            ]
-                        }
-                    ],
-                    "deviceName": "Device_10",
-                    "field": 1,
-                    "Location": {
-                        "Latitude": -1,
-                        "Longitude": -1
-                    },
-                    "PowerConsumption_kW": 19,
-                    "isActuator": true,
-                    "actuatorType": [
-                        "pump"
-                    ],
-                    "isSensor": true,
-                    "measureType": [
+                        "light",
                         "temperature",
-                        "humidity"
+                        "soilMoisture"
                     ],
-                    "lastUpdate": 1673779772.2501514
+                    "lastUpdate": 1673781460.4942956
                 },
                 {
                     "ID": 112,
@@ -304,7 +112,11 @@
                         {
                             "serviceType": "MQTT",
                             "subscribedTopics": [],
-                            "publishedTopics": []
+                            "publishedTopics": [
+                                "patata/2/112/temperature",
+                                "patata/2/112/humidity",
+                                "patata/2/112/soilMoisture"
+                            ]
                         }
                     ],
                     "deviceName": "Device_11",
@@ -316,73 +128,13 @@
                     "PowerConsumption_kW": 0,
                     "isActuator": false,
                     "actuatorType": [],
-                    "isSensor": false,
-                    "measureType": [],
-                    "lastUpdate": 1673779782.579799
-                },
-                {
-                    "ID": 113,
-                    "availableServices": [
-                        "MQTT"
-                    ],
-                    "servicesDetails": [
-                        {
-                            "serviceType": "MQTT",
-                            "subscribedTopics": [
-                                "patata/2/113/pump"
-                            ],
-                            "publishedTopics": []
-                        }
-                    ],
-                    "deviceName": "Device_12",
-                    "field": 2,
-                    "Location": {
-                        "Latitude": -1,
-                        "Longitude": -1
-                    },
-                    "PowerConsumption_kW": 14,
-                    "isActuator": true,
-                    "actuatorType": [
-                        "pump"
-                    ],
-                    "isSensor": false,
-                    "measureType": [],
-                    "lastUpdate": 1673779783.80845
-                },
-                {
-                    "ID": 114,
-                    "availableServices": [
-                        "MQTT"
-                    ],
-                    "servicesDetails": [
-                        {
-                            "serviceType": "MQTT",
-                            "subscribedTopics": [],
-                            "publishedTopics": [
-                                "patata/2/114/humidity",
-                                "patata/2/114/light",
-                                "patata/2/114/temperature",
-                                "patata/2/114/soilMoisture"
-                            ]
-                        }
-                    ],
-                    "deviceName": "Device_13",
-                    "field": 2,
-                    "Location": {
-                        "Latitude": -1,
-                        "Longitude": -1
-                    },
-                    "PowerConsumption_kW": 0,
-                    "isActuator": false,
-                    "actuatorType": [],
                     "isSensor": true,
                     "measureType": [
-                        "humidity",
-                        "light",
                         "temperature",
+                        "humidity",
                         "soilMoisture"
                     ],
-                    "lastUpdate": 1673779784.927919
+                    "lastUpdate": 1673781472.389482
                 },
                 {
                     "ID": 115,
@@ -392,8 +144,14 @@
                     "servicesDetails": [
                         {
                             "serviceType": "MQTT",
-                            "subscribedTopics": [],
-                            "publishedTopics": []
+                            "subscribedTopics": [
+                                "patata/2/115/led"
+                            ],
+                            "publishedTopics": [
+                                "patata/2/115/temperature",
+                                "patata/2/115/light",
+                                "patata/2/115/soilMoisture"
+                            ]
                         }
                     ],
                     "deviceName": "Device_14",
@@ -402,115 +160,18 @@
                         "Latitude": -1,
                         "Longitude": -1
                     },
-                    "PowerConsumption_kW": 0,
-                    "isActuator": false,
-                    "actuatorType": [],
-                    "isSensor": false,
-                    "measureType": [],
-                    "lastUpdate": 1673779786.0303943
-                },
-                {
-                    "ID": 116,
-                    "availableServices": [
-                        "MQTT"
-                    ],
-                    "servicesDetails": [
-                        {
-                            "serviceType": "MQTT",
-                            "subscribedTopics": [],
-                            "publishedTopics": [
-                                "patata/2/116/humidity",
-                                "patata/2/116/soilMoisture"
-                            ]
-                        }
-                    ],
-                    "deviceName": "Device_15",
-                    "field": 2,
-                    "Location": {
-                        "Latitude": -1,
-                        "Longitude": -1
-                    },
-                    "PowerConsumption_kW": 0,
-                    "isActuator": false,
-                    "actuatorType": [],
-                    "isSensor": true,
-                    "measureType": [
-                        "humidity",
-                        "soilMoisture"
-                    ],
-                    "lastUpdate": 1673779787.2331965
-                },
-                {
-                    "ID": 117,
-                    "availableServices": [
-                        "MQTT"
-                    ],
-                    "servicesDetails": [
-                        {
-                            "serviceType": "MQTT",
-                            "subscribedTopics": [
-                                "patata/2/117/pump"
-                            ],
-                            "publishedTopics": [
-                                "patata/2/117/light",
-                                "patata/2/117/soilMoisture",
-                                "patata/2/117/temperature"
-                            ]
-                        }
-                    ],
-                    "deviceName": "Device_16",
-                    "field": 2,
-                    "Location": {
-                        "Latitude": -1,
-                        "Longitude": -1
-                    },
-                    "PowerConsumption_kW": 5,
+                    "PowerConsumption_kW": 10,
                     "isActuator": true,
                     "actuatorType": [
-                        "pump"
+                        "led"
                     ],
                     "isSensor": true,
                     "measureType": [
-                        "light",
-                        "soilMoisture",
-                        "temperature"
-                    ],
-                    "lastUpdate": 1673779788.3262424
-                },
-                {
-                    "ID": 118,
-                    "availableServices": [
-                        "MQTT"
-                    ],
-                    "servicesDetails": [
-                        {
-                            "serviceType": "MQTT",
-                            "subscribedTopics": [],
-                            "publishedTopics": [
-                                "patata/2/118/humidity",
-                                "patata/2/118/temperature",
-                                "patata/2/118/light",
-                                "patata/2/118/soilMoisture"
-                            ]
-                        }
-                    ],
-                    "deviceName": "Device_17",
-                    "field": 2,
-                    "Location": {
-                        "Latitude": -1,
-                        "Longitude": -1
-                    },
-                    "PowerConsumption_kW": 0,
-                    "isActuator": false,
-                    "actuatorType": [],
-                    "isSensor": true,
-                    "measureType": [
-                        "humidity",
                         "temperature",
                         "light",
                         "soilMoisture"
                     ],
-                    "lastUpdate": 1673779789.597948
+                    "lastUpdate": 1673781415.868975
                 },
                 {
                     "ID": 119,
@@ -520,11 +181,14 @@
                     "servicesDetails": [
                         {
                             "serviceType": "MQTT",
-                            "subscribedTopics": [],
+                            "subscribedTopics": [
+                                "patata/2/119/led"
+                            ],
                             "publishedTopics": [
+                                "patata/2/119/humidity",
                                 "patata/2/119/soilMoisture",
-                                "patata/2/119/temperature",
-                                "patata/2/119/light"
+                                "patata/2/119/light",
+                                "patata/2/119/temperature"
                             ]
                         }
                     ],
@@ -534,86 +198,19 @@
                         "Latitude": -1,
                         "Longitude": -1
                     },
-                    "PowerConsumption_kW": 0,
-                    "isActuator": false,
-                    "actuatorType": [],
-                    "isSensor": true,
-                    "measureType": [
-                        "soilMoisture",
-                        "temperature",
-                        "light"
-                    ],
-                    "lastUpdate": 1673779790.8660984
-                },
-                {
-                    "ID": 120,
-                    "availableServices": [
-                        "MQTT"
-                    ],
-                    "servicesDetails": [
-                        {
-                            "serviceType": "MQTT",
-                            "subscribedTopics": [
-                                "patata/2/120/led"
-                            ],
-                            "publishedTopics": [
-                                "patata/2/120/soilMoisture",
-                                "patata/2/120/temperature"
-                            ]
-                        }
-                    ],
-                    "deviceName": "Device_19",
-                    "field": 2,
-                    "Location": {
-                        "Latitude": -1,
-                        "Longitude": -1
-                    },
-                    "PowerConsumption_kW": 20,
+                    "PowerConsumption_kW": 5,
                     "isActuator": true,
                     "actuatorType": [
                         "led"
                     ],
                     "isSensor": true,
                     "measureType": [
+                        "humidity",
                         "soilMoisture",
+                        "light",
                         "temperature"
                     ],
-                    "lastUpdate": 1673779791.946319
-                },
-                {
-                    "ID": 121,
-                    "availableServices": [
-                        "MQTT"
-                    ],
-                    "servicesDetails": [
-                        {
-                            "serviceType": "MQTT",
-                            "subscribedTopics": [
-                                "patata/2/121/led"
-                            ],
-                            "publishedTopics": [
-                                "patata/2/121/soilMoisture",
-                                "patata/2/121/humidity"
-                            ]
-                        }
-                    ],
-                    "deviceName": "Device_20",
-                    "field": 2,
-                    "Location": {
-                        "Latitude": -1,
-                        "Longitude": -1
-                    },
-                    "PowerConsumption_kW": 16,
-                    "isActuator": true,
-                    "actuatorType": [
-                        "led"
-                    ],
-                    "isSensor": true,
-                    "measureType": [
-                        "soilMoisture",
-                        "humidity"
-                    ],
-                    "lastUpdate": 1673779793.0142262
+                    "lastUpdate": 1673781420.6070821
                 }
             ],
             "fieldsList": [

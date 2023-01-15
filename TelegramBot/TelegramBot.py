@@ -228,7 +228,8 @@ class IoTBot(GenericService):
                 except:
                     print("Invalid chatID")
             else:
-                users = self.getList(msg["CompanyName"], "users")
+                companyName = topic.split("/")[1]
+                users = self.getList(companyName, "users")
                 if users is not None:
                     for user in users:
                         try:

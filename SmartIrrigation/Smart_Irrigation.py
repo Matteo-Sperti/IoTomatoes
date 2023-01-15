@@ -154,7 +154,7 @@ class SmartIrrigation(GenericService):
             print(f"message = {message}\n")
             commandTopic = str(singleTopic)
             print(f"command Topic={commandTopic}\n\n")
-            self.myPublish(commandTopic, json.dumps(message))
+            self.myPublish(commandTopic, message)
 
     def getTopics(self, company, fieldNumber : int): 
         """Return the list of the subscribed topics for a field in the company"""

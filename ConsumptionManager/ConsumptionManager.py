@@ -90,14 +90,16 @@ class ConsumptionManager (GenericService):
 		try:
 			command = payload['e']['v']
 		except:
-			msg = {'CompanyName': companyName,
+			msg = {'bn' : self._EndpointInfo["serviceName"],
+					'CompanyName': companyName,
 					'message': "Error, command not found", 
 					'timestamp' : time.time()}
 			self.myPublish(f"{self._publishedTopics[0]}", msg)
 		else:
 			check_actuator = inList(ActuatorID, self.deviceList)
 			if check_actuator.is_error:
-				msg = {'CompanyName': companyName,
+				msg = {'bn' : self._EndpointInfo["serviceName"],
+						'CompanyName': companyName,
 						'message': check_actuator.message, 
 						'timestamp' : time.time()}
 				self.myPublish(f"{companyName}/{self._publishedTopics[0]}", msg)

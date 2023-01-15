@@ -216,6 +216,7 @@ class IoTBot(GenericService):
 
     def notify(self, topic, msg):
         try:
+            print(msg)
             timestamp = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(msg["timestamp"]))
             message = (f"\nMessage from {msg['bn']} at {timestamp}:\n{msg}\n")
         except:

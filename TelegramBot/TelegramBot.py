@@ -217,7 +217,7 @@ class IoTBot(GenericService):
     def notify(self, topic, msg):
         try:
             timestamp = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(msg["timestamp"]))
-            message = (f"Message from {msg['bn']} at {timestamp}:\n\n{msg['message']}")
+            message = (f"\nMessage from {msg['bn']} at {timestamp}:\n{msg}\n")
         except:
             print("Invalid message")
         else:
@@ -228,7 +228,7 @@ class IoTBot(GenericService):
                 except:
                     print("Invalid chatID")
             else:
-                users = self.getList(msg["bn"], "users")
+                users = self.getList(msg["CompanyName"], "users")
                 if users is not None:
                     for user in users:
                         try:

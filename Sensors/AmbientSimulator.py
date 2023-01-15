@@ -1,7 +1,10 @@
-import time
 import random
 import json
 import paho.mqtt.client as PahoMQTT
+import sys
+
+sys.path.append('../SupportClasses/')
+from MyThread import MyThread
 
 noiseAmplitude = 1
 brokerIP = "mqtt.eclipseprojects.io"
@@ -23,11 +26,31 @@ class AmbientSimulator():
         self._led = False
         self._pump = False
 
+        self.UpdateThread = MyThread(self.update, 5)
+
     def start(self):
         self.start_MQTTclient()
 
     def stop(self):
         self.unsubscribe_all()
+        self._paho_mqtt.loop_stop()
+        self._paho_mqtt.disconnect()
+        self.UpdateThread.stop()
+
+    def update(self):
+        if self._led:
+            self._light = 150 + 10*self.noiseValue()
+        else:
+            self._light = 40 + 10*self.noiseValue()
+
+        if self._pump:
+            self._soilMoisture += (2 + self.noiseValue())
+            self._humidity += (1 + 0.2*self.noiseValue())
+        else:
+            self._soilMoisture -= (0.5 + self.noiseValue())
+            self._humidity -= (0.1 + 0.1*self.noiseValue())
+
+        self._temperature += (0.1 + 0.1*self.noiseValue())
 
     def get_temperature(self):
         return self._temperature + self.noiseValue()
@@ -87,10 +110,15 @@ class AmbientSimulator():
         actuator = topic_list[-1]
 
         if actuator == "led":
-            self._light = msg_dict["value"]
+            if msg_dict["e"]["v"] == 1:
+                self._led = True
+            else:
+                self._led = False
         elif actuator == "pump":
-            self._soilMoisture = msg_dict["value"]
-
+            if msg_dict["e"]["v"] == 1:
+                self._led = True
+            else:
+                self._led = False
 
     def mySubscribe(self, topic):
         """It subscribes to `topic`"""

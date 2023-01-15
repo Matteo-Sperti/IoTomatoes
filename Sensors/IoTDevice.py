@@ -8,9 +8,9 @@ from ItemInfo import *
 from MyThread import MyThread
 
 class IoTDevice(GenericResource):
-    def __init__(self, DeviceInfo : dict, Ambient : AmbientSimulator, measureTimeInterval : int = 3):
+    def __init__(self, DeviceInfo : dict, measureTimeInterval : int = 3):
         super().__init__(DeviceInfo)
-        self._Ambient = Ambient
+        self._Ambient = AmbientSimulator(getCompanyName(self._CompanyInfo), getField(self._EndpointInfo))
         self._message={
             "companyName" : getCompanyName(self._CompanyInfo),
             "bn" : 0,

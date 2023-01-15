@@ -260,12 +260,18 @@ class GenericService(GenericEndpoint) :
             params = {"SystemToken": self._SystemToken, "serviceName": serviceName}
             r = requests.get(self.ServiceCatalog_url+"/search/serviceName", params=params)
             r.raise_for_status()
-            serviceInfo = r.json()
+            servicesList = r.json()
         except:
             print("ERROR: Service Catalog not reachable!")
             return ""
         else:
-            return getIPaddress(serviceInfo)
+            if len(servicesList) == 0:
+                print("ERROR: Service not found!")
+                return ""
+            else:
+                serviceInfo = servicesList[0]
+                print(serviceInfo)
+                return getIPaddress(serviceInfo)
 
 
 class GenericResource(GenericEndpoint) :

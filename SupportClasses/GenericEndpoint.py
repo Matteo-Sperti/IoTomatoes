@@ -265,7 +265,7 @@ class GenericService(GenericEndpoint) :
             print("ERROR: Service Catalog not reachable!")
             return ""
         else:
-            return getIPaddress(serviceInfo["serviceIP"])
+            return getIPaddress(serviceInfo)
 
 
 class GenericResource(GenericEndpoint) :

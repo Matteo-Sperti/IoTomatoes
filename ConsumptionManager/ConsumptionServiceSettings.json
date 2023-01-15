@@ -10,7 +10,7 @@
         {
             "serviceType": "MQTT",
             "subscribedTopics": ["+/+/+/led", "+/+/+/pump"],
-            "publishedTopics": ["TelegramBot/ErrorReported", "TelegramBot/deviceUpdate"]
+            "publishedTopics": ["Users/ErrorReported", "Users/deviceUpdate"]
         }
     ]
 }

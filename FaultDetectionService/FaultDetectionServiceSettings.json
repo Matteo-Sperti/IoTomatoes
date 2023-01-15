@@ -10,7 +10,7 @@
       {
           "serviceType": "MQTT",
           "subscribedTopics": ["+/+/+/temperature", "+/+/+/humidity", "+/+/+/light", "+/+/+/soilMoisture"],
-          "publishedTopics": ["TelegramBot/ErrorReported", "TelegramBot/alertMeasureRange", "TelegramBot/alertNoMessage", "TelegramBot/deviceUpdate"]
+          "publishedTopics": ["Users/ErrorReported", "Users/alertMeasureRange", "Users/alertNoMessage", "Users/deviceUpdate"]
       }
   ],
   "thresholds": {

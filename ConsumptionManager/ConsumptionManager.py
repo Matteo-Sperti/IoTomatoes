@@ -21,6 +21,7 @@ class ConsumptionManager (GenericService):
 
 	def updateConsumption(self):
 		"""Calculate the consumption of the actuators for the passed hour and update the database"""
+		
 		currentTime = datetime.datetime.now()
 		dframe_list = []
 		for dev in self.deviceList:
@@ -57,20 +58,19 @@ class ConsumptionManager (GenericService):
 
 	def updateStatus (self, actuatorID: int, command: str):
 		"""Update the status of the actuator, if it is turned OFF calculates its consumption\n
-		Parameters:\n
-			- companyName (str) - 'Name of the company'\n
-			- actuatorID (str) - 'ID of the actuator'\n
-			- command (str) - 'Command sent to the actuator'\n
+		Arguments:\n
+		`actuatorID (str)` : ID of the actuator\n
+		`command (str)` : Command sent to the actuator\n
 		"""
 		for dev in self.deviceList:
 			if dev['ID'] == actuatorID:
-				if command == 'ON':
-					dev['status'] = command
+				if command == 1:
+					dev['status'] = 'ON'
 					dev['OnTime'] = time.time()
 					dev['control'] = True
 					return CheckResult(is_error=False)
-				elif command == 'OFF':
-					dev['status'] = command
+				elif command == 0:
+					dev['status'] = 'OFF'
 					#Calculate the consumption of a actuator by its mean power consumption and the time it was on 
 					dev['Consumption_kW'] += round((time.time() - dev['OnTime'])*dev['PowerConsumption_kW']/3600,2)
 					dev['OnTime'] = 0

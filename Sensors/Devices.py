@@ -29,7 +29,7 @@ class SimDevices_Manager():
 
         self.Sensors = []
 
-    def populateField(self, number : int = 10):
+    def populateField(self, number : int = 5):
         CompanyName = input("Insert Company Name: ")
         CompanyToken = input("Insert Company Token: ")
         fieldNumber = query_int("Insert field number: ")

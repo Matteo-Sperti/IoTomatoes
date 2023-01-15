@@ -21,8 +21,9 @@ class FaultDetector(GenericService):
 
 	def updateStatus(self, deviceID : int):
 		"""Update the status of a device in the deviceList\n
-		Parameters:\n
-			- deviceID (int) - 'ID of the device to update'"""
+		Arguments:\n
+		`deviceID (int)`: ID of the device to update
+		"""
 		
 		for dev in self.deviceList:
 			if dev['ID'] == deviceID:
@@ -31,12 +32,14 @@ class FaultDetector(GenericService):
 
 	def checkStatus(self, device : dict):
 		"""Check if a device has not sent a message for more than 5 minutes\n
-		Parameters:\n
-		 	- device (dict) - 'Device to check'\n
-		return: CheckResult object with:\n
-			- error (bool): ".is_error"\n
-			- message (str): ".message"\n
-			-  topic (str): ".topic" """
+		Arguments:\n
+		`device (dict)`: Device to check\n
+		Return:\n
+		`CheckResult` object with:\n
+		`error (bool)`: ".is_error"\n
+		`message (str)`: ".message"\n
+		` topic (str)`: ".topic" 
+		"""
 
 		currentTime = datetime.datetime.now()
 		if device['lastUpdate'] is not None:
@@ -50,15 +53,15 @@ class FaultDetector(GenericService):
 
 	def checkMeasure(self, deviceID: int, measureType: str,  measure : float):
 		"""Check if a measure is out of the thresholds\n
-		Parameters:\n
-			- companyName (str) - 'Name of the company of the device'\n
-			- deviceID (int) - 'ID of the device'\n
-			- measureType (str) - 'Type of the measure to check'\n
-			- measure (float) - 'Value of the measure to check'\n
-		return: CheckResult object with:\n
-			- error (bool): ".is_error"\n
-			- message (str): ".message"\n
-			- topic (str): ".topic" """
+		Arguments:\n
+		`deviceID (int)`: ID of the device\n
+		`measureType (str)`: Type of the measure to check\n
+		`measure (float)`: Value of the measure to check\n
+		Return:\n
+		`CheckResult` object with:\n
+		`error (bool)`: ".is_error"\n
+		`message (str)`: ".message"\n
+		`topic (str)`: ".topic" """
 
 		device = None
 

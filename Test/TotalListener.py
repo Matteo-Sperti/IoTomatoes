@@ -51,7 +51,8 @@ class Listener():
         It redirects the message to the notify method (which must be implemented by the user)"""
 
         topic, msg_dict = msg.topic, json.loads(msg.payload)
-        print(f"\n\nTIME: {datetime.datetime.now()}\nTOPIC: {topic}\nMESSAGE:\n{msg_dict}\n")
+        print(f"\n\nTIME: {datetime.datetime.now()}\nTOPIC: {topic}\n",
+                f"MESSAGE:\n{json.dumps(msg_dict, indent=4)}\n")
 
     def mySubscribe(self, topic):
         """It subscribes to `topic`"""

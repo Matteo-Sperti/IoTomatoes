@@ -41,6 +41,9 @@ If your company is already registered, you can register your account to your com
 
 class MessageHandler(telepot.helper.ChatHandler):
     def __init__(self, seed_tuple, connector, **kwargs):
+        """Construct a new MessageHandler instance. 
+        It will be used to handle the received messages on a per-chat basis.
+        """
         super(MessageHandler, self).__init__(seed_tuple, **kwargs)
         self._connector = connector
         self._command = None
@@ -53,6 +56,8 @@ class MessageHandler(telepot.helper.ChatHandler):
         self._CompanyName = self._connector.isRegistered(self._chat_id)
 
     def on_chat_message(self, msg):
+        """Handle the received message"""
+
         content_type, _, chat_ID = telepot.glance(msg)  # type: ignore
         
         if content_type != 'text':
@@ -99,6 +104,8 @@ class MessageHandler(telepot.helper.ChatHandler):
             
 
     def on_callback_query(self,msg):
+        """Handle the callback query"""
+
         _ , chat_ID , query_data = telepot.glance(msg,flavor='callback_query')
 
         if self._command is not None:
@@ -109,16 +116,25 @@ class MessageHandler(telepot.helper.ChatHandler):
             self.sender.sendMessage("Command not found")
 
     def on__idle(self, event):
+        """Close the delegate if the user is idle for too long"""
+
         self.sender.sendMessage("You have been idle for too long. Closing section.")
         self.close()
 
     def on_close(self, ex):
+        """Close the delegate and reset the command"""
+
         self._command = None
         print("Closing delegate")
 
 
 class ChatBox(telepot.DelegatorBot):
-    def __init__(self, token, connector):
+    def __init__(self, token : str, connector):
+        """Initialize the delegator bot.\n
+        Arguments:\n
+        `token (str)`: the token of the bot\n
+        `connector`: the endpoint object uses to connect to other services\n
+        """
         self._seen = set()
         self._companyList = []
         self._connector = connector
@@ -136,6 +152,8 @@ class ChatBox(telepot.DelegatorBot):
 
     # seed-calculating function: use returned value to indicate whether to spawn a delegate
     def _is_newcomer(self, msg):
+        """Check if the sender is a newcomer"""
+
         if telepot.is_event(msg):
             return None
 
@@ -150,12 +168,16 @@ class ChatBox(telepot.DelegatorBot):
         return []  # non-hashable ==> delegates are independent, no seed association is made.
 
     def _send_welcome(self, seed_tuple):
+        """Send a welcome message to new users"""
+
         chat_id = seed_tuple[1]['chat']['id']
         self.sendMessage(chat_id, WelcomeMessage)
 
 
 class IoTBot(GenericService):
     def __init__(self, settings :dict):
+        """Initialize the IoTBot service"""
+
         super().__init__(settings)
 
         self._message = {'bn': "", 'e': [{'n': "",'v': "", 'u': "", 't': ""}]}
@@ -166,6 +188,8 @@ class IoTBot(GenericService):
         MessageLoop(self.bot).run_as_thread()
 
     def get_token(self):
+        """Return the telegram token from the Service Catalog"""
+
         while True:
             try:
                 params = {"SystemToken": self._SystemToken}
@@ -183,6 +207,11 @@ class IoTBot(GenericService):
                     time.sleep(1)
 
     def isRegistered(self, chatID : int):
+        """Return the name of the company if the chatID is already registered.
+        Otherwise return an empty string.\n
+        Arguments:\n
+        `chatID (int)`: telegramID of the user\n
+        """
         try:
             params = {"SystemToken": self._SystemToken, "telegramID": chatID}
             res = requests.get(self.ResourceCatalog_url + "/isRegistered", params=params)
@@ -198,6 +227,12 @@ class IoTBot(GenericService):
                 return ""
 
     def getList(self, CompanyName : str, listType : str):
+        """Return the list of users, devices or fields of a company.
+        If the list is empty, return an empty list. If an error occurs, return None.\n
+        Arguments:\n
+        `CompanyName (str)`: name of the company\n
+        `listType (str)`: type of the list to return. It can be "users", "devices" or "fields"
+        """
         if listType not in ["users", "devices", "fields"]:
             return None
 
@@ -215,9 +250,14 @@ class IoTBot(GenericService):
                 return []
 
     def notify(self, topic, msg):
+        """Notify the user of the message received from the broker"""
         try:
             timestamp = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(msg["t"]))
-            message = (f"\nMessage from {msg['bn']} at {timestamp}:\n{json.dumps(msg, indent=2)}\n")
+            message = (f"\nMessage from {msg['bn']} at {timestamp}:\n")
+            for key, value in msg.items():
+                if key not in ["bn", "t", "cn"]:
+                    message += (f"{key}: {value}")
+            message += (f"\n")
         except:
             print("Invalid message")
         else:
@@ -236,7 +276,7 @@ class IoTBot(GenericService):
                             chatID = int(user["telegramID"])
                             self.bot.sendMessage(chatID, text=message)
                         except:
-                            print("Invalid chatID")
+                            print("Invalid chatID from catalog")
 
 if __name__ == "__main__":
     settings = json.load(open("TelegramSettings.json"))

@@ -6,7 +6,6 @@ import sys
 sys.path.append("../SupportClasses/")
 from MyExceptions import *
 
-
 keyboardYESNO = InlineKeyboardMarkup(inline_keyboard=[[
                 InlineKeyboardButton(text='YES ✅', callback_data='yes'),
                 InlineKeyboardButton(text='NO ❌', callback_data='no'),
@@ -14,6 +13,13 @@ keyboardYESNO = InlineKeyboardMarkup(inline_keyboard=[[
 
 class InsertNewCompany():
     def __init__(self, chatID, sender, connector):
+        """This class is used to insert a new company in the system.
+        It is used by the /insertNewCompany command.\n
+        Arguments:\n
+        `chatID` : the ID of the chat with the user\n
+        `sender` : the TelegramBot object\n
+        `connector` : the IoTBot object used to comunicate with other services.\n
+        """
         self.chatID = chatID
         self._connector = connector
         self._bot = sender
@@ -37,31 +43,42 @@ class InsertNewCompany():
     def location(self):
         return self.response["Location"]
 
-    def update(self, message): 
+    def update(self, message : str): 
+        """Update the status of the command.\n
+        Arguments:\n
+        `message (str)` : the message received from the user.\n
+        Return:\n
+        `True` if the command is finished, `False` otherwise.
+        """
         if self._status == 0:
             self._bot.sendMessage("Insert your Company Name")
             self._status += 1
+            return False
         
         elif self._status == 1:
             self.response["CompanyName"] = message
             self._bot.sendMessage("Insert your Name")
             self._status += 1
+            return False
 
         elif self._status == 2:
             self.response["Name"] = message
             self._bot.sendMessage("Insert your Surname")
             self._status += 1
+            return False
         
         elif self._status == 3:
             self.response["Surname"] = message
             self._bot.sendMessage("Insert your Company Token")
             self._status += 1
+            return False
 
         elif self._status == 4:
             self.response["CompanyToken"] = message
             self._bot.sendMessage(f"Your Company Token is: {message}\nProceed with the registration?",
                                     reply_markup=keyboardYESNO)
             self._status += 1
+            return False
 
         elif self._status == 5:
             if message == "yes":
@@ -70,6 +87,7 @@ class InsertNewCompany():
             else:
                 self._bot.sendMessage("Insert your Company Token")
                 self._status = 4
+            return False
 
         elif self._status == 6:
             try:
@@ -84,9 +102,11 @@ class InsertNewCompany():
                 self._bot.sendMessage("Invalid location")
                 self._bot.sendMessage("Insert your location as couple of coordinates:")
                 self._status = 6
+                return False
             else:
                 self._bot.sendMessage(f"Is this your location?", reply_markup=keyboardYESNO)
                 self._status += 1
+                return False
 
         elif self._status == 7:
             if message == "yes":
@@ -95,6 +115,7 @@ class InsertNewCompany():
             else:
                 self._bot.sendMessage("Insert your location as couple coordinates:")
                 self._status = 6
+            return False
 
         elif self._status == 8:
             try:
@@ -103,9 +124,11 @@ class InsertNewCompany():
                 self._bot.sendMessage("Invalid number, please insert a positive integer number")
                 self._bot.sendMessage("How many indipendent fields do you have in your company?")
                 self._status = 8
+                return False
             else:
                 self._bot.sendMessage("Insert the colture of your fields, separated by a comma")
                 self._status += 1
+                return False
 
         elif self._status == 9:
             try:
@@ -123,6 +146,7 @@ class InsertNewCompany():
                 self._bot.sendMessage("Invalid input")
                 self._bot.sendMessage("Insert the colture of your fields, separated by a comma")
                 self._status = 9
+                return False
             else:
                 summary = (f"You are going to register the following company:\n"
                             f"Company Name: {self.response['CompanyName']}\n"
@@ -132,6 +156,7 @@ class InsertNewCompany():
                 self._bot.sendMessage(summary)
                 self._bot.sendMessage("Confirm your registration?", reply_markup=keyboardYESNO)
                 self._status += 1
+                return False
 
         elif self._status == 10:
             if message == "yes":
@@ -143,7 +168,12 @@ class InsertNewCompany():
                 self._bot.sendMessage("Registration canceled")
             return True
             
-    def insert_company(self):   
+    def insert_company(self): 
+        """Insert the company in the Resource Catalog.\n
+        Returns:\n
+        `True` if the company is correctly inserted in the Resource Catalog.\n
+        `False` otherwise.\n
+        """
         try:
             params = self.company
             params.update({"SystemToken" : self._connector._SystemToken})
@@ -181,6 +211,12 @@ class InsertNewCompany():
 
 class RegisterNewUser():
     def __init__(self, chatID, sender, connector):
+        """This class is used to register a new user in the Resource Catalog.\n
+        Arguments:\n
+        `chatID` : the telegram ID of the user.\n
+        `sender` : the object used to send messages to the user.\n
+        `connector` : the IoTBot object used to connect to the Resource Catalog.\n
+        """
         self.chatID = chatID
         self._connector = connector
         self._bot = sender
@@ -189,7 +225,9 @@ class RegisterNewUser():
 
     @property
     def UserInfo(self):
-        return {"Name" : self.response["Name"], "Surname" : self.response["Surname"], "telegramID" : self.chatID}
+        return {"Name" : self.response["Name"], 
+                "Surname" : self.response["Surname"], 
+                "telegramID" : self.chatID}
 
     @property
     def completeName(self):
@@ -197,34 +235,47 @@ class RegisterNewUser():
 
     @property
     def company(self):
-        return {"CompanyName": self.response["CompanyName"], "CompanyToken" : self.response["CompanyToken"]}
+        return {"CompanyName": self.response["CompanyName"], 
+                "CompanyToken" : self.response["CompanyToken"]}
 
-    def update(self, message):            
+    def update(self, message):   
+        """Update the status of the registration.\n
+        Arguments:\n
+        `message` : the message received from the user.\n
+        Returns:\n
+        `True` if the registration is completed.\n
+        `False` otherwise.\n
+        """
         if self._status == 0:
             self._bot.sendMessage("Insert your Company Name")
             self._status += 1
+            return False
 
         elif self._status == 1:
             self.response["CompanyName"] = message
             self._bot.sendMessage("Insert your Name")
             self._status += 1
+            return False            
 
         elif self._status == 2:
             self.response["Name"] = message
             self._bot.sendMessage("Insert your Surname")
             self._status += 1
+            return False
         
         elif self._status == 3:
             self.response["Surname"] = message
             self._bot.sendMessage("Insert your Company Token")
             self._status += 1
+            return False
 
         elif self._status == 4:
             self.response["CompanyToken"] = message
             summary = (f"You are going to register {self.completeName} as a new user of {self.response['CompanyName']}\n"
                         f"Company Token: {self.response['CompanyToken']}\n")
-            self._bot.sendMessage("Confirm your registration?", reply_markup=keyboardYESNO)
+            self._bot.sendMessage(f"{summary}\nConfirm your registration?", reply_markup=keyboardYESNO)
             self._status += 1
+            return False
 
         elif self._status == 5:
             if message == "yes":
@@ -237,6 +288,11 @@ class RegisterNewUser():
             return True
 
     def insert_user(self):
+        """Insert the user in the Resource Catalog.\n
+        Returns:\n
+        `True` if the user is correctly inserted in the Resource Catalog.\n
+        `False` otherwise.\n
+        """
         try:
             res = requests.post(self._connector.ResourceCatalog_url + f"/insert/user", 
                                     params=self.company, json=self.UserInfo)
@@ -266,6 +322,12 @@ class RegisterNewUser():
                 return False
 
 def getUsers(CompanyName : str, bot, connector) -> None:
+    """Get the list of users registered in the Resource Catalog.\n
+    Arguments:\n
+    `CompanyName` : the name of the company.\n
+    `bot` : the object used to send messages to the user.\n
+    `connector` : the IoTBot object used to connect to the Resource Catalog.\n
+    """
     users = connector.getList(CompanyName, "users")
     if users is None:
         bot.sendMessage("Error in the connection with the Resource Catalog")
@@ -282,6 +344,12 @@ def getUsers(CompanyName : str, bot, connector) -> None:
         
 
 def getDevices(CompanyName : str, bot, connector) -> None:
+    """Get the list of devices registered in the Resource Catalog.\n
+    Arguments:\n
+    `CompanyName` : the name of the company.\n
+    `bot` : the object used to send messages to the user.\n
+    `connector` : the IoTBot object used to connect to the Resource Catalog.\n
+    """
     devices = connector.getList(CompanyName, "devices")
     if devices is None:
         bot.sendMessage("Error in the connection with the Resource Catalog")
@@ -304,6 +372,12 @@ def getDevices(CompanyName : str, bot, connector) -> None:
                 bot.sendMessage(message)
 
 def getFields(CompanyName : str, bot, connector) -> None:
+    """Get the list of fields registered in the Resource Catalog.\n
+    Arguments:\n
+    `CompanyName` : the name of the company.\n
+    `bot` : the object used to send messages to the user.\n
+    `connector` : the IoTBot object used to connect to the Resource Catalog.\n
+    """
     fields = connector.getList(CompanyName, "fields")
     if fields is None:
         bot.sendMessage("Error in the connection with the Resource Catalog")

@@ -249,6 +249,18 @@ class ResourceCatalogManager():
             return json.dumps({"CompanyToken": company["CompanyToken"]}, indent=4)
         raise web_exception(404, "Company not found")
 
+    def getLocation(self, CompanyInfo : dict):
+        """Return the location of the company in json format.
+
+        Arguments:
+        `CompanyInfo` -- the information about the company.
+        Must contain the `CompanyName` and `CompanyToken`.\n
+        """
+        item = self.findCompany(CompanyInfo)
+        if item != None:
+            return json.dumps({"Location": item["Location"]}, indent=4)
+        raise web_exception(404, "Service info not found")
+
     def isRegistered(self, params : dict):
         """Return True if the company specified in `CompanyInfo` is registered in the catalog.
 
@@ -596,6 +608,9 @@ class RESTResourceCatalog(GenericService):
                 elif len(uri) == 1 and uri[0] == "fields":
                     CompanyInfo = self.catalog.accessInfo(params)
                     return self.catalog.getList(CompanyInfo, fieldsList_name)
+                elif len(uri) == 1 and uri[0] == "location":
+                    CompanyInfo = self.catalog.accessInfo(params)
+                    return self.catalog.getLocation(CompanyInfo)
                 elif len(uri) == 2 and uri[0] == "topics":
                     if "field" in params:
                         CompanyInfo = self.catalog.accessInfo(params)

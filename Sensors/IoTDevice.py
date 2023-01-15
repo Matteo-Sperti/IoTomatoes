@@ -8,7 +8,7 @@ from ItemInfo import *
 from MyThread import MyThread
 
 class IoTDevice(GenericResource):
-    def __init__(self, DeviceInfo : dict, measureTimeInterval : int = 3):
+    def __init__(self, DeviceInfo : dict, measureTimeInterval : int = 5):
         super().__init__(DeviceInfo)
         self._Ambient = AmbientSimulator(getCompanyName(self._CompanyInfo), getField(self._EndpointInfo))
         self._message={
@@ -50,7 +50,7 @@ class IoTDevice(GenericResource):
         return message
 
     def get_temperature(self):
-        message = self.construct_message("temperature", "°C")
+        message = self.construct_message("temperature", "C")
         message["e"][-1]["v"] = self._Ambient.get_temperature()
         return message
 

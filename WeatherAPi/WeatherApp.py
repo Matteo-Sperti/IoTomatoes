@@ -5,11 +5,11 @@ import cherrypy
 
 
 def validateJSON(jsonData):
-    try:
-        json.loads(jsonData)
-    except ValueError as err:
-        return False
-    return True
+	try:
+		json.loads(jsonData)
+	except ValueError as err:
+		return False
+	return True
 
 
 class WeatherApp:
@@ -20,7 +20,6 @@ class WeatherApp:
 		'''handles an API request based on the JSON input file(forwards a getRequest to the weather API)'''
 		dict = json.load(open(fileInput,"r")) #loads the input file
 		response = requests.get(self.url, params=dict) #makes the request, the parameters are in the input file
-		json.dump(response.json(),open(fileOutput,"w")) #writes the output in the output file
 		return response.json()
 
 	def IrrigationData(self):
@@ -28,7 +27,18 @@ class WeatherApp:
 		return self.makeRequest("IrrigationInput.json","IrrigationOutput.json") #makes the request and writes the output in the output file
 	def LightingData(self):
 		'''gets the data from the weather API for the lighting service'''
-		return self.makeRequest("LightingInput.json","LightingOutput.json") #makes the request and writes the output in the output file
+		response = self.makeRequest("LightingInput.json","LightingOutput.json")
+		listToBeConverted=(response["hourly"].pop("shortwave_radiation"))
+		convertedList=[x/0.0079 for x in listToBeConverted] #converts the shortwave radiation to lux
+		response["hourly"]["Illumination"]=convertedList
+		listToBeConverted=response["daily"].pop("shortwave_radiation_sum")
+		convertedList=[x/0.0079 for x in listToBeConverted] #converts the shortwave radiation to lux
+		response["daily"]["Illumination_sum"]=convertedList
+		response["hourly_units"]["Illumination"]="lux"
+		response["hourly_units"].pop("shortwave_radiation")
+		response["daily_units"]["Illumination_sum"]="lux"
+		response["daily_units"].pop("shortwave_radiation_sum")
+		return response #makes the request and writes the output in the output file
 	def CustomData(self):
 		'''gets the data from the weather API for a  custom user request'''
 		return self.makeRequest("CustomInput.json","CustomOutput.json") #makes the request and writes the output in the output file
@@ -65,13 +75,22 @@ class WebPage(object):
 	
 
 if __name__ == '__main__':
-	conf =  {
-			'/': {
-				 'request.dispatch': cherrypy.dispatch.MethodDispatcher(),
-				 'tools.sessions.on': True,
-		}
-	}
-	webService = WebPage()
-	cherrypy.tree.mount(webService, '/', conf)
-	cherrypy.engine.start()
-	cherrypy.engine.block()     
+	try:
+
+		print("Starting server...")
+		conf =  {
+		 '/': {
+		      'request.dispatch': cherrypy.dispatch.MethodDispatcher(),
+		      'tools.sessions.on': True,
+		 	}
+		 		}
+		webService = WebPage()
+		cherrypy.tree.mount(webService, '/', conf)
+		cherrypy.engine.start()
+		cherrypy.engine.block() 
+			
+	
+
+	except KeyboardInterrupt:
+		cherrypy.engine.exit()
+		cherrypy.server.stop()

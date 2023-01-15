@@ -36,7 +36,6 @@ class IoTDevice(GenericResource):
         print(f"{self.ID} received {msg} on topic {topic}")
 
     def run(self):
-        print("run")
         for topic in publishedTopics(self._EndpointInfo):
             message = eval(f"self.get_{topic.split('/')[-1]}()")
             self.myPublish(topic, message)

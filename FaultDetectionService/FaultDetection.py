@@ -126,7 +126,7 @@ if __name__ == "__main__":
 					if status.is_error:
 						payload = {'message': status.message}
 						companyName = dev['companyName']
-						fd.myPublish(f"{fd._baseTopic}/{companyName}/{status.topic}", payload)
+						fd.myPublish(f"{companyName}/{status.topic}", payload)
 		except KeyboardInterrupt:
 			fd.stop()
 			print("FaultDetection stopped")

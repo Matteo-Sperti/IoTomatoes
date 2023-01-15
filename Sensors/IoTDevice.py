@@ -11,7 +11,6 @@ class IoTDevice(GenericResource):
     def __init__(self, DeviceInfo : dict, Ambient : AmbientSimulator, measureTimeInterval : int = 3):
         super().__init__(DeviceInfo)
         self._Ambient = Ambient
-        print("sono qui")
         self._message={
             "companyName" : getCompanyName(self._CompanyInfo),
             "bn" : 0,
@@ -23,7 +22,6 @@ class IoTDevice(GenericResource):
                 "timestamp": None
             }]
         }
-        print(self._message)
         self._SendThread = MyThread(self.run, measureTimeInterval)
 
     def start(self):
@@ -38,9 +36,10 @@ class IoTDevice(GenericResource):
         print(f"{self.ID} received {msg} on topic {topic}")
 
     def run(self):
+        print("run")
         for topic in publishedTopics(self._EndpointInfo):
             message = eval(f"self.get_{topic.split('/')[-1]}()")
-            self.myPublish(self._baseTopic+topic, message)
+            self.myPublish(topic, message)
     
     def construct_message(self, measure : str, unit : str) :
         message=self._message

@@ -16,9 +16,9 @@ def createDeviceList(companyList : list, isActuator: bool = False):
 	deviceList = []
 	for comp in companyList:
 		for dev in comp['devicesList']:
-			if dev['isActuator']&isActuator:
+			if dev['isActuator'] and isActuator:
 				deviceList.append({**dev, **{'Datetime' : None, 'status': 'OFF', 'OnTime': 0, 'control': False}})
-			elif dev['isSensor']&(isActuator == False):
+			elif dev['isSensor'] and not isActuator:
 				deviceList.append({**dev, **{'lastUpdate' : None}})
 	return deviceList
 
@@ -36,18 +36,18 @@ def checkUpdate(Connector, isActuator: bool):
 			if _compare_dicts(d, new_dev, keys_to_ignore=['Datetime', 'lastUpdate', 'status', 'OnTime', 'control']):
 				d.update(new_dev)
 				payload = {'message': f"Device {new_dev['ID']} updated."}
-				Connector.myPublish(f"{Connector.baseTopic}/{new_dev['companyName']}/{Connector._publishedTopics[3]}", payload)
+				Connector.myPublish(f"{Connector._baseTopic}/{new_dev['companyName']}/{Connector._publishedTopics[3]}", payload)
 
 		if not_present:
 			Connector.deviceList.append(new_dev)
 			payload = {'message': f"Device {new_dev['ID']} added."}
-			Connector.myPublish(f"{Connector.baseTopic}/{new_dev['companyName']}/{Connector._publishedTopics[3]}", payload)
+			Connector.myPublish(f"{Connector._baseTopic}/{new_dev['companyName']}/{Connector._publishedTopics[3]}", payload)
 
 	for old_dev in Connector.deviceList:
 		if old_dev['ID'] not in [d['ID'] for d in new_deviceList]:
 			Connector.deviceList.remove(old_dev)
 			payload = {'message': f"Device {old_dev['ID']} removed."}
-			Connector.myPublish(f"{Connector.baseTopic}/{old_dev['companyName']}/{Connector._publishedTopics[3]}", payload)
+			Connector.myPublish(f"{Connector._baseTopic}/{old_dev['companyName']}/{Connector._publishedTopics[3]}", payload)
 
 
 def inList(deviceID : int, deviceList : list):

@@ -91,12 +91,12 @@ class ConsumptionManager (GenericService):
 			command = payload['command']
 		except:
 			payload = json.dumps({'message': "Error, command not found", 'companyName': companyName})
-			self.myPublish(f"{self._baseTopic}/{self._publishedTopics[0]}", payload)
+			self.myPublish(f"{self._publishedTopics[0]}", payload)
 		else:
 			check_actuator = inList(ActuatorID, self.deviceList)
 			if check_actuator.is_error:
 				payload = {'message': check_actuator.message}
-				self.myPublish(f"{self._baseTopic}/{companyName}/{self._publishedTopics[0]}", payload)
+				self.myPublish(f"{companyName}/{self._publishedTopics[0]}", payload)
 			else:
 				self.updateStatus(ActuatorID, command)
 

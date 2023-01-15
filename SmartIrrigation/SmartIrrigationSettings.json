@@ -12,5 +12,7 @@
             "subscribedTopics": []
         }
     ],
-    "controlTimeInterval": 30
+    "controlTimeInterval": 30,
+    "WeatherForescast_ServiceName" : "WeatherForecast",
+    "MongoDB_ServiceName" : "MongoDB"
 }

@@ -9,19 +9,21 @@ from GenericEndpoint import GenericService
 from ItemInfo import *
 from MyExceptions import *
 
-weatherToCall="WeatherForecast" #Global variable: name of the service that Smart Lighting must search in the catalog thorugh a get request
-mongoToCall="MongoDB" #Global variable: name of the service that provides previous hour and current measures of each field
-
-
 class SmartLighting(GenericService):
 
     def __init__(self, settings : dict, plantInfo : dict):
         """Inizializzazione della classe del servizio """
         super().__init__(settings)
 
+        if "WeatherForescast_ServiceName" in settings:
+            self.weatherToCall = settings["WeatherForescast_ServiceName"]
+
+        if "MongoDB_ServiceName" in settings:
+            self.mongoToCall = settings["MongoDB_ServiceName"]
+
         self.plantInfo = plantInfo   
         self._message = {
-            "bn":"",
+            "bn": self._EndpointInfo["serviceName"],
             "CompanyName":"",
             "fieldNumber":"",
             "e":{
@@ -70,15 +72,11 @@ class SmartLighting(GenericService):
                     continue   
 
                 currentTime = datetime.datetime.now().time()
-                forecast = self.callWeatherService(currentTime.hour)
-                if forecast == None:
+                cloudCover, lightForecast, Sunrise, Sunset = self.callWeatherService(currentTime.hour)
+                if cloudCover == None or lightForecast == None or Sunrise == None or Sunset == None:
                     print("No weather forecast available")
                     self.sendCommand(companyName, fieldID, actuatorTopicsForField, 0)
                     continue
-                cloudCover = forecast[0]
-                lightForecast = forecast[1]
-                Sunrise = forecast[2]
-                Sunset = forecast[3]
                     
                 currentLight=round((3*currentLight+lightForecast)/4,2) #integration sensor measures with the weather forecast one
 
@@ -158,15 +156,14 @@ class SmartLighting(GenericService):
 
         print(f"\nActuators topics list= {topicList}\n")
         for singleTopic in topicList:    
-            message["bn"] = self._EndpointInfo["serviceName"]
             message["CompanyName"] = companyName
             message["fieldNumber"] = fieldID
             message["e"]["v"] = command
             message["e"]["timestamp"]=time.time()
         
-            print(f"message = {message}\n")
-            commandTopic = self._baseTopic + str(singleTopic)
-            print(f"command Topic={commandTopic}\n\n")
+            print(f"message = {message}")
+            commandTopic = str(singleTopic)
+            print(f"command Topic={commandTopic}\n")
             self.myPublish(commandTopic, json.dumps(message))
 
     def getTopics(self, company, fieldNumber : int): 
@@ -175,7 +172,7 @@ class SmartLighting(GenericService):
         for device in company["devicesList"]:
             if fieldNumber == device["field"] and device["isActuator"]==True:
                 if "led" in device["actuatorType"]:
-                    topics.append(subscribedTopics(device))
+                    topics += subscribedTopics(device)
 
         return topics
 
@@ -194,22 +191,12 @@ class SmartLighting(GenericService):
         return minLight, maxLight            
 
     def getMongoDBdata(self):
-        #IN FUTURO:
-        #POSSIBILE FORMA DELLA CHIAMATA AL SERVICE CATALOG PER OTTENERE L'URL DI MONGODB
-        # try:
-        #     MongoDB_url=requests.get(self.ServiceCatalog_url+"/search/serviceName",params={"serviceName":"mongoToCall"})
-        #     #### mongoToCall è una global variable che rappresenta il nome del mongoDB service nel Service catalog
-        #     MongoDB_url.raise_for_status()
-        # except requests.exceptions.InvalidURL as errURL:
-        #     print(f"ERROR: invalid URL for the Service Catalog!\n\n{errURL})
-        #     time.sleep(1)
-        # except requests.exceptions.HTTPError as errHTTP:
-        #     print(f"ERROR: something went wrong with the Service Catalog!\n\n{errHTTP}")
-        #     time.sleep(1)
-        # except requests.exceptions.ConnectionError:
-        #     print("503: Connection error. Service Catalog unavailable")
-        #     time.sleep(1)
-        # else:
+        mongoDB_url = self.getOtherServiceURL(self.mongoToCall)
+
+        if mongoDB_url == None or mongoDB_url == "":
+            print("ERROR: MongoDB service not found!")
+            return None, None
+
         #     try:
         #         r=requests.get("MongoDB_url/...media?companyname=<companyName>&fieldID=<ID>&hour=1...") ESPRIMERE BENE L'URL E I PARAMETRI IN RELAZIONE A COME COSTRUISCE IL SERVIZIO LUCA
         #         r.raise_for_status()
@@ -245,27 +232,12 @@ class SmartLighting(GenericService):
             - sunset time
 
             from the received json file"""
-        ####MODIFICA: RICAVARE I DATI DAL WEATHER FORECAST ATTRAVERSO LA CHIAMATA AL SERVICE CATALOG
-        # try:
-        ##     weatherServiceInfo=requests.get(self.ServiceCatalog_url+"/search/serviceName",params={"serviceName":weatherToCall})
-        #     ## weatherToCall è la variabile globale definita all'inizio dello script che contiene il nome del weather forecast service
-        #     weatherServiceInfo.raise_for_status()
+        
+        weatherForecast_url = self.getOtherServiceURL(self.weatherToCall)
+        if weatherForecast_url == None or weatherForecast_url == "":
+            print("ERROR: Weather Forecast service not found!")
+            return None, None, None, None
 
-        # except requests.exceptions.InvalidURL as errURL:
-        #     print(f"ERROR: invalid URL for the Service Catalog!\n\n{errURL})
-        #     time.sleep(1)
-        # except requests.exceptions.HTTPError as errHTTP:
-        #     pprint(f"ERROR: something went wrong with the Service Catalog!\n\n{errHTTP}")
-        #     time.sleep(1)
-        # except requests.exceptions.ConnectionError:
-        #     print("503: Connection error. Service Catalog unavailable")
-        #     time.sleep(1)
-
-        # else:
-        #-ESTRAE L'URL DEL WEATHER FORECAST SERVICE DALLE INFORMAZIONI RICEVUTE DAL CATALOG:
-        #     weatherForecast_url=weatherServiceInfo["serviceDetails"][0]["serviceIP"].... 
-        #     non so se sia giusto il tipo di json che si ottiene eseguendo la ricerca tramite search (ho preso in considerazione
-        #     la struttura del dizionario relativo al generico servizio scritto sul file del drive ) 
         #
         #-ESEGUE LA GET AL WEATHER FORECAST SERVICE (da verificare come implementa Luca la gestione della chiamata):
         #     try:
@@ -321,7 +293,7 @@ class SmartLighting(GenericService):
         sunset=datetime.time(sunsetHour,sunsetMinutes,0) #crea un oggetto "data" per avere l'ora del tramonto
         
         cloudCover=weatherService_r["hourly"]["cloudcover"][hour]
-        return [cloudCover,light,sunrise,sunset]                       
+        return cloudCover,light,sunrise,sunset                      
     
 if __name__=="__main__":
     try:

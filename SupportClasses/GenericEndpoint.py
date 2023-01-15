@@ -176,7 +176,7 @@ class GenericEndpoint():
         """It publishes a dictionary message `msg` in `topic`"""
 
         # publish a message with a certain topic
-        self._paho_mqtt.publish(topic, json.dumps(msg), 2)
+        self._paho_mqtt.publish(self._baseTopic + topic, json.dumps(msg), 2)
 
     def mySubscribe(self, topic):
         """It subscribes to `topic`"""
@@ -253,6 +253,20 @@ class GenericService(GenericEndpoint) :
                 except:
                     print(f"Error in the response\n")  
 
+    def getOtherServiceURL(self, serviceName:str):
+        """Return the URL of the service `serviceName`"""
+
+        try:
+            params = {"SystemToken": self._SystemToken, "serviceName": serviceName}
+            r = requests.get(self.ServiceCatalog_url+"/search/serviceName", params=params)
+            r.raise_for_status()
+            serviceInfo = r.json()
+        except:
+            print("ERROR: Service Catalog not reachable!")
+            return ""
+        else:
+            return getIPaddress(serviceInfo["serviceIP"])
+
 
 class GenericResource(GenericEndpoint) :
     def __init__(self, settings: dict):
@@ -260,7 +274,7 @@ class GenericResource(GenericEndpoint) :
         It checks if the Company Info is present in the settings and then it calls the GenericEndpoint constructor.
         """
 
-        if "CompanyInfo" in settings:
+        if "CompanyName" in settings and "CompanyToken" in settings:
             super().__init__(settings, isResource=True)
         else:
             raise InfoException("The Company Info is missing")

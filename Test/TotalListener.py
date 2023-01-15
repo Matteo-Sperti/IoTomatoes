@@ -6,12 +6,15 @@ brokerIP = "mqtt.eclipseprojects.io"
 brokerPort = 1883
 baseTopic =  "IoTomatoes/"
 
-class AmbientSimulator():
+class Listener():
     def __init__(self):
         self._broker, self._port, self._baseTopic = brokerIP, brokerPort, baseTopic
+        self.topic = self._baseTopic + "#"
 
     def stop(self):
-        self._paho_mqtt.unsubscribe(self._baseTopic)
+        self._paho_mqtt.unsubscribe(self.topic)
+        self._paho_mqtt.loop_stop()
+        self._paho_mqtt.disconnect()
 
     def start(self) :
         """Start the MQTT client.
@@ -29,7 +32,8 @@ class AmbientSimulator():
         self._paho_mqtt.connect(self._broker, self._port)
         self._paho_mqtt.loop_start()
         # subscribe the topics
-        self.mySubscribe(self._baseTopic)
+
+        self.mySubscribe(self.topic)
 
     def myOnConnect(self,client,userdata,flags,rc):
         """It provides information about Connection result with the broker"""
@@ -55,3 +59,11 @@ class AmbientSimulator():
         self._paho_mqtt.subscribe(topic, 2)
         # just to remember that it works also as a subscriber
         print("Subscribed to %s" % (topic))
+
+if __name__ == "__main__":
+    listener = Listener()
+    listener.start()
+    input("Press Enter to stop listening...")
+
+    listener.stop()
+    print("Listening stopped")

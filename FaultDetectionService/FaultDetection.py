@@ -95,16 +95,16 @@ class FaultDetector(GenericService):
 			measure = payload['measure']
 		except:
 			payload = {'message': "Error, measure not found"}
-			self.myPublish(f"{self._baseTopic}/{companyName}/{self._publishedTopics[0]}", payload)
+			self.myPublish(f"{companyName}/{self._publishedTopics[0]}", payload)
 		else:
 			sensor_check = inList(deviceID, self.deviceList)
 			measure_check = self.checkMeasure(deviceID, measureType, measure)
 			if sensor_check.is_error:
 				payload = {'message': sensor_check.message}
-				self.myPublish(f"{self._baseTopic}/{companyName}/{sensor_check.topic}", payload)
+				self.myPublish(f"{companyName}/{sensor_check.topic}", payload)
 			if measure_check.is_error:
 				payload = {'message': measure_check.message}
-				self.myPublish(f"{self._baseTopic}/{companyName}/{measure_check.topic}", payload)
+				self.myPublish(f"{companyName}/{measure_check.topic}", payload)
 			
 			if (measure_check.is_error and sensor_check.is_error) == False:
 				self.updateStatus(deviceID)

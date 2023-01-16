@@ -1,0 +1,45 @@
+version: '3.4'
+
+networks:
+  inside:
+    internal: true
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: "172.16.0.0/24"
+
+
+services:
+  service_catalog:
+    image: service_catalog
+    build:
+      context: .
+      dockerfile: ./ServiceCatalog/Dockerfile
+    ports:
+      - "8080:8080"
+    networks:
+      inside:
+        ipv4_address: "172.16.0.2"
+
+  resource_catalog:
+    image: resource_catalog
+    build:
+      context: .
+      dockerfile: ./ResourceCatalog/Dockerfile
+    ports:
+      - "8081:8081"
+    networks:
+      inside:
+        ipv4_address: "172.16.0.3"
+
+  telegram_bot:
+    image: telegram_bot
+    build:
+      context: .
+      dockerfile: ./TelegramBot/Dockerfile
+    ports:
+      - "8082:8082"
+    networks:
+      inside:
+        ipv4_address: "172.16.0.4"

@@ -1,11 +1,8 @@
 import json
 import cherrypy
 import time
-import sys
 import requests
-from socket import gethostname, gethostbyname
 
-sys.path.append("../SupportClasses/")
 from MyExceptions import *
 from MyThread import MyThread
 from MyIDGenerator import IDs
@@ -422,8 +419,6 @@ class RESTServiceCatalog():
 if __name__ == "__main__":
     settings = json.load(open("ServiceCatalogSettings.json"))
 
-    # local_ip = gethostbyname(gethostname())
-    local_ip = "127.0.0.1"
     port = settings["IPport"]
 
     Catalog = RESTServiceCatalog(settings)
@@ -435,7 +430,7 @@ if __name__ == "__main__":
         }
     }
     cherrypy.tree.mount(Catalog, '/', conf)
-    cherrypy.config.update({'server.socket_host': local_ip})
+    cherrypy.config.update({'server.socket_host': "0.0.0.0"})
     cherrypy.config.update({'server.socket_port': port})
     cherrypy.engine.start()
     

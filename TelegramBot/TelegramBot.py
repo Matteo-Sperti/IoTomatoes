@@ -7,11 +7,9 @@ from telepot.delegate import (
 import json
 import time
 import requests
-import sys
 from socket import gethostname, gethostbyname
 
 from Commands import *
-sys.path.append("../SupportClasses/")
 from MyExceptions import *
 from GenericEndpoint import GenericService
 from MyThread import custom_thread
@@ -182,6 +180,7 @@ class IoTBot(GenericService):
 
         self._message = {'bn': "", 'e': [{'n': "",'v': "", 'u': "", 't': ""}]}
         #TelegramBot
+        print("Starting TelegramBot")
         self.tokenBot = self.get_token()
         self.bot = ChatBox(self.tokenBot, self)
 
@@ -295,7 +294,7 @@ if __name__ == "__main__":
         while True:
             try:
                 time.sleep(3)
-            except KeyboardInterrupt:
+            except KeyboardInterrupt or SystemExit:
                 break
 
         IoTomatoesBOT.stop()

@@ -714,14 +714,14 @@ if __name__ == "__main__":
             }
         }
         cherrypy.tree.mount(Catalog, '/', conf)
-        cherrypy.config.update({'server.socket_host': ip_address})
+        cherrypy.config.update({'server.socket_host': "0.0.0.0"})
         cherrypy.config.update({'server.socket_port': port})
         cherrypy.engine.start()
 
         try:
             while True:
                 time.sleep(3)
-        except KeyboardInterrupt:
+        except KeyboardInterrupt or SystemExit:
             Catalog.close()
             print("Catalog closed, press Ctrl+C to stop the server")
             cherrypy.engine.block()

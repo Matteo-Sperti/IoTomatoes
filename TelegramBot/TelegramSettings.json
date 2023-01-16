@@ -1,8 +1,8 @@
 {
-    "ServiceCatalog_url" : "http://127.0.0.1:8080",
+    "ServiceCatalog_url" : "http://172.16.0.2:8080",
     "SystemToken": "IoTomatoes_1234567890",
     "serviceName" : "IoTomatoes_bot",
-    "IPport" : 8083,
+    "IPport" : 8082,
     "availableServices" : [
         "MQTT"
     ],

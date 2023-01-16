@@ -1,8 +1,7 @@
 version: '3.4'
 
 networks:
-  inside:
-    internal: true
+  mynet:
     driver: bridge
     ipam:
       driver: default
@@ -19,7 +18,7 @@ services:
     ports:
       - "8080:8080"
     networks:
-      inside:
+      mynet:
         ipv4_address: "172.16.0.2"
 
   resource_catalog:
@@ -30,7 +29,7 @@ services:
     ports:
       - "8081:8081"
     networks:
-      inside:
+      mynet:
         ipv4_address: "172.16.0.3"
 
   telegram_bot:
@@ -41,7 +40,7 @@ services:
     ports:
       - "8082:8082"
     networks:
-      inside:
+      mynet:
         ipv4_address: "172.16.0.4"
 
   smart_irrigation:
@@ -52,5 +51,16 @@ services:
     ports:
       - "8083:8083"
     networks:
-      inside:
+      mynet:
         ipv4_address: "172.16.0.5"
+
+  smart_lighting:
+    image: smart_lighting
+    build:
+      context: .
+      dockerfile: ./SmartLighting/Dockerfile
+    ports:
+      - "8084:8084"
+    networks:
+      mynet:
+        ipv4_address: "172.16.0.6"

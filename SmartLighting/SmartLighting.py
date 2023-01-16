@@ -2,9 +2,7 @@ import requests
 import time
 import datetime
 import json
-import sys
 
-sys.path.append("../SupportClasses/")
 from GenericEndpoint import GenericService
 from ItemInfo import *
 from MyExceptions import *
@@ -12,7 +10,12 @@ from MyExceptions import *
 class SmartLighting(GenericService):
 
     def __init__(self, settings : dict, plantInfo : dict):
-        """Inizializzazione della classe del servizio """
+        """It initializes the service with the settings and the plantInfo
+        
+        Arguments:\n
+        `settings (dict)`: the settings of the service\n
+        `plantInfo (dict)`: dictionary with the plants threshold values\n
+        """
         super().__init__(settings)
 
         if "WeatherForescast_ServiceName" in settings:
@@ -40,8 +43,10 @@ class SmartLighting(GenericService):
         - Call to resource catalog -> to retrieve information about each field for each company
         - Call to MongoDB to retrieve information about last hour measures (currentLigh) and previous hour measures 
           (previousLight)
-        - Call to Weather forecast service to retrieve information about current cloudcover percentage, light, sunrise hour and sunset hour
-        With these information it integrates the forecast light with sensor measures and performs a simple control strategy to check if the light is under a fixed threshold"""
+        - Call to Weather forecast service to retrieve information about current cloudcover percentage, light, 
+        sunrise hour and sunset hour. 
+        With these information it integrates the forecast light with sensor measures and performs a simple control 
+        strategy to check if the light is under a fixed threshold"""
 
         companyList = self.getCompaniesList()
 
@@ -77,8 +82,9 @@ class SmartLighting(GenericService):
                     print("No weather forecast available")
                     self.sendCommand(companyName, fieldID, actuatorTopicsForField, 0)
                     continue
-                    
-                currentLight=round((3*currentLight+lightForecast)/4,2) #integration sensor measures with the weather forecast one
+                
+                #integration sensor measures with the weather forecast one
+                currentLight=round((3*currentLight+lightForecast)/4,2) 
 
                 #CONTROL ALGORITHM:
                 #controllo schedulato dall'inizio dell'alba al tramonto (LA NOTTE NO, COSI SI LASCIA UN
@@ -94,11 +100,9 @@ class SmartLighting(GenericService):
                         print("LIGHTING DOES NOT MAKE SENSE")
                         print("light set to OFF")
                         self.sendCommand(companyName, fieldID, actuatorTopicsForField, 0)
-                    #cosi se temporaneamente passa una nuvola che abbassa troppo il valore di luce non si accendono comunque
                     else:    
                         command = 0
                         print("LIGHTING MAKE SENSE")
-                        #print(f"OFF threshold={maxLight}")
                         print(f"ON/OFF threshold={minLight}")
                         print(f"current value light={currentLight}")
                         
@@ -142,8 +146,8 @@ class SmartLighting(GenericService):
         #Check if the crop is in our json file:
         if plant in list(self.plantInfo.keys()):
             limits=self.plantInfo[plant]
-            minLight=limits["lightLimit"]["min"]    #extract the ideal min value of light for the given plant from the json file 
-            maxLight=limits["lightLimit"]["max"]    #extract the ideal max value of light for the given plant from the json file
+            minLight=limits["lightLimit"]["min"]    #ideal min value of light for the given plant
+            maxLight=limits["lightLimit"]["max"]    #ideal max value of light for the given plant
         else:
             print("No crop with the specified name. \nDefault limits will be used") 
             limits=self.plantInfo["default"]
@@ -159,24 +163,9 @@ class SmartLighting(GenericService):
             print("ERROR: MongoDB service not found!")
             return None, None
 
-        #     try:
-        #         r=requests.get("MongoDB_url/...media?companyname=<companyName>&fieldID=<ID>&hour=1...") ESPRIMERE BENE L'URL E I PARAMETRI IN RELAZIONE A COME COSTRUISCE IL SERVIZIO LUCA
-        #         r.raise_for_status()
-        #     except requests.exceptions.InvalidURL as errURL:
-        #         print(f"ERROR: invalid URL for MongoDB service!\n\n{errURL}")
-        #         time.sleep(1)
-        #     except requests.exceptions.HTTPError as errHTTP:
-        #         print(f"ERROR: something went wrong with MongoDB service!\n\n{errHTTP}")
-        #         time.sleep(1)
-        #     except requests.exceptions.ConnectionError:
-        #         print("503: Connection error. MongoDB service unavailable")
-        #         time.sleep(1)
-        #     else:
-        #           ####RESTO DEL CODICE####
-        
-        #PER ORA I DATI(VALORE MEDIA ORA PRECEDENTE E VALORE MEDIA CORRENTE) VENGONO OTTENUTI DA UNA SORTA DI SIMULATORE MONGODB:
+        ###ESEGUE LA GET AL MONGODB
         try:
-            r=requests.get("http://127.0.0.1:8080/decreasing") #richiesta al MongoDBSimulator, da sostituire con il vero mongoDB
+            r=requests.get("http://127.0.0.1:8080/decreasing")
             r.raise_for_status()
             rValues=list((r.json()).values())
             currentLight=float(rValues[0])
@@ -270,6 +259,6 @@ if __name__=="__main__":
             while True:
                 lighting.control()
                 time.sleep(controlTimeInterval)
-        except KeyboardInterrupt:
+        except KeyboardInterrupt or SystemExit:
             lighting.stop()
             print("SmartLighting stopped")

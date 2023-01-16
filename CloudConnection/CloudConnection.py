@@ -6,223 +6,325 @@ import cherrypy
 from GenericEndpoint import GenericEndpoint
 import requests
 from MyExceptions import *
+from matplotlib import pyplot as plt
+import datetime
 
 
 class MongoConnection():
-    def __init__(self):
-        try:
-            self.client = MongoClient("mongodb+srv://admin:admin@cluster0.lzvxrr9.mongodb.net/test")
-        except errors.AutoReconnect():
-            print("Error connecting to the database")
-        
-        self.checkNewCompany()
-    
-    def insertDataBase(self, CompanyName):
-        '''create a new database (company)
-         Arguments:
-         CompanyName: unique name of the company'''
-        if CompanyName not in self.client.list_database_names():
-            db = self.client[CompanyName]
-            collection = db["CompanyData"]
-            data = {"Company": CompanyName, "Database Creation Time": time.ctime()}
-            collection.insert_one(data)
-            print("Database created") 
-        else:
-            print("Database already exists")
+	def __init__(self,settings):
+		self.settings=settings
+		try:
+			self.client = MongoClient("mongodb+srv://admin:admin@cluster0.lzvxrr9.mongodb.net/test")
+		except errors.AutoReconnect():
+			print("Error connecting to the database")
+		except errors.ServerSelectionTimeoutError():
+			print("Error connecting to the database")
+		
+		self.checkNewCompany()
+	
+	def insertDataBase(self, CompanyName):
+		'''create a new database (company)
+		 Arguments:
+		 CompanyName: unique name of the company'''
+		if CompanyName not in self.client.list_database_names():
+			db = self.client[CompanyName]
+			collection = db["CompanyData"]
+			data = {"Company": CompanyName, "Database Creation Time": time.ctime()}
+			collection.insert_one(data)
+			print("Database created") 
+		else:
+			print("Database already exists")
 
-    def insertField(self, CompanyName, CollectionName,data):
-        '''create a collection for a field (dataset for a company)/update a collection\n
-            Arguments:
-            `CompanyName`: unique name of the company\n
-            `CollectionName`: unique name of the collection\n
-            `data`: data to be inserted in the collection\n'''
-        if CompanyName in self.client.list_database_names():
-            db = self.client[CompanyName]
-            collection = db[CollectionName]
-            data["_id"]=data.pop("bn")
-            collection.insert_one(data)
-        else:
-            print("Company database is still being generated")
-    def insertDataSensors(self, CompanyName, CollectionName,ID,data):
-        '''insert data in a collection\n
-            Parameters:
-            CompanyName: unique name of the company
-            CollectionName: unique name of the collection
-            ID of the device
-            data: data to be inserted in the collection'''
-        if CompanyName in self.client.list_database_names():
-            if CollectionName in self.client[CompanyName].list_collection_names():
-                db = self.client[CompanyName]
-                collection = db[CollectionName]
-                data["_id"]=data.pop("bn")
-                dict =list(collection.find())
-                for i in range(len(data["e"])):
-                    for j in range(len(dict[ID]["e"])):
-                        if data["e"][i]["name"] == dict[ID]["e"][j]["name"]:
-                            if type(dict[ID]["e"][j]["value"]) is not list:
-                                dict[ID]["e"][j]["value"]=[dict[ID]["e"][j]["value"]]
-                            if type(dict[ID]["e"][i]["timestamp"]) is not list:
-                                dict[ID]["e"][i]["timestamp"]=[dict[ID]["e"][i]["timestamp"]]
-                            dict[ID]["e"][j]["value"].extend([data["e"][i]["value"]])
-                            dict[ID]["e"][j]["timestamp"].extend([data["e"][i]["timestamp"]])
-                            collection.update_one({"_id":ID}, {"$set": dict[ID]})                                
-            else:
-                   self.insertField(CompanyName,CollectionName,data)
-        else:
-            print("Database does not exist, please create database first")
-    
-    #def insertDataService(self,CompanyName,CollectionName,data):       
-    #da fare
-                         
-    def notify(self,topic, payload):
-             '''get data on notification
-            Parameters: \n
-            `topic` -- string containing the topic of the new message\n
-            `payload` -- string containing the payload of the new message\n'''
-    
-             list=topic.split("/")
-             self.insertDataSensors(list[1],list[2],payload)
-            
-            #need how to get data from topic to right collection
-            
-        
-    def checkNewCompany(self):
-            '''check if a new company is added by making a GET request to the Resource Catalog'''
-            while True:
-                response = requests.get(self.ResourceCatalog_url + "/CompaniesName", self._SystemToken)
-                list = json.loads(response)
-                for i in list:
-                    if i not in self.client.list_database_names():
-                        self.insertDataBase(i)
-                time.sleep(300)
-            
-                
-    def GetAvg(self,CompanyName,CollectionName,measure):
-        '''get the average of a measure\n
-            Parameters:\n
-            CompanyName: unique name of the company\n
-            CollectionName: unique name of the collection\n
-            measure: measure to be calculated\n'''
-        if CompanyName in self.client.list_database_names():
-            if CollectionName in self.client[CompanyName].list_collection_names():
-                db = self.client[CompanyName]
-                collection = db[CollectionName]
-                dict =list(collection.find())
-                lst=[]
-                for i in range(len(dict)):
-                    for j in range(len(dict[i]["e"])):
-                        if dict[i]["e"][j]["name"] == measure:
-                            lst.extend(dict[i]["e"][j]["value"])
-                if len(lst)==0:
-                    result={"result":f"No data available for {measure} in field {CollectionName} of company {CompanyName}"}
-                else:
-                    result={"Company":CompanyName,"Field":CollectionName,"Measure":measure,"Average":sum(lst)/len(lst),"Unit":dict[0]["e"][j]["unit"],"Timestamp":time.ctime()}
-                return json.dumps(result)
-            else:
-                print("Collection does not exist")
-        else:
-            print("Database does not exist")
-    def getAvgAll(self,CompanyName,measure):
-        '''get the average of a measure for all the fields of a company\n
-            Parameters:\n
-            CompanyName: unique name of the company\n
-            measure: measure to be calculated\n'''
-        if CompanyName in self.client.list_database_names():
-            db = self.client[CompanyName]
-            lst=[]
-            for i in db.list_collection_names():
-                if i != "CompanyData":
-                    result = self.GetAvg(CompanyName,i,measure)
-                    if len(result)>1:
-                        list.extend["Average"]
-                        unit = result["Unit"]
-            
-            resultDict = {"Company":CompanyName,"Measure":measure,"Average":sum(lst)/len(lst),"Unit":unit,"Timestamp":time.ctime()}                       
-            return json.dumps(resultDict)
-        else:
-            print("Database does not exist")
-    def insertConsumptionData(self,CompanyName,CollectionName,ID):
-        '''insert data coming from the consumption service\n
-        Arguments:\n
-        str: str coming from the consumption service\n'''
-        # da sistemare con fede- capire come arrivano i dati non in csv
-        db = self.client[CompanyName]
-        collection = db[CollectionName]
-        dict2={"consumption_value":2,"timestamp":time.ctime(),"unit":"kWh"}
-        dict = list(collection.find()) 
-        try:
-            dict[ID]["consumption"].append(dict2)
-            collection.update_one({"_id":ID}, {"$set": dict[ID]})
-            return True
-        except KeyError:
-            print("its not an actuator")
-            dict[ID]["consumption"]=[]   
-            dict[ID]["consumption"].append(dict2)
-            collection.update_one({"_id":ID}, {"$set": dict[ID]})
-        except AttributeError:
-            dict[ID]["consumption"]=[dict[ID]["consumption"]]
-            dict[ID]["consumption"].append(dict2)
-            collection.update_one({"_id":ID}, {"$set": dict[ID]})
+	def insertField(self, CompanyName, CollectionName,data):
+		'''create a collection for a field (dataset for a company)/update a collection\n
+			Arguments:
+			`CompanyName`: unique name of the company\n
+			`CollectionName`: unique name of the collection\n
+			`data`: data to be inserted in the collection\n'''
+		self.insertDataBase(CompanyName)
+		db = self.client[CompanyName]
+		collection = db[CollectionName]
+		data["_id"]=data.pop("bn")
+		collection.insert_one(data)
 
-        
-    
-    # def GetBotGrafici
+
+	
+	def insertDeviceData(self,CompanyName,CollectionName,ID,measure,data):
+		'''insert data in a collection\n
+			Parameters:
+			`CompanyName`-- unique name of the company
+			`CollectionName`-- unique name of the collection(a.k.a. field)
+			`ID`-- ID of the device
+			`measure`-- measure to be inserted in the collection
+			`data`-- data to be inserted in the collection'''
+		data["_id"]=data.pop("bn")
+		counter=0
+	
+		try:
+			dict=self.client[CompanyName][CollectionName].find_one({"_id":ID})
+			if "e" not in dict:
+				raise KeyError
+			for i in dict["e"]:
+				if measure not in dict["e"][i]["name"]:
+					counter+=1
+				else :
+					found =i
+			
+			if counter == len(dict["e"]):
+				raise Exception("measure not found")    
+			if isinstance(dict["e"][found]["value"],list) == False:
+				dict["e"][found]["value"]=[dict["e"][found]["value"]]
+			if isinstance(dict["e"][found]["value"],list) == False:
+				dict["e"][found]["timestamp"]=[dict["e"][found]["timestamp"]]
+			if isinstance(dict["e"],list) == False:
+				dict["e"]=[dict["e"]]
+			dict["e"][found]["value"].extend([data["e"][0]["value"]])
+			dict[ID]["e"][found]["timestamp"].extend([data["e"][0]["timestamp"]])
+
+		except errors.InvalidOperation:
+			#means that the device is not in the database, so it is added
+			self.client[CompanyName][CollectionName].insert_one(data)
+		except KeyError:
+			#means that the consumption key of the device was created before the other keys, so it
+			#is copied on the data dictionary and the object of the collection is updated
+			data["consumption"]=dict["consumption"]
+			self.client[CompanyName][CollectionName].update_one({"_id":ID}, {"$set": data})
+		except Exception as e:
+			#the device is in the database but the measure is not,so it is added
+			if str(e) == "measure not found":
+				dict["e"].append(data["e"][0])
+				
+	def notify(self,topic, payload):
+			'''get data on notification
+			Parameters: \n
+			`topic` -- string containing the topic of the new message\n
+			`payload` -- string containing the payload of the new message\n'''
+			
+			listTopic=topic.split("/")
+			try:
+				if listTopic[2] == "consumption":
+					self.insertConsumptionData(listTopic[1],payload)
+					#IoTomatoes/CompanyName/consumption    
+				elif isinstance(int(listTopic[2]),int):
+					self.insertDataSensors(listTopic[1],listTopic[2],listTopic[3],listTopic[4],payload)
+					#IoTomatoes/CompanyName/Field#/deviceID/measure
+			except IndexError:
+					pass
+			
+			
+		
+	def checkNewCompany(self):
+			'''check if a new company is added by making a GET request to the Resource Catalog'''
+			while True:
+				response = requests.get(self.get_ResourceCatalog_url() + "/CompaniesName", self._SystemToken)
+				list = json.loads(response)
+				for i in list:
+					if i not in self.client.list_database_names():
+						self.insertDataBase(i)
+				time.sleep(300)
+	def time_period(self,list,start,end):
+		'''get the time period of a list of dates\n
+			Parameters:\n
+			`list`-- list to be analyzed\n
+			`start` -- start date\n
+			`end` -- end date \n
+			date must be in the format "YYYY-MM-DD '''
+
+		for i in range(len(list)):
+			if list[i]<=start:
+				start=i
+			if list[i]>=end:
+				end=i
+		if start== (len(list)-1):
+			return(start,start)
+		elif start == end:
+			end+=1
+			return (start,end)       
+				
+	def GetAvg(self,CompanyName,CollectionName,measure,start,end):
+		'''get the average of a measure\n
+			Parameters:\n
+			`CompanyName` -- unique name of the company\n
+		   `CollectionName` -- unique name of the collection\n
+			`measure` -- measure to be calculated\n
+			`start` -- start date of the period\n
+			`end` -- end date of the period\n
+			date must be in the format "YYYY-MM-DD 
+			if the last value of the timestamp is put as start, the result will be empty'''
+		
+		if CompanyName in self.client.list_database_names():
+			if CollectionName in self.client[CompanyName].list_collection_names():
+				db = self.client[CompanyName]
+				collection = db[CollectionName]
+				dict =list(collection.find())
+				lst=[]
+				
+				for i in range(len(dict)):
+					
+					for j in range(len(dict[i]["e"])):
+						if dict[i]["e"][j]["name"] == measure:
+							indexes=self.time_period(dict[i]["e"][j]["timestamp"],start,end)
+							lst.extend(dict[i]["e"][j]["value"][indexes[0]:indexes[1]])
+							indexes_to_get_unit=[i,j]
+				if len(lst)==0:
+					return False
+				else:
+					result={"Company":CompanyName,"Field":CollectionName,"Measure":measure,"Average":sum(lst)/len(lst),"Unit":dict[indexes_to_get_unit[0]]["e"][indexes_to_get_unit[1]]["unit"],"Time Period":[start,end]}
+				return json.dumps(result)
+			else:
+				return False
+		else:
+			print("Database does not exist")
+	def getAvgAll(self,CompanyName,measure,start,end):
+		'''get the average of a measure for all the fields of a company\n
+			Parameters:\n
+			`CompanyName` -- unique name of the company\n
+			`measure` -- measure to be calculated\n
+			`start` -- start date of the period\n
+			`end` -- end date of the period\n'''
+		if CompanyName in self.client.list_database_names():
+			db = self.client[CompanyName]
+			lst=[]
+			for i in db.list_collection_names():
+				if i != "CompanyData":
+					result = self.GetAvg(CompanyName,i,measure,start,end)
+					if len("result" not in result):
+						result=json.loads(result)
+						list.append(result["Average"])
+						unit = result["Unit"]
+			
+			resultDict = {"Company":CompanyName,"Measure":measure,"Average":sum(lst)/len(lst),"Unit":unit,"Timeperiod":[start,end]}                       
+			return json.dumps(resultDict)
+		else:
+			return False
+	def insertConsumptionData(self,CompanyName,data):
+		'''insert data coming from the consumption service\n
+		Parameters:\n
+		`companyName`-- unique name of the company\n
+		`data`-- JSON coming from the consumption service\n'''
+		db = self.client[CompanyName]
+		data["_id"]=data.pop("bn")
+		ID = data["_id"]
+		consumptionData=data["consumption"]
+		consumptionValue=consumptionData["consumption_value"]
+		timestamp=consumptionData["timestamp"]
+		power=consumptionData["power"]
+		CollectionName = data["field"]
+		collection = db[CollectionName]
+		dict = list(collection.find()) 
+		self.insertDataBase(CompanyName)
+		
+		try:
+			#update consumption_value,power and timestamp list
+			dict[ID]["consumption"]["consumption_value"].append(consumptionValue)
+			dict[ID]["consumption"]["power"].append(power)
+			dict[ID]["consumption"]["timestamp"].append(timestamp)
+			collection.update_one({"_id":ID}, {"$set": dict[ID]})
+		except KeyError:
+			#if KeyError raise, it means that the consumption dictionary is not present in the field colleciton
+			#yet, so it is created
+			dict[ID]["consumption"]=data["consumption"]
+			dict[ID]["consumption"]["consumption_value"]=[dict[ID]["consumption"]["consumption_value"]]
+			dict[ID]["consumption"]["power"]=[dict[ID]["consumption"]["power"]]
+			dict[ID]["consumption"]["timestamp"]=[dict[ID]["consumption"]["timestamp"]]
+			collection.update_one({"_id":ID}, {"$set": dict[ID]})
+		except AttributeError:
+			#if AttributeError raise, it means that the values of the dictionary are not lists, so they are converted
+			dict[ID]["consumption"]["consumption_value"]=[dict[ID]["consumption"]["consumption_value"]]
+			dict[ID]["consumption"]["power"]=[dict[ID]["consumption"]["power"]]
+			dict[ID]["consumption"]["timestamp"]=[dict[ID]["consumption"]["timestamp"]]
+			dict[ID]["consumption"]["consumption_value"].append(consumptionValue)
+			dict[ID]["consumption"]["power"].append(power)
+			dict[ID]["consumption"]["timestamp"].append(timestamp)
+			collection.update_one({"_id":ID}, {"$set": dict[ID]})
+
+	def getGraphMeasure(self,CompanyName,CollectionName,measure,start,end):
+		'''get the graph of a measure for a field of a company\n
+		Parameters:\n
+		`CompanyName` -- unique name of the company\n
+		`collectionName` -- field of the company\n
+		`Measure` -- measure to be calculated\n
+		`Start` -- start date of the period\n
+		`end` -- end date of the period\n'''
+
+		if CompanyName in self.client.list_database_names():
+			if CollectionName in self.client[CompanyName].list_collection_names():
+				db = self.client[CompanyName]
+				collection = db[CollectionName]
+				dict =list(collection.find())
+				lst=[]
+				timestamps=[]
+								
+				for i in range(len(dict)):
+					
+					for j in range(len(dict[i]["e"])):
+						if dict[i]["e"][j]["name"] == measure:
+							indexes=self.time_period(dict[i]["e"][j]["timestamp"],start,end)
+							lst.extend(dict[i]["e"][j]["value"][indexes[0]:indexes[1]])
+							timestamps.extend(dict[i]["e"][j]["timestamp"][indexes[0]:indexes[1]])
+							indexes_to_get_unit=[i,j]
+				unit = dict[indexes_to_get_unit[0]]["e"][indexes_to_get_unit[1]]["unit"]
+				#get 7 timestamps points
+				if len(timestamps)/self.settings["PointsPerGraph"] > 1:
+					step = int(len(timestamps)/self.settings["PointsPerGraph"])
+					timestamps = timestamps[::step]
+				for i in range(len(timestamps)):
+					lst.append(json.loads(self.GetAvg(CompanyName,CollectionName,measure,0,timestamps[i]))["Average"])
+				#convert timestamps to normal time
+				for i in range(len(timestamps)):
+					timestamps[i]=datetime.fromtimestamp(timestamps[i])
+				#plot graph
+				plt.plot(timestamps,lst)
+				plt.xlabel("Time")
+				plt.ylabel(measure+" ("+unit+")")
+				plt.title("Graph of "+measure+" for "+CollectionName+" of "+CompanyName)
+				plt.savefig("graph.png")
+				#capire con fede come passare l'immagine
+			
+				
+			
+				
+		
 class RESTApi(GenericEndpoint):
-    exposed = True
-    def __init__(self):
-        settings = json.load(open("settings.json","r"))
-        super().__init__(settings,True,False)
-        self.mongo = MongoConnection()
-        
-    def GET(self, *uri, **params):
-        '''GET method for the REST API\n
-        Returns a JSON with the requested information\n
-        Allowed URI:\n
-        `/Avg` -- returns the average of the measures requested. The parameters are "CompanyName", "Field" and "measure"\n
-        if `params["CompanyName"]` == "all" returns the average of all field of corresponding company\n'''
-        try:
-            if len(uri) > 0:
-                if len(uri) == 1 and uri[0] == "avg" and params["CompanyName"] != "all":
-                    return self.mongo.GetAvg(params["CompanyName"],params["Field"],params["measure"])
-                elif len(uri) == 1 and uri[0] == "avg" and params["CompanyName"] == "all":                    
-                    return self.mongo.getAvgAll(params["CompanyName"],params["measure"])
-                else:
-                    raise web_exception(404, "Resource not found.")
-        except web_exception as e:
-            raise cherrypy.HTTPError(e.code, e.message)
-        except:
-            raise cherrypy.HTTPError(500, "Internal Server Error")
-    # def POST(self,*uri,**params):
-    #     '''POST method for the REST API\n
-    #     Returns a JSON with the operation's status\n
-    #     Allowed URI:\n
-    #     `/insertConsumptionData` -- Insert the consumption data of the actuators of a field.\n 
-    #     \tThe parameters are "CompanyName", "Field". \n
-    #     '''
-    #     try:
-    #         if len(uri) > 0:
-    #             if len(uri) == 1 and uri[0] == "insertConsumptionData":
-    #                 #da capire come mi arrivano i dati
-    #             else:
-    #                 raise web_exception(404, "Resource not found.")
-    #     except web_exception as e:
-    #         raise cherrypy.HTTPError(e.code, e.message)
-    #     except:
-    #         raise cherrypy.HTTPError(500, "Internal Server Error")
-                    
-        
-        
-    
-    
-    
-if __name__ == '__main__':
-    conf =  {
-            '/': {
-                 'request.dispatch': cherrypy.dispatch.MethodDispatcher(),
-                 'tools.sessions.on': True,
-        }
-    }
-    webService = RESTApi()
-    cherrypy.tree.mount(webService, '/', conf)
-    cherrypy.engine.start()
-    cherrypy.engine.block()     
+	exposed = True
+	def __init__(self,settings:dict):
+		
+		
+		super().__init__(settings)
+		self.mongo = MongoConnection(self.settings)
+		
+	def GET(self, *uri, **params):
+		'''GET method for the REST API\n
+		Returns a JSON with the requested information\n
+		Allowed URI:\n
+		`/Avg` -- returns the average of the measures requested.\n The parameters are "CompanyName", "Field" and "measure", "starting date", "end date"\n
+		if `params["Field"]` == "all" returns the average of all field of corresponding company\n'''
+		try:
+			if len(uri) > 0:
+				if len(uri) == 1 and uri[0] == "avg" and params["Field"] != "all":
+					return self.mongo.GetAvg(params["CompanyName"],params["Field"],params["measure"],params["start_date"],params["end_date"])
+				elif len(uri) == 1 and uri[0] == "avg" and params["Field"] == "all":                    
+					return self.mongo.getAvgAll(params["CompanyName"],params["measure"],params["start_date"],params["end_date"])
+				else:
+					raise web_exception(404, "Resource not found.")
+		except web_exception as e:
+			raise cherrypy.HTTPError(e.code, e.message)
+		except:
+			raise cherrypy.HTTPError(500, "Internal Server Error")
+
+		
+	
+	
+	
+if __name__ == "__main__":
+	settings = json.load(open("settings.json"))
+	
+	WebService = RESTApi(settings)
+	conf = {
+		'/': {
+			'request.dispatch': cherrypy.dispatch.MethodDispatcher(),
+			'tools.sessions.on': True
+		}
+	}
+	cherrypy.tree.mount(WebService, '/', conf)
+	cherrypy.engine.start()

@@ -180,7 +180,6 @@ class IoTBot(GenericService):
 
         self._message = {'bn': "", 'e': [{'n': "",'v': "", 'u': "", 't': ""}]}
         #TelegramBot
-        print("Starting TelegramBot")
         self.tokenBot = self.get_token()
         self.bot = ChatBox(self.tokenBot, self)
 

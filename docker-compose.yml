@@ -43,3 +43,14 @@ services:
     networks:
       inside:
         ipv4_address: "172.16.0.4"
+
+  smart_irrigation:
+    image: smart_irrigation
+    build:
+      context: .
+      dockerfile: ./SmartIrrigation/Dockerfile
+    ports:
+      - "8083:8083"
+    networks:
+      inside:
+        ipv4_address: "172.16.0.5"

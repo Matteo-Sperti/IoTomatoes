@@ -2,9 +2,7 @@ import requests
 import time
 import datetime
 import json
-import sys
 
-sys.path.append("../SupportClasses/")
 from GenericEndpoint import GenericService
 from ItemInfo import *
 from MyExceptions import *
@@ -12,7 +10,12 @@ from MyExceptions import *
 class SmartIrrigation(GenericService):
 
     def __init__(self, settings : dict, plantInfo : dict):
-        """Inizializzazione della classe del servizio (da adattare in seguito)"""
+        """It initializes the service with the settings and the plantInfo
+        
+        Arguments:\n
+        `settings (dict)`: the settings of the service\n
+        `plantInfo (dict)`: dictionary with the plants threshold values\n
+        """
         super().__init__(settings)
 
         if "WeatherForescast_ServiceName" in settings:
@@ -37,11 +40,12 @@ class SmartIrrigation(GenericService):
     def control(self):
         """It performs:
         - Call to resource catalog -> to retrieve information about each field for each company
-        - Call to MongoDB to retrieve information about last hour measures (currentSoilMoisture) and previoius hour measures 
-          (previousSoilMoisture)
+        - Call to MongoDB to retrieve information about last hour measures (currentSoilMoisture) 
+            and previoius hour measures (previousSoilMoisture)
         - Call to Weather forecast service to retrieve information about precipitation during the day
-        With these information it performs a control strategy with an hysteresis law in order to send the command ON when the 
-        soil moisture mesaure decrease and is under a specific low threshold and to send command OFF in the opposite case"""
+        With these information it performs a control strategy with an hysteresis law in order to send 
+        the command ON when the soil moisture mesaure decrease and is under a specific low threshold 
+        and to send command OFF in the opposite case"""
 
         companyList = self.getCompaniesList()
 
@@ -74,7 +78,8 @@ class SmartIrrigation(GenericService):
                     self.sendCommand(companyName, fieldID, actuatorTopicsForField, 0)
                     continue
                 
-                currentSoilMoisture = round((3*currentSoilMoisture+soilMoistureForecast)/4,2) #integration sensor measure with the weather forecast one
+                #integration sensor measure with the weather forecast one
+                currentSoilMoisture = round((3*currentSoilMoisture+soilMoistureForecast)/4,2) 
                 maxLimitTemp = datetime.time(23,59,0)
                 minLimitTemp = datetime.time(20,0,0)  #da cambiare per poter eseguire le prove sul controllo
                 
@@ -189,23 +194,7 @@ class SmartIrrigation(GenericService):
             print("ERROR: MongoDB service not found!")
             return None, None
 
-
-    #     try:
-    #         r=requests.get("MongoDB_url/...media?companyname=<companyName>&fieldID=<ID>&hour=1...") ESPRIMERE BENE L'URL E I PARAMETRI IN RELAZIONE A COME COSTRUISCE IL SERVIZIO LUCA
-    #         r.raise_for_status()
-    #     except requests.exceptions.InvalidURL as errURL:
-    #         print(f"ERROR: invalid URL for MongoDB service!\n\n{errURL}")
-    #         time.sleep(1)
-    #     except requests.exceptions.HTTPError as errHTTP:
-    #         print(f"ERROR: something went wrong with MongoDB service!\n\n{errHTTP}")
-    #         time.sleep(1)
-    #     except requests.exceptions.ConnectionError:
-    #         print("503: Connection error. MongoDB service unavailable")
-    #         time.sleep(1)
-    #     else:
-    #           ####RESTO DEL CODICE####
-
-        #PER ORA I DATI(VALORE MEDIA ORA PRECEDENTE E VALORE MEDIA CORRENTE) VENGONO OTTENUTI DA UNA SORTA DI SIMULATORE MONGODB:
+        #ESEGUE LA GET AL MONGODB SERVICE (da verificare)
         try:
             r=requests.get("http://127.0.0.1:8090/increasing") 
             r.raise_for_status()
@@ -269,6 +258,6 @@ if __name__=="__main__":
             while True:
                 irrigation.control()
                 time.sleep(controlTimeInterval)
-        except KeyboardInterrupt:
+        except KeyboardInterrupt or SystemExit:
             irrigation.stop()
             print("SmartIrrigation stopped")

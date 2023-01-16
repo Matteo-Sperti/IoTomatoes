@@ -35,6 +35,7 @@ class RefreshThread(MyThread):
                     param.update({"SystemToken" : kwargs["SystemToken"]})
                 res = requests.put(self._url + "/refresh", params=param)
                 res.raise_for_status()
+                stat = res.json()
             except requests.exceptions.HTTPError as err:
                 print(f"{err.response.status_code} : {err.response.reason}")
                 time.sleep(1)
@@ -42,7 +43,6 @@ class RefreshThread(MyThread):
                 print(f"Connection Error\nRetrying connection\n")
                 time.sleep(1)
             else:
-                stat = res.json()
                 if "Status" in stat and stat["Status"] == True:
                     refreshed = True
                     print(f"Refreshed correctly to the Catalog; myID = {self._ID}\n")
@@ -100,12 +100,12 @@ class GenericEndpoint():
                     params = self._CompanyInfo
                 res = requests.get(self.ServiceCatalog_url + "/ResourceCatalog_url", params = params)
                 res.raise_for_status()
+                res_dict = res.json()  
             except:
                 print(f"Connection Error\nRetrying connection\n")
                 time.sleep(1)
             else:
                 try:
-                    res_dict = res.json()
                     return res_dict["ResourceCatalog_url"]
                 except:
                     print(f"Error in the Resource information\nRetrying connection\n")
@@ -122,12 +122,12 @@ class GenericEndpoint():
                     params = self._CompanyInfo
                 res = requests.get(self.ServiceCatalog_url + "/broker", params=params)
                 res.raise_for_status()
+                broker = res.json()
             except:
                 print(f"Connection Error\nRetrying connection\n")
                 time.sleep(1)
             else:
                 try:
-                    broker = res.json()
                     return broker["IP"], broker["port"], broker["baseTopic"]
                 except:
                     print(f"Error in the broker information\nRetrying connection\n")
@@ -239,6 +239,7 @@ class GenericService(GenericEndpoint) :
                 res = requests.post(self.ServiceCatalog_url + "/insert", 
                                         params=params, json = self._EndpointInfo)
                 res.raise_for_status()
+                res_dict = res.json()
             except requests.exceptions.HTTPError as err:
                 print(f"{err.response.status_code} : {err.response.reason}")
                 time.sleep(1)
@@ -247,7 +248,7 @@ class GenericService(GenericEndpoint) :
                 time.sleep(1)
             else:
                 try:                    
-                    ID = res.json()["ID"]
+                    ID = res_dict["ID"]
                     print(f"Registered correctly to the ServiceCatalog.\nID: {ID}\n")
                     return ID
                 except:
@@ -303,6 +304,7 @@ class GenericResource(GenericEndpoint) :
                 res = requests.post(self.ResourceCatalog_url + "/insert/device", 
                                         params=self._CompanyInfo, json = self._EndpointInfo)
                 res.raise_for_status()
+                res_dict = res.json()
             except requests.exceptions.HTTPError as err:
                 print(f"{err.response.status_code} : {err.response.reason}")
                 time.sleep(1)
@@ -311,7 +313,7 @@ class GenericResource(GenericEndpoint) :
                 time.sleep(1)
             else:
                 try:                    
-                    ID = res.json()["ID"]
+                    ID = res_dict["ID"]
                     print(f"Registered correctly to the ServiceCatalog.\nID: {ID}\n")
                     return ID
                 except:
@@ -325,12 +327,13 @@ class GenericResource(GenericEndpoint) :
                 res = requests.get(self.ResourceCatalog_url + "/get", 
                                     params = {"ID": self.ID, **self._CompanyInfo})
                 res.raise_for_status()
+                res_dict = res.json()
             except:
                 print(f"Connection Error\nRetrying connection\n")
                 time.sleep(1)
             else:
                 try:
-                    return res.json()
+                    return res_dict
                 except:
                     print(f"Error in the Resource information\nRetrying connection\n")
                     time.sleep(1)

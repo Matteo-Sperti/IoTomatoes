@@ -1,0 +1,16 @@
+{
+    "deviceName" : "SimulatedDevice5",
+    "field" : 2,
+    "isSensor" : true,
+    "measureType" : ["temperature", "humidity", "light"],
+    "CompanyInfo" : {
+        "CompanyName" : "PatataNovella",
+        "CompanyToken" : "123"
+    },
+    "Location" : {
+        "latitude" : 44.996, 
+        "longitude" : 7.481
+    },
+    "ServiceCatalog_url" : "http://172.20.10.3:8080",
+    "measureTimeInterval" : 5
+}

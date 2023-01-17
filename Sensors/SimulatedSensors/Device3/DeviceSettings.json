@@ -1,0 +1,16 @@
+{
+    "deviceName" : "SimulatedDevice3",
+    "field" : 2,
+    "isActuator" : true,
+    "actuatorType" : ["led", "pump"],
+    "CompanyInfo" : {
+        "CompanyName" : "PatataNovella",
+        "CompanyToken" : "123"
+    },
+    "Location" : {
+        "latitude" : 45.001, 
+        "longitude" : 7.481
+    },
+    "ServiceCatalog_url" : "http://172.20.10.3:8080",
+    "measureTimeInterval" : 5
+}

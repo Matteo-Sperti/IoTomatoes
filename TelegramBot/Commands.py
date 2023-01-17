@@ -363,7 +363,7 @@ def getDevices(CompanyName : str, bot, connector) -> None:
             for device in devices:
                 message = (f"Device Name: {device['deviceName']}\n"
                             f"DeviceID: {device['ID']}\n"
-                            f"Location: {device['Location']['Latitude']}, {device['Location']['Longitude']}\n")
+                            f"Location: {device['Location']['latitude']}, {device['Location']['longitude']}\n")
                 if device["isActuator"]:
                     act_msg = f"Actuators: " + ", ".join(device["actuatorType"])
                     message = message + act_msg +"\n"

@@ -7,9 +7,6 @@ networks:
       driver: default
       config:
         - subnet: "172.16.0.0/24"
-  hostnet:
-    external: true
-    name: host
 
 services:
   service_catalog:
@@ -66,14 +63,37 @@ services:
     build:
       context: .
       dockerfile: ./Sensors/SimulatedSensors/Device1/Dockerfile
-    networks:
-      hostnet: {}
+    ports:
+      - "9082:9082"
 
   device2:
     image: device2
     build:
       context: .
       dockerfile: ./Sensors/SimulatedSensors/Device2/Dockerfile
-    networks:
-      hostnet: {}
+    ports:
+      - "9083:9083"
 
+  device3:
+    image: device3
+    build:
+      context: .
+      dockerfile: ./Sensors/SimulatedSensors/Device3/Dockerfile
+    ports:
+      - "9084:9084"
+
+  device4:
+    image: device4
+    build:
+      context: .
+      dockerfile: ./Sensors/SimulatedSensors/Device4/Dockerfile
+    ports:
+      - "9085:9085"
+
+  device5:
+    image: device5
+    build:
+      context: .
+      dockerfile: ./Sensors/SimulatedSensors/Device5/Dockerfile
+    ports:
+      - "9086:9086"

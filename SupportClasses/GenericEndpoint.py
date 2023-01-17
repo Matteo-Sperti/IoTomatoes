@@ -217,7 +217,7 @@ class GenericService(GenericEndpoint) :
         """
         
         if "SystemToken" in settings:
-                    self._SystemToken = settings["SystemToken"]
+            self._SystemToken = settings["SystemToken"]
         else:
             raise InfoException("The System Token is missing")
 

@@ -16,7 +16,7 @@ WORKDIR /app
 RUN adduser -u 8080 --disabled-password --gecos "" appuser && chown -R appuser /app
 USER appuser
 
-COPY ./Sensors/SimulatedSensors/Device1/ /app/
+COPY ./Sensors/SimulatedSensors/Device4/ /app/
 COPY ./Sensors/SimulatedSensors/AmbientSimulator.py /app/
 COPY ./Sensors/SimulatedSensors/FakeSensor.py /app/
 COPY ./SupportClasses/ /app/

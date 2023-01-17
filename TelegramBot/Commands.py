@@ -363,6 +363,7 @@ def getDevices(CompanyName : str, bot, connector) -> None:
             for device in devices:
                 message = (f"Device Name: {device['deviceName']}\n"
                             f"DeviceID: {device['ID']}\n"
+                            f"Field: {device['fieldNumber']}\n"
                             f"Location: {device['Location']['latitude']}, {device['Location']['longitude']}\n")
                 if device["isActuator"]:
                     act_msg = f"Actuators: " + ", ".join(device["actuatorType"])
@@ -473,7 +474,7 @@ class ChangePlant():
                 for field in fields:
                     number = field['fieldNumber']
                     plant = field['plant']
-                    button = InlineKeyboardButton(text=f"F{number} : {plant}", callback_data=f"{number}")
+                    button = InlineKeyboardButton(text=f"Field {number} : {plant}", callback_data=f"{number}")
                     inline_keyboard_.append([button])
                 keyboard = InlineKeyboardMarkup(inline_keyboard=inline_keyboard_)
                 self._bot.sendMessage(f"Which field of company {self.CompanyName} do you want to change?",

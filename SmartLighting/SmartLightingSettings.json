@@ -13,6 +13,6 @@
         }
     ],
     "controlTimeInterval": 30,
-    "WeahterForescast_ServiceName" : "WeatherForecast",
+    "WeatherForecast_ServiceName" : "WeatherForecast",
     "MongoDB_ServiceName" : "MongoDB"
 }

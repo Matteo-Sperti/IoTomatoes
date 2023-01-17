@@ -18,8 +18,8 @@ class SmartIrrigation(GenericService):
         """
         super().__init__(settings)
 
-        if "WeatherForescast_ServiceName" in settings:
-            self.weatherToCall = settings["WeatherForescast_ServiceName"]
+        if "WeatherForecast_ServiceName" in settings:
+            self.weatherToCall = settings["WeatherForecast_ServiceName"]
 
         if "MongoDB_ServiceName" in settings:
             self.mongoToCall = settings["MongoDB_ServiceName"]

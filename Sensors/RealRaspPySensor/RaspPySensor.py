@@ -7,11 +7,12 @@ from ItemInfo import *
 
 sensor = Adafruit_DHT.DHT11
 
-pin = 17
-
 class RasPySensor(GenericResource):
     def __init__(self, DeviceInfo : dict):
         super().__init__(DeviceInfo)
+
+        self.pin = settings["PIN_IN"]
+
         self._message = {
             "cn" : getCompanyName(self._CompanyInfo),
             "bn" : 0,
@@ -35,7 +36,7 @@ class RasPySensor(GenericResource):
 
         # Try to grab a sensor reading.  Use the read_retry method which will retry up
         # to 15 times to get a sensor reading (waiting 2 seconds between each retry).
-        humidity, temperature = Adafruit_DHT.read_retry(sensor, pin)
+        humidity, temperature = Adafruit_DHT.read_retry(sensor, self.pin)
 
         if humidity is not None and humidity_topic is not None:
             message = self.construct_message("humidity", "%")

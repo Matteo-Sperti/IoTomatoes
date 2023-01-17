@@ -12,5 +12,6 @@
         "longitude" : 7.65
     },
     "ServiceCatalog_url" : "http://172.20.10.3:8080",
-    "measureTimeInterval" : 5
+    "measureTimeInterval" : 5,
+    "PIN_IN" : 17
 }

@@ -264,7 +264,7 @@ class RESTServiceCatalog():
             "CatalogName": settings["CatalogName"],
             "broker": settings["broker"],
             "telegramToken" : settings["telegramToken"],
-            "platfomIP": settings["IPaddress"]
+            "platformIP": settings["IPaddress"]
             }
         self._systemToken = settings["SystemToken"]
         self.ServiceCatalog = ServiceCatalogManager(heading, settings["filename"], settings["autoDeleteTime"])

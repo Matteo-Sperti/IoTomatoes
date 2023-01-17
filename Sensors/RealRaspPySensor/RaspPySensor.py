@@ -13,7 +13,7 @@ class RasPySensor(GenericResource):
     def __init__(self, DeviceInfo : dict):
         super().__init__(DeviceInfo)
         self._message = {
-            "cn" : getCompanyName(self._EndpointInfo),
+            "cn" : getCompanyName(self._CompanyInfo),
             "bn" : 0,
             "field" : getField(self._EndpointInfo),
             "e" : [{

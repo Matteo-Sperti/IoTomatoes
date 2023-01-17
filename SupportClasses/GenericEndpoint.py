@@ -9,7 +9,7 @@ from MyExceptions import InfoException
 from MyThread import MyThread
 
 class RefreshThread(MyThread):
-    def __init__(self, url : str, ID : int, interval=60, **kwargs):
+    def __init__(self, url : str, endpoint, interval=60, **kwargs):
         """RefreshThread class. Refresh the Catalog every `interval` seconds.
         
         `url {str}`: Catalog URL.\n
@@ -19,7 +19,7 @@ class RefreshThread(MyThread):
         """
 
         self._url = url
-        self._ID = ID
+        self.endpoint = endpoint
         super().__init__(self.refresh_item, interval, **kwargs)
 
 
@@ -28,7 +28,7 @@ class RefreshThread(MyThread):
         refreshed = False
         while not refreshed :
             try:
-                param = {"ID": self._ID}
+                param = {"ID": self.endpoint.ID}
                 if "CompanyInfo" in kwargs:
                     param.update(kwargs["CompanyInfo"])
                 elif "SystemToken" in kwargs:
@@ -43,9 +43,16 @@ class RefreshThread(MyThread):
                 print(f"Connection Error\nRetrying connection\n")
                 time.sleep(1)
             else:
-                if "Status" in stat and stat["Status"] == True:
-                    refreshed = True
-                    print(f"Refreshed correctly to the Catalog; myID = {self._ID}\n")
+                if "Status" in stat:
+                    if stat["Status"] == True:
+                        refreshed = True
+                        print(f"Refreshed correctly to the Catalog; myID = {self.endpoint.ID}\n")
+                    else:
+                        # problem in the Catalog, maybe the item has been deleted
+                        # register again
+                        print(f"Error in the Catalog, trying to register again\n")
+                        self.endpoint.stop()
+                        self.endpoint.restart()
                 else:
                     print(stat)
                     time.sleep(1)
@@ -70,14 +77,22 @@ class GenericEndpoint():
             self._isService = isService
             self._isResource = isResource
             self._EndpointInfo, self._CompanyInfo = construct(settings, isService, isResource)
-            
             self._start()
+            self.start_MQTT()
 
-            self._MQTTclient = isMQTT(self._EndpointInfo)
-            if self._MQTTclient:
-                self._subscribedTopics = subscribedTopics(self._EndpointInfo)
-                self._publishedTopics = publishedTopics(self._EndpointInfo)
-                self.start_MQTTclient()
+    def restart(self):
+        """Restart the endpoint."""
+
+        self.stop()
+        self._start()
+        self.start_MQTT()
+        
+    def start_MQTT(self):
+        self._MQTTclient = isMQTT(self._EndpointInfo)
+        if self._MQTTclient:
+            self._subscribedTopics = subscribedTopics(self._EndpointInfo)
+            self._publishedTopics = publishedTopics(self._EndpointInfo)
+            self.start_MQTTclient()
 
     def stop(self):
         """Stop the endpoint."""
@@ -225,12 +240,12 @@ class GenericService(GenericEndpoint) :
         """ Start the endpoint as a service.
         It registers the service to the Service Catalog and starts the RefreshThread."""
 
-        self.ID = self.register_service()
-        self._RefreshThread = RefreshThread(self.ServiceCatalog_url, self.ID, SystemToken=self._SystemToken)
+        self.ID = self.register()
+        self._RefreshThread = RefreshThread(self.ServiceCatalog_url, self, SystemToken=self._SystemToken)
         if self._EndpointInfo["serviceName"] != "ResourceCatalog":
             self.ResourceCatalog_url = self.get_ResourceCatalog_url()
 
-    def register_service(self) -> int:
+    def register(self) -> int:
         """Register the service to the Service Catalog."""
 
         while True:
@@ -286,11 +301,11 @@ class GenericResource(GenericEndpoint) :
 
         self.ResourceCatalog_url = self.get_ResourceCatalog_url()
         #Register
-        self.ID = self.register_device()
+        self.ID = self.register()
         self._EndpointInfo = self.get_device_info()
-        self._RefreshThread = RefreshThread(self.ResourceCatalog_url, self.ID, CompanyInfo=self._CompanyInfo)
+        self._RefreshThread = RefreshThread(self.ResourceCatalog_url, self, CompanyInfo=self._CompanyInfo)
 
-    def register_device(self) -> int:
+    def register(self) -> int:
         """Register the resource to the Resource Catalog."""
 
         while True:

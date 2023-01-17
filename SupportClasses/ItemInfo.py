@@ -101,7 +101,10 @@ def construct(EInfo : dict, isService : bool = False, isResource : bool = False)
                 "CompanyToken" : EInfo["CompanyToken"]
             }
         elif "CompanyInfo" in EInfo and "CompanyName" in EInfo["CompanyInfo"] and "CompanyToken" in EInfo["CompanyInfo"]:
-            CompanyInfo = EInfo["CompanyInfo"]
+            CompanyInfo = {
+                "CompanyName" : EInfo["CompanyInfo"]["CompanyName"],
+                "CompanyToken" : EInfo["CompanyInfo"]["CompanyToken"]
+            }
         else:
             raise InfoException("Company information is missing")
         info = _makeResource(EInfo, CompanyInfo)

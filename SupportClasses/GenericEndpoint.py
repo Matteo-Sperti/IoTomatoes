@@ -346,3 +346,42 @@ class GenericResource(GenericEndpoint) :
                 except:
                     print(f"Error in the Resource information\nRetrying connection\n")
                     time.sleep(1)
+
+    @property
+    def CompanyName(self) -> str:
+        """Return the name of the company that owns the resource."""
+
+        return self._CompanyInfo["CompanyName"]
+    
+    @property
+    def field(self) -> int:
+        """Return the field of the resource."""
+        try:
+            return self._EndpointInfo["field"]
+        except:
+            return -1
+
+    @property
+    def isActuator(self) -> bool:
+        if "isActuator" not in self._EndpointInfo:
+            return False
+        else:
+            return self._EndpointInfo["isActuator"]
+
+    @property
+    def isSensor(self) -> bool:
+        if "isSensor" not in self._EndpointInfo:
+            return False
+        else:
+            return self._EndpointInfo["isSensor"]
+
+    def __str__(self):
+        """Return a string with the information of the resource."""
+
+        dict = {
+            "ID": self.ID,
+            "CompanyInfo": self._CompanyInfo,
+            "EndpointInfo": self._EndpointInfo
+        }
+
+        return json.dumps(dict, indent=4)

@@ -1,15 +1,15 @@
 {
-    "deviceName" : "SimulatedDevice1",
+    "deviceName" : "SimulatedDevice2",
     "field" : 1,
-    "isSensor" : true,
-    "measureType" : ["temperature", "humidity", "light", "soilMoisture"],
+    "isActuator" : true,
+    "actuatorType" : ["led", "pump"],
     "CompanyInfo" : {
         "CompanyName" : "PatataNovella",
         "CompanyToken" : "123"
     },
     "Location" : {
-        "latitude" : 44.996469, 
-        "longitude" : 7.482377
+        "latitude" : 44.996, 
+        "longitude" : 7.481
     },
     "ServiceCatalog_url" : "http://172.20.10.3:8080",
     "measureTimeInterval" : 5

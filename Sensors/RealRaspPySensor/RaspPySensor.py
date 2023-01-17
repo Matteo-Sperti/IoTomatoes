@@ -18,9 +18,9 @@ class RasPySensor(GenericResource):
         self.pin = settings["PIN_IN"]
 
         self._message = {
-            "cn" : getCompanyName(self._CompanyInfo),
+            "cn" : self.CompanyName,
             "bn" : 0,
-            "field" : getField(self._EndpointInfo),
+            "field" : self.field,
             "e" : [{
                 "n": "",
                 "v": None,
@@ -64,7 +64,7 @@ class RasPySensor(GenericResource):
         """
         print(f"{self.ID} received {msg} on topic {topic}")
 
-        if isActuator(self._EndpointInfo):
+        if self.isActuator:
             actuator_info = actuatorType(self._EndpointInfo)
             actuator_topic = topic.split("/")[-1]
 

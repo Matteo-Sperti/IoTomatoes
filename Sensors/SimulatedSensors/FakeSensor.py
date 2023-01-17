@@ -15,9 +15,9 @@ class SimDevice(GenericResource):
         super().__init__(DeviceInfo)
         self._Ambient = AmbientSimulator()
         self._message={
-            "cn" : getCompanyName(self._CompanyInfo),
+            "cn" : self.CompanyName,
             "bn" : 0,
-            "field" : getField(self._EndpointInfo),
+            "field" : self.field,
             "e" : [{
                 "n": "",
                 "v": None,
@@ -29,7 +29,7 @@ class SimDevice(GenericResource):
     def notify(self, topic, msg):
         print(f"Resource {self.ID} received message on topic {topic}\n")
 
-        if isActuator(self._EndpointInfo):
+        if self.isActuator:
             actuator_info = actuatorType(self._EndpointInfo)
             actuator_topic = topic.split("/")[-1]
 

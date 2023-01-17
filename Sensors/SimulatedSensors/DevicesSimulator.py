@@ -2,10 +2,13 @@ import time
 import json
 import random
 import requests
+import sys
 
 from FakeSensor import SimDevice
+sys.path.append("../../SupportClasses/")
 from MyIDGenerator import IDs
 from TerminalQuery import *
+from MyThread import MyThread
 
 HelpMessage = """
 Devices Simulator.
@@ -20,13 +23,17 @@ class SimDevices_Manager():
     def __init__(self, settings : dict):
         self._ServiceCatalog_url = settings["ServiceCatalog_url"]
         self._SystemToken = settings["SystemToken"]
-        self._measureTimeInterval = settings["measureTimeInterval"]
         self._measuresType = settings["MeasuresType"]
         self._actuatorsType = settings["ActuatorsType"]
         self.DevicesIDs = IDs(1)
 
         self.Sensors = []
         self._ResourceCatalog_url = self.get_ResourceCatalog_url()
+        self._measureThread = MyThread(self.measure, settings["measureTimeInterval"])
+
+    def measure(self):
+        for sensor in self.Sensors:
+            sensor.get_measures()
 
     def populateField(self, number : int = 5):
         CompanyName = input("Insert Company Name: ")
@@ -43,7 +50,6 @@ class SimDevices_Manager():
 
     def createDevice(self, CompanyInfo : dict, fieldNumber : int, latitude : float, longitude : float):
         ID = self.DevicesIDs.get_ID()
-        IPport = 10000 + ID
 
         if random.randint(0, 1) == 0:
             isActuator = False
@@ -60,7 +66,7 @@ class SimDevices_Manager():
             measures = []
 
         Device_information = {
-            "deviceName" : f"Device_{ID}",
+            "deviceName" : f"SimDevice_{ID}",
             "field" : fieldNumber,
             "isSensor" : isSensor,
             "isActuator" : isActuator,
@@ -78,7 +84,7 @@ class SimDevices_Manager():
                 "latitude" : dev_latitude,
                 "longitude" : dev_longitude
             }
-        return SimDevice(Device_information, self._measureTimeInterval)
+        return SimDevice(Device_information)
 
     def get_ResourceCatalog_url(self) :
         """Get the URL of the Resource Catalog from the Service Catalog."""
@@ -133,7 +139,17 @@ class SimDevices_Manager():
         return dev_latitude, dev_longitude
 
     def stopDevice(self):
-        pass
+        companyName = input("Insert Company Name: ")
+        field = query_int("Insert field number: ")
+
+        for sensor in self.Sensors:
+            if sensor.CompanyName == companyName and sensor.field == field:
+                sensor.stop()
+                print(sensor)
+                self.Sensors.remove(sensor)
+                return
+
+        print("No device found with the given information")
 
     def run(self) :
         print("\nType 'help' for the list of available commands")
@@ -156,6 +172,7 @@ class SimDevices_Manager():
                 return True
     
     def exit(self):
+        self._measureThread.stop()
         for sensor in self.Sensors:
             sensor.stop()
 

@@ -232,7 +232,7 @@ class ResourceCatalogManager():
         company = self.findCompany(CompanyInfo)
         if company != None:
             for item in company[devicesList_name]:
-                if getField(item) == field:
+                if item["field"] == field:
                     if ResourceType in measureType(item) or ResourceType in actuatorType(item):
                         return json.dumps(publishedTopics(item), indent=4)
         raise web_exception(404, "Company not found")

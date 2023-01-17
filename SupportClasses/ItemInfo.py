@@ -4,33 +4,6 @@ from MyExceptions import InfoException
 
 ### Get item information from a dictionary ###
 
-def getID(dict_ : dict) -> int:
-    if "ID" not in dict_:
-        raise InfoException("ID is missing")   
-    else:
-        return dict_["ID"]
-
-def getCompanyName(dict_ : dict) -> str:
-    if "CompanyName" not in dict_:
-        raise InfoException("Company name is missing")
-    else:
-        return dict_["CompanyName"]
-
-def getField(dict_ : dict) -> int:
-    return dict_["field"]
-
-def isActuator(dict_ : dict) -> bool:
-    if "isActuator" not in dict_:
-        raise InfoException("isActuator is missing")
-    else:
-        return dict_["isActuator"]
-
-def isSensor(dict_ : dict) -> bool:
-    if "isSensor" not in dict_:
-        raise InfoException("isSensor is missing")
-    else:
-        return dict_["isSensor"]
-
 def measureType(dict_ : dict) -> list:
     if "measureType" not in dict_:
         raise InfoException("measureType is missing")

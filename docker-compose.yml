@@ -7,7 +7,9 @@ networks:
       driver: default
       config:
         - subnet: "172.16.0.0/24"
-
+  hostnet:
+    external: true
+    name: host
 
 services:
   service_catalog:
@@ -58,3 +60,20 @@ services:
     networks:
       mynet:
         ipv4_address: "172.16.0.6"
+
+  device1:
+    image: device1
+    build:
+      context: .
+      dockerfile: ./Sensors/SimulatedSensors/Device1/Dockerfile
+    networks:
+      hostnet: {}
+
+  device2:
+    image: device2
+    build:
+      context: .
+      dockerfile: ./Sensors/SimulatedSensors/Device2/Dockerfile
+    networks:
+      hostnet: {}
+

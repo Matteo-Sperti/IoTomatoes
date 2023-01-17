@@ -1,0 +1,60 @@
+version: '3.4'
+
+networks:
+  mynet:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: "172.16.0.0/24"
+
+
+services:
+  service_catalog:
+    image: service_catalog
+    build:
+      context: .
+      dockerfile: ./ServiceCatalog/Dockerfile
+    ports:
+      - "8080:8080"
+    networks:
+      mynet:
+        ipv4_address: "172.16.0.2"
+
+  resource_catalog:
+    image: resource_catalog
+    build:
+      context: .
+      dockerfile: ./ResourceCatalog/Dockerfile
+    ports:
+      - "8081:8081"
+    networks:
+      mynet:
+        ipv4_address: "172.16.0.3"
+
+  telegram_bot:
+    image: telegram_bot
+    build:
+      context: .
+      dockerfile: ./TelegramBot/Dockerfile
+    networks:
+      mynet:
+        ipv4_address: "172.16.0.4"
+
+  smart_irrigation:
+    image: smart_irrigation
+    build:
+      context: .
+      dockerfile: ./SmartIrrigation/Dockerfile
+    networks:
+      mynet:
+        ipv4_address: "172.16.0.5"
+
+  smart_lighting:
+    image: smart_lighting
+    build:
+      context: .
+      dockerfile: ./SmartLighting/Dockerfile
+    networks:
+      mynet:
+        ipv4_address: "172.16.0.6"

@@ -281,8 +281,41 @@ class MongoConnection():
 				plt.savefig("graph.png")
 				#capire con fede come passare l'immagine
 			
-				
-			
+def getGraphActuator(self,CompanyName,CollectionName,Actuator,start,end):
+		'''get pie chart of actuators's status of a field of a company\n
+		Multiple actuator can be monitored at the same time\n
+		Parameters:\n
+		`CompanyName` -- unique name of the company\n
+		`collectionName` -- field of the company\n
+		`Actuator` -- actuator to be monitor (either pump or led)\n
+		`Start` -- start date of the period\n
+		`end` -- end date of the period\n'''
+		#da finire
+		if CompanyName in self.client.list_database_names():
+			if CollectionName in self.client[CompanyName].list_collection_names():
+				db = self.client[CompanyName]
+				collection = db[CollectionName]
+				dict =list(collection.find())
+				dict_values={}
+				timestamps=[]
+				counter1=0
+				counter0=0
+				for i in range(len(dict)):
+					
+					for j in range(len(dict[i]["e"])):
+						if dict[i]["e"][j]["name"] == Actuator:
+							indexes=self.time_period(dict[i]["e"][j]["timestamp"],start,end)
+							dict_values[dict[i]["_id"]]=dict[i]["e"][j]["value"][indexes[0]:indexes[1]]
+							for i in range(len(dict_values[dict[i]["_id"]])):
+								if dict_values[dict[i]["_id"]][i] == 1:
+									counter1+=1
+								else:
+									counter0+=1
+							plt.pie([counter1,counter0],labels=["ON","OFF"])
+							plt.title("Graph of "+Actuator+" for "+CollectionName+" of "+CompanyName)
+							plt.savefig("graph"+dict[i]["_id"]+".png")
+
+
 				
 		
 class RESTApi(GenericEndpoint):
@@ -290,7 +323,7 @@ class RESTApi(GenericEndpoint):
 	def __init__(self,settings:dict):
 		
 		
-		super().__init__(settings)
+		super().__init__(settings,True,False)
 		self.mongo = MongoConnection(self.settings)
 		
 	def GET(self, *uri, **params):

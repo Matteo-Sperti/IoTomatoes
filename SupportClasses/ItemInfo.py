@@ -95,13 +95,15 @@ def construct(EInfo : dict, isService : bool = False, isResource : bool = False)
         info = _makeService(EInfo)
         CompanyInfo = {}
     else:
-        if "CompanyName" not in EInfo and "CompanyToken" not in EInfo:
-            raise InfoException("Company name is missing")
-        else:
+        if "CompanyName" in EInfo and "CompanyToken" in EInfo:
             CompanyInfo = {
                 "CompanyName" : EInfo["CompanyName"],
                 "CompanyToken" : EInfo["CompanyToken"]
             }
+        elif "CompanyInfo" in EInfo and "CompanyName" in EInfo["CompanyInfo"] and "CompanyToken" in EInfo["CompanyInfo"]:
+            CompanyInfo = EInfo["CompanyInfo"]
+        else:
+            raise InfoException("Company information is missing")
         info = _makeResource(EInfo, CompanyInfo)
     return info, CompanyInfo
 
@@ -204,17 +206,17 @@ def _makeResource(EInfo : dict, CompInfo : dict, info : dict = {}):
     else: 
         info["field"] = 1 
 
-    if "Latitude" in EInfo and "Longitude" in EInfo:
+    if "latitude" in EInfo and "longitude" in EInfo:
         info["Location"] = {
-            "Latitude" : EInfo["Latitude"],
-            "Longitude" : EInfo["Longitude"]
+            "latitude" : EInfo["latitude"],
+            "longitude" : EInfo["longitude"]
         }
-    elif "Location" in EInfo and "Latitude" in EInfo["Location"] and "Longitude" in EInfo["Location"]:
+    elif "Location" in EInfo and "latitude" in EInfo["Location"] and "longitude" in EInfo["Location"]:
         info["Location"] = EInfo["Location"]
     else:
         info["Location"] = {
-            "Latitude" : -1,
-            "Longitude" : -1
+            "latitude" : -1,
+            "longitude" : -1
         }
     
     if "PowerConsumption_kW" in EInfo:

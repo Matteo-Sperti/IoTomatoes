@@ -73,20 +73,22 @@ class ServiceCatalogManager:
         except KeyError:
             raise web_exception(404, "Telegram token not found")
 
-    @property
-    def ResourceCatalog_url(self):
-        """Return the ResourceCatalog url in json format."""
 
-        try:
-            for service in self.catalog[serviceList_Name]:
-                if service["serviceName"] == "ResourceCatalog":
-                    url = getIPaddress(service)
-                    if url != "":
-                        return url
-        except KeyError:
-            raise web_exception(404, "ResourceCatalog url not found")
-        else:
-            raise web_exception(404, "ResourceCatalog url not found")
+    def getResourceCatalog_url(self, select : str):
+        """Return the ResourceCatalog url as a string"""
+
+        for service in self.catalog[serviceList_Name]:
+            if service["serviceName"] == "ResourceCatalog":
+                internal_url = getIPaddress(service)
+                if internal_url != "":
+                    if select == "internal":
+                        return internal_url
+                    elif select == "external":
+                        port = internal_url.split(":")[-1]
+                        ip = self.catalog["platformIP"]
+                        return "http://" + ip + ":" + port
+
+        raise web_exception(404, "ResourceCatalog url not found")
 
     def get_all(self):
         """Return a json with all the services"""
@@ -262,6 +264,7 @@ class RESTServiceCatalog():
             "CatalogName": settings["CatalogName"],
             "broker": settings["broker"],
             "telegramToken" : settings["telegramToken"],
+            "platfomIP": settings["IPaddress"]
             }
         self._systemToken = settings["SystemToken"]
         self.ServiceCatalog = ServiceCatalogManager(heading, settings["filename"], settings["autoDeleteTime"])
@@ -274,7 +277,7 @@ class RESTServiceCatalog():
         if "CompanyName" in credential and "CompanyToken" in credential:
             try:
                 param = {"CompanyName": credential["CompanyName"], "SystemToken": self._systemToken}
-                url = self.ServiceCatalog.ResourceCatalog_url
+                url = self.ServiceCatalog.getResourceCatalog_url("internal")
                 res = requests.get(url +"/CompanyToken", params=param)
                 res.raise_for_status()
                 res_dict = res.json()
@@ -315,7 +318,10 @@ class RESTServiceCatalog():
             elif len(uri) == 1 and uri[0] == "telegram":
                 return self.ServiceCatalog.telegramToken
             elif len(uri) == 1 and uri[0] == "ResourceCatalog_url":
-                out = {"ResourceCatalog_url": self.ServiceCatalog.ResourceCatalog_url}
+                if "SystemToken" in params:
+                    out = {"ResourceCatalog_url": self.ServiceCatalog.getResourceCatalog_url("internal")}
+                else:
+                    out = {"ResourceCatalog_url": self.ServiceCatalog.getResourceCatalog_url("external")}
                 return json.dumps(out, indent=4)
             elif len(uri) == 2 and uri[0] == "search":
                 if uri[1] in params:

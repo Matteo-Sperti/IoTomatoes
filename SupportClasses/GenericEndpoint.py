@@ -277,14 +277,8 @@ class GenericService(GenericEndpoint) :
 
 class GenericResource(GenericEndpoint) :
     def __init__(self, settings: dict):
-        """Initialize the GenericResource class.
-        It checks if the Company Info is present in the settings and then it calls the GenericEndpoint constructor.
-        """
-
-        if "CompanyName" in settings and "CompanyToken" in settings:
-            super().__init__(settings, isResource=True)
-        else:
-            raise InfoException("The Company Info is missing")
+        """Initialize the GenericResource class."""
+        super().__init__(settings, isResource=True)
 
     def _start(self) :        
         """ Start the endpoint as a resource.

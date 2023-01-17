@@ -1,0 +1,16 @@
+{
+    "deviceName" : "RealSensor_1",
+    "field" : 1,
+    "isSensor" : true,
+    "measureType" : ["temperature", "humidity"],
+    "CompanyInfo" : {
+        "CompanyName" : "PatataNovella",
+        "CompanyToken" : "123"
+    },
+    "Location" : {
+        "latitude" : 45.02,
+        "longitude" : 7.65
+    },
+    "ServiceCatalog_url" : "http://172.20.10.3:8080",
+    "measureTimeInterval" : 5
+}

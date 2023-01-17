@@ -66,8 +66,6 @@ class SimDevices_Manager():
         Device_information = {
             "deviceName" : f"Device_{ID}",
             "field" : fieldNumber,
-            "IPport" : IPport,
-            "IPaddress" : gethostbyname(gethostname()),
             "isSensor" : isSensor,
             "isActuator" : isActuator,
             "measureType" : measures,
@@ -80,8 +78,10 @@ class SimDevices_Manager():
         
         dev_latitude, dev_longitude = self.generatePosition(latitude, longitude, fieldNumber)
         if dev_latitude != -1 and dev_longitude != -1:
-            Device_information["Latitude"] = dev_latitude
-            Device_information["Longitude"] = dev_longitude
+            Device_information["Location"] = {
+                "latitude" : dev_latitude,
+                "longitude" : dev_longitude
+            }
         return IoTDevice(Device_information, self._measureTimeInterval)
 
     def get_ResourceCatalog_url(self) :

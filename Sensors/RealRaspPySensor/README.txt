@@ -1,0 +1,1 @@
+Copy in the RaspberryPy the "RasPySensor.py" script, the "DeviceSettings.json" configuration file and the "GenericEndpoint.py" script (../../SupporClasses/GenericEndpoint)

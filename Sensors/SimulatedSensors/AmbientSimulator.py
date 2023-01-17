@@ -1,9 +1,7 @@
 import random
 import json
 import paho.mqtt.client as PahoMQTT
-import sys
 
-sys.path.append('../SupportClasses/')
 from MyThread import MyThread
 
 noiseAmplitude = 1

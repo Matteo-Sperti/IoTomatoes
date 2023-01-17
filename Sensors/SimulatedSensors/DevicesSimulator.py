@@ -1,13 +1,9 @@
 import time
 import json
 import random
-import numpy as np
 import requests
-import sys
-from socket import gethostname, gethostbyname
 
-from IoTDevice import IoTDevice
-sys.path.append("../SupportClasses/")
+from FakeSensor import SimDevice
 from MyIDGenerator import IDs
 from TerminalQuery import *
 
@@ -82,7 +78,7 @@ class SimDevices_Manager():
                 "latitude" : dev_latitude,
                 "longitude" : dev_longitude
             }
-        return IoTDevice(Device_information, self._measureTimeInterval)
+        return SimDevice(Device_information, self._measureTimeInterval)
 
     def get_ResourceCatalog_url(self) :
         """Get the URL of the Resource Catalog from the Service Catalog."""
@@ -164,7 +160,7 @@ class SimDevices_Manager():
             sensor.stop()
 
 if __name__ == "__main__":
-    settings = json.load(open("DevicesSettings.json", "r"))
+    settings = json.load(open("DevicesSimulatorSettings.json", "r"))
 
     Simulator = SimDevices_Manager(settings)
 

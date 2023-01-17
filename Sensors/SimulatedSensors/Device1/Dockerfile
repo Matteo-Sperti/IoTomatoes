@@ -7,7 +7,7 @@ ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
 
 # Install pip requirements
-COPY ./ServiceCatalog/requirements.txt .
+COPY ./Sensors/requirements.txt .
 RUN python -m pip install -r requirements.txt
 
 WORKDIR /app
@@ -16,9 +16,9 @@ WORKDIR /app
 RUN adduser -u 8080 --disabled-password --gecos "" appuser && chown -R appuser /app
 USER appuser
 
-COPY ./ServiceCatalog/ /app/
+COPY ./Sensors/SimulatedSensors/Device1/ /app/
+COPY ./Sensors/SimulatedSensors/AmbientSimulator.py /app/
+COPY ./Sensors/SimulatedSensors/FakeSensor.py /app/
 COPY ./SupportClasses/ /app/
 
-RUN pip install -r /app/requirements.txt
-RUN cd /app/
-CMD ["python","/app/ServiceCatalog.py"]
+CMD ["python","/app/FakeSensor.py"]

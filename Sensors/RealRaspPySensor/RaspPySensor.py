@@ -9,6 +9,10 @@ sensor = Adafruit_DHT.DHT11
 
 class RasPySensor(GenericResource):
     def __init__(self, DeviceInfo : dict):
+        """Constructor of the Raspberry Pi sensor. It will initialize the sensor and
+        the MQTT client, it will register the sensor to the ResourceCatalog and to the broker 
+        and it will subscribe to the topics specified in the ResourceCatalog."""
+
         super().__init__(DeviceInfo)
 
         self.pin = settings["PIN_IN"]
@@ -25,7 +29,12 @@ class RasPySensor(GenericResource):
             }]
         }
 
-    def run(self):
+    def get_measures(self):
+        """This function is called periodically in order to get the sensor readings.
+        It will publish the readings on the topics specified in the ResourceCatalog.
+        
+        In this example, the sensor is a DHT11 temperature and humidity sensor."""
+
         humidity_topic = None
         temperature_topic = None
         for topic in publishedTopics(self._EndpointInfo):
@@ -49,10 +58,40 @@ class RasPySensor(GenericResource):
             self.myPublish(temperature_topic, message)
 
     def notify(self, topic, msg):
+        """Callback function called when a message is received from the broker.
+        If the resource is an actuator, it will turn it on or off 
+        depending on the message received
+        """
         print(f"{self.ID} received {msg} on topic {topic}")
+
+        if isActuator(self._EndpointInfo):
+            actuator_info = actuatorType(self._EndpointInfo)
+            actuator_topic = topic.split("/")[-1]
+
+            if actuator_topic in actuator_info:
+                try:
+                    state = msg["e"][-1]["v"]
+                except KeyError:
+                    print("Message not valid")
+                else:
+                    if state == 0:
+                        print(f"Resource {self.ID}: {actuator_topic} turned OFF")
+                        # If a real actuator is connected to the Raspberry Pi, 
+                        # here it should be turned OFF
+                    elif state == 1:
+                        print(f"Resource {self.ID}: {actuator_topic} turned ON")
+                        # If a real actuator is connected to the Raspberry Pi, 
+                        # here it should be turned ON
+                    else:
+                        print(f"Resource {self.ID}: {actuator_topic} state not valid")
+            else:
+                print(f"Resource {self.ID}: {actuator_topic} not found")
+
     
     def construct_message(self, measure : str, unit : str) :
-        message=self._message
+        """Constructs a message to be sent to the broker using the SenML format"""
+
+        message=self._message.copy()
         message["bn"]=self.ID
         message["e"][-1]["n"] = measure
         message["e"][-1]["v"] = 0
@@ -70,5 +109,5 @@ if __name__ == "__main__":
         print(e)
     else:
         while True:
-            IoTSensor.run()
+            IoTSensor.get_measures()
             time.sleep(measureTimeInterval)

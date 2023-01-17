@@ -2,3 +2,4 @@ ServiceCatalogSettings.json
 ServiceCatalog.json
 .vscode/
 __pycache__/
+pyrightconfig.json

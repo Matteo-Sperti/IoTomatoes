@@ -20,6 +20,4 @@ USER appuser
 COPY ./TelegramBot/ /app/
 COPY ./SupportClasses/ /app/
 
-RUN pip install -r /app/requirements.txt
-RUN cd /app/
 CMD ["python","/app/TelegramBot.py"]

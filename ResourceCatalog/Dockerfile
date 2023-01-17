@@ -19,6 +19,4 @@ USER appuser
 COPY ./ResourceCatalog/ /app/
 COPY ./SupportClasses/ /app/
 
-RUN pip install -r /app/requirements.txt
-RUN cd /app/
 CMD ["python","/app/ResourceCatalog.py"]

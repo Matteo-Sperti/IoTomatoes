@@ -28,6 +28,8 @@ The proposed IoT platform for Smart Farming is built on the base of the microser
 - **PUBLISH/SUBSCRIBE:** based on the usage of the MQTT protocol;
 - **REQUEST/RESPONSE:** based on REST Web Services.
 
+![plot](./Doc/Schema_platform.png)
+
 ## Device Connector
 Device connector for Raspberry Pi: It works as a device connector integrating the low-level technology of sensors  and actuators into the platform. The Raspberry Pi board communicates using low-energy communication protocols with temperature, humidity, air quality, solar radiations, soil moisture sensors located in the field, to retrieve environmental and soil information, or with leds and pumps. It communicates with the Catalog through REST and it works as a MQTT publisher to send the data collected, or as a MQTT subscriber to receive the actuation commands. It can be also used to integrate pre-existing sensors in the platform.
 

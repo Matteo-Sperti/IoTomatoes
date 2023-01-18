@@ -18,7 +18,7 @@ In the [DeviceSettings.json](DeviceSettings.json) configuration file you must sp
 - the type of sensor or actuator (in this case ["humidity", "temperature"])
 
 Moreover you must add in the configuration file any additional information about the sensor or actuator. in this example:
-- **PIN_IN:** the PIN number of the RaspberryPy where the sensor is connected
+- **PIN_IN:** the PIN number of the Raspberry Pi where the sensor is connected
 - **measureTimeInterval:** the time interval between two measures
 
 Optionally you can specify also:
@@ -26,7 +26,7 @@ Optionally you can specify also:
 
 ## Installation
 
-Copy in the same folder in the RaspberryPy:
+Copy in the same folder in the Raspberry Pi:
 - [DeviceSettings.json](DeviceSettings.json)
 - [RealRaspPySensor.py](RealRaspPySensor.py)
 - [MyExceptions.py](../../SupportClasses/MyExceptions.py)

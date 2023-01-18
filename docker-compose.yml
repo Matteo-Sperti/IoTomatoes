@@ -62,7 +62,7 @@ services:
     image: device1
     build:
       context: .
-      dockerfile: ./Sensors/SimulatedSensors/Device1/Dockerfile
+      dockerfile: ./Devices/SimulatedDevices/Device1/Dockerfile
     ports:
       - "9082:9082"
 
@@ -70,7 +70,7 @@ services:
     image: device2
     build:
       context: .
-      dockerfile: ./Sensors/SimulatedSensors/Device2/Dockerfile
+      dockerfile: ./Devices/SimulatedDevices/Device2/Dockerfile
     ports:
       - "9083:9083"
 
@@ -78,7 +78,7 @@ services:
     image: device3
     build:
       context: .
-      dockerfile: ./Sensors/SimulatedSensors/Device3/Dockerfile
+      dockerfile: ./Devices/SimulatedDevices/Device3/Dockerfile
     ports:
       - "9084:9084"
 
@@ -86,7 +86,7 @@ services:
     image: device4
     build:
       context: .
-      dockerfile: ./Sensors/SimulatedSensors/Device4/Dockerfile
+      dockerfile: ./Devices/SimulatedDevices/Device4/Dockerfile
     ports:
       - "9085:9085"
 
@@ -94,6 +94,6 @@ services:
     image: device5
     build:
       context: .
-      dockerfile: ./Sensors/SimulatedSensors/Device5/Dockerfile
+      dockerfile: ./Devices/SimulatedDevices/Device5/Dockerfile
     ports:
       - "9086:9086"

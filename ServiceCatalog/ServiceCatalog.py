@@ -245,7 +245,7 @@ class ServiceCatalogManager:
                         print("Device without lastUpdate field")
                         self.catalog[key].remove(device)
         self.catalog["lastUpdate"] = actualtime
-
+        self.save()
 
 class RESTServiceCatalog():
     exposed = True

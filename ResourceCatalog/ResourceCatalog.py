@@ -555,6 +555,7 @@ class ResourceCatalogManager():
                     print("Device without lastUpdate field")
                     company[devicesList_name].remove(device)
         self.catalog["lastUpdate"] = actualtime
+        self.save()
 
 class RESTResourceCatalog(GenericService):
     exposed = True

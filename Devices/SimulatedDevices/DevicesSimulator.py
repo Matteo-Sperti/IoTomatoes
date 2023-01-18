@@ -4,8 +4,8 @@ import random
 import requests
 
 
-from Devices.SimulatedDevices.FakeDevice import SimDevice
-from MyIDGenerator import IDs
+from FakeDevice import SimDevice
+from iotomatoes_supportpackage.MyIDGenerator import IDs
 
 HelpMessage = """
 Devices Simulator.

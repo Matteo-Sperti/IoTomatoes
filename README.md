@@ -13,7 +13,9 @@ The main features provided by the platform will be:
 - Unified interfaces (REST Web Services and MQTT);
 - End-users’ maintenance and awareness.
 
-# Requirements
+# Installation
+
+The required packages to run the IoT platform are:
 
 - [Python 3.x](https://www.python.org/)
 - [NumPy](https://numpy.org/)
@@ -21,6 +23,10 @@ The main features provided by the platform will be:
 - [paho-mqtt](https://www.eclipse.org/paho/index.php?page=clients/python/index.php)
 - [docker](https://www.docker.com/)
 - [requests](https://requests.readthedocs.io/en/latest/#)
+
+Moreover it is suggested to install the IoT support package [IoTomatoes_SupportPackage](./IoTomatoes_SupportPackage/README.md) that contains some useful functions to simplify the development of the IoT devices.
+
+    python -m pip install -i https://test.pypi.org/simple/ IoTomatoes_SupportPackage --no-deps
 
  # Docker Compose
 

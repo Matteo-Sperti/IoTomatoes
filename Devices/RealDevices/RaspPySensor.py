@@ -25,22 +25,14 @@ class RasPySensor(IoTDevice):
         # to 15 times to get a sensor reading (waiting 2 seconds between each retry).
         humidity, temperature = Adafruit_DHT.read_retry(sensor, self.pin)
 
-        if temperature is not None:
-            message = self.construct_message("temperature", "C")
-            message["e"][-1]["v"] = temperature
-            
-            return message
+        return temperature
 
     def get_humidity(self):
         # Try to grab a sensor reading.  Use the read_retry method which will retry up
         # to 15 times to get a sensor reading (waiting 2 seconds between each retry).
         humidity, temperature = Adafruit_DHT.read_retry(sensor, self.pin)
 
-        if humidity is not None:
-            message = self.construct_message("humidity", "%")
-            message["e"][-1]["v"] = humidity
-            
-            return message
+        return humidity
 
 
 if __name__ == "__main__":

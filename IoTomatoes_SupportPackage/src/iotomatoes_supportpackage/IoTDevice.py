@@ -25,13 +25,12 @@ class IoTDevice(GenericResource):
         if self.isSensor:
             if sensor is None:
                 raise Exception("Sensor not specified")
-            self._Sensor = sensor
 
             if "measureTimeInterval" in DeviceInfo:
                 self._measureTimeInterval = DeviceInfo["measureTimeInterval"]
             else:
                 self._measureTimeInterval = 5
-            self._SendThread = MyThread(self.get_measures, self._measureTimeInterval)
+            self._SendThread = MyThread(self.get_measures, self._measureTimeInterval, sensor)
             self._message={
                 "cn" : self.CompanyName,
                 "bn" : self.ID,
@@ -87,14 +86,32 @@ class IoTDevice(GenericResource):
                         print(f"Resource {self.ID}: {actuator_topic} state not valid")
 
             
-    def get_measures(self):
+    def get_measures(self, sensor):
         """This function is called periodically in order to get the sensor readings.
         It will publish the readings on the topics specified in the ResourceCatalog.
         """
 
         for topic in publishedTopics(self._EndpointInfo):
-            message = eval(f"self._Sensor.get_{topic.split('/')[-1]}()")
-            self.myPublish(topic, message)
+            measureType = topic.split("/")[-1]
+            
+            if measureType == "temperature":
+                message = self.construct_message(measureType, "C")
+                v = sensor.get_temperature()
+            elif measureType == "humidity":
+                message = self.construct_message(measureType, "%")
+                v = sensor.get_humidity()
+            elif measureType == "light":
+                message = self.construct_message(measureType, "lux")
+                v = sensor.get_light()
+            elif measureType == "soilMoisture":
+                message = self.construct_message(measureType, "%")
+                v = sensor.get_soilMoisture()
+            else:
+                continue
+                
+            if v is not None:
+                message["e"][-1]["v"] = v
+                self.myPublish(topic, message)
     
     def construct_message(self, measure : str, unit : str) :
         """This function is used to construct the message to be published on the topics."""

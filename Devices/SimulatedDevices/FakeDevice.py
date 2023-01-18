@@ -1,7 +1,6 @@
 import json
-from AmbientSimulator import AmbientSimulator
-from IoTDevice import IoTDevice
-from ItemInfo import *
+from iotomatoes_supportpackage.AmbientSimulator import AmbientSimulator
+from iotomatoes_supportpackage.IoTDevice import IoTDevice
 
 class SimDevice(IoTDevice):
     def __init__(self, DeviceInfo : dict):
@@ -25,30 +24,22 @@ class SimDevice(IoTDevice):
     def get_temperature(self):
         """This function is used to get the temperature reading from the AmbientSimulator."""
 
-        message = self.construct_message("temperature", "C")
-        message["e"][-1]["v"] = self._Ambient.get_temperature()
-        return message
+        return self._Ambient.get_temperature()
 
     def get_humidity(self):
         """This function is used to get the humidity reading from the AmbientSimulator."""
 
-        message = self.construct_message("humidity", "%")
-        message["e"][-1]["v"] = self._Ambient.get_humidity()
-        return message
+        return self._Ambient.get_humidity()
 
     def get_light(self):
         """This function is used to get the light reading from the AmbientSimulator."""
 
-        message = self.construct_message("light", "lx") #1 lux = 1 lumen/m2
-        message["e"][-1]["v"] = self._Ambient.get_light()
-        return message
+        return self._Ambient.get_light()
 
     def get_soilMoisture(self):
         """This function is used to get the soil moisture reading from the AmbientSimulator."""
         
-        message = self.construct_message("soilMoisture", "%")
-        message["e"][-1]["v"] = self._Ambient.get_soilMoisture()
-        return message
+        return self._Ambient.get_soilMoisture()
 
 if __name__ == "__main__":
     try:

@@ -156,8 +156,8 @@ if __name__ == "__main__":
 	else:
 		try:
 			while True:
-				time.sleep(60)
 				fd.checkDeviceStatus()
+				time.sleep(60)
 		except KeyboardInterrupt:
 			fd.stop()
 			print("FaultDetection stopped")

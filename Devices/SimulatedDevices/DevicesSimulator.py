@@ -2,13 +2,10 @@ import time
 import json
 import random
 import requests
-import sys
 
-from FakeSensor import SimDevice
-sys.path.append("../../SupportClasses/")
+
+from Devices.SimulatedDevices.FakeDevice import SimDevice
 from MyIDGenerator import IDs
-from TerminalQuery import *
-from MyThread import MyThread
 
 HelpMessage = """
 Devices Simulator.
@@ -29,11 +26,6 @@ class SimDevices_Manager():
 
         self.Sensors = []
         self._ResourceCatalog_url = self.get_ResourceCatalog_url()
-        self._measureThread = MyThread(self.measure, settings["measureTimeInterval"])
-
-    def measure(self):
-        for sensor in self.Sensors:
-            sensor.get_measures()
 
     def populateField(self, number : int = 5):
         CompanyName = input("Insert Company Name: ")
@@ -172,9 +164,25 @@ class SimDevices_Manager():
                 return True
     
     def exit(self):
-        self._measureThread.stop()
         for sensor in self.Sensors:
-            sensor.stop()
+            sensor.close()
+
+def query_int(question):
+    """Ask a question via input() and return the int answer"""
+    while True:
+        resp = input(question)
+        if _is_integer(resp):
+            return int(resp)
+        else:
+            print(f"Please respond with a integer number\n")
+
+def _is_integer(n):
+    try:
+        float(n)
+    except ValueError:
+        return False
+    else:
+        return float(n).is_integer()
 
 if __name__ == "__main__":
     settings = json.load(open("DevicesSimulatorSettings.json", "r"))

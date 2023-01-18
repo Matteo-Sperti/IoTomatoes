@@ -3,10 +3,10 @@ import cherrypy
 import time
 import requests
 
-from MyExceptions import *
-from MyThread import MyThread
-from MyIDGenerator import IDs
-from ItemInfo import *
+from iotomatoes_supportpackage.MyExceptions import web_exception, InfoException
+from iotomatoes_supportpackage.MyThread import MyThread
+from iotomatoes_supportpackage.MyIDGenerator import IDs
+from iotomatoes_supportpackage.ItemInfo import getIPaddress, constructService
 
 serviceList_Name = "servicesList"
 

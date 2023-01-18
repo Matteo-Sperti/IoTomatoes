@@ -3,8 +3,9 @@ import time
 import datetime
 import json
 
-from iotomatoes_supportpackage.GenericEndpoint import GenericService
-from iotomatoes_supportpackage.ItemInfo import subscribedTopics
+from GenericEndpoint import GenericService
+from ItemInfo import *
+from MyExceptions import *
 
 class SmartLighting(GenericService):
 

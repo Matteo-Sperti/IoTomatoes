@@ -2,8 +2,8 @@ import datetime
 import time
 import json
 
-from GenericEndpoint import GenericService
-from DeviceManager import *
+from iotomatoes_supportpackage.GenericEndpoint import GenericService
+import iotomatoes_supportpackage.DeviceManager as DM
 
 class ConsumptionManager (GenericService):
 	def __init__(self, settings):
@@ -18,7 +18,7 @@ class ConsumptionManager (GenericService):
 					't' : ""
 					}
 		companyList = self.getCompaniesList()
-		self.deviceList = createDeviceList(companyList, isActuator=True)
+		self.deviceList = DM.createDeviceList(companyList, isActuator=True)
 
 	def updateConsumption(self):
 		"""Calculate the consumption of the actuators for the passed hour and update the database"""
@@ -68,16 +68,16 @@ class ConsumptionManager (GenericService):
 					dev['status'] = 'ON'
 					dev['OnTime'] = time.time()
 					dev['control'] = True
-					return CheckResult(is_error=False)
+					return DM.CheckResult(is_error=False)
 				elif command == 0:
 					dev['status'] = 'OFF'
 					#Calculate the consumption of a actuator by its mean power consumption and the time it was on 
 					dev['Consumption_kWh'] += round((time.time() - dev['OnTime'])*dev['PowerConsumption_kW']/3600,2)
 					dev['OnTime'] = 0
-					return CheckResult(is_error=False)
+					return DM.CheckResult(is_error=False)
 				else:
-					return CheckResult(is_error=True, messageType="Error", message="Command not recognized")
-		return CheckResult(is_error=True, messageType="Error", message="Actuator not found.")
+					return DM.CheckResult(is_error=True, messageType="Error", message="Command not recognized")
+		return DM.CheckResult(is_error=True, messageType="Error", message="Actuator not found.")
 
 	def notify (self, topic, payload):
 		"""Parse the message received and control the topic\n
@@ -97,8 +97,8 @@ class ConsumptionManager (GenericService):
 			msg['t'] = time.time()
 			self.myPublish(f"{self._publishedTopics[0]}", msg)
 		else:
-			checkUpdate(self, True)
-			check_actuator = inList(ActuatorID, self.deviceList)
+			DM.checkUpdate(self, True)
+			check_actuator = DM.inList(ActuatorID, self.deviceList)
 			if check_actuator.is_error:
 				msg = self._message.copy()
 				msg['cn'] = companyName

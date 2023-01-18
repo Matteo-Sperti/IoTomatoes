@@ -2,15 +2,13 @@ import json
 import time
 import cherrypy
 from socket import gethostname, gethostbyname
-import sys
 
-sys.path.append("../SupportClasses/")
-from GenericEndpoint import GenericService
-from ItemInfo import *
-from MyExceptions import *
-from MyIDGenerator import IDs
-from MyThread import MyThread
-from TerminalQuery import *
+from iotomatoes_supportpackage.GenericEndpoint import GenericService
+from iotomatoes_supportpackage.MyExceptions import web_exception, InfoException
+from iotomatoes_supportpackage.ItemInfo import (
+    constructResource, measureType, actuatorType, publishedTopics)
+from iotomatoes_supportpackage.MyIDGenerator import IDs
+from iotomatoes_supportpackage.MyThread import MyThread
 
 companyList_name = "companiesList"
 devicesList_name = "devicesList"

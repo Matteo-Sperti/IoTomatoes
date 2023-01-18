@@ -1,10 +1,6 @@
 import json
 import requests
 from telepot.namedtuple import InlineKeyboardMarkup, InlineKeyboardButton
-import sys
-
-sys.path.append("../SupportClasses/")
-from MyExceptions import *
 
 keyboardYESNO = InlineKeyboardMarkup(inline_keyboard=[[
                 InlineKeyboardButton(text='YES ✅', callback_data='yes'),

@@ -10,9 +10,8 @@ import requests
 from socket import gethostname, gethostbyname
 
 from Commands import *
-from MyExceptions import *
-from GenericEndpoint import GenericService
-from MyThread import custom_thread
+from iotomatoes_supportpackage.GenericEndpoint import GenericService
+from iotomatoes_supportpackage.MyThread import custom_thread
 
 HelpMessage = """Help message to the IoTomatoesBot!
 
@@ -276,12 +275,9 @@ class IoTBot(GenericService):
                             print("Invalid chatID from catalog")
 
 if __name__ == "__main__":
-    settings = json.load(open("TelegramSettings.json"))
-
-    local_IPaddress = gethostbyname(gethostname())
-    settings["IPaddress"] = local_IPaddress
-    
     try:
+        settings = json.load(open("TelegramSettings.json"))
+        
         IoTomatoesBOT = IoTBot(settings)
     except Exception as e:
         print(e)

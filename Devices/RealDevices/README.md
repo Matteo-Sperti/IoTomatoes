@@ -29,6 +29,7 @@ Optionally you can specify also:
 Copy in the same folder in the Raspberry Pi:
 - [DeviceSettings.json](DeviceSettings.json)
 - [RealRaspPySensor.py](RealRaspPySensor.py)
-- [MyExceptions.py](../../SupportClasses/MyExceptions.py)
-- [ItemInfo.py](../../SupportClasses/ItemInfo.py)
-- [GenericEndpoint.py](../../SupportClasses/GenericEndpoint.py)
+
+Install the requirements and the IoT support package:
+
+    python -m pip install -i https://test.pypi.org/simple/ IoTomatoes_SupportPackage --no-deps

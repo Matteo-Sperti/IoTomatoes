@@ -1,6 +1,6 @@
 import random
 
-from MyThread import MyThread
+from iotomatoes_supportpackage.MyThread import MyThread
 
 noiseAmplitude = 1
 

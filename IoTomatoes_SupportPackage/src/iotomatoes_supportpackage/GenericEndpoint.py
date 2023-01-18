@@ -3,10 +3,10 @@ import time
 import json
 import paho.mqtt.client as PahoMQTT
 
-
-from ItemInfo import * 
-from MyExceptions import InfoException
-from MyThread import MyThread
+from iotomatoes_supportpackage.ItemInfo import (
+        getIPaddress, isMQTT, subscribedTopics, publishedTopics, construct)
+from iotomatoes_supportpackage.MyExceptions import InfoException
+from iotomatoes_supportpackage.MyThread import MyThread
 
 class RefreshThread(MyThread):
     def __init__(self, url : str, endpoint, interval=60, **kwargs):

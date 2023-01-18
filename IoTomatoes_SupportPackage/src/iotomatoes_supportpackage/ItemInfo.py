@@ -1,6 +1,6 @@
 import time
 
-from MyExceptions import InfoException
+from iotomatoes_supportpackage.MyExceptions import InfoException
 
 ### Get item information from a dictionary ###
 
@@ -51,15 +51,15 @@ def getIPaddress(dict_ : dict) -> str:
 def construct(EInfo : dict, isService : bool = False, isResource : bool = False):
     """Construct the dictionary of a resource or a service according to the specification of the catalog.
     
-    Parameters:\n
-    `EInfo` (dict): The dictionary containing the information of the resource or service.\n
-    `isService` (bool): True if the dictionary is a service, False otherwise.\n
-    `isResource` (bool): True if the dictionary is a resource, False otherwise. 
+    Arguments:\n
+    `EInfo (dict)`: The dictionary containing the information of the resource or service.\n
+    `isService (bool)`: True if the dictionary is a service, False otherwise.\n
+    `isResource (bool)`: True if the dictionary is a resource, False otherwise. 
     `isService` and `isResource` are mutually exclusive.\n
     
     Returns:\n
-    `info` (dict): The dictionary of the resource or service.\n
-    `CompanyInfo` (dict): The dictionary containing the information of the company 
+    `info (dict)`: The dictionary of the resource or service.\n
+    `CompanyInfo (dict)`: The dictionary containing the information of the company 
     of the resource, empty if the endoint is a service.
     """
     if not isResource ^ isService:
@@ -86,12 +86,12 @@ def construct(EInfo : dict, isService : bool = False, isResource : bool = False)
 def constructService(ID : int, EInfo : dict):
     """ Construct the dictionary of a service according to the specification of the catalog.
 
-    Parameters:\n
-    `ID` (int): The ID of the service.\n
-    `EInfo` (dict): The dictionary containing the information of the service.\n
+    Arguments:\n
+    `ID (int)`: The ID of the service.\n
+    `EInfo (dict)`: The dictionary containing the information of the service.\n
 
     Returns:\n
-    `info` (dict): The dictionary of the service.\n
+    `info` (dict)`: The dictionary of the service.\n
     """
     info = {}
     info["ID"] = ID
@@ -102,13 +102,13 @@ def constructService(ID : int, EInfo : dict):
 def constructResource(ID : int, CompInfo : dict, EInfo : dict):
     """ Construct the dictionary of a resource according to the specification of the catalog.
 
-    Parameters:\n
-    `ID` (int): The ID of the resource.\n
-    `CompInfo` (dict): The dictionary containing the information of the company of the resource.\n
-    `EInfo` (dict): The dictionary containing the information of the resource.\n
+    Arguments:\n
+    `ID (int)`: The ID of the resource.\n
+    `CompInfo (dict)`: The dictionary containing the information of the company of the resource.\n
+    `EInfo (dict)`: The dictionary containing the information of the resource.\n
 
     Returns:\n
-    `info` (dict): The dictionary of the resource.\n
+    `info (dict)`: The dictionary of the resource.\n
     """
     info = {}
     info["ID"] = ID
@@ -140,6 +140,8 @@ def _makeService(EInfo : dict, info : dict = {}):
     return info.copy()
 
 def _makeResourceTopic(EInfo : dict, CompInfo : dict, dict_to_construct : dict):
+    """If the resource is a sensor or an actuator, add the MQTT topics to the dictionary."""
+
     if "ID" not in dict_to_construct:
         raise InfoException("ID is missing")
 
@@ -166,6 +168,8 @@ def _makeResourceTopic(EInfo : dict, CompInfo : dict, dict_to_construct : dict):
 
 
 def _makeResource(EInfo : dict, CompInfo : dict, info : dict = {}):
+    """Construct the dictionary of a resource according to the specification of the catalog."""
+
     info["availableServices"] = []
     info["servicesDetails"] = []
 
@@ -221,6 +225,8 @@ def _makeResource(EInfo : dict, CompInfo : dict, info : dict = {}):
     return info.copy()
 
 def _setIPport(local_ip : str,  IPport : int, dict_ : dict = {}):
+    """Add the REST service information to the dictionary."""
+
     service = {
         "serviceType" : "REST",
         "serviceIP" : f"http://{local_ip}:{IPport}" }
@@ -230,6 +236,8 @@ def _setIPport(local_ip : str,  IPport : int, dict_ : dict = {}):
     return service
 
 def _addService(dict_ : dict, service : str, serviceInfo : dict = {}):
+    """Add a service to the dictionary."""
+    
     if "serviceType" in serviceInfo and serviceInfo["serviceType"] != service:
         raise InfoException("Service type and service name are different")
 

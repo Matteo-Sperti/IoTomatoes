@@ -2,10 +2,8 @@ import datetime
 import time
 import json
 
-import sys
-sys.path.append('../SupportClasses/')
-from GenericEndpoint import GenericService
-from DeviceManager import *
+from iotomatoes_supportpackage.GenericEndpoint import GenericService
+import iotomatoes_supportpackage.DeviceManager as DM
 
 class FaultDetector(GenericService):
 	def __init__(self, settings):
@@ -22,7 +20,7 @@ class FaultDetector(GenericService):
 					't' : ''
 					}
 		companyList = self.getCompaniesList()
-		self.deviceList = createDeviceList(companyList, isActuator=False)
+		self.deviceList = DM.createDeviceList(companyList, isActuator=False)
 
 	def updateStatus(self, deviceID : int):
 		"""Update the status of a device in the deviceList\n
@@ -51,11 +49,11 @@ class FaultDetector(GenericService):
 			elapsedTime = (currentTime - device['lastMeasure']).total_seconds()
 			if elapsedTime > 300:
 				message = f"Device {device['ID']} has not sent a message for more than 5 minutes, possible fault!"
-				return CheckResult(is_error=True, messageType="Warning", message=message, 
+				return DM.CheckResult(is_error=True, messageType="Warning", message=message, 
 										device_id=device['ID'])
 			else:
-				return CheckResult(is_error=False)
-		return CheckResult(is_error=False)
+				return DM.CheckResult(is_error=False)
+		return DM.CheckResult(is_error=False)
 
 	def checkMeasure(self, deviceID: int, measureType: str,  measure : float, unit : str):
 		"""Check if a measure is out of the thresholds\n
@@ -71,28 +69,28 @@ class FaultDetector(GenericService):
 		"""
 		device = None
 		if unit != self.thresholds[measureType]['unit']:
-			return CheckResult(is_error=True, messageType="Error", message=f"Unit of measure '{unit}' of device {deviceID} not recognized.")
+			return DM.CheckResult(is_error=True, messageType="Error", message=f"Unit of measure '{unit}' of device {deviceID} not recognized.")
 
 		for dev in self.deviceList:
 			if dev['ID'] == deviceID:
 				device = dev
 				break
 		if not device:
-			return CheckResult(is_error=True, messageType="Error", message="Device not found") 
+			return DM.CheckResult(is_error=True, messageType="Error", message="Device not found") 
 		if measureType not in device['measureType']:
-			return CheckResult(is_error=True, messageType="Error", message=f"Measure type of device {deviceID} not recognized.") 
+			return DM.CheckResult(is_error=True, messageType="Error", message=f"Measure type of device {deviceID} not recognized.") 
 
 		min_value = self.thresholds[measureType]['min_value']
 		max_value = self.thresholds[measureType]['max_value']
 
 		if min_value is None or max_value is None:
-			return CheckResult(is_error=True, messageType="Error", message="Thresholds not configured")
+			return DM.CheckResult(is_error=True, messageType="Error", message="Thresholds not configured")
 
 		if measure > max_value or measure < min_value:
 			message = f"Device {deviceID} has sent a measure out of the thresholds, possible fault! {measure}"
-			return CheckResult(is_error=True, messageType="Warning", message=message, 
+			return DM.CheckResult(is_error=True, messageType="Warning", message=message, 
 								device_id=deviceID)
-		return CheckResult(is_error=False)
+		return DM.CheckResult(is_error=False)
 
 	def notify(self, topic, payload):
 		"""Parse the topic received, check the device status and the measure and publish the alert messages if needed.\n
@@ -114,8 +112,8 @@ class FaultDetector(GenericService):
 			msg['msg'] = "Measure not found"
 			self.myPublish(f"{companyName}/{self._publishedTopics[0]}", msg)
 		else:
-			checkUpdate(self, False)
-			sensor_check = inList(deviceID, self.deviceList)
+			DM.checkUpdate(self, False)
+			sensor_check = DM.inList(deviceID, self.deviceList)
 			measure_check = self.checkMeasure(deviceID, measureType, measure, unit)
 			if sensor_check.is_error:
 				msg = self._message.copy()
@@ -136,7 +134,7 @@ class FaultDetector(GenericService):
 				self.updateStatus(deviceID)
 
 	def checkDeviceStatus(self):
-		checkUpdate(self, isActuator=False)
+		DM.checkUpdate(self, isActuator=False)
 		for dev in self.deviceList:
 			status = self.checkStatus(dev)
 			if status.is_error:

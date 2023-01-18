@@ -150,7 +150,7 @@ class FaultDetector(GenericService):
 
 if __name__ == "__main__":
 	try:
-		settings = json.load(open('FaultDetectionServiceSettings.json', 'r'))
+		settings = json.load(open('FaultDetectionSettings.json', 'r'))
 		fd = FaultDetector(settings)
 	except Exception as e:
 		print(e)

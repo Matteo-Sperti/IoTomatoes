@@ -7,7 +7,7 @@ ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
 
 # Install pip requirements
-COPY ./SmartIrrigation/requirements.txt .
+COPY ./ConsumptionManager/requirements.txt .
 RUN python -m pip install -r requirements.txt
 
 WORKDIR /app
@@ -16,7 +16,7 @@ WORKDIR /app
 RUN adduser -u 8083 --disabled-password --gecos "" appuser && chown -R appuser /app
 USER appuser
 
-COPY ./SmartIrrigation/ /app/
+COPY ./ConsumptionManager/ /app/
 COPY ./SupportClasses/ /app/
 
-CMD ["python","/app/SmartIrrigation.py"]
+CMD ["python","/app/ConsumptionManager.py"]

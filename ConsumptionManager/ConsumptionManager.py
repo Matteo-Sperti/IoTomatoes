@@ -111,7 +111,7 @@ class ConsumptionManager (GenericService):
 
 if __name__ == "__main__":
 	try:
-		settings = json.load(open('ConsumptionServiceSettings.json', 'r'))
+		settings = json.load(open('ConsumptionManagerSettings.json', 'r'))
 		cm = ConsumptionManager(settings)
 	except Exception as e:
 		print(e)
@@ -120,7 +120,7 @@ if __name__ == "__main__":
 		try:
 			while True:
 				#!To change for testing
-				if datetime.datetime.now().minute >= 59: #Update the consumption every hour 
+				if datetime.datetime.now().second >= 59: #Update the consumption every hour 
 					cm.updateConsumption()
 				time.sleep(60)
 		except KeyboardInterrupt:

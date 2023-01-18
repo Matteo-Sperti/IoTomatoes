@@ -58,3 +58,21 @@ services:
     networks:
       mynet:
         ipv4_address: "172.16.0.6"
+
+  fault_detection:
+    image: fault_detection
+    build:
+      context: .
+      dockerfile: ./FaultDetection/Dockerfile
+    networks:
+      mynet:
+        ipv4_address: "172.16.0.7"
+
+  consumption_manager:
+    image: consumption_manager
+    build:
+      context: .
+      dockerfile: ./ConsumptionManager/Dockerfile
+    networks:
+      mynet:
+        ipv4_address: "172.16.0.8"

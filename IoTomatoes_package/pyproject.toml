@@ -1,0 +1,25 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "IoTomatoes_package"
+version = "0.0.1"
+authors = [
+  { name="Matteo Sperti", mail="matteo.sperti@studenti.polito.it"},
+  { name="Luca Zanetti"},
+  { name="Andrea Usai"},
+  { name="Federico Moscato"}
+]
+description = "Small IoT package for smart-agriculture. IoTomatoes allows support to farmers and agri-service providers in order to increase productivity, optimize use of water and light, reducing the impact on the environment."
+readme = "README.md"
+requires-python = ">=3.7"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+
+[project.urls]
+"Homepage" = "https://github.com/Matteo-Sperti/IoTomatoes"
+"Bug Tracker" = "https://github.com/Matteo-Sperti/IoTomatoes/issues"

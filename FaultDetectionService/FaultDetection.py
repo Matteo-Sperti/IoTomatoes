@@ -16,10 +16,10 @@ class FaultDetector(GenericService):
 		super().__init__(settings)
 		self._message = {
 					'bn' : self._EndpointInfo['serviceName'],
-					'cn': "",
+					'cn': '',
 					'msgType': '',
-					'msg': "", 
-					't' : ""
+					'msg': '', 
+					't' : ''
 					}
 		companyList = self.getCompaniesList()
 		self.deviceList = createDeviceList(companyList, isActuator=False)
@@ -43,7 +43,7 @@ class FaultDetector(GenericService):
 		`CheckResult` object with:\n
 		`error (bool)`: ".is_error"\n
 		`message (str)`: ".message"\n
-		` topic (str)`: ".topic" 
+		`topic (str)`: ".topic" 
 		"""
 
 		currentTime = datetime.datetime.now()
@@ -57,7 +57,7 @@ class FaultDetector(GenericService):
 				return CheckResult(is_error=False)
 		return CheckResult(is_error=False)
 
-	def checkMeasure(self, deviceID: int, measureType: str,  measure : float):
+	def checkMeasure(self, deviceID: int, measureType: str,  measure : float, unit : str):
 		"""Check if a measure is out of the thresholds\n
 		Arguments:\n
 		`deviceID (int)`: ID of the device\n
@@ -70,6 +70,8 @@ class FaultDetector(GenericService):
 		`topic (str)`: ".topic" 
 		"""
 		device = None
+		if unit != self.thresholds[measureType]['unit']:
+			return CheckResult(is_error=True, messageType="Error", message=f"Unit of measure '{unit}' of device {deviceID} not recognized.")
 
 		for dev in self.deviceList:
 			if dev['ID'] == deviceID:
@@ -103,6 +105,7 @@ class FaultDetector(GenericService):
 		companyName = topic_list[-4]
 		try:
 			measure = payload['e'][-1]['v']
+			unit = payload['e'][-1]['u']
 		except:
 			msg = self._message.copy()
 			msg['t'] = time.time()
@@ -113,7 +116,7 @@ class FaultDetector(GenericService):
 		else:
 			checkUpdate(self, False)
 			sensor_check = inList(deviceID, self.deviceList)
-			measure_check = self.checkMeasure(deviceID, measureType, measure)
+			measure_check = self.checkMeasure(deviceID, measureType, measure, unit)
 			if sensor_check.is_error:
 				msg = self._message.copy()
 				msg['t'] = time.time()

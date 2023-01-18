@@ -3,7 +3,7 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [project]
-name = "IoTomatoes_package"
+name = "IoTomatoes_SupportPackage"
 version = "0.0.1"
 authors = [
   { name="Matteo Sperti", mail="matteo.sperti@studenti.polito.it"},
@@ -11,7 +11,7 @@ authors = [
   { name="Andrea Usai"},
   { name="Federico Moscato"}
 ]
-description = "Small IoT package for smart-agriculture. IoTomatoes allows support to farmers and agri-service providers in order to increase productivity, optimize use of water and light, reducing the impact on the environment."
+description = "Small IoT support package for IoTomatoes project"
 readme = "README.md"
 requires-python = ">=3.7"
 classifiers = [

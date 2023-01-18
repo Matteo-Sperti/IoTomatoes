@@ -6,20 +6,20 @@ import time
 	- inList (list of dict, int) -> bool\n
 	- compare_dicts (dict, dict, list of str) -> bool\n
 	"""
+
 def createDeviceList(companyList : list, isActuator: bool = False):
 	"""Create a list of all devices integrating informations about the last time a message was received from a device\n
-	Parameters:\n
-			- companyList (list of dict) - 'List of all companies and their devices'\n
-			- isActuator (bool) - 'True if the list should contain only actuators, False if the list should contain only sensors'\n
-	return: \n
-		- deviceList (list of dict) - 'List of all devices updated'
+	Arguments:\n
+	`companyList (list of dict)`: List of all companies and their devices\n
+	`isActuator (bool)`: True if the list should contain only actuators, False if the list should contain only sensors\n
+	Return: \n
+	`deviceList (list of dict)`: List of all devices updated
 	"""
 	deviceList = []
 	for comp in companyList:
 		for dev in comp['devicesList']:
 			if dev['isActuator'] and isActuator:
 				deviceList.append({**dev, **{'CompanyName': comp['CompanyName'], 
-											'Datetime' : None, 
 											'status': 'OFF', 
 											'OnTime': 0, 
 											'control': False,
@@ -31,6 +31,7 @@ def createDeviceList(companyList : list, isActuator: bool = False):
 
 def checkUpdate(Connector, isActuator: bool):
 	"""Check if there are changes in the ResourceCatalog and update the device list"""
+	
 	new_companyList = Connector.getCompaniesList()
 	new_deviceList = createDeviceList(new_companyList, isActuator=isActuator)
 	for new_dev in new_deviceList:
@@ -40,8 +41,10 @@ def checkUpdate(Connector, isActuator: bool):
 			not_present = True
 			for d in old_dev_iter:
 				not_present = False
-				if _different_dicts(d, new_dev, keys_to_ignore=['CompanyName', 'Datetime', 'Consumption_kWh'
-									'lastUpdate', 'lastMeasure', 'status', 'OnTime', 'control']):
+				keys_to_ignore = selectKeys(isActuator)
+				if _different_dicts(d, new_dev, keys_to_ignore):
+					for key in keys_to_ignore:
+						new_dev[key] = d[key]
 					d.update(new_dev)
 					payload = Connector._message.copy()
 					payload['cn'] = new_dev['CompanyName']
@@ -71,23 +74,31 @@ def checkUpdate(Connector, isActuator: bool):
 
 def inList(deviceID : int, deviceList : list):
 	"""Check if an actuator is in the list of the actuators\n
-	Parameters:\n
-		- deviceID (int) - 'ID of the device to check'\n
-		- deviceList (list of dict) - 'List of all devices'\n
-	return: CheckResult object with:\n
-		- error (bool): ".is_error"\n
-		- message (str): ".message"\n
-		-  topic (str): ".topic" """
+	Arguments:\n
+	`deviceID (int)`: ID of the device to check\n
+	`deviceList (list of dict)`: List of all devices\n
+	Return: CheckResult object with:\n
+	`error (bool)`: ".is_error"\n
+	`message (str)`: ".message"\n
+	`topic (str)`: ".topic" 
+	"""
 
 	for dev in deviceList:
 		if dev['ID'] == deviceID:
 			return CheckResult(is_error = False)
 	return CheckResult(is_error=True, messageType="Error", message="Actuator not found")
 
-def _different_dicts(dict1, dict2, keys_to_ignore=[]):
+def selectKeys(isActuator: bool):
+	if isActuator:
+		return ['CompanyName', 'status', 'OnTime', 'control', 'Consumption_kWh', 'lastUpdate']
+	else:
+		return ['CompanyName', 'lastMeasure', 'lastUpdate']
+
+def _different_dicts(dict1, dict2, keys_to_ignore):
+	
 	dict1_filtered = {k: v for k, v in dict1.items() if k not in keys_to_ignore}
 	dict2_filtered = {k: v for k, v in dict2.items() if k not in keys_to_ignore}
-	
+		
 	return dict1_filtered != dict2_filtered
 
 class CheckResult():

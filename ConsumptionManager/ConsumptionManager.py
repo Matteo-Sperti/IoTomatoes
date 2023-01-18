@@ -1,13 +1,9 @@
 import datetime
 import time
 import json
-import pandas as pd
 
-import sys
-sys.path.append('../SupportClasses/')
 from GenericEndpoint import GenericService
 from DeviceManager import *
-
 
 class ConsumptionManager (GenericService):
 	def __init__(self, settings):
@@ -27,39 +23,38 @@ class ConsumptionManager (GenericService):
 	def updateConsumption(self):
 		"""Calculate the consumption of the actuators for the passed hour and update the database"""
 
-		currentTime = datetime.datetime.now()
-		dframe_list = []
 		for dev in self.deviceList:
-			actuators = []
 			if(dev['status'] == 'OFF' and dev['control']):
-				dev['Datetime']= currentTime #*TEST	  
-				#!FINAL: f"{currentTime.date()} {currentTime.hour}:00:00"
-
-				actuators.append(dev.copy())
-
+				dev_consumption = {
+					'companyName': dev['companyName'],	
+					'bn': dev['ID'],
+					'field': dev['field'],
+					'consumption': {
+						'consumption_value': dev['Consumption_kWh'],
+						'unit': 'kWh',
+						'power': dev['PowerConsumption_kW'],
+						'timestamp': time.time()
+					}
+				}
 				dev['Consumption_kWh'] = 0
-				dev['Datetime'] = None
+				self.myPublish(f"{dev['companyName']}/consumption", dev_consumption)
 
 			elif(dev['status'] == 'ON' and dev['control']):
-				dev['Datetime']= currentTime #*TEST
-				#!FINAL: f"{currentTime.date()} {currentTime.hour}:00:00"
 				dev['Consumption_kWh'] = round((time.time() - dev['OnTime'])*dev['PowerConsumption_kW']/3600,2)
-
-				actuators.append(dev.copy())
-
+				dev_consumption = {
+					'companyName': dev['companyName'],	
+					'bn': dev['ID'],
+					'field': dev['field'],
+					'consumption': {
+						'consumption_value': dev['Consumption_kWh'],
+						'unit': 'kWh',
+						'power': dev['PowerConsumption_kW'],
+						'timestamp': time.time()
+					}
+				}
 				dev['OnTime'] = time.time()
 				dev['Consumption_kWh'] = 0
-				dev['Datetime'] = None
-			
-			df = pd.DataFrame(actuators, columns=['companyName', 'ID', 'deviceName', 'PowerConsumption_kW', 'Datetime', 'Consumption_kWh'])
-			dframe_list.append(df)
-
-		db = pd.read_csv('Consumption.csv') 
-		dframe_list.insert(0, db)
-		df = pd.concat(dframe_list)
-		df = df.reset_index(drop=True)	
-		print(df)			  #? TO CHECK with mongoDB		
-		df.to_csv('Consumption.csv', index=False) #!!!!! PUT REQUEST TO DATABASE TODO
+				self.myPublish(f"{dev['companyName']}/consumption", dev_consumption)
 
 	def updateStatus (self, actuatorID: int, command: str):
 		"""Update the status of the actuator, if it is turned OFF calculates its consumption\n
@@ -124,10 +119,10 @@ if __name__ == "__main__":
 	else:
 		try:
 			while True:
-				if datetime.datetime.now().second >= 59: #Update the consumption every hour
+				#!To change for testing
+				if datetime.datetime.now().minute >= 59: #Update the consumption every hour 
 					cm.updateConsumption()
 				time.sleep(60)
 		except KeyboardInterrupt:
 			cm.stop()
 			print("ConsumptionManager stopped")
-

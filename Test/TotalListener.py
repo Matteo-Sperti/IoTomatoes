@@ -64,7 +64,13 @@ class Listener():
 if __name__ == "__main__":
     listener = Listener()
     listener.start()
-    input("Press Enter to stop listening...")
 
-    listener.stop()
-    print("Listening stopped")
+    try:
+        input("Press Enter to stop listening")
+    except KeyboardInterrupt:
+        listener.stop()
+        print("Listening stopped")
+    else:
+        listener.stop()
+        print("Listening stopped")
+    

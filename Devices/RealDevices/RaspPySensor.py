@@ -1,4 +1,5 @@
 import json
+import time
 import Adafruit_DHT
 
 from iotomatoes_supportpackage.IoTDevice import IoTDevice
@@ -39,6 +40,11 @@ if __name__ == "__main__":
     try:
         settings = json.load(open("DeviceSettings.json"))
         IoTSensor = RasPySensor(settings)
-
     except Exception as e:
         print(e)
+    else:
+        try:
+            while True:
+                time.sleep(10)
+        except KeyboardInterrupt or SystemExit:
+                IoTSensor.close()

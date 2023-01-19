@@ -26,7 +26,7 @@ class ConsumptionManager (GenericService):
 		for dev in self.deviceList:
 			if(dev['status'] == 'OFF' and dev['control']):
 				dev_consumption = {
-					'companyName': dev['companyName'],	
+					'CompanyName': dev['CompanyName'],	
 					'bn': dev['ID'],
 					'field': dev['field'],
 					'consumption': {
@@ -37,12 +37,12 @@ class ConsumptionManager (GenericService):
 					}
 				}
 				dev['Consumption_kWh'] = 0
-				self.myPublish(f"{dev['companyName']}/consumption", dev_consumption)
+				self.myPublish(f"{dev['CompanyName']}/consumption", dev_consumption)
 
 			elif(dev['status'] == 'ON' and dev['control']):
 				dev['Consumption_kWh'] = round((time.time() - dev['OnTime'])*dev['PowerConsumption_kW']/3600,2)
 				dev_consumption = {
-					'companyName': dev['companyName'],	
+					'CompanyName': dev['CompanyName'],	
 					'bn': dev['ID'],
 					'field': dev['field'],
 					'consumption': {
@@ -54,7 +54,7 @@ class ConsumptionManager (GenericService):
 				}
 				dev['OnTime'] = time.time()
 				dev['Consumption_kWh'] = 0
-				self.myPublish(f"{dev['companyName']}/consumption", dev_consumption)
+				self.myPublish(f"{dev['CompanyName']}/consumption", dev_consumption)
 
 	def updateStatus (self, actuatorID: int, command: str):
 		"""Update the status of the actuator, if it is turned OFF calculates its consumption\n
@@ -86,12 +86,12 @@ class ConsumptionManager (GenericService):
 		"""
 		topic_list = topic.split('/')
 		ActuatorID = int(topic_list[-2])
-		companyName = topic_list[-4]
+		CompanyName = topic_list[-4]
 		try:
 			command = payload['e'][-1]['v']
 		except:
 			msg = self._message.copy()
-			msg['cn'] = companyName
+			msg['cn'] = CompanyName
 			msg['msg'] = "Error in the payload"
 			msg['msgType'] = "Error"
 			msg['t'] = time.time()
@@ -101,11 +101,11 @@ class ConsumptionManager (GenericService):
 			check_actuator = DM.inList(ActuatorID, self.deviceList)
 			if check_actuator.is_error:
 				msg = self._message.copy()
-				msg['cn'] = companyName
+				msg['cn'] = CompanyName
 				msg['msg'] = check_actuator.message
 				msg['msgType'] = check_actuator.messageType
 				msg['t'] = time.time()
-				self.myPublish(f"{companyName}/{self._publishedTopics[0]}", msg)
+				self.myPublish(f"{CompanyName}/{self._publishedTopics[0]}", msg)
 			else:
 				self.updateStatus(ActuatorID, command)
 

@@ -131,11 +131,11 @@ class SimDevices_Manager():
         return dev_latitude, dev_longitude
 
     def stopDevice(self):
-        companyName = input("Insert Company Name: ")
+        CompanyName = input("Insert Company Name: ")
         field = query_int("Insert field number: ")
 
         for sensor in self.Sensors:
-            if sensor.CompanyName == companyName and sensor.field == field:
+            if sensor.CompanyName == CompanyName and sensor.field == field:
                 sensor.stop()
                 print(sensor)
                 self.Sensors.remove(sensor)

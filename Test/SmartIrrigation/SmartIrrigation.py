@@ -50,7 +50,7 @@ class SmartIrrigation(GenericService):
         companyList = self.getCompaniesList()
 
         for company in companyList:
-            companyName = company["CompanyName"]
+            CompanyName = company["CompanyName"]
 
             for field in company["fieldsList"]:
                 fieldID = field ["fieldNumber"]
@@ -68,14 +68,14 @@ class SmartIrrigation(GenericService):
                 previousSoilMoisture, currentSoilMoisture = self.getMongoDBdata()
                 if previousSoilMoisture == None or currentSoilMoisture == None:
                     print("No previous or current soil moisture measure")
-                    self.sendCommand(companyName, fieldID, actuatorTopicsForField, 0)
+                    self.sendCommand(CompanyName, fieldID, actuatorTopicsForField, 0)
                     continue
                     
                 currentTime = datetime.datetime.now().time()
                 soilMoistureForecast, dailyPrecipitationSum = self.callWeatherService(currentTime.hour)
                 if soilMoistureForecast == None or dailyPrecipitationSum == None:
                     print("No weather forecast available")
-                    self.sendCommand(companyName, fieldID, actuatorTopicsForField, 0)
+                    self.sendCommand(CompanyName, fieldID, actuatorTopicsForField, 0)
                     continue
                 
                 #integration sensor measure with the weather forecast one
@@ -85,17 +85,17 @@ class SmartIrrigation(GenericService):
                 
                 #CONTROL ALGORITHM:
                 #controllo schedulato per la sera dalle 20 alle 24(quindi sappiamo già complessivamente se durante il giorno ha piovuto)
-                print(f"Performing control on: Company={companyName} field={fieldID}")
+                print(f"Performing control on: Company={CompanyName} field={fieldID}")
                 if currentTime < minLimitTemp or currentTime > maxLimitTemp:
                     print("NO IRRIGATION TIME")
                     print("pumps set to OFF")
-                    self.sendCommand(companyName, fieldID, actuatorTopicsForField, 0)
+                    self.sendCommand(CompanyName, fieldID, actuatorTopicsForField, 0)
                 else:
                     #PRECIPITATIONS CONTROL:
                     if dailyPrecipitationSum > precipitationLimit:    #soil too moist
                         print("IRRIGATION DOES NOT MAKE SENSE")
                         print("pumps set to OFF")
-                        self.sendCommand(companyName, fieldID, actuatorTopicsForField, 0)
+                        self.sendCommand(CompanyName, fieldID, actuatorTopicsForField, 0)
                     else:
                         print("IRRIGATION MAKE SENSE")
                         command = 0
@@ -142,16 +142,16 @@ class SmartIrrigation(GenericService):
                                 print("pumps set to ON")
                                 command = 1
 
-                        self.sendCommand(companyName, fieldID, actuatorTopicsForField, command)
+                        self.sendCommand(CompanyName, fieldID, actuatorTopicsForField, command)
                                     
                             
-    def sendCommand(self, companyName : str, fieldID : int, topicList : list, command : int):
+    def sendCommand(self, CompanyName : str, fieldID : int, topicList : list, command : int):
         message=self._message.copy()
 
         print(f"\nActuators topics list= {topicList}\n")
         for singleTopic in topicList:    
             message["bn"] = self._EndpointInfo["serviceName"]
-            message["cn"] = companyName
+            message["cn"] = CompanyName
             message["field"] = fieldID
             message["e"][-1]["v"] = command
             message["e"][-1]["t"]=time.time()

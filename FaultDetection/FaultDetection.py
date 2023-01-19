@@ -100,17 +100,17 @@ class FaultDetector(GenericService):
 		topic_list = topic.split('/')
 		measureType = topic_list[-1]
 		deviceID = int(topic_list[-2])
-		companyName = topic_list[-4]
+		CompanyName = topic_list[-4]
 		try:
 			measure = payload['e'][-1]['v']
 			unit = payload['e'][-1]['u']
 		except:
 			msg = self._message.copy()
 			msg['t'] = time.time()
-			msg['cn'] = companyName
+			msg['cn'] = CompanyName
 			msg['msgType'] = "Error"
 			msg['msg'] = "Measure not found"
-			self.myPublish(f"{companyName}/{self._publishedTopics[0]}", msg)
+			self.myPublish(f"{CompanyName}/{self._publishedTopics[0]}", msg)
 		else:
 			DM.checkUpdate(self, False)
 			sensor_check = DM.inList(deviceID, self.deviceList)
@@ -118,17 +118,17 @@ class FaultDetector(GenericService):
 			if sensor_check.is_error:
 				msg = self._message.copy()
 				msg['t'] = time.time()
-				msg['cn'] = companyName
+				msg['cn'] = CompanyName
 				msg['msgType'] = sensor_check.messageType
 				msg['msg'] = sensor_check.message
-				self.myPublish(f"{companyName}/{self._publishedTopics[0]}", msg)
+				self.myPublish(f"{CompanyName}/{self._publishedTopics[0]}", msg)
 			if measure_check.is_error:
 				msg = self._message.copy()
 				msg['t'] = time.time()
-				msg['cn'] = companyName
+				msg['cn'] = CompanyName
 				msg['msgType'] = measure_check.messageType
 				msg['msg'] = measure_check.message
-				self.myPublish(f"{companyName}/{self._publishedTopics[0]}", msg)
+				self.myPublish(f"{CompanyName}/{self._publishedTopics[0]}", msg)
 			
 			if (measure_check.is_error and sensor_check.is_error) == False:
 				self.updateStatus(deviceID)
@@ -138,13 +138,13 @@ class FaultDetector(GenericService):
 		for dev in self.deviceList:
 			status = self.checkStatus(dev)
 			if status.is_error:
-				companyName = dev['companyName']
+				CompanyName = dev['CompanyName']
 				msg = self._message.copy()
 				msg['t'] = time.time()
-				msg['cn'] = companyName
+				msg['cn'] = CompanyName
 				msg['msgType'] = status.messageType
 				msg['msg'] = status.message
-				self.myPublish(f"{companyName}/{self._publishedTopics[0]}", msg)
+				self.myPublish(f"{CompanyName}/{self._publishedTopics[0]}", msg)
 
 if __name__ == "__main__":
 	try:

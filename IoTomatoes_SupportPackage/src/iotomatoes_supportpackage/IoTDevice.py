@@ -22,15 +22,19 @@ class IoTDevice(GenericResource):
         """
 
         super().__init__(DeviceInfo)
+
+        if self.isActuator:
+            if actuator is None:
+                raise Exception("Actuator not specified")
+            self._Actuator = actuator
+
         if self.isSensor:
             if sensor is None:
                 raise Exception("Sensor not specified")
-
             if "measureTimeInterval" in DeviceInfo:
                 self._measureTimeInterval = DeviceInfo["measureTimeInterval"]
             else:
                 self._measureTimeInterval = 5
-            self._SendThread = MyThread(self.get_measures, self._measureTimeInterval, sensor)
             self._message={
                 "cn" : self.CompanyName,
                 "bn" : self.ID,
@@ -42,11 +46,7 @@ class IoTDevice(GenericResource):
                     "t": None
                 }]
             }
-
-        if self.isActuator:
-            if actuator is None:
-                raise Exception("Actuator not specified")
-            self._Actuator = actuator
+            self._SendThread = MyThread(self.get_measures, self._measureTimeInterval, sensor)
 
     def close(self):
         """This function is used to close the MQTT client and the thread 
@@ -101,7 +101,7 @@ class IoTDevice(GenericResource):
                 message = self.construct_message(measureType, "%")
                 v = sensor.get_humidity()
             elif measureType == "light":
-                message = self.construct_message(measureType, "lux")
+                message = self.construct_message(measureType, "lx")
                 v = sensor.get_light()
             elif measureType == "soilMoisture":
                 message = self.construct_message(measureType, "%")
@@ -111,6 +111,7 @@ class IoTDevice(GenericResource):
                 
             if v is not None:
                 message["e"][-1]["v"] = v
+                print(message)
                 self.myPublish(topic, message)
     
     def construct_message(self, measure : str, unit : str) :

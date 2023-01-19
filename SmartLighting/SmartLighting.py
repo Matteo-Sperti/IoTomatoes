@@ -50,7 +50,7 @@ class SmartLighting(GenericService):
         companyList = self.getCompaniesList()
 
         for company in companyList:
-            companyName = company["CompanyName"]
+            CompanyName = company["CompanyName"]
 
             for field in company["fieldsList"]:
                 fieldID = field ["fieldNumber"]
@@ -66,20 +66,20 @@ class SmartLighting(GenericService):
                 minLight, maxLight = self.getPlantLimit(plant)
                 if minLight == None or maxLight == None:
                     print("No previous or current light measure")
-                    self.sendCommand(companyName, fieldID, actuatorTopicsForField, 0)
+                    self.sendCommand(CompanyName, fieldID, actuatorTopicsForField, 0)
                     continue 
 
                 currentLight = self.getMongoDBdata()
                 if currentLight == None:
                     print("No previous or current soil moisture measure")
-                    self.sendCommand(companyName, fieldID, actuatorTopicsForField, 0)
+                    self.sendCommand(CompanyName, fieldID, actuatorTopicsForField, 0)
                     continue   
 
                 currentTime = datetime.datetime.now().time()
                 cloudCover, lightForecast, Sunrise, Sunset = self.callWeatherService(currentTime.hour)
                 if cloudCover == None or lightForecast == None or Sunrise == None or Sunset == None:
                     print("No weather forecast available")
-                    self.sendCommand(companyName, fieldID, actuatorTopicsForField, 0)
+                    self.sendCommand(CompanyName, fieldID, actuatorTopicsForField, 0)
                     continue
                 
                 #integration sensor measures with the weather forecast one
@@ -88,17 +88,17 @@ class SmartLighting(GenericService):
                 #CONTROL ALGORITHM:
                 #controllo schedulato dall'inizio dell'alba al tramonto (LA NOTTE NO, COSI SI LASCIA UN
                 # CICLO LUCE/BUIO ALLE PIANTE PER LA FOTOSINTESI)                
-                print(f"Performing control on: Company={companyName} field={fieldID}")
+                print(f"Performing control on: Company={CompanyName} field={fieldID}")
                 if currentTime < Sunrise or currentTime > Sunset:
                     print("IT'S NIGHT, NO LIGHTING TIME")
                     print("light set to OFF")
-                    self.sendCommand(companyName, fieldID, actuatorTopicsForField, 0)
+                    self.sendCommand(CompanyName, fieldID, actuatorTopicsForField, 0)
                 else:
                     #CLOUDCOVER CONTROL
                     if cloudCover < 60:  
                         print("LIGHTING DOES NOT MAKE SENSE")
                         print("light set to OFF")
-                        self.sendCommand(companyName, fieldID, actuatorTopicsForField, 0)
+                        self.sendCommand(CompanyName, fieldID, actuatorTopicsForField, 0)
                     else:    
                         command = 0
                         print("LIGHTING MAKE SENSE")
@@ -113,15 +113,15 @@ class SmartLighting(GenericService):
                             print("light set to OFF")
                             command = 1
 
-                        self.sendCommand(companyName, fieldID, actuatorTopicsForField, command)
+                        self.sendCommand(CompanyName, fieldID, actuatorTopicsForField, command)
 
 
-    def sendCommand(self, companyName : str, fieldID : int, topicList : list, command : int):
+    def sendCommand(self, CompanyName : str, fieldID : int, topicList : list, command : int):
         message=self._message.copy()
 
         print(f"\nActuators topics list= {topicList}\n")
         for singleTopic in topicList:    
-            message["cn"] = companyName
+            message["cn"] = CompanyName
             message["field"] = fieldID
             message["e"][-1]["v"] = command
             message["e"][-1]["t"]=time.time()

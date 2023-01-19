@@ -13,7 +13,8 @@ Python Support package for the IoT platform for smart agriculture.
 
 To install the package, run the following command:
 
-    pip install -i https://test.pypi.org/simple/ IoTomatoes_SupportPackage --no-deps
+    python3 -m pip install -i https://test.pypi.org/simple/ IoTomatoes-SupportPackage --no-deps
+
 
 ## Contents
 

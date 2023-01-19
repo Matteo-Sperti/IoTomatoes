@@ -56,10 +56,16 @@ It works as a REST Web Service and provides information about endpoints (URI and
 
 **[Code >>](./ResourceCatalog/)**  
 
+**[Example of ResourceCatalog >>](./Doc/ResourceCatalog.json)**
+
 ## Service Catalog
 It works as a REST Web Service and provides information about endpoints (URI and MQTT topics) of all the REST Web Services (including the Resource Catalog) in the platform. 
 
 **[Code >>](./ServiceCatalog/)**  
+
+**[Example of ServiceCatalog >>](./Doc/ServiceCatalog.json)**
+
+**[Service Catalog Settings >>](./Doc/ServiceCatalogSettings.json)**
 
 ## Database Connector
 prova

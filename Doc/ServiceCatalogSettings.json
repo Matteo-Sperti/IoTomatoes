@@ -1,0 +1,15 @@
+{
+    "owner": "IoTomatoes",
+    "CatalogName": "ServiceCatalog",
+    "broker": {
+        "IP": "mqtt.eclipseprojects.io",
+        "port": 1883,
+        "baseTopic": "IoTomatoes/"
+    },
+    "telegramToken": "<YOUR_TOKEN>",
+    "SystemToken": "IoTomatoes_1234567890",
+    "IPport" : 8080,
+    "IPaddress" : "172.20.10.3",
+    "filename": "ServiceCatalog.json",
+    "autoDeleteTime": 120
+}

@@ -10,7 +10,7 @@ ENV PYTHONUNBUFFERED=1
 COPY ./Devices/SimulatedDevices/requirements.txt .
 RUN python -m pip install -r requirements.txt
 
-RUN python -m pip install -i https://test.pypi.org/simple/ IoTomatoes-SupportPackage --no-deps
+RUN python -m pip install -i https://test.pypi.org/simple/ IoTomatoes-SupportPackage==0.0.7 --no-deps
 
 WORKDIR /app
 

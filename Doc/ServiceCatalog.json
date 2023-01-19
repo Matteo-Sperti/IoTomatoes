@@ -1,0 +1,121 @@
+{
+    "owner": "IoTomatoes",
+    "CatalogName": "ServiceCatalog",
+    "broker": {
+        "IP": "mqtt.eclipseprojects.io",
+        "port": 1883,
+        "baseTopic": "IoTomatoes/"
+    },
+    "telegramToken": "<YOUR_TOKEN>",
+    "platformIP": "172.20.10.3",
+    "lastUpdate": 1674135700.8773584,
+    "servicesList": [
+        {
+            "ID": 1,
+            "serviceName": "IoTomatoes_bot",
+            "availableServices": [
+                "MQTT"
+            ],
+            "servicesDetails": [
+                {
+                    "serviceType": "MQTT",
+                    "subscribedTopics": [
+                        "+/Users/#"
+                    ],
+                    "publishedTopics": []
+                }
+            ],
+            "lastUpdate": 1674135641.161394
+        },
+        {
+            "ID": 2,
+            "serviceName": "Smart Lighting",
+            "availableServices": [
+                "MQTT"
+            ],
+            "servicesDetails": [
+                {
+                    "serviceType": "MQTT",
+                    "subscribedTopics": [],
+                    "publishedTopics": [
+                        -1
+                    ]
+                }
+            ],
+            "lastUpdate": 1674135641.3162718
+        },
+        {
+            "ID": 3,
+            "serviceName": "Fault Detection",
+            "availableServices": [
+                "MQTT"
+            ],
+            "servicesDetails": [
+                {
+                    "serviceType": "MQTT",
+                    "subscribedTopics": [
+                        "+/+/+/temperature",
+                        "+/+/+/humidity",
+                        "+/+/+/light",
+                        "+/+/+/soilMoisture"
+                    ],
+                    "publishedTopics": [
+                        "Users"
+                    ]
+                }
+            ],
+            "lastUpdate": 1674135641.4373012
+        },
+        {
+            "ID": 4,
+            "serviceName": "ResourceCatalog",
+            "availableServices": [
+                "REST"
+            ],
+            "servicesDetails": [
+                {
+                    "serviceType": "REST",
+                    "serviceIP": "http://172.16.0.3:8081"
+                }
+            ],
+            "lastUpdate": 1674135641.441043
+        },
+        {
+            "ID": 5,
+            "serviceName": "Consumption Management",
+            "availableServices": [
+                "MQTT"
+            ],
+            "servicesDetails": [
+                {
+                    "serviceType": "MQTT",
+                    "subscribedTopics": [
+                        "+/+/+/led",
+                        "+/+/+/pump"
+                    ],
+                    "publishedTopics": [
+                        "Users"
+                    ]
+                }
+            ],
+            "lastUpdate": 1674135641.6212833
+        },
+        {
+            "ID": 6,
+            "serviceName": "Smart Irrigation",
+            "availableServices": [
+                "MQTT"
+            ],
+            "servicesDetails": [
+                {
+                    "serviceType": "MQTT",
+                    "subscribedTopics": [],
+                    "publishedTopics": [
+                        -1
+                    ]
+                }
+            ],
+            "lastUpdate": 1674135641.5887187
+        }
+    ]
+}

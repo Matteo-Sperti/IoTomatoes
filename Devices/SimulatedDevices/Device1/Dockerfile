@@ -8,9 +8,9 @@ ENV PYTHONUNBUFFERED=1
 
 # Install pip requirements
 COPY ./Devices/SimulatedDevices/requirements.txt .
-RUN python -m pip install -r requirements.txt
+RUN python3 -m pip install -r requirements.txt
 
-RUN python -m pip install -i https://test.pypi.org/simple/ IoTomatoes-SupportPackage --no-deps
+RUN python3 -m pip install -i https://test.pypi.org/simple/ IoTomatoes-SupportPackage==0.0.7 --no-deps
 
 WORKDIR /app
 
@@ -21,4 +21,4 @@ USER appuser
 COPY ./Devices/SimulatedDevices/Device1/ /app/
 COPY ./Devices/SimulatedDevices/FakeDevice.py /app/
 
-CMD ["python","/app/FakeDevice.py"]
+CMD ["python3","/app/FakeDevice.py"]

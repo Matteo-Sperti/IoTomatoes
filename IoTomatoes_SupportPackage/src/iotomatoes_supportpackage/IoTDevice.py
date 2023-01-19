@@ -95,31 +95,30 @@ class IoTDevice(GenericResource):
             measureType = topic.split("/")[-1]
             
             if measureType == "temperature":
-                message = self.construct_message(measureType, "C")
+                msg = self.construct_message(measureType, "C")
                 v = sensor.get_temperature()
             elif measureType == "humidity":
-                message = self.construct_message(measureType, "%")
+                msg = self.construct_message(measureType, "%")
                 v = sensor.get_humidity()
             elif measureType == "light":
-                message = self.construct_message(measureType, "lx")
+                msg = self.construct_message(measureType, "lx")
                 v = sensor.get_light()
             elif measureType == "soilMoisture":
-                message = self.construct_message(measureType, "%")
+                msg = self.construct_message(measureType, "%")
                 v = sensor.get_soilMoisture()
             else:
                 continue
                 
             if v is not None:
-                message["e"][-1]["v"] = v
-                print(message)
-                self.myPublish(topic, message)
+                msg["e"][-1]["v"] = v
+                self.myPublish(topic, msg)
     
     def construct_message(self, measure : str, unit : str) :
         """This function is used to construct the message to be published on the topics."""
 
-        message=self._message.copy()
-        message["e"][-1]["n"] = measure
-        message["e"][-1]["v"] = 0
-        message["e"][-1]["t"] = time.time()
-        message["e"][-1]["u"] = unit
-        return message
+        msg = self._message.copy()
+        msg["e"][-1]["n"] = measure
+        msg["e"][-1]["v"] = 0
+        msg["e"][-1]["t"] = time.time()
+        msg["e"][-1]["u"] = unit
+        return msg

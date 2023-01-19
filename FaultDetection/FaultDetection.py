@@ -87,7 +87,8 @@ class FaultDetector(GenericService):
 			return DM.CheckResult(is_error=True, messageType="Error", message="Thresholds not configured")
 
 		if measure > max_value or measure < min_value:
-			message = f"Device {deviceID} has sent a measure out of the thresholds, possible fault! {measure}"
+			message = (f"Device {deviceID} has sent a measure out of the thresholds, possible fault!\n"
+						f"Value = {measure} {unit}")
 			return DM.CheckResult(is_error=True, messageType="Warning", message=message, 
 								device_id=deviceID)
 		return DM.CheckResult(is_error=False)

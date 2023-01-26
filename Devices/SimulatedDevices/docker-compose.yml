@@ -1,0 +1,42 @@
+version: '3.4'
+
+services:
+  device1:
+    image: device1
+    build:
+      context: .
+      dockerfile: ./Device1/Dockerfile
+    ports:
+      - "9082:9082"
+
+  device2:
+    image: device2
+    build:
+      context: .
+      dockerfile: ./Device2/Dockerfile
+    ports:
+      - "9083:9083"
+
+  device3:
+    image: device3
+    build:
+      context: .
+      dockerfile: ./Device3/Dockerfile
+    ports:
+      - "9084:9084"
+
+  device4:
+    image: device4
+    build:
+      context: .
+      dockerfile: ./Device4/Dockerfile
+    ports:
+      - "9085:9085"
+
+  device5:
+    image: device5
+    build:
+      context: .
+      dockerfile: ./Device5/Dockerfile
+    ports:
+      - "9086:9086"

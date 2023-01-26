@@ -1,13 +1,11 @@
 import telepot
 from telepot.loop import MessageLoop
-from telepot.namedtuple import InlineKeyboardMarkup, InlineKeyboardButton
 from telepot.delegate import (
     per_chat_id_in, create_open, pave_event_space, call,
     include_callback_query_chat_id)
 import json
 import time
 import requests
-from socket import gethostname, gethostbyname
 
 from Commands import *
 from iotomatoes_supportpackage.GenericEndpoint import GenericService

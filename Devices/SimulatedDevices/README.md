@@ -26,6 +26,10 @@ Moreover you must add in the configuration file any additional information about
 Optionally you can specify also:
 - **Location** of the sensor (latitude and longitude)
 
+## Multiple Devices
+
+It is possibile to run multiple devices (each one in a different container) using the [docker-compose.yml](docker-compose.yml) file. It runs all the five devices in the [Simulated Devices](./) folder. For each of them it is possible to customize the configuration file and the Dockerfile. All the devices uses the host network.
+
 ## Devices Simulator
 
 The device simulator is a python script that simulates a set of devices. 

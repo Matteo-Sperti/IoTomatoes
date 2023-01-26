@@ -7,7 +7,7 @@ ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
 
 # Install pip requirements
-COPY ./Devices/SimulatedDevices/requirements.txt .
+COPY ./requirements.txt .
 RUN python -m pip install -r requirements.txt
 
 RUN python -m pip install -i https://test.pypi.org/simple/ IoTomatoes-SupportPackage==0.0.7 --no-deps
@@ -18,7 +18,7 @@ WORKDIR /app
 RUN adduser -u 8080 --disabled-password --gecos "" appuser && chown -R appuser /app
 USER appuser
 
-COPY ./Devices/SimulatedDevices/Device3/ /app/
-COPY ./Devices/SimulatedDevices/FakeDevice.py /app/
+COPY ./Device3/ /app/
+COPY ./FakeDevice.py /app/
 
 CMD ["python","/app/FakeDevice.py"]

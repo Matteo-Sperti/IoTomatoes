@@ -4,7 +4,7 @@ import json
 import paho.mqtt.client as PahoMQTT
 
 from iotomatoes_supportpackage.ItemInfo import (
-        getIPaddress, isMQTT, subscribedTopics, publishedTopics, construct)
+    construct, isMQTT, subscribedTopics, publishedTopics, getIPaddress)
 from iotomatoes_supportpackage.MyExceptions import InfoException
 from iotomatoes_supportpackage.MyThread import MyThread
 
@@ -88,10 +88,8 @@ class GenericEndpoint():
         self.start_MQTT()
         
     def start_MQTT(self):
-        self._MQTTclient = isMQTT(self._EndpointInfo)
+        self._MQTTclient = self.isMQTT
         if self._MQTTclient:
-            self._subscribedTopics = subscribedTopics(self._EndpointInfo)
-            self._publishedTopics = publishedTopics(self._EndpointInfo)
             self.start_MQTTclient()
 
     def stop(self):
@@ -166,7 +164,7 @@ class GenericEndpoint():
         self._paho_mqtt.loop_start()
         time.sleep(1)
         # subscribe the topics
-        for topic in self._subscribedTopics:
+        for topic in self.subscribedTopics:
             self.mySubscribe(self._baseTopic + topic)
 
     def myOnConnect(self,client,userdata,flags,rc):
@@ -207,8 +205,24 @@ class GenericEndpoint():
 
         if (self._isSubscriber):
             # remember to unsuscribe if it is working also as subscriber
-            for topic in self._subscribedTopics:
+            for topic in self.subscribedTopics:
                 self._paho_mqtt.unsubscribe(self._baseTopic + topic)
+
+    @property
+    def isMQTT(self) -> bool:
+        return isMQTT(self._EndpointInfo)
+
+    @property
+    def subscribedTopics(self) -> list:
+        return subscribedTopics(self._EndpointInfo)
+
+    @property
+    def publishedTopics(self) -> list:
+        return publishedTopics(self._EndpointInfo)
+
+    @property
+    def getIPaddress(self) -> str:
+        return getIPaddress(self._EndpointInfo)
 
 class GenericService(GenericEndpoint) :
     def __init__(self, settings: dict):
@@ -288,7 +302,6 @@ class GenericService(GenericEndpoint) :
                 serviceInfo = servicesList[0]
                 print(serviceInfo)
                 return getIPaddress(serviceInfo)
-
 
 class GenericResource(GenericEndpoint) :
     def __init__(self, settings: dict):
@@ -374,6 +387,27 @@ class GenericResource(GenericEndpoint) :
             return False
         else:
             return self._EndpointInfo["isSensor"]
+
+    @property
+    def measureType(self) -> list:
+        if "measureType" not in self._EndpointInfo:
+            raise InfoException("measureType is missing")
+        else:
+            return self._EndpointInfo["measureType"]
+
+    @property
+    def actuatorType(self) -> list:
+        if "actuatorType" not in self._EndpointInfo:
+            raise InfoException("actuatorType is missing")
+        else:
+            return self._EndpointInfo["actuatorType"]
+
+    @property
+    def PowerConsumption_kW(self) -> int:
+        if "PowerConsumption_kW" not in self._EndpointInfo:
+            raise InfoException("PowerConsumption_kW is missing")
+        else:
+            return self._EndpointInfo["PowerConsumption_kW"]
 
     def __str__(self):
         """Return a string with the information of the resource."""

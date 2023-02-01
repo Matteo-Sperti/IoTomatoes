@@ -1,0 +1,1 @@
+{"ServiceCatalog_url": "http://127.0.0.1:8080", "serviceName": "Tractor", "IPport": 8088, "lastKnownLocation": {"latitude": -0.01506697493687771, "longitude": 5.195714840746703}, "availableServices": ["MQTT"], "servicesDetails": [{"serviceType": "MQTT", "subscribedTopics": [], "publishedTopics": []}]}

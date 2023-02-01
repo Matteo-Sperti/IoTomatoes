@@ -33,7 +33,7 @@ It works as a REST Web Service and provides information about endpoints (URI and
 ## Database Connector
 prova
 
-**[Code >>](./Connector/)**  
+**[Code >>](./MongoDBConnector/)**  
 
 ## Telegram Bot
 It is a service that allows the integration of the IoT infrastructure into Telegram platform. It will exploit REST Web Services to retrieve IoT devices data from the Database Connector. Moreover, it will exploit the MQTT protocol to receive messages and alarms from the different microservices and it provides the possibility to manage your company.

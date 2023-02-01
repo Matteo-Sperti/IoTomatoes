@@ -76,3 +76,39 @@ services:
     networks:
       mynet:
         ipv4_address: "172.16.0.8"
+
+  weather_forecast:
+    image: weather_forecast
+    build:
+      context: .
+      dockerfile: ./WeatherForecast/Dockerfile
+    networks:
+      mynet:
+        ipv4_address: "172.16.0.9"
+  
+  localization:
+    image: localization
+    build:
+      context: .
+      dockerfile: ./Localization/Dockerfile
+    networks:
+      mynet:
+        ipv4_address: "172.16.0.10"
+
+  mongodb_connector:
+    image: mongodb_connector
+    build:
+      context: .
+      dockerfile: ./MongoDBConnector/Dockerfile
+    networks:
+      mynet:
+        ipv4_address: "172.16.0.11"
+
+  data_visualization:
+    image: data_visualization
+    build:
+      context: .
+      dockerfile: ./DataVisualizer/Dockerfile
+    networks:
+      mynet:
+        ipv4_address: "172.16.0.12"

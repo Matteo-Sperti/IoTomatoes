@@ -106,6 +106,9 @@ class IoTDevice(GenericResource):
             elif measureType == "soilMoisture":
                 msg = self.construct_message(measureType, "%")
                 v = sensor.get_soilMoisture()
+            elif measureType == "position":
+                msg = self.construct_message(measureType, "°")
+                v = sensor.get_position()
             else:
                 continue
                 

@@ -1,0 +1,23 @@
+{
+    "ServiceCatalog_url" : "http://172.16.0.2:8080",
+    "SystemToken": "IoTomatoes_1234567890",
+    "create_url": "http://api.openstreetmap.org/api/0.6/gpx/create",
+    "view_url": "http://api.openstreetmap.org/api/0.6/trace",
+    "serviceName": "TraceGenerator",
+    "password": "SW9Ub21hdG9lczpJb1RvbWF0b2Vz",
+    "IPport": 8089,
+    "availableServices": [
+        "MQTT"
+    ],
+    "servicesDetails": [
+        {
+            "serviceType": "MQTT",
+            "subscribedTopics": [
+
+            ],
+            "publishedTopics": [
+                
+            ]
+        }
+    ]
+}

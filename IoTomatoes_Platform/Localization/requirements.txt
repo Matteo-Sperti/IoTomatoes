@@ -1,0 +1,4 @@
+folium==0.14.0
+gpxpy==1.5.0
+requests==2.25.1
+paho_mqtt==1.6.1

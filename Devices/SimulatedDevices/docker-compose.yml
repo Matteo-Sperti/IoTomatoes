@@ -40,3 +40,19 @@ services:
       dockerfile: ./Device5/Dockerfile
     ports:
       - "9086:9086"
+
+  truck1:
+    image: truck1
+    build:
+      context: .
+      dockerfile: ./Truck1/Dockerfile
+    ports:
+      - "9087:9087"
+
+  truck2:
+    image: truck2
+    build:
+      context: .
+      dockerfile: ./Truck2/Dockerfile
+    ports:
+      - "9088:9088"

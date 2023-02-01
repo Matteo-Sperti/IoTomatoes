@@ -1,0 +1,33 @@
+{
+    "ServiceCatalog_url": "http://127.0.0.1:8080",
+    "serviceName": "CloudConnection",
+    "SystemToken": "IoTomatoes_1234567890",
+    "IPaddress":"127.0.0.1",
+    "IPport": 8087,
+    "PointsPerGraph": 7,
+    "isService": true,
+    "isResource": false,
+    "availableServices": [
+        "MQTT",
+        "REST"
+    ],
+    "servicesDetails": [
+        {
+            "serviceType": "MQTT",
+            "subscribedTopics": [
+                "+/+/+/temperature",
+                "+/+/+/humidity",
+                "+/+/+/light",
+                "+/+/+/soilMoisture",
+                "+/+/+/led",
+                "+/+/+/pump"
+            ],
+            "publishedTopics": []
+        },
+        {
+            "serviceType": "REST",
+            "IPaddress":"127.0.0.1",
+            "IPport": 8087
+        }
+    ]
+}

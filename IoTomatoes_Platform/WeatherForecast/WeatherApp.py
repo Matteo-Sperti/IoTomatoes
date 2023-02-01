@@ -1,7 +1,9 @@
 import requests
 import json
+import time
 from socket import gethostname, gethostbyname
 import cherrypy
+
 from iotomatoes_supportpackage.GenericEndpoint import GenericService
 
 
@@ -82,7 +84,8 @@ class WheaterService(GenericService):
 
 
 if __name__ == '__main__':
-	settings=json.load(open("settings.json","r"))
+	settings=json.load(open("WeatherForecastSettings.json","r"))
+
 	ip_address = gethostbyname(gethostname())
 	port = settings["IPport"]
 	settings["IPaddress"] = ip_address
@@ -101,4 +104,11 @@ if __name__ == '__main__':
 	cherrypy.config.update({'server.socket_host': ip_address})
 	cherrypy.config.update({'server.socket_port': port})
 	cherrypy.engine.start()
-	cherrypy.engine.block() 
+
+	try:
+		while True:
+			time.sleep(3)
+	except KeyboardInterrupt or SystemExit:
+		webService.stop()
+		cherrypy.engine.exit()
+		print("Server stopped")

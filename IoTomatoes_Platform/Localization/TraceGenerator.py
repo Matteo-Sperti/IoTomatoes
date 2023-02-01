@@ -47,7 +47,7 @@ class TraceGenerator(GenericService):
         map.save("map.html")
        
 if __name__ == "__main__":
-    settings = json.load(open('settingsTraceGenerator.json',"r"))
+    settings = json.load(open('TraceGeneratorSettings.json',"r"))
 
     tg = TraceGenerator()
     tg.GenerateGPX()

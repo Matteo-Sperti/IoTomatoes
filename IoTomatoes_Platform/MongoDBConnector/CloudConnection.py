@@ -3,24 +3,25 @@ from pymongo import errors
 import json
 import time
 import cherrypy
-from GenericEndpoint import GenericEndpoint
 import requests
-from MyExceptions import *
 from matplotlib import pyplot as plt
 import datetime
+from socket import gethostname, gethostbyname
 
+from iotomatoes_supportpackage.GenericEndpoint import GenericService
+from iotomatoes_supportpackage.MyExceptions import web_exception
 
 class MongoConnection():
-	def __init__(self,settings):
-		self.settings=settings
+	def __init__(self, ResourceCatalog_url : str, MongoDB_url : str, PointsPerGraph : int):
+		self.ResourceCatalog_url = ResourceCatalog_url
+		self.MongoDB_url = MongoDB_url
+		self.PointsPerGraph = PointsPerGraph
 		try:
-			self.client = MongoClient("mongodb+srv://admin:admin@cluster0.lzvxrr9.mongodb.net/test")
-		except errors.AutoReconnect():
+			self.client = MongoClient(self.MongoDB_url)
+		except errors.AutoReconnect:
 			print("Error connecting to the database")
-		except errors.ServerSelectionTimeoutError():
-			print("Error connecting to the database")
-		
-		self.checkNewCompany()
+		else:
+			self.checkNewCompany()
 	
 	def insertDataBase(self, CompanyName):
 		'''create a new database (company)
@@ -47,9 +48,7 @@ class MongoConnection():
 		data["_id"]=data.pop("bn")
 		collection.insert_one(data)
 
-
-	
-	def insertDeviceData(self,CompanyName,CollectionName,ID,measure,data):
+	def insertDeviceData(self, CompanyName, CollectionName, ID, measure, data):
 		'''insert data in a collection\n
 			Parameters:
 			`CompanyName`-- unique name of the company
@@ -57,29 +56,31 @@ class MongoConnection():
 			`ID`-- ID of the device
 			`measure`-- measure to be inserted in the collection
 			`data`-- data to be inserted in the collection'''
-		data["_id"]=data.pop("bn")
+		data["_id"] = data.pop("bn")
 		counter=0
 	
 		try:
-			dict=self.client[CompanyName][CollectionName].find_one({"_id":ID})
-			if "e" not in dict:
+			dict_ = self.client[CompanyName][CollectionName].find_one({"_id":ID})
+			if dict_ == None or "e" not in dict_:
 				raise KeyError
-			for i in dict["e"]:
-				if measure not in dict["e"][i]["name"]:
+			
+			found = 0
+			for i in dict_["e"]:
+				if measure not in dict_["e"][i]["name"]:
 					counter+=1
 				else :
-					found =i
+					found = i
 			
-			if counter == len(dict["e"]):
+			if counter == len(dict_["e"]):
 				raise Exception("measure not found")    
-			if isinstance(dict["e"][found]["value"],list) == False:
-				dict["e"][found]["value"]=[dict["e"][found]["value"]]
-			if isinstance(dict["e"][found]["value"],list) == False:
-				dict["e"][found]["timestamp"]=[dict["e"][found]["timestamp"]]
-			if isinstance(dict["e"],list) == False:
-				dict["e"]=[dict["e"]]
-			dict["e"][found]["value"].extend([data["e"][0]["value"]])
-			dict[ID]["e"][found]["timestamp"].extend([data["e"][0]["timestamp"]])
+			if isinstance(dict_["e"][found]["value"],list) == False:
+				dict_["e"][found]["value"]=[dict_["e"][found]["value"]]
+			if isinstance(dict_["e"][found]["value"],list) == False:
+				dict_["e"][found]["timestamp"]=[dict_["e"][found]["timestamp"]]
+			if isinstance(dict_["e"],list) == False:
+				dict_["e"]=[dict_["e"]]
+			dict_["e"][found]["value"].extend([data["e"][0]["value"]])
+			dict_[ID]["e"][found]["timestamp"].extend([data["e"][0]["timestamp"]])
 
 		except errors.InvalidOperation:
 			#means that the device is not in the database, so it is added
@@ -87,12 +88,12 @@ class MongoConnection():
 		except KeyError:
 			#means that the consumption key of the device was created before the other keys, so it
 			#is copied on the data dictionary and the object of the collection is updated
-			data["consumption"]=dict["consumption"]
+			data["consumption"]=dict_["consumption"]
 			self.client[CompanyName][CollectionName].update_one({"_id":ID}, {"$set": data})
 		except Exception as e:
 			#the device is in the database but the measure is not,so it is added
 			if str(e) == "measure not found":
-				dict["e"].append(data["e"][0])
+				dict_["e"].append(data["e"][0])
 				
 	def notify(self,topic, payload):
 			'''get data on notification
@@ -116,7 +117,7 @@ class MongoConnection():
 	def checkNewCompany(self):
 			'''check if a new company is added by making a GET request to the Resource Catalog'''
 			while True:
-				response = requests.get(self.get_ResourceCatalog_url() + "/CompaniesName", self._SystemToken)
+				response = requests.get(self._() + "/CompaniesName", self._SystemToken)
 				list = json.loads(response)
 				for i in list:
 					if i not in self.client.list_database_names():
@@ -169,12 +170,20 @@ class MongoConnection():
 				if len(lst)==0:
 					return False
 				else:
-					result={"Company":CompanyName,"Field":CollectionName,"Measure":measure,"Average":sum(lst)/len(lst),"Unit":dict[indexes_to_get_unit[0]]["e"][indexes_to_get_unit[1]]["unit"],"Time Period":[start,end]}
+					result={
+							"Company": CompanyName,
+	     					"Field": CollectionName,
+							"Measure": measure,
+							"Average": sum(lst)/len(lst),
+							"Unit": dict[indexes_to_get_unit[0]]["e"][indexes_to_get_unit[1]]["unit"],
+							"Time Period" : [start,end]
+						}
 				return json.dumps(result)
 			else:
 				return False
 		else:
 			print("Database does not exist")
+
 	def getAvgAll(self,CompanyName,measure,start,end):
 		'''get the average of a measure for all the fields of a company\n
 			Parameters:\n
@@ -197,6 +206,7 @@ class MongoConnection():
 			return json.dumps(resultDict)
 		else:
 			return False
+		
 	def insertConsumptionData(self,CompanyName,data):
 		'''insert data coming from the consumption service\n
 		Parameters:\n
@@ -265,8 +275,8 @@ class MongoConnection():
 							indexes_to_get_unit=[i,j]
 				unit = dict[indexes_to_get_unit[0]]["e"][indexes_to_get_unit[1]]["unit"]
 				#get 7 timestamps points
-				if len(timestamps)/self.settings["PointsPerGraph"] > 1:
-					step = int(len(timestamps)/self.settings["PointsPerGraph"])
+				if len(timestamps)/self.PointsPerGraph > 1:
+					step = int(len(timestamps)/self.PointsPerGraph)
 					timestamps = timestamps[::step]
 				for i in range(len(timestamps)):
 					lst.append(json.loads(self.GetAvg(CompanyName,CollectionName,measure,0,timestamps[i]))["Average"])
@@ -315,23 +325,20 @@ def getGraphActuator(self,CompanyName,CollectionName,Actuator,start,end):
 							plt.title("Graph of "+Actuator+" for "+CollectionName+" of "+CompanyName)
 							plt.savefig("graph"+dict[i]["_id"]+".png")
 
-
-				
-		
-class RESTApi(GenericEndpoint):
+class RESTConnector(GenericService):
 	exposed = True
 	def __init__(self,settings:dict):
 		
-		
-		super().__init__(settings,True,False)
-		self.mongo = MongoConnection(self.settings)
+		super().__init__(settings)
+		self.mongo = MongoConnection(self.ResourceCatalog_url, settings["MongoDB_Url"], settings["PointsPerGraph"])
 		
 	def GET(self, *uri, **params):
-		'''GET method for the REST API\n
+		"""GET method for the REST API\n
 		Returns a JSON with the requested information\n
 		Allowed URI:\n
-		`/Avg` -- returns the average of the measures requested.\n The parameters are "CompanyName", "Field" and "measure", "starting date", "end date"\n
-		if `params["Field"]` == "all" returns the average of all field of corresponding company\n'''
+		`/Avg`: returns the average of the measures requested.\n 
+		The parameters are "CompanyName", "Field" and "measure", "starting date", "end date"\n
+		if `params["Field"]` == "all" returns the average of all field of corresponding company\n"""
 		try:
 			if len(uri) > 0:
 				if len(uri) == 1 and uri[0] == "avg" and params["Field"] != "all":
@@ -346,13 +353,14 @@ class RESTApi(GenericEndpoint):
 			raise cherrypy.HTTPError(500, "Internal Server Error")
 
 		
-	
-	
-	
 if __name__ == "__main__":
-	settings = json.load(open("settings.json"))
-	
-	WebService = RESTApi(settings)
+	settings = json.load(open("ConnectorSettings.json"))
+
+	ip_address = gethostbyname(gethostname())
+	port = settings["IPport"]
+	settings["IPaddress"] = ip_address
+
+	WebService = RESTConnector(settings)
 	conf = {
 		'/': {
 			'request.dispatch': cherrypy.dispatch.MethodDispatcher(),
@@ -360,4 +368,14 @@ if __name__ == "__main__":
 		}
 	}
 	cherrypy.tree.mount(WebService, '/', conf)
+	cherrypy.config.update({'server.socket_host': ip_address})
+	cherrypy.config.update({'server.socket_port': port})
 	cherrypy.engine.start()
+
+	try:
+		while True:
+			time.sleep(3)
+	except KeyboardInterrupt or SystemExit:
+		WebService.stop()
+		cherrypy.engine.exit()
+		print("Server stopped")

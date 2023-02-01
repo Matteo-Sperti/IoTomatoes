@@ -44,6 +44,9 @@ class Tractor():
         json.dump(dict,open('TruckSettings.json',"w"))
         
         json.dump(self.trace,open('trace.json',"w"))
+
+    def get_position(self):
+        return self.lat,self.lon
         
 
 

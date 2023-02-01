@@ -722,6 +722,5 @@ if __name__ == "__main__":
                 time.sleep(3)
         except KeyboardInterrupt or SystemExit:
             Catalog.close()
-            print("Catalog closed, press Ctrl+C to stop the server")
-            cherrypy.engine.block()
+            cherrypy.engine.exit()
             print("Server stopped")

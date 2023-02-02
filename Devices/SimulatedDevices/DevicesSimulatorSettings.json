@@ -1,6 +1,5 @@
 {
-    "ServiceCatalog_url" : "http://172.20.10.3:8080",
-    "SystemToken": "IoTomatoes_1234567890",
+    "IoTomatoes_url" : "http://172.20.10.3:8080",
     "MeasuresType" : ["temperature", "humidity", "light", "soilMoisture"],
     "ActuatorsType" : ["led", "pump"],
     "measureTimeInterval" : 5

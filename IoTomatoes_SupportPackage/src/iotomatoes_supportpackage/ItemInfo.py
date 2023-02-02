@@ -47,42 +47,6 @@ def getIPaddress(dict_ : dict) -> str:
     return ""
 
 ### Construct item dictionary according to the specification of the catalog ###
-
-def construct(EInfo : dict, isService : bool = False, isResource : bool = False):
-    """Construct the dictionary of a resource or a service according to the specification of the catalog.
-    
-    Arguments:\n
-    `EInfo (dict)`: The dictionary containing the information of the resource or service.\n
-    `isService (bool)`: True if the dictionary is a service, False otherwise.\n
-    `isResource (bool)`: True if the dictionary is a resource, False otherwise. 
-    `isService` and `isResource` are mutually exclusive.\n
-    
-    Returns:\n
-    `info (dict)`: The dictionary of the resource or service.\n
-    `CompanyInfo (dict)`: The dictionary containing the information of the company 
-    of the resource, empty if the endoint is a service.
-    """
-    if not isResource ^ isService:
-        raise InfoException("isResource and isService are not compatible")
-    if isService:
-        info = _makeService(EInfo)
-        CompanyInfo = {}
-    else:
-        if "CompanyName" in EInfo and "CompanyToken" in EInfo:
-            CompanyInfo = {
-                "CompanyName" : EInfo["CompanyName"],
-                "CompanyToken" : EInfo["CompanyToken"]
-            }
-        elif "CompanyInfo" in EInfo and "CompanyName" in EInfo["CompanyInfo"] and "CompanyToken" in EInfo["CompanyInfo"]:
-            CompanyInfo = {
-                "CompanyName" : EInfo["CompanyInfo"]["CompanyName"],
-                "CompanyToken" : EInfo["CompanyInfo"]["CompanyToken"]
-            }
-        else:
-            raise InfoException("Company information is missing")
-        info = _makeResource(EInfo, CompanyInfo)
-    return info, CompanyInfo
-
 def constructService(ID : int, EInfo : dict):
     """ Construct the dictionary of a service according to the specification of the catalog.
 

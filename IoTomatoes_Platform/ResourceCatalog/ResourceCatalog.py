@@ -18,7 +18,7 @@ usersList_name = "usersList"
 fieldsList_name = "fieldsList"
 
 class ResourceCatalogManager():
-    def __init__(self, heading : dict, SystemToken : str, filename = "CompanyCatalog.json", autoDeleteTime = 120, 
+    def __init__(self, heading : dict, filename = "CompanyCatalog.json", autoDeleteTime = 120, 
                     IDs = IDs(100)):
         """Initialize the catalog manager.
     
@@ -33,7 +33,6 @@ class ResourceCatalogManager():
         self.catalog["lastUpdate"] = time.time()
         self.catalog[companyList_name] = []
         
-        self._SystemToken = SystemToken
         self._filename = filename
         self._IDs = IDs
         self._autoDeleteTime = autoDeleteTime
@@ -85,25 +84,6 @@ class ResourceCatalogManager():
                 raise web_exception(401, "Wrong credentials")
         else:
             return False
-
-    def systemAuthorize(self, credentials : dict):
-        """Check if the credentials are correct for the system.
-        
-        Arguments:\n
-        `credentials` -- the credentials to access the system.\n
-        
-        Return:\n
-        `True` if the credentials are correct.
-        Raise an exception is the `SystemToken` is not correct or is not present.
-        """
-
-        if "SystemToken" not in credentials:
-            raise web_exception(400, "Missing credentials")
-
-        if self._SystemToken == credentials["SystemToken"]:
-            return True
-        else:
-            raise web_exception(401, "Wrong credentials")
 
     def accessInfo(self, params : dict):
         """Return the access info of a device.
@@ -162,25 +142,23 @@ class ResourceCatalogManager():
                         return item
         return None
     
-    def getAll(self, credential : dict):
+    def getAll(self):
         """Return a json with the list of all the companies in the catalog.
 
         Arguments:\n
         `credential` -- dictionary with `SystemToken`, the token of the system to authorize the request.
         """
 
-        if self.systemAuthorize(credential):
-            return json.dumps(self.catalog[companyList_name], indent=4)
+        return json.dumps(self.catalog[companyList_name], indent=4)
 
-    def getCompanyNameList(self, credential : dict):
+    def getCompanyNameList(self):
         """Return a json with the list of names of all the companies in the catalog.
 
         Arguments:\n
         `credential` -- dictionary with `SystemToken`, the token of the system to authorize the request.
         """
 
-        if self.systemAuthorize(credential):
-            return json.dumps([company["CompanyName"] for company in self.catalog[companyList_name]], indent=4)
+        return json.dumps([company["CompanyName"] for company in self.catalog[companyList_name]], indent=4)
 
     def getItem(self, CompanyInfo : dict, ID : int):
         """Return the information of item `ID` in json format.
@@ -404,29 +382,6 @@ class ResourceCatalogManager():
         else:
             raise web_exception(500, "No Company found")
 
-    def update(self, CompanyInfo : dict, ID : int, new_item : dict):
-        """Update a device in the catalog.
-        Return a json with the status of the operation.
-        
-        Arguments:
-        `ID` -- ID of the item to update and
-        `new_item` -- the item in json format to update
-        """
-
-        item = self.find_item(CompanyInfo, ID)
-        if item != None:
-            actualtime = time.time()
-            self.catalog["lastUpdate"] = actualtime
-            for key in item:
-                if key in new_item:
-                    item[key] = new_item[key]
-            item["ID"] = ID
-            item["lastUpdate"] = actualtime
-            out = {"Status": True}
-        else:
-            out = {"Status": False}
-        return json.dumps(out, indent=4)
-
     def updateField(self, params : dict) : 
         """Update a field in the catalog.
 
@@ -497,30 +452,6 @@ class ResourceCatalogManager():
                     raise web_exception(403, "You are not the admin of this company")
         
         raise web_exception(403, "You are not a user of this company")
-
-
-
-    def deleteItem(self, CompanyInfo : dict, IDvalue : int):
-        """Delete a item from the catalog.
-        Return a json with the status of the operation.
-        
-        Arguments:
-        `IDvalue` -- the ID of the item to delete
-        """
-
-        current_list = self.find_list(CompanyInfo, IDvalue)
-        if current_list != None:
-            actualtime = time.time()
-            self.catalog["lastUpdate"] = actualtime
-            for item in current_list:
-                if item["ID"] == IDvalue:
-                    current_list.remove(item)
-                    self._IDs.free_ID(IDvalue)
-                    break
-            out = {"Status": True}
-        else:
-            out = {"Status": False}
-        return json.dumps(out, indent=4)
 
     def refreshItem(self, CompanyInfo : dict, IDvalue : int):
         """Refresh the lastUpdate field of a device.
@@ -636,22 +567,20 @@ class RESTResourceCatalog(GenericService):
         Return a json with the status of the operation.
         
         Allowed commands:
-        `/insertCompany`: insert a new company in the catalog. 
+        `/company`: insert a new company in the catalog. 
         The body must contain the company information and the Administrator information.\n
-        `/insert/device`: insert a new device in the catalog. The parameters are the device information.\n
-        `/insert/user`: insert a new user in the catalog. The parameters are the user information.\n
+        `/device`: insert a new device in the catalog. The parameters are the device information.\n
+        `/user`: insert a new user in the catalog. The parameters are the user information.\n
         """
         try:
-            if len(uri) > 0:
-                if len(uri) == 1 and uri[0] == "insertCompany":
-                    body_dict = json.loads(cherrypy.request.body.read())
+            if len(uri) == 1:
+                body_dict = json.loads(cherrypy.request.body.read())
+                if  uri[0] == "company":
                     return self.catalog.insertCompany(params, body_dict)
-                elif len(uri) == 2 and uri [0] == "insert":
-                    body_dict = json.loads(cherrypy.request.body.read())
-                    if uri[1] == "user":
+                elif uri[0] == "user":
                         return self.catalog.insertUser(params, body_dict)
-                    elif uri[1] == "device":
-                        return self.catalog.insertDevice(params, body_dict)
+                elif uri[0] == "device":
+                    return self.catalog.insertDevice(params, body_dict)
             raise web_exception(404, "Resource not found.")
         except web_exception as e:
             raise cherrypy.HTTPError(e.code, e.message)
@@ -663,14 +592,13 @@ class RESTResourceCatalog(GenericService):
 
         Allowed commands:
         `/refresh`: update the device information. 
-        The parameters are `ID`, `CompanyName` and `CompanyToken`.\n
+        The parameters are `ID`, `CompanyName`.\n
         """
         try:
             if len(uri) > 0:
                 if len(uri) == 1 and uri[0] == "refresh":
-                    if all(key in params for key in ["ID", "CompanyName", "CompanyToken"]):
-                        CompanyInfo = {"CompanyName": params["CompanyName"], "CompanyToken": params["CompanyToken"]}
-                        return self.catalog.refreshItem(CompanyInfo, int(params["ID"]))
+                    if all(key in params for key in ["ID", "CompanyName"]):
+                        return self.catalog.refreshItem(params["CompanyName"], int(params["ID"]))
                 if len(uri) == 1 and uri[0] == "field":
                     return self.catalog.updateField(params)
             raise web_exception(404, "Resource not found.")

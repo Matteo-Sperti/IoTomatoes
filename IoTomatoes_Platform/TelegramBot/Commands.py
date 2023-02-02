@@ -171,11 +171,10 @@ class InsertNewCompany():
         `False` otherwise.\n
         """
         try:
-            params = {"SystemToken" : self._connector._SystemToken}
             body = {"CompanyInfo" : self.company,
                     "AdminInfo" : self.adminInfo, 
                     "fieldsList" : self.response["fieldsList"]}
-            res = requests.post(self._connector.ResourceCatalog_url + "/insertCompany", params=params, 
+            res = requests.post(self._connector.ResourceCatalog_url + "/insertCompany",
                                     data= json.dumps(body))
             res.raise_for_status()
         except requests.exceptions.HTTPError as err:

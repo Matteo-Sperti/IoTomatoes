@@ -18,14 +18,12 @@ exit: exit the program
 
 class SimDevices_Manager():
     def __init__(self, settings : dict):
-        self._ServiceCatalog_url = settings["ServiceCatalog_url"]
-        self._SystemToken = settings["SystemToken"]
+        self._Platform_url = settings["IoTomatoes_url"]
         self._measuresType = settings["MeasuresType"]
         self._actuatorsType = settings["ActuatorsType"]
         self.DevicesIDs = IDs(1)
 
         self.Sensors = []
-        self._ResourceCatalog_url = self.get_ResourceCatalog_url()
 
     def populateField(self, number : int = 5):
         CompanyName = input("Insert Company Name: ")
@@ -77,25 +75,6 @@ class SimDevices_Manager():
                 "longitude" : dev_longitude
             }
         return SimDevice(Device_information)
-
-    def get_ResourceCatalog_url(self) :
-        """Get the URL of the Resource Catalog from the Service Catalog."""
-
-        while True:
-            try:
-                params = {"SystemToken": self._SystemToken}
-                res = requests.get(self._ServiceCatalog_url + "/ResourceCatalog_url", params = params)
-                res.raise_for_status()
-            except:
-                print(f"Connection Error\nRetrying connection\n")
-                time.sleep(1)
-            else:
-                try:
-                    res_dict = res.json()
-                    return res_dict["ResourceCatalog_url"]
-                except:
-                    print(f"Error in the Resource information\nRetrying connection\n")
-                    time.sleep(1)
 
     def getCompanyPosition(self, Companyinfo : dict):
         try:

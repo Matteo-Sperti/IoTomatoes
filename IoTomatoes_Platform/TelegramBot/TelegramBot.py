@@ -187,8 +187,7 @@ class IoTBot(GenericService):
 
         while True:
             try:
-                params = {"SystemToken": self._SystemToken}
-                res = requests.get(self.ServiceCatalog_url + "/telegram", params=params)
+                res = requests.get(self.ServiceCatalog_url + "/telegram")
                 res.raise_for_status()
             except :
                 print(f"Error in the connection with the Service Catalog\nRetrying connection\n")
@@ -208,7 +207,7 @@ class IoTBot(GenericService):
         `chatID (int)`: telegramID of the user\n
         """
         try:
-            params = {"SystemToken": self._SystemToken, "telegramID": chatID}
+            params = {"telegramID": chatID}
             res = requests.get(self.ResourceCatalog_url + "/isRegistered", params=params)
             res.raise_for_status()
         except:
@@ -232,7 +231,7 @@ class IoTBot(GenericService):
             return None
 
         try:
-            params = {"SystemToken": self._SystemToken, "CompanyName": CompanyName}
+            params = {"CompanyName": CompanyName}
             res = requests.get(self.ResourceCatalog_url + "/" + listType, params=params)
             res.raise_for_status()
             res_dict = res.json()

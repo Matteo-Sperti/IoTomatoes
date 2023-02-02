@@ -1,10 +1,9 @@
 import requests
 import time
 import json
-import paho.mqtt.client as PahoMQTT
 
 from iotomatoes_supportpackage.ItemInfo import (
-    construct, isMQTT, subscribedTopics, publishedTopics, getIPaddress)
+    isMQTT, subscribedTopics, publishedTopics, getIPaddress)
 from iotomatoes_supportpackage.MyExceptions import InfoException
 from iotomatoes_supportpackage.MyThread import MyThread
 
@@ -31,8 +30,6 @@ class RefreshThread(MyThread):
                 param = {"ID": self.endpoint.ID}
                 if "CompanyInfo" in kwargs:
                     param.update(kwargs["CompanyInfo"])
-                elif "SystemToken" in kwargs:
-                    param.update({"SystemToken" : kwargs["SystemToken"]})
                 res = requests.put(self._url + "/refresh", params=param)
                 res.raise_for_status()
                 stat = res.json()
@@ -51,121 +48,54 @@ class RefreshThread(MyThread):
                         # problem in the Catalog, maybe the item has been deleted
                         # register again
                         print(f"Error in the Catalog, trying to register again\n")
-                        self.endpoint.stop()
                         self.endpoint.restart()
                 else:
                     print(stat)
                     time.sleep(1)
 
-class GenericEndpoint(): 
-    def __init__(self, settings : dict, isService : bool = False, 
-                    isResource : bool = False) :
-        """GenericEndpoint class. It is the base class for all the endpoints.
-        
-        `settings {dict}`: dictionary containing the settings of the endpoint.\n
-        `isService {bool}`: True if the endpoint is a service, False otherwise (default = False).\n
-        `isResource {bool}`: True if the endpoint is a resource, False otherwise (default = False).
-        `isService` and `isResource` are mutually exclusive.
+class GenericMQTTClient(): 
+    def __init__(self, url : str, EndpointInfo: dict, CompanyName : str = ""):
+        """GenericMQTTClient class. It is the base class for the MQTT client.
+
+        Arguments:\n
+        `url (str)`: Catalog URL.\n
+        `EndpointInfo (dict)`: Dictionary containing the information of the resource or service.\n
+        `CompanyName (str)`: Name of the company.
         """
 
-        if "ServiceCatalog_url" not in settings:
-            raise InfoException("The Service Catalog URL is missing")
-        self.ServiceCatalog_url = settings["ServiceCatalog_url"]
-        if not isService ^ isResource:
-            raise InfoException("The Endpoint must be a service or a resource, not both or none")
-        else:
-            self._isService = isService
-            self._isResource = isResource
-            self._EndpointInfo, self._CompanyInfo = construct(settings, isService, isResource)
-            self._start()
-            self.start_MQTT()
+        self._url = url
+        self._EndpointInfo = EndpointInfo
+        self._CompanyName = CompanyName
 
-    def restart(self):
-        """Restart the endpoint."""
-
-        self.stop()
-        self._start()
-        self.start_MQTT()
-        
-    def start_MQTT(self):
-        self._MQTTclient = self.isMQTT
-        if self._MQTTclient:
-            self.start_MQTTclient()
-
-    def stop(self):
+    def stopMQTT(self):
         """Stop the endpoint."""
-
-        self._RefreshThread.stop()
-
-        if self._MQTTclient:
+        if self.isMQTT:
             self.unsubscribe_all()
             self._paho_mqtt.loop_stop()
             self._paho_mqtt.disconnect()                             
 
-    def get_ResourceCatalog_url(self) :
-        """Get the URL of the Resource Catalog from the Service Catalog."""
-
-        while True:
-            try:
-                if self._isService:
-                    params = {"SystemToken": self._SystemToken}
-                else:
-                    params = self._CompanyInfo
-                res = requests.get(self.ServiceCatalog_url + "/ResourceCatalog_url", params = params)
-                res.raise_for_status()
-                res_dict = res.json()  
-            except:
-                print(f"Connection Error\nRetrying connection\n")
-                time.sleep(1)
-            else:
-                try:
-                    return res_dict["ResourceCatalog_url"]
-                except:
-                    print(f"Error in the Resource information\nRetrying connection\n")
-                    time.sleep(1)
-                    
-    def get_broker(self) :
-        """Get the broker information from the Service Catalog."""
-
-        while True:
-            try:
-                if self._isService:
-                    params = {"SystemToken": self._SystemToken}
-                else:
-                    params = self._CompanyInfo
-                res = requests.get(self.ServiceCatalog_url + "/broker", params=params)
-                res.raise_for_status()
-                broker = res.json()
-            except:
-                print(f"Connection Error\nRetrying connection\n")
-                time.sleep(1)
-            else:
-                try:
-                    return broker["IP"], broker["port"], broker["baseTopic"]
-                except:
-                    print(f"Error in the broker information\nRetrying connection\n")
-                    time.sleep(1)
-
-    def start_MQTTclient(self) :
-        """Start the MQTT client.
+    def startMQTT(self) :
+        """If the Endpoint is MQTT, starts the MQTT client.
         It subscribes the topics and starts the MQTT client loop.
         """
-        self._MQTTclient = True
-        self._broker, self._port, self._baseTopic = self.get_broker()
-        self.MQTTclientID = f"IoTomatoes_ID{self.ID}"
-        self._isSubscriber = False
-        # create an instance of paho.mqtt.client
-        self._paho_mqtt = PahoMQTT.Client(self.MQTTclientID, True)
-        # register the callback
-        self._paho_mqtt.on_connect = self.myOnConnect
-        self._paho_mqtt.on_message = self.myOnMessageReceived
-        # manage connection to broker
-        self._paho_mqtt.connect(self._broker, self._port)
-        self._paho_mqtt.loop_start()
-        time.sleep(1)
-        # subscribe the topics
-        for topic in self.subscribedTopics:
-            self.mySubscribe(self._baseTopic + topic)
+        if self.isMQTT:
+            import paho.mqtt.client as PahoMQTT
+
+            self._broker, self._port, self._baseTopic = self.get_broker()
+            self.MQTTclientID = f"IoTomatoes_ID{self._EndpointInfo['ID']}"
+            self._isSubscriber = False
+            # create an instance of paho.mqtt.client
+            self._paho_mqtt = PahoMQTT.Client(self.MQTTclientID, True)
+            # register the callback
+            self._paho_mqtt.on_connect = self.myOnConnect
+            self._paho_mqtt.on_message = self.myOnMessageReceived
+            # manage connection to broker
+            self._paho_mqtt.connect(self._broker, self._port)
+            self._paho_mqtt.loop_start()
+            time.sleep(1)
+            # subscribe the topics
+            for topic in self.subscribedTopics:
+                self.mySubscribe(self._baseTopic + topic)
 
     def myOnConnect(self,client,userdata,flags,rc):
         """It provides information about Connection result with the broker"""
@@ -208,6 +138,24 @@ class GenericEndpoint():
             for topic in self.subscribedTopics:
                 self._paho_mqtt.unsubscribe(self._baseTopic + topic)
 
+    def get_broker(self):
+        """Get the broker information from the Service Catalog."""
+
+        while True:
+            try:
+                res = requests.get(self._url + "/broker")
+                res.raise_for_status()
+                broker = res.json()
+            except:
+                print(f"Connection Error\nRetrying connection\n")
+                time.sleep(1)
+            else:
+                try:
+                    return broker["IP"], broker["port"], broker["baseTopic"]
+                except:
+                    print(f"Error in the broker information\nRetrying connection\n")
+                    time.sleep(1)
+
     @property
     def isMQTT(self) -> bool:
         return isMQTT(self._EndpointInfo)
@@ -220,28 +168,22 @@ class GenericEndpoint():
     def publishedTopics(self) -> list:
         return publishedTopics(self._EndpointInfo)
 
-    @property
-    def getIPaddress(self) -> str:
-        return getIPaddress(self._EndpointInfo)
 
-class GenericService(GenericEndpoint) :
+class GenericService() :
     def __init__(self, settings: dict):
         """Initialize the GenericService class.
         It gets the System Token from the settings and calls the GenericEndpoint constructor.
         """
-        
-        if "SystemToken" in settings:
-            self._SystemToken = settings["SystemToken"]
-        else:
-            raise InfoException("The System Token is missing")
-
-        super().__init__(settings, isService=True)
+        self.ServiceCatalog_url = settings["ServiceCatalog_url"]
+        self.start()
+        self._MQTTClient = GenericMQTTClient(self.ServiceCatalog_url, self._EndpointInfo)
+        self._MQTTClient.startMQTT()
 
     def getCompaniesList(self):
         """Return the complete list of the companies from the Resource Catalog""" 
 
         try:
-            r = requests.get(self.ResourceCatalog_url+"/all", params={"SystemToken": self._SystemToken})
+            r = requests.get(self.ResourceCatalog_url+"/all")
             r.raise_for_status()
             companyList = r.json()
         except:
@@ -250,23 +192,31 @@ class GenericService(GenericEndpoint) :
         else:
             return companyList
 
-    def _start(self) :
+    def start(self) :
         """ Start the endpoint as a service.
         It registers the service to the Service Catalog and starts the RefreshThread."""
 
-        self.ID = self.register()
-        self._RefreshThread = RefreshThread(self.ServiceCatalog_url, self, SystemToken=self._SystemToken)
-        if self._EndpointInfo["serviceName"] != "ResourceCatalog":
-            self.ResourceCatalog_url = self.get_ResourceCatalog_url()
+        self._EndpointInfo = self.register()
+        self._RefreshThread = RefreshThread(self.ServiceCatalog_url, self)
+        if self.serviceName != "ResourceCatalog":
+            self.ResourceCatalog_url = self.getOtherServiceURL("ResourceCatalog")
 
-    def register(self) -> int:
+    def restart(self):
+        self.start()
+        self._MQTTClient = GenericMQTTClient(self.ServiceCatalog_url, self._EndpointInfo)
+        self._MQTTClient.startMQTT()
+
+    def stop(self):
+        self._RefreshThread.stop()
+        self._MQTTClient.stopMQTT()
+
+    def register(self) -> dict:
         """Register the service to the Service Catalog."""
 
         while True:
             try:
-                params = {"SystemToken": self._SystemToken}
                 res = requests.post(self.ServiceCatalog_url + "/insert", 
-                                        params=params, json = self._EndpointInfo)
+                                        json = self._EndpointInfo)
                 res.raise_for_status()
                 res_dict = res.json()
             except requests.exceptions.HTTPError as err:
@@ -277,9 +227,9 @@ class GenericService(GenericEndpoint) :
                 time.sleep(1)
             else:
                 try:                    
-                    ID = res_dict["ID"]
-                    print(f"Registered correctly to the ServiceCatalog.\nID: {ID}\n")
-                    return ID
+                    if "ID" in res_dict:
+                        print("Service registered to the Service Catalog")
+                        return res_dict
                 except:
                     print(f"Error in the response\n")  
 
@@ -287,8 +237,7 @@ class GenericService(GenericEndpoint) :
         """Return the URL of the service `serviceName`"""
 
         try:
-            params = {"SystemToken": self._SystemToken, "serviceName": serviceName}
-            r = requests.get(self.ServiceCatalog_url+"/search/serviceName", params=params)
+            r = requests.get(self.ServiceCatalog_url+"/" + serviceName + "/url")
             r.raise_for_status()
             servicesList = r.json()
         except:
@@ -302,29 +251,48 @@ class GenericService(GenericEndpoint) :
                 serviceInfo = servicesList[0]
                 print(serviceInfo)
                 return getIPaddress(serviceInfo)
-
-class GenericResource(GenericEndpoint) :
+    
+    @property
+    def serviceName(self) -> str:
+        return self._EndpointInfo["serviceName"]
+    
+    @property
+    def ID(self) -> int:
+        return self._EndpointInfo["ID"]
+    
+class GenericResource() :
     def __init__(self, settings: dict):
         """Initialize the GenericResource class."""
-        super().__init__(settings, isResource=True)
 
-    def _start(self) :        
+        self._CompanyName = settings["CompanyName"]
+        self.platform_url = settings["IoTomatoes_url"]
+        self.start()
+        self._MQTTClient = GenericMQTTClient(self.platform_url, self._EndpointInfo, self._CompanyName)
+        self._MQTTClient.startMQTT()
+
+    def start(self) :        
         """ Start the endpoint as a resource.
         It registers the resource to the Resource Catalog and starts the RefreshThread."""
 
-        self.ResourceCatalog_url = self.get_ResourceCatalog_url()
-        #Register
-        self.ID = self.register()
-        self._EndpointInfo = self.get_device_info()
-        self._RefreshThread = RefreshThread(self.ResourceCatalog_url, self, CompanyInfo=self._CompanyInfo)
+        self._EndpointInfo = self.register()
+        self._RefreshThread = RefreshThread(self.platform_url + "/rc/", self, CompanyName=self._CompanyName)
 
-    def register(self) -> int:
+    def restart(self):
+        self.start()
+        self._MQTTClient = GenericMQTTClient(self.platform_url, self._EndpointInfo, self._CompanyName)
+        self._MQTTClient.startMQTT()
+
+    def stop(self):
+        self._RefreshThread.stop()
+        self._MQTTClient.stopMQTT()
+
+    def register(self) -> dict:
         """Register the resource to the Resource Catalog."""
 
         while True:
             try:
-                res = requests.post(self.ResourceCatalog_url + "/insert/device", 
-                                        params=self._CompanyInfo, json = self._EndpointInfo)
+                res = requests.post(self.platform_url + "/rc/insert/device", 
+                                        params=self._CompanyName, json = self._EndpointInfo)
                 res.raise_for_status()
                 res_dict = res.json()
             except requests.exceptions.HTTPError as err:
@@ -333,38 +301,17 @@ class GenericResource(GenericEndpoint) :
             except:
                 print(f"Connection Error\nRetrying connection\n")
                 time.sleep(1)
-            else:
-                try:                    
-                    ID = res_dict["ID"]
-                    print(f"Registered correctly to the ServiceCatalog.\nID: {ID}\n")
-                    return ID
-                except:
-                    print(f"Error in the response\n")
-
-    def get_device_info(self) -> dict:
-        """Get the information of the resource from the Resource Catalog."""
-
-        while True:
-            try:
-                res = requests.get(self.ResourceCatalog_url + "/get", 
-                                    params = {"ID": self.ID, **self._CompanyInfo})
-                res.raise_for_status()
-                res_dict = res.json()
-            except:
-                print(f"Connection Error\nRetrying connection\n")
-                time.sleep(1)
-            else:
-                try:
+            else:               
+                if "ID" in res_dict:
+                    print("Resource registered to the Resource Catalog")
                     return res_dict
-                except:
-                    print(f"Error in the Resource information\nRetrying connection\n")
+                else:
+                    print(f"Error in the response\n")
                     time.sleep(1)
 
     @property
-    def CompanyName(self) -> str:
-        """Return the name of the company that owns the resource."""
-
-        return self._CompanyInfo["CompanyName"]
+    def ID(self) -> int:
+        return self._EndpointInfo["ID"]
     
     @property
     def field(self) -> int:
@@ -414,7 +361,7 @@ class GenericResource(GenericEndpoint) :
 
         dict = {
             "ID": self.ID,
-            "CompanyInfo": self._CompanyInfo,
+            "CompanyName": self._CompanyName,
             "EndpointInfo": self._EndpointInfo
         }
 

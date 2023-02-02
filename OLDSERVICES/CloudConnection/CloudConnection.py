@@ -116,12 +116,13 @@ class MongoConnection():
 	def checkNewCompany(self):
 			'''check if a new company is added by making a GET request to the Resource Catalog'''
 			while True:
-				response = requests.get(self.get_ResourceCatalog_url() + "/CompaniesName", self._SystemToken)
+				response = requests.get(self.get_ResourceCatalog_url() + "/CompaniesName")
 				list = json.loads(response)
 				for i in list:
 					if i not in self.client.list_database_names():
 						self.insertDataBase(i)
 				time.sleep(300)
+
 	def time_period(self,list,start,end):
 		'''get the time period of a list of dates\n
 			Parameters:\n

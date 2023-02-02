@@ -41,7 +41,8 @@ services:
       - load_balancer
       - service_catalog
     networks:
-      - mynet
+      mynet:
+        ipv4_address: "172.16.0.3"
 
   telegram_bot:
     image: telegram_bot

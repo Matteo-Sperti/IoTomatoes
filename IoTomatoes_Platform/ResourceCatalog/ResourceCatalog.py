@@ -1,6 +1,8 @@
 import json
 import time
 import cherrypy
+import sys
+import signal
 from socket import gethostname, gethostbyname
 
 from iotomatoes_supportpackage.GenericEndpoint import GenericService
@@ -694,6 +696,14 @@ class RESTResourceCatalog(GenericService):
         except:
             return cherrypy.HTTPError(500, "Internal Server Error.")
 
+def sigterm_handler(signal, frame):
+    Catalog.close()
+    cherrypy.engine.exit()
+    print("Server stopped")
+    sys.exit(0)
+
+signal.signal(signal.SIGTERM, sigterm_handler)
+
 if __name__ == "__main__":
     settings = json.load(open("ResourceCatalogSettings.json"))
 
@@ -717,10 +727,5 @@ if __name__ == "__main__":
         cherrypy.config.update({'server.socket_port': port})
         cherrypy.engine.start()
 
-        try:
-            while True:
-                time.sleep(3)
-        except KeyboardInterrupt or SystemExit:
-            Catalog.close()
-            cherrypy.engine.exit()
-            print("Server stopped")
+        while True:
+            time.sleep(5)

@@ -12,7 +12,7 @@ class BaseResource() :
     def __init__(self, settings: dict):
         """Initialize the BaseResource class."""
 
-        self._CompanyName = settings["CompanyName"]
+        self._CompanyInfo = settings["CompanyInfo"]
         self.platform_url = settings["IoTomatoes_url"]
         self.start()
 
@@ -21,9 +21,9 @@ class BaseResource() :
         It registers the resource to the Resource Catalog and starts the RefreshThread."""
 
         self._EndpointInfo = self.register()
-        self._RefreshThread = RefreshThread(self.platform_url + "/rc/", self, CompanyName=self._CompanyName)
+        self._RefreshThread = RefreshThread(self.platform_url + "/rc/", self, CompanyName=self.CompanyName)
         if self.isMQTT:
-            self._MQTTClient = BaseMQTTClient(self.platform_url, self._EndpointInfo, self._CompanyName)
+            self._MQTTClient = BaseMQTTClient(self.platform_url, self._EndpointInfo, self.CompanyName)
             self._MQTTClient.startMQTT()
 
     def restart(self):
@@ -41,7 +41,7 @@ class BaseResource() :
         while True:
             try:
                 res = requests.post(self.platform_url + "/rc/device", 
-                                        params=self._CompanyName, json = self._EndpointInfo)
+                                        params=self.CompanyName, json = self._EndpointInfo)
                 res.raise_for_status()
                 res_dict = res.json()
             except requests.exceptions.HTTPError as err:
@@ -61,6 +61,10 @@ class BaseResource() :
     @property
     def ID(self) -> int:
         return self._EndpointInfo["ID"]
+    
+    @property
+    def CompanyName(self) -> str:
+        return self._CompanyInfo["CompanyName"]
     
     @property
     def isMQTT(self) -> bool:
@@ -105,7 +109,7 @@ class BaseResource() :
 
         dict = {
             "ID": self.ID,
-            "CompanyName": self._CompanyName,
+            "CompanyName": self.CompanyName,
             "EndpointInfo": self._EndpointInfo
         }
 

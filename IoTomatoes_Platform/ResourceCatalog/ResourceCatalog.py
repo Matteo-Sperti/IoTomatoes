@@ -615,7 +615,7 @@ def sigterm_handler(signal, frame):
 signal.signal(signal.SIGTERM, sigterm_handler)
 
 if __name__ == "__main__":
-    settings = json.load(open("ResourceCatalogSettings.json"))
+    settings = json.load(open("ResourceCatalogSettings.json", "r"))
 
     ip_address = gethostbyname(gethostname())
     port = settings["IPport"]

@@ -36,7 +36,7 @@ class IoTDevice(BaseResource):
             else:
                 self._measureTimeInterval = 5
             self._message={
-                "cn" : self._CompanyName,
+                "cn" : self.CompanyName,
                 "bn" : self.ID,
                 "field" : self.field,
                 "e" : [{

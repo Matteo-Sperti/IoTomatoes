@@ -22,7 +22,7 @@ class SimTruck(IoTDevice):
 
 if __name__ == "__main__":
     try:
-        settings = json.load(open("DeviceSettings.json"))
+        settings = json.load(open("TruckSettings.json", "r"))
         IoTSensor = SimTruck(settings)
     except Exception as e:
         print(e)

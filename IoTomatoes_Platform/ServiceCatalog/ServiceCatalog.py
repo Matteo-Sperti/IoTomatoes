@@ -1,7 +1,6 @@
 import json
 import cherrypy
 import time
-import requests
 import signal
 import sys
 
@@ -9,6 +8,7 @@ from iotomatoes_supportpackage.MyExceptions import web_exception, InfoException
 from iotomatoes_supportpackage.MyThread import MyThread
 from iotomatoes_supportpackage.MyIDGenerator import IDs
 from iotomatoes_supportpackage.ItemInfo import getIPaddress, constructService
+
 
 serviceList_Name = "servicesList"
 
@@ -70,12 +70,16 @@ class ServiceCatalogManager:
         except KeyError:
             raise web_exception(404, "List not found")
 
-    def getService_url(self, ID : int):
+    def getService_url(self, service : str):
         """Return the url of item `ID` in json format.
 
         `ID` is the ID of the item to return the information of.
         """
-        item = self.find_item(ID)
+        try:
+            ID = int(service)
+            item = self.find_item(ID=ID)
+        except ValueError:
+            item = self.find_item(serviceName=service)
 
         if item != None:
             out = {"url": getIPaddress(item)}
@@ -100,7 +104,7 @@ class ServiceCatalogManager:
                 except InfoException as e:
                     raise web_exception(500, e.message)
                 self.catalog[serviceList_Name].append(new_item)
-                out = {"ID": ID}
+                out = new_item.copy()
                 return json.dumps(out, indent=4)
         except KeyError:
             raise web_exception(500, "Invalid key")
@@ -113,7 +117,7 @@ class ServiceCatalogManager:
         `IDvalue` is the ID of the service to delete.
         """
         try:
-            item = self.find_item(IDvalue)
+            item = self.find_item(ID=IDvalue)
             if item != None : 
                 actualtime = time.time()
                 self.catalog["lastUpdate"] = actualtime
@@ -127,12 +131,24 @@ class ServiceCatalogManager:
             raise web_exception(500, "Invalid key")
 
 
-    def find_item(self, IDvalue : int) :
+    def find_item(self, **kwargs):
         """Return the service with the ID `IDvalue`."""
 
+        if "ID" in kwargs:
+            key = "ID"
+            value =  int(kwargs["ID"])
+        elif "serviceName" in kwargs:
+            value = kwargs["serviceName"]
+            key = "serviceName"
+        else:
+            return None
+        
         for item in self.catalog[serviceList_Name]:
-            if item["ID"] == IDvalue:
+            if item[key] == value:
                 return item
+        return None
+
+
         return None
 
     def refreshItem(self, IDvalue : int):
@@ -143,7 +159,7 @@ class ServiceCatalogManager:
         `IDvalue` is the ID of the service to refresh.
         """
 
-        item = self.find_item(IDvalue)
+        item = self.find_item(ID=IDvalue)
         if item != None:
             actualtime = time.time()
             self.catalog["lastUpdate"] = actualtime
@@ -187,8 +203,7 @@ class RESTServiceCatalog():
             "owner": settings["owner"], 
             "CatalogName": settings["CatalogName"],
             "broker": settings["broker"],
-            "telegramToken" : settings["telegramToken"],
-            "platformIP": settings["IPaddress"]
+            "telegramToken" : settings["telegramToken"]
             }
         self._systemToken = settings["SystemToken"]
         self.ServiceCatalog = ServiceCatalogManager(heading, settings["filename"], settings["autoDeleteTime"])
@@ -199,32 +214,11 @@ class RESTServiceCatalog():
         self.ServiceCatalog.autoDeleteItemsThread.stop()
         self.ServiceCatalog.save()
 
-    def isAuthorize(self, credential : dict):
-        if "SystemToken" in credential:
-            if credential["SystemToken"] == self._systemToken:
-                return True
-
-        if "CompanyName" in credential and "CompanyToken" in credential:
-            try:
-                param = {"CompanyName": credential["CompanyName"], "SystemToken": self._systemToken}
-                url = self.ServiceCatalog.getResourceCatalog_url("internal")
-                res = requests.get(url +"/CompanyToken", params=param)
-                res.raise_for_status()
-                res_dict = res.json()
-            except:
-                return False
-            else:
-                if "CompanyToken" in res_dict:
-                    if res_dict["CompanyToken"] == credential["CompanyToken"]:
-                        return True
-
-        return False
-
     def GET(self, *uri, **params):
         """REST GET method.
 
         Allowed commands:\n
-        `/getall` to get all the services.\n
+        `/all` to get all the services.\n
         `/broker` to get the broker info.\n
         `/telegram` to get the telegram token.\n
         `/<servicename>/url to get the url of a service
@@ -232,7 +226,7 @@ class RESTServiceCatalog():
         try:
             if len(uri) == 0:
                 raise web_exception(404, "No command received")
-            elif len(uri) == 1 and uri[0] == "getall":
+            elif len(uri) == 1 and uri[0] == "all":
                 return self.ServiceCatalog.get_all()
             elif len(uri) == 1 and uri[0] == "broker":
                 return self.ServiceCatalog.broker
@@ -321,9 +315,9 @@ class RESTServiceCatalog():
 
 def sigterm_handler(signal, frame):
     Catalog.close()
+    cherrypy.engine.stop()
     cherrypy.engine.exit()
     print("Server stopped")
-    sys.exit(0)
 
 signal.signal(signal.SIGTERM, sigterm_handler)
 

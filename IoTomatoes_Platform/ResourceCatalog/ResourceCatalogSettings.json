@@ -1,7 +1,7 @@
 {
     "serviceName": "ResourceCatalog",
-    "IPport": 8081,
-    "ServiceCatalog_url" : "http://172.16.0.2:8080",
+    "IPport": 8080,
+    "ServiceCatalog_url" : "http://service_catalog:8080",
     "filename": "ResourceCatalog.json",
     "autoDeleteTime": 120
 }

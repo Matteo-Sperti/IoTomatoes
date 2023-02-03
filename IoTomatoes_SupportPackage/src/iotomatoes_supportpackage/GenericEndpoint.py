@@ -69,33 +69,33 @@ class GenericMQTTClient():
 
     def stopMQTT(self):
         """Stop the endpoint."""
-        if self.isMQTT:
-            self.unsubscribe_all()
-            self._paho_mqtt.loop_stop()
-            self._paho_mqtt.disconnect()                             
+
+        self.unsubscribe_all()
+        self._paho_mqtt.loop_stop()
+        self._paho_mqtt.disconnect()                             
 
     def startMQTT(self) :
         """If the Endpoint is MQTT, starts the MQTT client.
         It subscribes the topics and starts the MQTT client loop.
         """
-        if self.isMQTT:
-            import paho.mqtt.client as PahoMQTT
 
-            self._broker, self._port, self._baseTopic = self.get_broker()
-            self.MQTTclientID = f"IoTomatoes_ID{self._EndpointInfo['ID']}"
-            self._isSubscriber = False
-            # create an instance of paho.mqtt.client
-            self._paho_mqtt = PahoMQTT.Client(self.MQTTclientID, True)
-            # register the callback
-            self._paho_mqtt.on_connect = self.myOnConnect
-            self._paho_mqtt.on_message = self.myOnMessageReceived
-            # manage connection to broker
-            self._paho_mqtt.connect(self._broker, self._port)
-            self._paho_mqtt.loop_start()
-            time.sleep(1)
-            # subscribe the topics
-            for topic in self.subscribedTopics:
-                self.mySubscribe(self._baseTopic + topic)
+        import paho.mqtt.client as PahoMQTT
+
+        self._broker, self._port, self._baseTopic = self.get_broker()
+        self.MQTTclientID = f"IoTomatoes_ID{self._EndpointInfo['ID']}"
+        self._isSubscriber = False
+        # create an instance of paho.mqtt.client
+        self._paho_mqtt = PahoMQTT.Client(self.MQTTclientID, True)
+        # register the callback
+        self._paho_mqtt.on_connect = self.myOnConnect
+        self._paho_mqtt.on_message = self.myOnMessageReceived
+        # manage connection to broker
+        self._paho_mqtt.connect(self._broker, self._port)
+        self._paho_mqtt.loop_start()
+        time.sleep(1)
+        # subscribe the topics
+        for topic in self.subscribedTopics:
+            self.mySubscribe(self._baseTopic + topic)
 
     def myOnConnect(self,client,userdata,flags,rc):
         """It provides information about Connection result with the broker"""
@@ -157,10 +157,6 @@ class GenericMQTTClient():
                     time.sleep(1)
 
     @property
-    def isMQTT(self) -> bool:
-        return isMQTT(self._EndpointInfo)
-
-    @property
     def subscribedTopics(self) -> list:
         return subscribedTopics(self._EndpointInfo)
 
@@ -168,16 +164,13 @@ class GenericMQTTClient():
     def publishedTopics(self) -> list:
         return publishedTopics(self._EndpointInfo)
 
-
 class GenericService() :
     def __init__(self, settings: dict):
         """Initialize the GenericService class.
         It gets the System Token from the settings and calls the GenericEndpoint constructor.
         """
-        self.ServiceCatalog_url = settings["ServiceCatalog_url"]
-        self.start()
-        self._MQTTClient = GenericMQTTClient(self.ServiceCatalog_url, self._EndpointInfo)
-        self._MQTTClient.startMQTT()
+        self._ServiceCatalog_url = settings["ServiceCatalog_url"]
+        self.start(settings)
 
     def getCompaniesList(self):
         """Return the complete list of the companies from the Resource Catalog""" 
@@ -192,31 +185,38 @@ class GenericService() :
         else:
             return companyList
 
-    def start(self) :
+    def start(self, info: dict):
         """ Start the endpoint as a service.
         It registers the service to the Service Catalog and starts the RefreshThread."""
 
-        self._EndpointInfo = self.register()
-        self._RefreshThread = RefreshThread(self.ServiceCatalog_url, self)
+        self._EndpointInfo = self.register(info)
+        self._RefreshThread = RefreshThread(self._ServiceCatalog_url, self)
         if self.serviceName != "ResourceCatalog":
             self.ResourceCatalog_url = self.getOtherServiceURL("ResourceCatalog")
+        if self.isMQTT:
+            self._MQTTClient = GenericMQTTClient(self._ServiceCatalog_url, self._EndpointInfo)
+            self._MQTTClient.startMQTT()
+
 
     def restart(self):
-        self.start()
-        self._MQTTClient = GenericMQTTClient(self.ServiceCatalog_url, self._EndpointInfo)
-        self._MQTTClient.startMQTT()
+        """Restart the endpoint as a service.
+        It stops the RefreshThread and the MQTTClient and starts them again."""
+
+        self.stop()
+        self.start(self._EndpointInfo)
 
     def stop(self):
         self._RefreshThread.stop()
-        self._MQTTClient.stopMQTT()
+        if self.isMQTT:
+            self._MQTTClient.stopMQTT()
 
-    def register(self) -> dict:
+    def register(self, info: dict) -> dict:
         """Register the service to the Service Catalog."""
 
         while True:
             try:
-                res = requests.post(self.ServiceCatalog_url + "/insert", 
-                                        json = self._EndpointInfo)
+                res = requests.post(self._ServiceCatalog_url + "/insert", 
+                                        json = info)
                 res.raise_for_status()
                 res_dict = res.json()
             except requests.exceptions.HTTPError as err:
@@ -237,7 +237,7 @@ class GenericService() :
         """Return the URL of the service `serviceName`"""
 
         try:
-            r = requests.get(self.ServiceCatalog_url+"/" + serviceName + "/url")
+            r = requests.get(self._ServiceCatalog_url +"/" + serviceName + "/url")
             r.raise_for_status()
             servicesList = r.json()
         except:
@@ -260,6 +260,11 @@ class GenericService() :
     def ID(self) -> int:
         return self._EndpointInfo["ID"]
     
+    @property
+    def isMQTT(self) -> bool:
+        return isMQTT(self._EndpointInfo)
+
+    
 class GenericResource() :
     def __init__(self, settings: dict):
         """Initialize the GenericResource class."""
@@ -267,8 +272,6 @@ class GenericResource() :
         self._CompanyName = settings["CompanyName"]
         self.platform_url = settings["IoTomatoes_url"]
         self.start()
-        self._MQTTClient = GenericMQTTClient(self.platform_url, self._EndpointInfo, self._CompanyName)
-        self._MQTTClient.startMQTT()
 
     def start(self) :        
         """ Start the endpoint as a resource.
@@ -276,15 +279,18 @@ class GenericResource() :
 
         self._EndpointInfo = self.register()
         self._RefreshThread = RefreshThread(self.platform_url + "/rc/", self, CompanyName=self._CompanyName)
+        if self.isMQTT:
+            self._MQTTClient = GenericMQTTClient(self.platform_url, self._EndpointInfo, self._CompanyName)
+            self._MQTTClient.startMQTT()
 
     def restart(self):
+        self.stop()
         self.start()
-        self._MQTTClient = GenericMQTTClient(self.platform_url, self._EndpointInfo, self._CompanyName)
-        self._MQTTClient.startMQTT()
 
     def stop(self):
         self._RefreshThread.stop()
-        self._MQTTClient.stopMQTT()
+        if self.isMQTT:
+            self._MQTTClient.stopMQTT()
 
     def register(self) -> dict:
         """Register the resource to the Resource Catalog."""
@@ -313,6 +319,10 @@ class GenericResource() :
     def ID(self) -> int:
         return self._EndpointInfo["ID"]
     
+    @property
+    def isMQTT(self) -> bool:
+        return isMQTT(self._EndpointInfo)
+
     @property
     def field(self) -> int:
         """Return the field of the resource."""

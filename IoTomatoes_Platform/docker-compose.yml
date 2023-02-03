@@ -1,14 +1,17 @@
 version: '3.4'
 
 networks:
-  mynet:
+  internal:
     driver: bridge
-    ipam:
-      driver: default
-      config:
-        - subnet: 172.16.0.0/16
-          ip_range: 172.16.0.0/24
-          gateway: 172.16.0.254
+
+volumes:
+  iotomatoes_supportpackage:
+    name: iotomatoes_supportpackage
+    driver: local
+    driver_opts:
+      type: none
+      device: /home/matte/Desktop/PoliTO/ProgrammingIOT/IoTomatoes/IoTomatoes_SupportPackage/src/iotomatoes_supportpackage/
+      o: bind
 
 services:
   load_balancer:
@@ -19,7 +22,7 @@ services:
     ports:
       - "8080:80"
     networks:
-      - mynet
+      - internal
 
   service_catalog:
     image: service_catalog
@@ -28,9 +31,10 @@ services:
       dockerfile: ./ServiceCatalog/Dockerfile
     depends_on:
       - load_balancer
+    volumes:
+      - iotomatoes_supportpackage:/app/iotomatoes_supportpackage
     networks:
-      mynet:
-        ipv4_address: "172.16.0.2"
+      - internal
 
   resource_catalog:
     image: resource_catalog
@@ -38,11 +42,11 @@ services:
       context: .
       dockerfile: ./ResourceCatalog/Dockerfile
     depends_on:
-      - load_balancer
       - service_catalog
+    volumes:
+      - iotomatoes_supportpackage:/app/iotomatoes_supportpackage
     networks:
-      mynet:
-        ipv4_address: "172.16.0.3"
+      - internal
 
   telegram_bot:
     image: telegram_bot
@@ -52,67 +56,7 @@ services:
     depends_on:
       - resource_catalog
     networks:
-      - mynet
-
-  smart_irrigation:
-    image: smart_irrigation
-    build:
-      context: .
-      dockerfile: ./SmartIrrigation/Dockerfile
-    depends_on:
-      - resource_catalog
-    networks:
-      - mynet
-
-  smart_lighting:
-    image: smart_lighting
-    build:
-      context: .
-      dockerfile: ./SmartLighting/Dockerfile
-    depends_on:
-      - resource_catalog
-    networks:
-      - mynet
-
-  fault_detection:
-    image: fault_detection
-    build:
-      context: .
-      dockerfile: ./FaultDetection/Dockerfile
-    depends_on:
-      - resource_catalog
-    networks:
-      - mynet
-
-  consumption_manager:
-    image: consumption_manager
-    build:
-      context: .
-      dockerfile: ./ConsumptionManager/Dockerfile
-    depends_on:
-      - resource_catalog
-    networks:
-      - mynet
-
-  weather_forecast:
-    image: weather_forecast
-    build:
-      context: .
-      dockerfile: ./WeatherForecast/Dockerfile
-    depends_on:
-      - resource_catalog
-    networks:
-      - mynet
-  
-  localization:
-    image: localization
-    build:
-      context: .
-      dockerfile: ./Localization/Dockerfile
-    depends_on:
-      - resource_catalog
-    networks:
-      - mynet
+      - internal
 
   mongodb_connector:
     image: mongodb_connector
@@ -122,7 +66,69 @@ services:
     depends_on:
       - resource_catalog
     networks:
-      - mynet
+      - internal
+
+  weather_forecast:
+    image: weather_forecast
+    build:
+      context: .
+      dockerfile: ./WeatherForecast/Dockerfile
+    depends_on:
+      - resource_catalog
+    networks:
+      - internal
+
+  smart_irrigation:
+    image: smart_irrigation
+    build:
+      context: .
+      dockerfile: ./SmartIrrigation/Dockerfile
+    depends_on:
+      - mongodb_connector
+      - weather_forecast
+    networks:
+      - internal
+
+  smart_lighting:
+    image: smart_lighting
+    build:
+      context: .
+      dockerfile: ./SmartLighting/Dockerfile
+    depends_on:
+      - mongodb_connector
+      - weather_forecast
+    networks:
+      - internal
+
+  fault_detection:
+    image: fault_detection
+    build:
+      context: .
+      dockerfile: ./FaultDetection/Dockerfile
+    depends_on:
+      - resource_catalog
+    networks:
+      - internal
+
+  consumption_manager:
+    image: consumption_manager
+    build:
+      context: .
+      dockerfile: ./ConsumptionManager/Dockerfile
+    depends_on:
+      - resource_catalog
+    networks:
+      - internal
+  
+  localization:
+    image: localization
+    build:
+      context: .
+      dockerfile: ./Localization/Dockerfile
+    depends_on:
+      - resource_catalog
+    networks:
+      - internal
 
   data_visualization:
     image: data_visualization
@@ -130,6 +136,6 @@ services:
       context: .
       dockerfile: ./DataVisualizer/Dockerfile
     depends_on:
-      - resource_catalog
+      - mongodb_connector
     networks:
-      - mynet
+      - internal

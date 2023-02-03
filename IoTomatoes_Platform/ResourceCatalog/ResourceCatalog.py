@@ -626,7 +626,7 @@ class RESTResourceCatalog(GenericService):
 
 def sigterm_handler(signal, frame):
     Catalog.close()
-    cherrypy.engine.exit()
+    cherrypy.engine.block()
     print("Server stopped")
     sys.exit(0)
 
@@ -651,7 +651,7 @@ if __name__ == "__main__":
             }
         }
         cherrypy.tree.mount(Catalog, '/', conf)
-        cherrypy.config.update({'server.socket_host': "0.0.0.0"})
+        cherrypy.config.update({'server.socket_host': ip_address})
         cherrypy.config.update({'server.socket_port': port})
         cherrypy.engine.start()
 

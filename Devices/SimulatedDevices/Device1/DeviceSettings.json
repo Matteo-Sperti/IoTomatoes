@@ -11,6 +11,6 @@
         "latitude" : 44.996469, 
         "longitude" : 7.482377
     },
-    "ServiceCatalog_url" : "http://172.20.10.3:8080",
+    "IoTomatoes_url" : "http://localhost:8080",
     "measureTimeInterval" : 5
 }

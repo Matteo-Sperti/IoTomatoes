@@ -1,6 +1,6 @@
 {
-    "ServiceCatalog_url" : "http://172.16.0.2:8080",
-    "serviceName": "CloudConnection",
+    "ServiceCatalog_url" : "http://service_catalog:8080",
+    "serviceName": "mongodb_connector",
     "IPport": 8080,
     "PointsPerGraph": 7,
     "availableServices": [

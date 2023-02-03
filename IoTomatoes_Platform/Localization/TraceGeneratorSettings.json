@@ -1,10 +1,10 @@
 {
-    "ServiceCatalog_url" : "http://172.16.0.2:8080",
+    "ServiceCatalog_url" : "http://service_catalog:8080",
     "create_url": "http://api.openstreetmap.org/api/0.6/gpx/create",
     "view_url": "http://api.openstreetmap.org/api/0.6/trace",
-    "serviceName": "TraceGenerator",
+    "serviceName": "localization",
     "password": "SW9Ub21hdG9lczpJb1RvbWF0b2Vz",
-    "IPport": 8089,
+    "IPport": 8080,
     "availableServices": [
         "MQTT"
     ],
@@ -13,9 +13,6 @@
             "serviceType": "MQTT",
             "subscribedTopics": [
 
-            ],
-            "publishedTopics": [
-                
             ]
         }
     ]

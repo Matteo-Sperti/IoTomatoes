@@ -1,6 +1,6 @@
 {
-  "ServiceCatalog_url" : "http://172.16.0.2:8080",
-  "serviceName" : "Fault Detection",
+  "ServiceCatalog_url" : "http://service_catalog:8080",
+  "serviceName" : "fault_detection",
   "availableServices" : [
       "MQTT"
   ],

@@ -1,6 +1,6 @@
 {
-    "ServiceCatalog_url" : "http://172.16.0.2:8080",
-    "serviceName" : "IoTomatoes_bot",
+    "ServiceCatalog_url" : "http://service_catalog:8080",
+    "serviceName" : "telegram_bot",
     "availableServices" : [
         "MQTT"
     ],

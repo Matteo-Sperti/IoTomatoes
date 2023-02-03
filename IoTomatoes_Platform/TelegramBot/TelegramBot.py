@@ -187,7 +187,7 @@ class IoTBot(GenericService):
 
         while True:
             try:
-                res = requests.get(self.ServiceCatalog_url + "/telegram")
+                res = requests.get(self._ServiceCatalog_url + "/telegram")
                 res.raise_for_status()
             except :
                 print(f"Error in the connection with the Service Catalog\nRetrying connection\n")

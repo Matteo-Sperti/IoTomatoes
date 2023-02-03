@@ -3,18 +3,16 @@ import time
 import json
 
 from iotomatoes_supportpackage.ItemInfo import (
-    isMQTT, subscribedTopics, publishedTopics, getIPaddress)
-from iotomatoes_supportpackage.MyExceptions import InfoException
+    isMQTT, subscribedTopics, publishedTopics, getIPaddress, measureType, actuatorType, PowerConsumption_kW)
 from iotomatoes_supportpackage.MyThread import MyThread
 
 class RefreshThread(MyThread):
     def __init__(self, url : str, endpoint, interval=60, **kwargs):
         """RefreshThread class. Refresh the Catalog every `interval` seconds.
         
-        `url {str}`: Catalog URL.\n
-        `ID {int}`: ID of the item.\n
-        `interval {int}`: refresh interval in seconds (default = 60).\n
-        `CompanyInfo {dict}`: Company information (default = {}), needed only if the item is a resource.
+        `url (str}`: Catalog URL.\n
+        `endpoint (object)`: Endpoint to be refreshed.\n
+        `interval (int): refresh interval in seconds (default = 60).\n
         """
 
         self._url = url
@@ -28,8 +26,9 @@ class RefreshThread(MyThread):
         while not refreshed :
             try:
                 param = {"ID": self.endpoint.ID}
-                if "CompanyInfo" in kwargs:
-                    param.update(kwargs["CompanyInfo"])
+                if "CompanyName" in kwargs:
+                    param.update(kwargs["CompanyName"])
+                print("STIAMO REFRESHANDO")
                 res = requests.put(self._url + "/refresh", params=param)
                 res.raise_for_status()
                 stat = res.json()
@@ -193,6 +192,8 @@ class GenericService() :
         self._RefreshThread = RefreshThread(self._ServiceCatalog_url, self)
         if self.serviceName != "ResourceCatalog":
             self.ResourceCatalog_url = self.getOtherServiceURL("ResourceCatalog")
+
+        print("FINITo di controllare se è resource catalog")
         if self.isMQTT:
             self._MQTTClient = GenericMQTTClient(self._ServiceCatalog_url, self._EndpointInfo)
             self._MQTTClient.startMQTT()
@@ -233,24 +234,21 @@ class GenericService() :
                 except:
                     print(f"Error in the response\n")  
 
-    def getOtherServiceURL(self, serviceName:str):
+    def getOtherServiceURL(self, serviceName: str):
         """Return the URL of the service `serviceName`"""
 
         try:
             r = requests.get(self._ServiceCatalog_url +"/" + serviceName + "/url")
             r.raise_for_status()
-            servicesList = r.json()
+            res_dict = r.json()
         except:
             print("ERROR: Service Catalog not reachable!")
             return ""
         else:
-            if len(servicesList) == 0:
-                print("ERROR: Service not found!")
-                return ""
+            if "url" in res_dict:
+                return res_dict["url"]
             else:
-                serviceInfo = servicesList[0]
-                print(serviceInfo)
-                return getIPaddress(serviceInfo)
+                return ""
     
     @property
     def serviceName(self) -> str:
@@ -347,24 +345,15 @@ class GenericResource() :
 
     @property
     def measureType(self) -> list:
-        if "measureType" not in self._EndpointInfo:
-            raise InfoException("measureType is missing")
-        else:
-            return self._EndpointInfo["measureType"]
+        return measureType(self._EndpointInfo)
 
     @property
     def actuatorType(self) -> list:
-        if "actuatorType" not in self._EndpointInfo:
-            raise InfoException("actuatorType is missing")
-        else:
-            return self._EndpointInfo["actuatorType"]
+        return actuatorType(self._EndpointInfo)
 
     @property
     def PowerConsumption_kW(self) -> int:
-        if "PowerConsumption_kW" not in self._EndpointInfo:
-            raise InfoException("PowerConsumption_kW is missing")
-        else:
-            return self._EndpointInfo["PowerConsumption_kW"]
+        return PowerConsumption_kW(self._EndpointInfo)
 
     def __str__(self):
         """Return a string with the information of the resource."""

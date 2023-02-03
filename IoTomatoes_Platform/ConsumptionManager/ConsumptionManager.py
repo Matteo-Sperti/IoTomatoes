@@ -37,7 +37,7 @@ class ConsumptionManager (GenericService):
 					}
 				}
 				dev['Consumption_kWh'] = 0
-				self.myPublish(f"{dev['CompanyName']}/consumption", dev_consumption)
+				self._MQTTClient.myPublish(f"{dev['CompanyName']}/consumption", dev_consumption)
 
 			elif(dev['status'] == 'ON' and dev['control']):
 				dev['Consumption_kWh'] = round((time.time() - dev['OnTime'])*dev['PowerConsumption_kW']/3600,2)
@@ -54,7 +54,7 @@ class ConsumptionManager (GenericService):
 				}
 				dev['OnTime'] = time.time()
 				dev['Consumption_kWh'] = 0
-				self.myPublish(f"{dev['CompanyName']}/consumption", dev_consumption)
+				self._MQTTClient.myPublish(f"{dev['CompanyName']}/consumption", dev_consumption)
 
 	def updateStatus (self, actuatorID: int, command: str):
 		"""Update the status of the actuator, if it is turned OFF calculates its consumption\n
@@ -95,7 +95,7 @@ class ConsumptionManager (GenericService):
 			msg['msg'] = "Error in the payload"
 			msg['msgType'] = "Error"
 			msg['t'] = time.time()
-			self.myPublish(f"{self._publishedTopics[0]}", msg)
+			self._MQTTClient.myPublish(f"{self._MQTTClient.publishedTopics[0]}", msg)
 		else:
 			DM.checkUpdate(self, True)
 			check_actuator = DM.inList(ActuatorID, self.deviceList)
@@ -105,7 +105,7 @@ class ConsumptionManager (GenericService):
 				msg['msg'] = check_actuator.message
 				msg['msgType'] = check_actuator.messageType
 				msg['t'] = time.time()
-				self.myPublish(f"{CompanyName}/{self._publishedTopics[0]}", msg)
+				self._MQTTClient.myPublish(f"{CompanyName}/{self._MQTTClient.publishedTopics[0]}", msg)
 			else:
 				self.updateStatus(ActuatorID, command)
 

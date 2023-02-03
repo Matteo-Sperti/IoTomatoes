@@ -36,7 +36,7 @@ class IoTDevice(GenericResource):
             else:
                 self._measureTimeInterval = 5
             self._message={
-                "cn" : self.CompanyName,
+                "cn" : self._CompanyName,
                 "bn" : self.ID,
                 "field" : self.field,
                 "e" : [{
@@ -114,7 +114,7 @@ class IoTDevice(GenericResource):
                 
             if v is not None:
                 msg["e"][-1]["v"] = v
-                self.myPublish(topic, msg)
+                self._MQTTClient.myPublish(topic, msg)
     
     def construct_message(self, measure : str, unit : str) :
         """This function is used to construct the message to be published on the topics."""

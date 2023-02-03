@@ -1,17 +1,16 @@
 {
-    "ServiceCatalog_url" : "http://172.16.0.2:8080",
-    "serviceName" : "Smart Lighting",
+    "ServiceCatalog_url" : "http://service_catalog:8080",
+    "serviceName" : "smart_lighting",
     "availableServices" : [
         "MQTT"
     ],
     "servicesDetails" : [
         {
             "serviceType": "MQTT",
-            "subscribedTopics": [],
             "publishedTopics": [-1]
         }
     ],
     "controlTimeInterval": 30,
-    "WeatherForecast_ServiceName" : "WeatherForecast",
-    "MongoDB_ServiceName" : "MongoDB"
+    "WeatherForecast_ServiceName" : "weather_forecast",
+    "MongoDB_ServiceName" : "mongodb_connector"
 }

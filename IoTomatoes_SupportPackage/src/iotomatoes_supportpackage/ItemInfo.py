@@ -23,24 +23,36 @@ def PowerConsumption_kW(dict_ : dict) -> int:
         return dict_["PowerConsumption_kW"]
 
 def isMQTT(dict_ : dict) -> bool:
+    if "availableServices" not in dict_:
+        return False
+    
     for service in dict_["availableServices"]:
         if service == "MQTT":
             return True
     return False
 
 def subscribedTopics(dict_ : dict) -> list:
+    if "servicesDetails" not in dict_:
+        return []
+    
     for service in dict_["servicesDetails"]:
         if service["serviceType"] == "MQTT":
             return service["subscribedTopics"]
     return []
 
 def publishedTopics(dict_ : dict) -> list:
+    if "servicesDetails" not in dict_:
+        return []
+    
     for service in dict_["servicesDetails"]:
         if service["serviceType"] == "MQTT":
             return service["publishedTopics"]
     return []
 
 def getIPaddress(dict_ : dict) -> str:
+    if "servicesDetails" not in dict_:
+        return ""
+    
     for service in dict_["servicesDetails"]:
         if service["serviceType"] == "REST":
             return service["serviceIP"]

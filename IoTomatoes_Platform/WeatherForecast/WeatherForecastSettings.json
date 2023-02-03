@@ -1,7 +1,7 @@
 {
-    "ServiceCatalog_url" : "http://172.16.0.2:8080",
+    "ServiceCatalog_url" : "http://service_catalog:8080",
     "WeatherUrl": "https://api.open-meteo.com/v1/forecast",
-    "serviceName": "WeatherForecast",
+    "serviceName": "weather_forecast",
     "IPport": 8080,
     "PointsPerGraph": 7,
     "IrrigationDict": {

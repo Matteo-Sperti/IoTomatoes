@@ -55,6 +55,8 @@ services:
       dockerfile: ./TelegramBot/Dockerfile
     depends_on:
       - resource_catalog
+    volumes:
+      - iotomatoes_supportpackage:/app/iotomatoes_supportpackage
     networks:
       - internal
 
@@ -67,6 +69,8 @@ services:
       - resource_catalog
     networks:
       - internal
+    volumes:
+      - iotomatoes_supportpackage:/app/iotomatoes_supportpackage
 
   weather_forecast:
     image: weather_forecast
@@ -77,6 +81,8 @@ services:
       - resource_catalog
     networks:
       - internal
+    volumes:
+      - iotomatoes_supportpackage:/app/iotomatoes_supportpackage
 
   smart_irrigation:
     image: smart_irrigation
@@ -88,6 +94,8 @@ services:
       - weather_forecast
     networks:
       - internal
+    volumes:
+      - iotomatoes_supportpackage:/app/iotomatoes_supportpackage
 
   smart_lighting:
     image: smart_lighting
@@ -99,6 +107,8 @@ services:
       - weather_forecast
     networks:
       - internal
+    volumes:
+      - iotomatoes_supportpackage:/app/iotomatoes_supportpackage
 
   fault_detection:
     image: fault_detection
@@ -109,6 +119,8 @@ services:
       - resource_catalog
     networks:
       - internal
+    volumes:
+      - iotomatoes_supportpackage:/app/iotomatoes_supportpackage
 
   consumption_manager:
     image: consumption_manager
@@ -119,7 +131,9 @@ services:
       - resource_catalog
     networks:
       - internal
-  
+    volumes:
+      - iotomatoes_supportpackage:/app/iotomatoes_supportpackage
+
   localization:
     image: localization
     build:
@@ -129,9 +143,11 @@ services:
       - resource_catalog
     networks:
       - internal
+    volumes:
+      - iotomatoes_supportpackage:/app/iotomatoes_supportpackage
 
-  data_visualization:
-    image: data_visualization
+  data_visualizer:
+    image: data_visualizer
     build:
       context: .
       dockerfile: ./DataVisualizer/Dockerfile
@@ -139,3 +155,5 @@ services:
       - mongodb_connector
     networks:
       - internal
+    volumes:
+      - iotomatoes_supportpackage:/app/iotomatoes_supportpackage

@@ -7,9 +7,25 @@ networks:
 volumes:
   iotomatoes_supportpackage:
     name: iotomatoes_supportpackage
-    external: true
+    driver: local
+    driver_opts:
+      type: none
+      device: /home/matte/Desktop/PoliTO/ProgrammingIOT/IoTomatoes/IoTomatoes_SupportPackage/src/iotomatoes_supportpackage/
+      o: bind
+  data: ~
 
 services:
+  mosquitto:
+    image: eclipse-mosquitto:2
+    volumes:
+      - ./mosquitto.conf:/mosquitto/config/mosquitto.conf
+      - data:/mosquitto/data/
+    ports:
+      - 1883:1883
+      - 9001:9001
+    networks:
+      - internal
+
   load_balancer:
     image: nginx
     volumes:
@@ -39,6 +55,7 @@ services:
       dockerfile: ./ResourceCatalog/Dockerfile
     depends_on:
       - service_catalog
+      - mosquitto
     volumes:
       - iotomatoes_supportpackage:/app/iotomatoes_supportpackage
     networks:

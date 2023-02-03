@@ -2,7 +2,7 @@ import datetime
 import json
 import paho.mqtt.client as PahoMQTT
 
-brokerIP = "mqtt.eclipseprojects.io"
+brokerIP = "localhost"
 brokerPort = 1883
 baseTopic =  "IoTomatoes/"
 

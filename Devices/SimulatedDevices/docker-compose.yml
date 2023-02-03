@@ -3,11 +3,7 @@ version: '3.4'
 volumes:
   iotomatoes_supportpackage:
     name: iotomatoes_supportpackage
-    driver: local
-    driver_opts:
-      type: none
-      device: /home/matte/Desktop/PoliTO/ProgrammingIOT/IoTomatoes/IoTomatoes_SupportPackage/src/iotomatoes_supportpackage/
-      o: bind
+    external: true
 
 services:
   device1:
@@ -15,8 +11,8 @@ services:
     build:
       context: .
       dockerfile: ./Device1/Dockerfile
-    ports:
-      - "9082:9082"
+    extra_hosts:
+        - "host.docker.internal:host-gateway"
     volumes:
       - iotomatoes_supportpackage:/app/iotomatoes_supportpackage
 
@@ -25,8 +21,7 @@ services:
     build:
       context: .
       dockerfile: ./Device2/Dockerfile
-    ports:
-      - "9083:9083"
+    network_mode: "bridge"
     volumes:
       - iotomatoes_supportpackage:/app/iotomatoes_supportpackage
 
@@ -35,8 +30,7 @@ services:
     build:
       context: .
       dockerfile: ./Device3/Dockerfile
-    ports:
-      - "9084:9084"
+    network_mode: "bridge"
     volumes:
       - iotomatoes_supportpackage:/app/iotomatoes_supportpackage
 
@@ -45,8 +39,7 @@ services:
     build:
       context: .
       dockerfile: ./Device4/Dockerfile
-    ports:
-      - "9085:9085"
+    network_mode: "bridge"
     volumes:
       - iotomatoes_supportpackage:/app/iotomatoes_supportpackage
 
@@ -55,8 +48,7 @@ services:
     build:
       context: .
       dockerfile: ./Device5/Dockerfile
-    ports:
-      - "9086:9086"
+    network_mode: "bridge"
     volumes:
       - iotomatoes_supportpackage:/app/iotomatoes_supportpackage
 
@@ -65,8 +57,7 @@ services:
     build:
       context: .
       dockerfile: ./Truck1/Dockerfile
-    ports:
-      - "9087:9087"
+    network_mode: "bridge"
     volumes:
       - iotomatoes_supportpackage:/app/iotomatoes_supportpackage
 
@@ -75,7 +66,6 @@ services:
     build:
       context: .
       dockerfile: ./Truck2/Dockerfile
-    ports:
-      - "9088:9088"
+    network_mode: "bridge"
     volumes:
       - iotomatoes_supportpackage:/app/iotomatoes_supportpackage

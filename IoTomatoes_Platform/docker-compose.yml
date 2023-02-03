@@ -7,11 +7,7 @@ networks:
 volumes:
   iotomatoes_supportpackage:
     name: iotomatoes_supportpackage
-    driver: local
-    driver_opts:
-      type: none
-      device: /home/matte/Desktop/PoliTO/ProgrammingIOT/IoTomatoes/IoTomatoes_SupportPackage/src/iotomatoes_supportpackage/
-      o: bind
+    external: true
 
 services:
   load_balancer:
@@ -31,10 +27,10 @@ services:
       dockerfile: ./ServiceCatalog/Dockerfile
     depends_on:
       - load_balancer
-    volumes:
-      - iotomatoes_supportpackage:/app/iotomatoes_supportpackage
     networks:
       - internal
+    volumes:
+      - iotomatoes_supportpackage:/app/iotomatoes_supportpackage
 
   resource_catalog:
     image: resource_catalog

@@ -1,9 +1,9 @@
 import time
-from iotomatoes_supportpackage.GenericEndpoint import GenericResource
+from iotomatoes_supportpackage.BaseResource import BaseResource
 from iotomatoes_supportpackage.MyThread import MyThread
 from iotomatoes_supportpackage.ItemInfo import publishedTopics, actuatorType
 
-class IoTDevice(GenericResource):
+class IoTDevice(BaseResource):
     def __init__(self, DeviceInfo : dict, sensor = None, actuator = None):
         """Constructor of a generic device. It will initialize the device and
         the MQTT client, it will register itself to the ResourceCatalog and to the broker

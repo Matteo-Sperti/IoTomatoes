@@ -1,11 +1,10 @@
 import json
 import time
 import cherrypy
-import sys
 import signal
 from socket import gethostname, gethostbyname
 
-from iotomatoes_supportpackage.GenericEndpoint import GenericService
+from iotomatoes_supportpackage.BaseService import BaseService
 from iotomatoes_supportpackage.MyExceptions import web_exception, InfoException
 from iotomatoes_supportpackage.ItemInfo import (
     constructResource, measureType, actuatorType, publishedTopics)
@@ -65,23 +64,17 @@ class ResourceCatalogManager():
         Raise an exception is the `CompanyToken` is not correct.
         """
 
-        if "CompanyName" not in credentials or not ("CompanyToken" in credentials 
-                or "SystemToken" in credentials):
+        if "CompanyName" not in credentials:
             raise web_exception(400, "Missing credentials")
 
         if company["CompanyName"] == credentials["CompanyName"]:
-            if "SystemToken" in credentials:
-                if credentials["SystemToken"] == self._SystemToken:
-                    return True
-                else:
-                    raise web_exception(401, "Wrong credentials")
-            elif "CompanyToken" in credentials:
+            if "CompanyToken" in credentials:
                 if company["CompanyToken"] == credentials["CompanyToken"]:
                     return True
                 else:
                     raise web_exception(401, "Wrong credentials")
             else:
-                raise web_exception(401, "Wrong credentials")
+                return True
         else:
             return False
 
@@ -90,7 +83,7 @@ class ResourceCatalogManager():
 
         Arguments:\n
         `params` -- a dictionary with the parameters of the request.
-        Must contain the `CompanyName` and `CompanyToken` or `SystemToken`.\n
+        Must contain the `CompanyName` and `CompanyToken`.\n
         Return:\n
         JSON with the access info of the device, or an error message.
         """
@@ -98,8 +91,8 @@ class ResourceCatalogManager():
             if "CompanyToken" in params:
                 CompanyInfo = {"CompanyName": params["CompanyName"], "CompanyToken": params["CompanyToken"]}
                 return CompanyInfo
-            elif "SystemToken" in params:
-                CompanyInfo = {"CompanyName": params["CompanyName"], "SystemToken": params["SystemToken"]}
+            else:
+                CompanyInfo = {"CompanyName": params["CompanyName"]}
                 return CompanyInfo
 
         raise web_exception(400, "Error in the access information")
@@ -143,20 +136,12 @@ class ResourceCatalogManager():
         return None
     
     def getAll(self):
-        """Return a json with the list of all the companies in the catalog.
-
-        Arguments:\n
-        `credential` -- dictionary with `SystemToken`, the token of the system to authorize the request.
-        """
+        """Return a json with the list of all the companies in the catalog."""
 
         return json.dumps(self.catalog[companyList_name], indent=4)
 
     def getCompanyNameList(self):
-        """Return a json with the list of names of all the companies in the catalog.
-
-        Arguments:\n
-        `credential` -- dictionary with `SystemToken`, the token of the system to authorize the request.
-        """
+        """Return a json with the list of names of all the companies in the catalog."""
 
         return json.dumps([company["CompanyName"] for company in self.catalog[companyList_name]], indent=4)
 
@@ -220,7 +205,7 @@ class ResourceCatalogManager():
 
         Arguments: \n
         `dict_` -- the information about the company.
-        Must contain the `CompanyName` and `SystemToken`.
+        Must contain the `CompanyName`
         """
         company = self.findCompany(dict_)
         if company != None:
@@ -243,21 +228,20 @@ class ResourceCatalogManager():
         """Return True if the company specified in `CompanyInfo` is registered in the catalog.
 
         Arguments: \n
-        `params {dict}` -- must contain the `SystemToken` and `telegramID`.
+        `params (dict)` -- must contain the  `telegramID`.
         """
         
         out = {"CompanyName": ""}
-        if self.systemAuthorize(params):
-            if "telegramID" in params:
-                CompanyName = self.findUserByTelegramID(params["telegramID"])
-                if CompanyName != None:
-                    out["CompanyName"] = CompanyName
-                    return json.dumps(out, indent=4)
-                else:
-                    out["CompanyName"] = ""
-                    return json.dumps(out, indent=4)
+        if "telegramID" in params:
+            CompanyName = self.findUserByTelegramID(params["telegramID"])
+            if CompanyName != None:
+                out["CompanyName"] = CompanyName
+                return json.dumps(out, indent=4)
             else:
-                raise web_exception(400, "Missing telegramID")
+                out["CompanyName"] = ""
+                return json.dumps(out, indent=4)
+        else:
+            raise web_exception(400, "Missing telegramID")
 
     def findUserByTelegramID(self, telegramID : str):
         try:
@@ -271,11 +255,10 @@ class ResourceCatalogManager():
                     return company["CompanyName"]
         return None
 
-    def insertCompany(self, credentials: dict, Info : dict):
+    def insertCompany(self, Info : dict):
         """Insert a new company in the catalog.
 
         Arguments:\n
-        `credentials (dict)`: dictionary with `SystemToken`, the token of the system to authorize the request.\n
         `Info (dict)`: the information about the company.
         Must contain the `CompanyInfo (dict)`: the information about the company.
         `AdminInfo (dict)`: the information about the admin of the company.
@@ -292,35 +275,34 @@ class ResourceCatalogManager():
             raise web_exception(400, "Missing CompanyInfo, AdminInfo or fieldsList")
 
         out = {}
-        if self.systemAuthorize(credentials):
-            if self.findCompany(CompanyInfo) != None:
-                out["Status"] = False
-                out["Error"] = "Company already registered"
-            else:
-                if all(key in CompanyInfo for key in ["CompanyName", "CompanyToken"]):
-                    ID = self._IDs.get_ID()
-                    AdminID = self._IDs.get_ID()
-                    if ID == -1 or AdminID == -1:
-                        raise web_exception(500, "No more IDs available")
-                    else:
-                        NewCompany = {
-                            "ID": ID,
-                            "CompanyName": CompanyInfo["CompanyName"],
-                            "CompanyToken": str(CompanyInfo["CompanyToken"]),
-                            "Location": CompanyInfo["Location"],
-                            "NumberOfFields" : int(CompanyInfo["NumberOfFields"]),
-                            "adminID": AdminID,
-                            usersList_name: [],
-                            devicesList_name: [],
-                            fieldsList_name: Fieldlist
-                        }
-                        new_item = AdminInfo
-                        new_item["ID"] = AdminID
-                        new_item["lastUpdate"] =  time.time()
-                        NewCompany[usersList_name].append(new_item)
-                        self.catalog[companyList_name].append(NewCompany)
-                        self.catalog["lastUpdate"] =  time.time() 
-                        out = {"Status": True, "CompanyID": ID, "CompanyToken": CompanyInfo["CompanyToken"]}
+        if self.findCompany(CompanyInfo) != None:
+            out["Status"] = False
+            out["Error"] = "Company already registered"
+        else:
+            if all(key in CompanyInfo for key in ["CompanyName", "CompanyToken"]):
+                ID = self._IDs.get_ID()
+                AdminID = self._IDs.get_ID()
+                if ID == -1 or AdminID == -1:
+                    raise web_exception(500, "No more IDs available")
+                else:
+                    NewCompany = {
+                        "ID": ID,
+                        "CompanyName": CompanyInfo["CompanyName"],
+                        "CompanyToken": str(CompanyInfo["CompanyToken"]),
+                        "Location": CompanyInfo["Location"],
+                        "NumberOfFields" : int(CompanyInfo["NumberOfFields"]),
+                        "adminID": AdminID,
+                        usersList_name: [],
+                        devicesList_name: [],
+                        fieldsList_name: Fieldlist
+                    }
+                    new_item = AdminInfo
+                    new_item["ID"] = AdminID
+                    new_item["lastUpdate"] =  time.time()
+                    NewCompany[usersList_name].append(new_item)
+                    self.catalog[companyList_name].append(NewCompany)
+                    self.catalog["lastUpdate"] =  time.time() 
+                    out = {"Status": True, "CompanyID": ID, "CompanyToken": CompanyInfo["CompanyToken"]}
         
         return json.dumps(out, indent=4)
 
@@ -340,8 +322,7 @@ class ResourceCatalogManager():
                 if not (new_item["field"] > 0 and new_item["field"] <= company["NumberOfFields"]) :
                     raise web_exception(400, "Field number not valid")
                 company[devicesList_name].append(new_item)
-                out = {"ID": ID}
-                return json.dumps(out, indent=4)
+                return json.dumps(new_item, indent=4)
         else:
             raise web_exception(500, "No Company found")
 
@@ -490,7 +471,7 @@ class ResourceCatalogManager():
         self.catalog["lastUpdate"] = actualtime
         self.save()
 
-class RESTResourceCatalog(GenericService):
+class RESTResourceCatalog(BaseService):
     exposed = True
 
     def __init__(self, settings : dict): 
@@ -502,7 +483,7 @@ class RESTResourceCatalog(GenericService):
         filename = settings["filename"]
         autoDeleteTime = settings["autoDeleteTime"]
         super().__init__(settings)
-        self.catalog = ResourceCatalogManager(self._EndpointInfo, self._SystemToken, filename, autoDeleteTime)
+        self.catalog = ResourceCatalogManager(self._EndpointInfo, filename, autoDeleteTime)
 
     def close(self):
         """Close the endpoint and save the catalog."""
@@ -528,13 +509,13 @@ class RESTResourceCatalog(GenericService):
                     CompanyInfo = self.catalog.accessInfo(params)
                     return self.catalog.getCompany(CompanyInfo)
                 elif len(uri) == 1 and uri[0] == "companiesName":
-                    return self.catalog.getCompanyNameList(params)    
+                    return self.catalog.getCompanyNameList()    
                 elif len(uri) == 1 and uri[0] == "CompanyToken":
                     return self.catalog.getCompanyToken(params)
                 elif len(uri) == 1 and uri[0] == "isRegistered":
                     return self.catalog.isRegistered(params)
                 elif len(uri) == 1 and uri[0] == "all":
-                    return self.catalog.getAll(params)
+                    return self.catalog.getAll()
                 elif len(uri) == 1 and uri[0] == "get":
                     if "ID" in params:
                         CompanyInfo = self.catalog.accessInfo(params)
@@ -576,7 +557,7 @@ class RESTResourceCatalog(GenericService):
             if len(uri) == 1:
                 body_dict = json.loads(cherrypy.request.body.read())
                 if  uri[0] == "company":
-                    return self.catalog.insertCompany(params, body_dict)
+                    return self.catalog.insertCompany(body_dict)
                 elif uri[0] == "user":
                         return self.catalog.insertUser(params, body_dict)
                 elif uri[0] == "device":
@@ -614,21 +595,22 @@ class RESTResourceCatalog(GenericService):
         `/company`: delete the company from the platform. 
         The parameters are `telegramID`, `CompanyName` and `CompanyToken`.\n
         """
-        
-        try:
-            if len(uri) == 1 and uri[0] == "company":
+
+        if len(uri) == 1 and uri[0] == "company":
+            try:
                 return self.catalog.deleteCompany(params)
-            raise web_exception(400, "Unrecognized command.")
-        except web_exception as e:
-            return cherrypy.HTTPError(e.code, e.message)
-        except:
-            return cherrypy.HTTPError(500, "Internal Server Error.")
+            except web_exception as e:
+                return cherrypy.HTTPError(e.code, e.message)
+            except:
+                return cherrypy.HTTPError(500, "Internal Server Error.")
+
+        raise cherrypy.HTTPError(400, "Unrecognized command.")
 
 def sigterm_handler(signal, frame):
     Catalog.close()
-    cherrypy.engine.block()
+    cherrypy.engine.stop()
+    cherrypy.engine.exit()
     print("Server stopped")
-    sys.exit(0)
 
 signal.signal(signal.SIGTERM, sigterm_handler)
 

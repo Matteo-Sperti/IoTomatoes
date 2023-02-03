@@ -1,7 +1,7 @@
 import json
 import time
 
-from iotomatoes_supportpackage.AmbientSimulator import GPSgenerator
+from iotomatoes_supportpackage.GPSgenerator import GPSgenerator
 from iotomatoes_supportpackage.IoTDevice import IoTDevice
 
 class SimTruck(IoTDevice):

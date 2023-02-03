@@ -174,7 +174,7 @@ class InsertNewCompany():
             body = {"CompanyInfo" : self.company,
                     "AdminInfo" : self.adminInfo, 
                     "fieldsList" : self.response["fieldsList"]}
-            res = requests.post(self._connector.ResourceCatalog_url + "/insertCompany",
+            res = requests.post(self._connector.ResourceCatalog_url + "/company",
                                     data= json.dumps(body))
             res.raise_for_status()
         except requests.exceptions.HTTPError as err:
@@ -290,7 +290,7 @@ class RegisterNewUser():
         `False` otherwise.\n
         """
         try:
-            res = requests.post(self._connector.ResourceCatalog_url + f"/insert/user", 
+            res = requests.post(self._connector.ResourceCatalog_url + f"/user", 
                                     params=self.company, json=self.UserInfo)
             res.raise_for_status()
         except requests.exceptions.HTTPError as err:

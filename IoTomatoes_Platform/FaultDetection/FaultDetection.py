@@ -2,10 +2,10 @@ import datetime
 import time
 import json
 
-from iotomatoes_supportpackage.GenericEndpoint import GenericService
+from iotomatoes_supportpackage.BaseService import BaseService
 import iotomatoes_supportpackage.DeviceManager as DM
 
-class FaultDetector(GenericService):
+class FaultDetector(BaseService):
 	def __init__(self, settings):
 		"""Initialize the FaultDetector class"""
 
@@ -111,7 +111,7 @@ class FaultDetector(GenericService):
 			msg['cn'] = CompanyName
 			msg['msgType'] = "Error"
 			msg['msg'] = "Measure not found"
-			self.myPublish(f"{CompanyName}/{self._publishedTopics[0]}", msg)
+			self._MQTTClient.myPublish(f"{CompanyName}/{self._MQTTClient.publishedTopics[0]}", msg)
 		else:
 			DM.checkUpdate(self, False)
 			sensor_check = DM.inList(deviceID, self.deviceList)
@@ -122,14 +122,14 @@ class FaultDetector(GenericService):
 				msg['cn'] = CompanyName
 				msg['msgType'] = sensor_check.messageType
 				msg['msg'] = sensor_check.message
-				self.myPublish(f"{CompanyName}/{self._publishedTopics[0]}", msg)
+				self._MQTTClient.myPublish(f"{CompanyName}/{self._MQTTClient.publishedTopics[0]}", msg)
 			if measure_check.is_error:
 				msg = self._message.copy()
 				msg['t'] = time.time()
 				msg['cn'] = CompanyName
 				msg['msgType'] = measure_check.messageType
 				msg['msg'] = measure_check.message
-				self.myPublish(f"{CompanyName}/{self._publishedTopics[0]}", msg)
+				self._MQTTClient.myPublish(f"{CompanyName}/{self._MQTTClient.publishedTopics[0]}", msg)
 			
 			if (measure_check.is_error and sensor_check.is_error) == False:
 				self.updateStatus(deviceID)
@@ -145,7 +145,7 @@ class FaultDetector(GenericService):
 				msg['cn'] = CompanyName
 				msg['msgType'] = status.messageType
 				msg['msg'] = status.message
-				self.myPublish(f"{CompanyName}/{self._publishedTopics[0]}", msg)
+				self._MQTTClient.myPublish(f"{CompanyName}/{self._MQTTClient.publishedTopics[0]}", msg)
 
 if __name__ == "__main__":
 	try:

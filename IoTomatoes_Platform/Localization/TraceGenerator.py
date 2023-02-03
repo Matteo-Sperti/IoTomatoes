@@ -2,10 +2,10 @@ import json
 import gpxpy
 import folium
 
-from iotomatoes_supportpackage.GenericEndpoint import GenericService
+from iotomatoes_supportpackage.BaseService import BaseService
 
 
-class TraceGenerator(GenericService):
+class TraceGenerator(BaseService):
     def __init__(self):
 
         self.create_url = settings["create_url"]

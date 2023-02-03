@@ -4,7 +4,7 @@ import time
 from socket import gethostname, gethostbyname
 import cherrypy
 
-from iotomatoes_supportpackage.GenericEndpoint import GenericService
+from iotomatoes_supportpackage.BaseService import BaseService
 
 
 def validateJSON(jsonData):
@@ -50,7 +50,7 @@ class WeatherApp:
 
 
 
-class WheaterService(GenericService):
+class WheaterService(BaseService):
 	exposed = True
 
 	def __init__(self, settings:  dict):

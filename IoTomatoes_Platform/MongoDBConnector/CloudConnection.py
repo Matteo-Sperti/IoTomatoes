@@ -8,7 +8,7 @@ from matplotlib import pyplot as plt
 import datetime
 from socket import gethostname, gethostbyname
 
-from iotomatoes_supportpackage.GenericEndpoint import GenericService
+from iotomatoes_supportpackage.BaseService import BaseService
 from iotomatoes_supportpackage.MyExceptions import web_exception
 
 class MongoConnection():
@@ -326,7 +326,7 @@ def getGraphActuator(self,CompanyName,CollectionName,Actuator,start,end):
 							plt.title("Graph of "+Actuator+" for "+CollectionName+" of "+CompanyName)
 							plt.savefig("graph"+dict[i]["_id"]+".png")
 
-class RESTConnector(GenericService):
+class RESTConnector(BaseService):
 	exposed = True
 	def __init__(self,settings:dict):
 		

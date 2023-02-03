@@ -2,7 +2,6 @@ import json
 import cherrypy
 import time
 import signal
-import sys
 
 from iotomatoes_supportpackage.MyExceptions import web_exception, InfoException
 from iotomatoes_supportpackage.MyThread import MyThread
@@ -71,9 +70,11 @@ class ServiceCatalogManager:
             raise web_exception(404, "List not found")
 
     def getService_url(self, service : str):
-        """Return the url of item `ID` in json format.
+        """Return the url of item `service` in json format.
 
-        `ID` is the ID of the item to return the information of.
+        `service` is:
+        - the ID of the item to return the information of or, 
+        - the name of the item to return the information of.
         """
         try:
             ID = int(service)
@@ -104,8 +105,7 @@ class ServiceCatalogManager:
                 except InfoException as e:
                     raise web_exception(500, e.message)
                 self.catalog[serviceList_Name].append(new_item)
-                out = new_item.copy()
-                return json.dumps(out, indent=4)
+                return json.dumps(new_item, indent=4)
         except KeyError:
             raise web_exception(500, "Invalid key")
 
@@ -132,7 +132,8 @@ class ServiceCatalogManager:
 
 
     def find_item(self, **kwargs):
-        """Return the service with the ID `IDvalue`."""
+        """Return the service with the ID `IDvalue` or the 
+            corresponding `serviceName`."""
 
         if "ID" in kwargs:
             key = "ID"
@@ -146,9 +147,6 @@ class ServiceCatalogManager:
         for item in self.catalog[serviceList_Name]:
             if item[key] == value:
                 return item
-        return None
-
-
         return None
 
     def refreshItem(self, IDvalue : int):
@@ -194,10 +192,11 @@ class RESTServiceCatalog():
         """ Initialize the RESTServiceCatalog class.
 
         Arguments:\n
-        `heading` is the heading of the catalog.\n
-        `name` is the name of the catalog.\n
-        `filename` is the name of the file to save the catalog.\n
-        `autoDeleteTime` is the time in seconds to delete the services that are not online anymore.\n
+        `settings (dict)` is a dictionary with the following keys:\n
+        - `owner` is the owner of the catalog.\n
+        - `CatalogName` is the name of the catalog.\n
+        - `broker` is the broker info.\n
+        - `telegramToken` is the telegram token.\n
         """
         heading = {
             "owner": settings["owner"], 
@@ -251,21 +250,20 @@ class RESTServiceCatalog():
         Allowed commands:\n
         `/refresh?ID=<ID>` to refresh the lastUpdate field of a service by ID.\n
         """
-        try:
-            if len(uri) == 1 and uri[0] == "refresh":
-                if "ID" in params:
-                    return self.ServiceCatalog.refreshItem(int(params["ID"]))
-                else:
-                    raise web_exception(400, "Invalid parameter")
-            else:
-                raise web_exception(404, "Invalid command")
-        except web_exception as e:
-            print(e.message)
-            raise cherrypy.HTTPError(e.code, e.message)
-        except:
-            e_string = "Unknown server error"
-            print(e_string)
-            raise cherrypy.HTTPError(500, e_string)
+        if len(uri) == 1 and uri[0] == "refresh":
+            if "ID" not in params:
+                raise cherrypy.HTTPError(400, "Missing ID parameter")
+            try:
+                return self.ServiceCatalog.refreshItem(int(params["ID"]))
+            except web_exception as e:
+                print(e.message)
+                raise cherrypy.HTTPError(e.code, e.message)
+            except:
+                e_string = "Unknown server error"
+                print(e_string)
+                raise cherrypy.HTTPError(500, e_string)
+        else:
+            raise cherrypy.HTTPError(404, "Invalid command")
 
     def POST(self, *uri, **params):
         """POST REST method.
@@ -297,21 +295,20 @@ class RESTServiceCatalog():
         Allowed commands:\n
         `/delete?ID=<ID>` to delete a service by ID.
         """
-        try:
-            if len(uri) == 1 and uri[0] == "delete":
-                if "ID" in params:
-                    return self.ServiceCatalog.delete(int(params["ID"]))
-                else:
-                    raise web_exception(400, "Invalid parameter")
-            else:
-                raise web_exception(404, "Invalid command")
-        except web_exception as e:
-            print(e.message)
-            raise cherrypy.HTTPError(e.code, e.message)
-        except:
-            e_string = "Unknown server error"
-            print(e_string)
-            raise cherrypy.HTTPError(500, e_string)
+        if len(uri) == 1 and uri[0] == "delete":
+            if "ID" not in params:
+                raise cherrypy.HTTPError(400, "Missing ID parameter")
+            try:
+                return self.ServiceCatalog.delete(int(params["ID"]))
+            except web_exception as e:
+                print(e.message)
+                raise cherrypy.HTTPError(e.code, e.message)
+            except:
+                e_string = "Unknown server error"
+                print(e_string)
+                raise cherrypy.HTTPError(500, e_string)
+        else:
+            raise web_exception(404, "Invalid command")
 
 def sigterm_handler(signal, frame):
     Catalog.close()

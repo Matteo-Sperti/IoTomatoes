@@ -3,10 +3,10 @@ import time
 import datetime
 import json
 
-from iotomatoes_supportpackage.GenericEndpoint import GenericService
+from iotomatoes_supportpackage.BaseService import BaseService
 from iotomatoes_supportpackage.ItemInfo import subscribedTopics
 
-class SmartIrrigation(GenericService):
+class SmartIrrigation(BaseService):
 
     def __init__(self, settings : dict, plantInfo : dict):
         """It initializes the service with the settings and the plantInfo
@@ -158,7 +158,7 @@ class SmartIrrigation(GenericService):
             print(f"message = {message}\n")
             commandTopic = str(singleTopic)
             print(f"command Topic={commandTopic}\n\n")
-            self.myPublish(commandTopic, message)
+            self._MQTTClient.myPublish(commandTopic, message)
 
     def getTopics(self, company, fieldNumber : int): 
         """Return the list of the subscribed topics for a field in the company"""

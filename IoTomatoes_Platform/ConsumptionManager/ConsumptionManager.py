@@ -2,10 +2,10 @@ import datetime
 import time
 import json
 
-from iotomatoes_supportpackage.GenericEndpoint import GenericService
+from iotomatoes_supportpackage.BaseService import BaseService
 import iotomatoes_supportpackage.DeviceManager as DM
 
-class ConsumptionManager (GenericService):
+class ConsumptionManager (BaseService):
 	def __init__(self, settings):
 		"""Initialize the ConsumptionManager class"""
 

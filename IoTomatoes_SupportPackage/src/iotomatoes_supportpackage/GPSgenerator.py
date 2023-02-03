@@ -2,7 +2,7 @@ import random
 import json
 import math
 
-class Tractor():
+class GPSgenerator():
     def __init__(self):
         settings = json.load(open('TruckSettings.json'))
         self.lat = settings["Location"]["latitude"]

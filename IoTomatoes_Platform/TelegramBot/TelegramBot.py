@@ -8,7 +8,7 @@ import time
 import requests
 
 from Commands import *
-from iotomatoes_supportpackage.GenericEndpoint import GenericService
+from iotomatoes_supportpackage.BaseService import BaseService
 from iotomatoes_supportpackage.MyThread import custom_thread
 
 HelpMessage = """Help message to the IoTomatoesBot!
@@ -169,7 +169,7 @@ class ChatBox(telepot.DelegatorBot):
         self.sendMessage(chat_id, WelcomeMessage)
 
 
-class IoTBot(GenericService):
+class IoTBot(BaseService):
     def __init__(self, settings :dict):
         """Initialize the IoTBot service"""
 

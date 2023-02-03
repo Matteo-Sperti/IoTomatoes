@@ -51,7 +51,7 @@ def checkUpdate(Connector, isActuator: bool):
 					payload['msg'] = f"Device {new_dev['ID']} updated."
 					payload['msgType'] = 'Update'
 					payload['t'] = time.time()
-					Connector.myPublish(f"{new_dev['CompanyName']}/{Connector._publishedTopics[0]}", payload)
+					Connector._MQTTClient.myPublish(f"{new_dev['CompanyName']}/{Connector._MQTTClient.publishedTopics[0]}", payload)
 
 			if not_present:
 				Connector.deviceList.append(new_dev)
@@ -60,7 +60,7 @@ def checkUpdate(Connector, isActuator: bool):
 				payload['msg'] = f"Device {new_dev['ID']} added."
 				payload['msgType'] = 'Update'
 				payload['t'] = time.time()
-				Connector.myPublish(f"{new_dev['CompanyName']}/{Connector._publishedTopics[0]}", payload)
+				Connector._MQTTClient.myPublish(f"{new_dev['CompanyName']}/{Connector._MQTTClient.publishedTopics[0]}", payload)
 
 	for old_dev in Connector.deviceList:
 		if old_dev['ID'] not in [d['ID'] for d in new_deviceList] and old_dev['isActuator'] == isActuator:
@@ -70,7 +70,7 @@ def checkUpdate(Connector, isActuator: bool):
 			payload['msg'] = f"Device {old_dev['ID']} removed."
 			payload['msgType'] = 'Update'
 			payload['t'] = time.time()
-			Connector.myPublish(f"{old_dev['CompanyName']}/{Connector._publishedTopics[0]}", payload)
+			Connector._MQTTClient.myPublish(f"{old_dev['CompanyName']}/{Connector._MQTTClient.publishedTopics[0]}", payload)
 
 def inList(deviceID : int, deviceList : list):
 	"""Check if an actuator is in the list of the actuators\n

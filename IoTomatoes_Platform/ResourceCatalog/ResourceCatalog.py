@@ -6,7 +6,7 @@ import signal
 from iotomatoes_supportpackage.BaseService import BaseService
 from iotomatoes_supportpackage.MyExceptions import web_exception, InfoException
 from iotomatoes_supportpackage.ItemInfo import (
-    constructResource, measureType, actuatorType, publishedTopics, setREST)
+    constructResource, publishedTopics, setREST)
 from iotomatoes_supportpackage.MyIDGenerator import IDs
 from iotomatoes_supportpackage.MyThread import MyThread
 
@@ -50,31 +50,31 @@ class ResourceCatalogManager():
 
         return json.dumps(self.catalog, indent=4)
 
-    def isAuthorize(self, company : dict, credentials : dict):
-        """Check if the credentials are correct for the company.
+    # def isAuthorize(self, company : dict, credentials : dict):
+    #     """Check if the credentials are correct for the company.
         
-        Arguments:\n
-        `company` -- the company to check.\n
-        `credentials` -- the credentials to access the `company`.\n
+    #     Arguments:\n
+    #     `company` -- the company to check.\n
+    #     `credentials` -- the credentials to access the `company`.\n
         
-        Return:\n
-        `True` if the credentials are correct, `False` if the credential are for different company.
-        Raise an exception is the `CompanyToken` is not correct.
-        """
+    #     Return:\n
+    #     `True` if the credentials are correct, `False` if the credential are for different company.
+    #     Raise an exception is the `CompanyToken` is not correct.
+    #     """
 
-        if "CompanyName" not in credentials:
-            raise web_exception(400, "Missing credentials")
+    #     if "CompanyName" not in credentials:
+    #         raise web_exception(400, "Missing credentials")
 
-        if company["CompanyName"] == credentials["CompanyName"]:
-            if "CompanyToken" in credentials:
-                if company["CompanyToken"] == credentials["CompanyToken"]:
-                    return True
-                else:
-                    raise web_exception(401, "Wrong credentials")
-            else:
-                return False
-        else:
-            return False
+    #     if company["CompanyName"] == credentials["CompanyName"]:
+    #         if "CompanyToken" in credentials:
+    #             if company["CompanyToken"] == credentials["CompanyToken"]:
+    #                 return True
+    #             else:
+    #                 raise web_exception(401, "Wrong credentials")
+    #         else:
+    #             return False
+    #     else:
+    #         return False
     
     def findCompany(self, CompanyName : str):
         """Return the pointer to the company specified in `CompanyInfo`.
@@ -90,7 +90,10 @@ class ResourceCatalogManager():
 
     def find_list(self, CompanyName : str, IDvalue : int):
         """Return the list where the item with the ID `IDvalue` is present.
-        `CompanyName (str)`: the name of the company to find.
+
+        Arguments: \n
+        `CompanyName (str)`: the name of the company to find.\n
+        `IDvalue (int)`: the ID of the item to find.
         """
 
         company = self.findCompany(CompanyName)
@@ -103,7 +106,10 @@ class ResourceCatalogManager():
 
     def find_item(self, CompanyName : str, IDvalue : int) :
         """Return the item with the ID `IDvalue`.
-        `CompanyName` -- the name of the company to find.
+
+        Arguments:\n
+        `CompanyName (str)`: the name of the company to find.\n
+        `IDvalue (int)`: the ID of the item to find.
         """
 
         company = self.findCompany(CompanyName)
@@ -145,13 +151,15 @@ class ResourceCatalogManager():
         `params (dict)`: the parameters to filter the topics.
         """
         company = self.findCompany(CompanyName)
-        if company != None:
+        if company == None:
+            raise web_exception(404, "Company not found")
+        else:
+            outlist = []
             for item in company[devicesList_name]:
-                if item["field"] == field:
-                    if ResourceType in measureType(item) or ResourceType in actuatorType(item):
-                        return json.dumps(publishedTopics(item), indent=4)
-        raise web_exception(404, "Company not found")
-
+                if "field" in params:
+                    if item["field"] != params["field"]:
+                        outlist.append(publishedTopics(item))
+            return json.dumps(outlist, indent=4)
 
     def getLocation(self, CompanyName : str):
         """Return the location of the company `CompanyName` in json format."""
@@ -293,10 +301,10 @@ class ResourceCatalogManager():
 
         if "telegramID" not in userInfo:
             raise web_exception(400, "Missing telegramID")
-
-        CompanyName = self.findUserByTelegramID(userInfo["telegramID"])
-        if CompanyName != None:
-            raise web_exception(403, f"User already registered in {CompanyName}")
+        else:
+            NewCompanyName = self.findUserByTelegramID(userInfo["telegramID"])
+            if NewCompanyName != None:
+                raise web_exception(403, f"User already registered in {NewCompanyName}")
 
         ID = self._IDs.get_ID()
         if ID == -1:

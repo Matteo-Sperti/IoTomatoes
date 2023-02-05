@@ -38,7 +38,7 @@ class IoTDevice(BaseResource):
             self._message={
                 "cn" : self.CompanyName,
                 "bn" : self.ID,
-                "field" : self.field,
+                "fieldNumber" : self.field,
                 "e" : [{
                     "n": "",
                     "v": None,

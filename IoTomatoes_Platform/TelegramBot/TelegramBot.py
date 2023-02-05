@@ -6,6 +6,7 @@ from telepot.delegate import (
 import json
 import time
 import requests
+import signal
 
 from Commands import *
 from iotomatoes_supportpackage.BaseService import BaseService
@@ -231,11 +232,11 @@ class IoTBot(BaseService):
             return None
 
         try:
-            params = {"CompanyName": CompanyName}
-            res = requests.get(f"{self.ResourceCatalog_url}/{CompanyName}/{listType}", params=params)
+            res = requests.get(f"{self.ResourceCatalog_url}/{CompanyName}/{listType}")
             res.raise_for_status()
             res_dict = res.json()
         except:
+            print("Connection Error\nImpossibile to reach the ResourceCatalog")
             return None
         else:
             if len(res_dict) > 0:
@@ -245,6 +246,7 @@ class IoTBot(BaseService):
 
     def notify(self, topic, msg):
         """Notify the user of the message received from the broker"""
+        print(f"Received message from {topic}")
         try:
             timestamp = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(msg["t"]))
             message = (f"\nMessage from {msg['bn']} at {timestamp}:\n")
@@ -261,15 +263,23 @@ class IoTBot(BaseService):
                 except:
                     print("Invalid chatID")
             else:
-                CompanyName = topic.split("/")[1]
+                CompanyName = topic.split("/")[0]
                 users = self.getList(CompanyName, "users")
-                if users is not None:
+                if users is None:
+                    print("Error! No users found")
+                else:
                     for user in users:
                         try:
                             chatID = int(user["telegramID"])
                             self.bot.sendMessage(chatID, text=message)
                         except:
                             print("Invalid chatID from catalog")
+
+def sigterm_handler(signal, frame):
+    IoTomatoesBOT.stop()
+    print("Server stopped")
+
+signal.signal(signal.SIGTERM, sigterm_handler)
 
 if __name__ == "__main__":
     try:
@@ -284,9 +294,4 @@ if __name__ == "__main__":
         print("IoTBot started")
 
         while True:
-            try:
-                time.sleep(3)
-            except KeyboardInterrupt or SystemExit:
-                break
-
-        IoTomatoesBOT.stop()
+            time.sleep(5)

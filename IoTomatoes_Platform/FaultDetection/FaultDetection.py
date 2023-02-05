@@ -1,6 +1,7 @@
 import datetime
 import time
 import json
+import signal
 
 from iotomatoes_supportpackage.BaseService import BaseService
 import iotomatoes_supportpackage.DeviceManager as DM
@@ -147,6 +148,12 @@ class FaultDetector(BaseService):
 				msg['msg'] = status.message
 				self._MQTTClient.myPublish(f"{CompanyName}/{self._MQTTClient.publishedTopics[0]}", msg)
 
+def sigterm_handler(signal, frame):
+    fd.stop()
+    print("FaultDetection stopped")
+
+signal.signal(signal.SIGTERM, sigterm_handler)
+
 if __name__ == "__main__":
 	try:
 		settings = json.load(open('FaultDetectionSettings.json', 'r'))
@@ -155,12 +162,8 @@ if __name__ == "__main__":
 		print(e)
 		print("Error, FaultDetector not initialized")
 	else:
-		try:
-			while True:
-				fd.checkDeviceStatus()
-				time.sleep(60)
-		except KeyboardInterrupt:
-			fd.stop()
-			print("FaultDetection stopped")
+		while True:
+			fd.checkDeviceStatus()
+			time.sleep(60)
 
 		

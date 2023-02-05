@@ -156,8 +156,8 @@ class ResourceCatalogManager():
         else:
             outlist = []
             for item in company[devicesList_name]:
-                if "field" in params:
-                    if item["field"] != params["field"]:
+                if "fieldNumber" in params:
+                    if item["fieldNumber"] != params["fieldNumber"]:
                         outlist.append(publishedTopics(item))
             return json.dumps(outlist, indent=4)
 
@@ -268,7 +268,7 @@ class ResourceCatalogManager():
         """
         company = self.findCompany(CompanyName)
         if company == None:
-            raise web_exception(500, "No Company found")
+            raise web_exception(404, "No Company found")
         else:
             ID = self._IDs.get_ID()
             if ID == -1:
@@ -280,7 +280,7 @@ class ResourceCatalogManager():
                 except InfoException as e:
                     raise web_exception(500, e.message)
 
-                if not (new_item["field"] > 0 and new_item["field"] <= company["NumberOfFields"]) :
+                if not (new_item["fieldNumber"] > 0 and new_item["fieldNumber"] <= company["NumberOfFields"]):
                     raise web_exception(400, "Field number not valid")
                 company[devicesList_name].append(new_item)
                 return json.dumps(new_item, indent=4)
@@ -297,7 +297,7 @@ class ResourceCatalogManager():
         """
         company = self.findCompany(CompanyName)
         if company == None:
-            raise web_exception(500, "No Company found")
+            raise web_exception(404, "No Company found")
 
         if "telegramID" not in userInfo:
             raise web_exception(400, "Missing telegramID")
@@ -462,25 +462,24 @@ class RESTResourceCatalog(BaseService):
         
         """
         try:
-            if len(uri) > 0:
-                if len(uri) == 1 and uri[0] == "isRegistered":
-                    return self.catalog.isRegistered(params)
-                elif len(uri) == 1 and uri[0] == "companies":
-                    return self.catalog.getAll()
-                if len(uri) == 2 and uri[0] == "companies" and uri[1] == "names":
-                    return self.catalog.getCompanyNameList()    
-                elif len(uri) == 2 and uri[1] == "devices":
-                    return self.catalog.getList(uri[0], devicesList_name)
-                elif len(uri) == 2 and uri[1] == "users":
-                    return self.catalog.getList(uri[0], usersList_name)
-                elif len(uri) == 2 and uri[1] == "fields":
-                    return self.catalog.getList(uri[0], fieldsList_name)
-                elif len(uri) == 2 and uri[1] == "location":
-                    return self.catalog.getLocation(uri[0])
-                elif len(uri) == 2 and uri[1] == "topics":
-                    return self.catalog.getTopics(uri[0], params)
-
-            raise web_exception(404, "Resource not found.")
+            if len(uri) == 1 and uri[0] == "isRegistered":
+                return self.catalog.isRegistered(params)
+            elif len(uri) == 1 and uri[0] == "companies":
+                return self.catalog.getAll()
+            if len(uri) == 2 and uri[0] == "companies" and uri[1] == "names":
+                return self.catalog.getCompanyNameList()    
+            elif len(uri) == 2 and uri[1] == "devices":
+                return self.catalog.getList(uri[0], devicesList_name)
+            elif len(uri) == 2 and uri[1] == "users":
+                return self.catalog.getList(uri[0], usersList_name)
+            elif len(uri) == 2 and uri[1] == "fields":
+                return self.catalog.getList(uri[0], fieldsList_name)
+            elif len(uri) == 2 and uri[1] == "location":
+                return self.catalog.getLocation(uri[0])
+            elif len(uri) == 2 and uri[1] == "topics":
+                return self.catalog.getTopics(uri[0], params)
+            else:
+                raise web_exception(404, "Resource not found.")
         except web_exception as e:
             raise cherrypy.HTTPError(e.code, e.message)
         except:
@@ -522,13 +521,12 @@ class RESTResourceCatalog(BaseService):
         In the parameters must be the field number and the new plant.\n
         """
         try:
-            if len(uri) > 0:
-                if len(uri) == 2 and uri[1] == "refresh":
-                    if "ID" in params:
-                        return self.catalog.refreshItem(uri[0], int(params["ID"]))
-                if len(uri) == 2 and uri[1] == "field":
-                    return self.catalog.updateField(uri[0], params)
-            raise web_exception(404, "Resource not found.")
+            if len(uri) == 2 and uri[1] == "refresh" and "ID" in params:
+                return self.catalog.refreshItem(uri[0], int(params["ID"]))
+            elif len(uri) == 2 and uri[1] == "field":
+                return self.catalog.updateField(uri[0], params)
+            else:
+                raise web_exception(404, "Resource not found.")
         except web_exception as e:
             return cherrypy.HTTPError(e.code, e.message)
         except:

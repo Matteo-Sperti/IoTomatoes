@@ -448,7 +448,6 @@ class DeleteCompany():
 class ChangePlant():
     def __init__(self, CompanyName : str, sender, connector):
         self.CompanyName = CompanyName
-        self.CompanyToken = ""
         self.FieldNumber = ""
         self.newplant = ""
         self._connector = connector
@@ -488,16 +487,11 @@ class ChangePlant():
 
         elif self._status == 2:
             self.newplant = message
-            self._bot.sendMessage("Insert your Company Token")
-            self._status += 1
-
-        elif self._status == 3:
-            self.CompanyToken = message
             change = f"You are changing the plant of field {self.FieldNumber} of company {self.CompanyName} to {self.newplant}"
             self._bot.sendMessage(f"{change}\nConfirm your change?", reply_markup=keyboardYESNO)
             self._status += 1
 
-        elif self._status == 4:
+        elif self._status == 3:
             if message == "yes":
                 if self.change_plant():
                     self._bot.sendMessage("Update of field completed")

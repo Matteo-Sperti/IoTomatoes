@@ -2,6 +2,7 @@ import requests
 import time
 import datetime
 import json
+import signal
 
 from iotomatoes_supportpackage.BaseService import BaseService
 from iotomatoes_supportpackage.ItemInfo import subscribedTopics
@@ -27,7 +28,7 @@ class SmartIrrigation(BaseService):
         self._message={
             "bn":"",
             "cn":"",
-            "field":"",
+            "fieldNumber":"",
             "e":[{
                 "n" : "pump",
                 "u" : "/",
@@ -151,7 +152,7 @@ class SmartIrrigation(BaseService):
         for singleTopic in topicList:    
             message["bn"] = self._EndpointInfo["serviceName"]
             message["cn"] = CompanyName
-            message["field"] = fieldID
+            message["fieldNumber"] = fieldID
             message["e"][-1]["v"] = command
             message["e"][-1]["t"]=time.time()
         
@@ -164,7 +165,7 @@ class SmartIrrigation(BaseService):
         """Return the list of the subscribed topics for a field in the company"""
         topics = []
         for device in company["devicesList"]:
-            if fieldNumber == device["field"] and device["isActuator"]==True:
+            if fieldNumber == device["fieldNumber"] and device["isActuator"]==True:
                 if "pump" in device["actuatorType"]:
                     topics += subscribedTopics(device)
 
@@ -242,6 +243,11 @@ class SmartIrrigation(BaseService):
         soil_moisture_forecast=weatherService_r["hourly"]["soil_moisture_3_9cm"][hour]
         return soil_moisture_forecast,daily_precipitation_sum              
                      
+def sigterm_handler(signal, frame):
+    irrigation.stop()
+    print("SmartIrrigation stopped")
+
+signal.signal(signal.SIGTERM, sigterm_handler)
 
 if __name__=="__main__":
     try:
@@ -253,10 +259,7 @@ if __name__=="__main__":
         irrigation = SmartIrrigation(settings, plantDatabase)
 
         controlTimeInterval = settings["controlTimeInterval"]
-        try:
-            while True:
-                irrigation.control()
-                time.sleep(controlTimeInterval)
-        except KeyboardInterrupt or SystemExit:
-            irrigation.stop()
-            print("SmartIrrigation stopped")
+
+        while True:
+            irrigation.control()
+            time.sleep(controlTimeInterval)

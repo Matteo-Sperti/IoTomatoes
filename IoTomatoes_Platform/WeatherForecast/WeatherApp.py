@@ -2,6 +2,7 @@ import requests
 import json
 import time
 import cherrypy
+import signal
 
 from iotomatoes_supportpackage.BaseService import BaseService
 from iotomatoes_supportpackage.ItemInfo import setREST
@@ -83,6 +84,14 @@ class WheaterService(BaseService):
 			raise cherrypy.HTTPError(404, "Please specify the service you want to use")
 
 
+def sigterm_handler(signal, frame):
+	webService.stop()
+	cherrypy.engine.stop()
+	cherrypy.engine.exit()
+	print("Server stopped")
+
+signal.signal(signal.SIGTERM, sigterm_handler)
+
 if __name__ == '__main__':
 	settings = json.load(open("WeatherForecastSettings.json","r"))
 
@@ -103,10 +112,5 @@ if __name__ == '__main__':
 	cherrypy.config.update({'server.socket_port': port})
 	cherrypy.engine.start()
 
-	try:
-		while True:
-			time.sleep(3)
-	except KeyboardInterrupt or SystemExit:
-		webService.stop()
-		cherrypy.engine.exit()
-		print("Server stopped")
+	while True:
+		time.sleep(5)

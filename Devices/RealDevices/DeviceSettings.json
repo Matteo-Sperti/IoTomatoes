@@ -1,6 +1,6 @@
 {
     "deviceName" : "RealSensor_1",
-    "field" : 1,
+    "fieldNumber" : 1,
     "isSensor" : true,
     "measureType" : ["temperature", "humidity"],
     "CompanyName" : "PatataNovella",

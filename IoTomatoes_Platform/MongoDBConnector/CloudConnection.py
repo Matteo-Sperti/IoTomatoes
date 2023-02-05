@@ -6,6 +6,7 @@ import cherrypy
 import requests
 from matplotlib import pyplot as plt
 import datetime
+import signal
 
 from iotomatoes_supportpackage.BaseService import BaseService
 from iotomatoes_supportpackage.MyExceptions import web_exception
@@ -353,6 +354,13 @@ class RESTConnector(BaseService):
 		except:
 			raise cherrypy.HTTPError(500, "Internal Server Error")
 
+def sigterm_handler(signal, frame):
+    WebService.stop()
+    cherrypy.engine.stop()
+    cherrypy.engine.exit()
+    print("Server stopped")
+
+signal.signal(signal.SIGTERM, sigterm_handler)
 		
 if __name__ == "__main__":
 	settings = json.load(open("ConnectorSettings.json"))
@@ -371,10 +379,5 @@ if __name__ == "__main__":
 	cherrypy.config.update({'server.socket_port': port})
 	cherrypy.engine.start()
 
-	try:
-		while True:
-			time.sleep(3)
-	except KeyboardInterrupt or SystemExit:
-		WebService.stop()
-		cherrypy.engine.exit()
-		print("Server stopped")
+	while True:
+		time.sleep(5)

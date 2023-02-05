@@ -113,13 +113,13 @@ def _makeResourceTopic(dictInformation: dict, EInfo : dict, CompanyName : str):
         if "actuatorType" not in EInfo:
             raise InfoException("Actuators names is missing")
         for actuator in EInfo["actuatorType"]:
-            subscribedTopics.append(f"{CompanyTopic}/{EInfo['field']}/{dictInformation['ID']}/{actuator}")
+            subscribedTopics.append(f"{CompanyTopic}/{EInfo['fieldNumber']}/{dictInformation['ID']}/{actuator}")
 
     if "isSensor" in EInfo and EInfo["isSensor"] == True:
         if "measureType" not in EInfo:
             raise InfoException("Measure type is missing")
         for measure in EInfo["measureType"]:
-            publishedTopics.append(f"{CompanyTopic}/{EInfo['field']}/{dictInformation['ID']}/{measure}")
+            publishedTopics.append(f"{CompanyTopic}/{EInfo['fieldNumber']}/{dictInformation['ID']}/{measure}")
 
     _addMQTT(dictInformation, subscribedTopics=subscribedTopics, publishedTopics=publishedTopics)
 
@@ -135,10 +135,10 @@ def _makeResource(dictInformation : dict, EInfo : dict):
     else:
         dictInformation["deviceName"] = EInfo["deviceName"]
     
-    if "field" in EInfo:
-        dictInformation["field"] = EInfo["field"]
+    if "fieldNumber" in EInfo:
+        dictInformation["fieldNumber"] = EInfo["fieldNumber"]
     else: 
-        dictInformation["field"] = 1 
+        dictInformation["fieldNumber"] = 1 
 
     if "latitude" in EInfo and "longitude" in EInfo:
         dictInformation["Location"] = {

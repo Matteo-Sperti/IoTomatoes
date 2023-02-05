@@ -23,7 +23,8 @@ class BaseResource() :
         self._EndpointInfo = self.register(info)
         self._RefreshThread = RefreshThread(self.platform_url + "/rc/" + self.CompanyName, self)
         if self.isMQTT:
-            self._MQTTClient = BaseMQTTClient(self.platform_url, self._EndpointInfo, self.platform_url)
+            brokerip = self.platform_url.split(":")[1].replace("//", "")
+            self._MQTTClient = BaseMQTTClient(self.platform_url, self, brokerip)
             self._MQTTClient.startMQTT()
 
     def restart(self):
@@ -71,7 +72,7 @@ class BaseResource() :
     def field(self) -> int:
         """Return the field of the resource."""
         try:
-            return self._EndpointInfo["field"]
+            return self._EndpointInfo["fieldNumber"]
         except:
             return -1
 

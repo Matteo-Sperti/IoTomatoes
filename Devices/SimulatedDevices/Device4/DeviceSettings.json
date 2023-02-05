@@ -1,6 +1,6 @@
 {
     "deviceName" : "SimulatedDevice4",
-    "field" : 1,
+    "fieldNumber" : 1,
     "isSensor" : true,
     "measureType" : ["humidity", "light", "soilMoisture"],
     "CompanyName" : "PatataNovella",
@@ -8,6 +8,6 @@
         "latitude" : 44.996, 
         "longitude" : 7.475
     },
-    "IoTomatoes_url" : "http://localhost:8080",
+    "IoTomatoes_url" : "http://172.17.0.1:8080",
     "measureTimeInterval" : 5
 }

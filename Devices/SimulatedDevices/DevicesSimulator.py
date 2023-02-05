@@ -52,7 +52,7 @@ class SimDevices_Manager():
 
         Device_information = {
             "deviceName" : f"SimDevice_{ID}",
-            "field" : fieldNumber,
+            "fieldNumber" : fieldNumber,
             "isSensor" : isSensor,
             "isActuator" : isActuator,
             "measureType" : measures,

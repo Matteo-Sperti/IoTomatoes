@@ -1,6 +1,6 @@
 {
     "deviceName" : "SimulatedDevice3",
-    "field" : 2,
+    "fieldNumber" : 2,
     "isActuator" : true,
     "actuatorType" : ["led", "pump"],
     "CompanyName" : "PatataNovella",
@@ -8,6 +8,6 @@
         "latitude" : 45.001, 
         "longitude" : 7.481
     },
-    "IoTomatoes_url" : "http://localhost:8080",
+    "IoTomatoes_url" : "http://172.17.0.1:8080",
     "measureTimeInterval" : 5
 }

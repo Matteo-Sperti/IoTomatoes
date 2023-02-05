@@ -1,6 +1,7 @@
 import datetime
 import time
 import json
+import signal
 
 from iotomatoes_supportpackage.BaseService import BaseService
 import iotomatoes_supportpackage.DeviceManager as DM
@@ -28,7 +29,7 @@ class ConsumptionManager (BaseService):
 				dev_consumption = {
 					'CompanyName': dev['CompanyName'],	
 					'bn': dev['ID'],
-					'field': dev['field'],
+					'fieldNumber': dev['fieldNumber'],
 					'consumption': {
 						'consumption_value': dev['Consumption_kWh'],
 						'unit': 'kWh',
@@ -44,7 +45,7 @@ class ConsumptionManager (BaseService):
 				dev_consumption = {
 					'CompanyName': dev['CompanyName'],	
 					'bn': dev['ID'],
-					'field': dev['field'],
+					'fieldNumber': dev['fieldNumber'],
 					'consumption': {
 						'consumption_value': dev['Consumption_kWh'],
 						'unit': 'kWh',
@@ -109,6 +110,12 @@ class ConsumptionManager (BaseService):
 			else:
 				self.updateStatus(ActuatorID, command)
 
+def sigterm_handler(signal, frame):
+    cm.stop()
+    print("ConsumptionManager stopped")
+
+signal.signal(signal.SIGTERM, sigterm_handler)
+
 if __name__ == "__main__":
 	try:
 		settings = json.load(open('ConsumptionManagerSettings.json', 'r'))
@@ -117,12 +124,8 @@ if __name__ == "__main__":
 		print(e)
 		print("Error, ConsumptionManager not initialized")
 	else:
-		try:
-			while True:
-				#!To change for testing
-				if datetime.datetime.now().second >= 59: #Update the consumption every hour 
-					cm.updateConsumption()
-				time.sleep(60)
-		except KeyboardInterrupt:
-			cm.stop()
-			print("ConsumptionManager stopped")
+		while True:
+			#!To change for testing
+			if datetime.datetime.now().second >= 59: #Update the consumption every hour 
+				cm.updateConsumption()
+			time.sleep(60)

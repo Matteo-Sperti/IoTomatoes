@@ -5,7 +5,7 @@ import json
 from iotomatoes_supportpackage.ItemInfo import subscribedTopics, publishedTopics
 
 class BaseMQTTClient(): 
-    def __init__(self, url : str, EndpointInfo: dict, broker : str = ""):
+    def __init__(self, url : str, connector, broker : str = ""):
         """BaseMQTTClient class. It is the base class for the MQTT client.
 
         Arguments:\n
@@ -15,7 +15,7 @@ class BaseMQTTClient():
         """
 
         self._url = url
-        self._EndpointInfo = EndpointInfo
+        self._connector = connector
         self._broker = broker
 
     def stopMQTT(self):
@@ -35,7 +35,7 @@ class BaseMQTTClient():
         broker, self._port = self.get_broker()
         if self._broker == "":
             self._broker = broker
-        self.MQTTclientID = f"IoTomatoes_ID{self._EndpointInfo['ID']}"
+        self.MQTTclientID = f"IoTomatoes_ID{self._connector._EndpointInfo['ID']}"
         self._isSubscriber = False
         # create an instance of paho.mqtt.client
         self._paho_mqtt = PahoMQTT.Client(self.MQTTclientID, True)
@@ -67,7 +67,7 @@ class BaseMQTTClient():
         It redirects the message to the notify method (which must be implemented by the user)"""
 
         # A new message is received
-        self.notify(msg.topic, json.loads(msg.payload)) # type: ignore
+        self._connector.notify(msg.topic, json.loads(msg.payload)) # type: ignore
 
     def myPublish(self, topic, msg):
         """It publishes a dictionary message `msg` in `topic`"""
@@ -111,8 +111,8 @@ class BaseMQTTClient():
 
     @property
     def subscribedTopics(self) -> list:
-        return subscribedTopics(self._EndpointInfo)
+        return subscribedTopics(self._connector._EndpointInfo)
 
     @property
     def publishedTopics(self) -> list:
-        return publishedTopics(self._EndpointInfo)
+        return publishedTopics(self._connector._EndpointInfo)

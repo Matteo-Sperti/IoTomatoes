@@ -42,7 +42,7 @@ class AmbientSimulator():
 
         self._soilMoisture = self.saturate(self._soilMoisture, 0, 100)
         self._humidity = self.saturate(self._humidity, 0, 100)
-        self._light = self.saturate(self._light, 0, 100000)
+        self._light = self.saturate(self._light, 10, 100000)
 
     def saturate(self, value, min, max):
         """Saturate the value between min and max"""

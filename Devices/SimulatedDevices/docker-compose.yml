@@ -11,8 +11,7 @@ services:
     build:
       context: .
       dockerfile: ./Device1/Dockerfile
-    extra_hosts:
-        - "host.docker.internal:host-gateway"
+    network_mode: "bridge"
     volumes:
       - iotomatoes_supportpackage:/app/iotomatoes_supportpackage
 

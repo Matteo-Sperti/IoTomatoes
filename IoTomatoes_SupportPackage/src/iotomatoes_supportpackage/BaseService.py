@@ -31,9 +31,9 @@ class BaseService() :
         self._EndpointInfo = self.register(info)
         self._RefreshThread = RefreshThread(self._ServiceCatalog_url, self)
         if self.serviceName != "ResourceCatalog":
-            self.ResourceCatalog_url = self.getOtherServiceURL("resource_catalog")
+            self.ResourceCatalog_url = self.getOtherServiceURL("resource_catalog", True)
         if self.isMQTT:
-            self._MQTTClient = BaseMQTTClient(self._ServiceCatalog_url, self._EndpointInfo)
+            self._MQTTClient = BaseMQTTClient(self._ServiceCatalog_url, self)
             self._MQTTClient.startMQTT()
 
 
@@ -73,21 +73,23 @@ class BaseService() :
                     print(f"Error in the response\n")  
                     time.sleep(1)
 
-    def getOtherServiceURL(self, serviceName: str):
+    def getOtherServiceURL(self, serviceName: str, repeat : bool = False):
         """Return the URL of the service `serviceName`"""
 
-        try:
-            r = requests.get(self._ServiceCatalog_url +"/" + serviceName + "/url")
-            r.raise_for_status()
-            res_dict = r.json()
-        except:
-            print("ERROR: Service Catalog not reachable!")
-            return ""
-        else:
-            if "url" in res_dict:
-                return res_dict["url"]
+        while repeat:
+            try:
+                r = requests.get(self._ServiceCatalog_url +"/" + serviceName + "/url")
+                r.raise_for_status()
+                res_dict = r.json()
+            except:
+                print("ERROR: Service Catalog not reachable!")
+                time.sleep(1)
             else:
-                return ""
+                if "url" in res_dict:
+                    return res_dict["url"]
+                else:
+                    time.sleep(1)
+        return ""
     
     @property
     def serviceName(self) -> str:

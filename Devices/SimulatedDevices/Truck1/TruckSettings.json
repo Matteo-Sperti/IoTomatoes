@@ -2,10 +2,7 @@
     "deviceName" : "SimulatedTruck1",
     "isSensor" : true,
     "measureType" : ["position"],
-    "CompanyInfo" : {
-        "CompanyName" : "PatataNovella",
-        "CompanyToken" : "123"
-    },
+    "CompanyName" : "PatataNovella",
     "Location": {
         "latitude": -0.01506697493687771,
         "longitude": 5.195714840746703

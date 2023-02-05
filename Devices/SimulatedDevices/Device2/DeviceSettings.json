@@ -3,10 +3,7 @@
     "field" : 1,
     "isActuator" : true,
     "actuatorType" : ["led", "pump"],
-    "CompanyInfo" : {
-        "CompanyName" : "PatataNovella",
-        "CompanyToken" : "123"
-    },
+    "CompanyName" : "PatataNovella",
     "Location" : {
         "latitude" : 44.996, 
         "longitude" : 7.481

@@ -71,16 +71,16 @@ def constructService(ID : int, EInfo : dict):
     """
     info = {}
     info["ID"] = ID
-    _makeService(EInfo, info)
+    _makeService(info, EInfo)
     info["lastUpdate"] = time.time()
     return info
 
-def constructResource(ID : int, CompInfo : dict, EInfo : dict):
+def constructResource(ID : int, CompName : str, EInfo : dict):
     """ Construct the dictionary of a resource according to the specification of the catalog.
 
     Arguments:\n
     `ID (int)`: The ID of the resource.\n
-    `CompInfo (dict)`: The dictionary containing the information of the company of the resource.\n
+    `CompName (str)`: The name of the company of the resource.\n
     `EInfo (dict)`: The dictionary containing the information of the resource.\n
 
     Returns:\n
@@ -88,69 +88,47 @@ def constructResource(ID : int, CompInfo : dict, EInfo : dict):
     """
     info = {}
     info["ID"] = ID
-    _makeResource(EInfo, CompInfo, info)
-    _makeResourceTopic(EInfo, CompInfo, info)
+    _makeResource(info, EInfo)
+    _makeResourceTopic(info, EInfo, CompName)
     info["lastUpdate"] = time.time()
     return info
 
-def _makeService(EInfo : dict, info : dict = {}):
-    if "serviceName" not in EInfo:
-        raise InfoException("Service name is missing")
-    info["serviceName"] = EInfo["serviceName"]
-
-    info["availableServices"] = []
-    info["servicesDetails"] = []
-
-    if "availableServices" in EInfo:
-        if len(EInfo["availableServices"]) != len(EInfo["servicesDetails"]):
-            raise InfoException("Available services and details are different")
-        for i in range(len(EInfo["availableServices"])):
-            if EInfo["availableServices"][i] in ["REST", "MQTT"]:
-                _addService(info, EInfo["availableServices"][i], EInfo["servicesDetails"][i])
-            else:
-                raise InfoException("Service not supported")
-
-    if "IPport" in EInfo and "IPaddress" in EInfo:
-        _setIPport(EInfo["IPaddress"], EInfo["IPport"], info)
+def _makeResourceTopic(dict_to_construct: dict, EInfo : dict, CompanyName : str):
+    """If the resource is a sensor or an actuator, add the MQTT topics to the dictionary.
     
-    return info.copy()
-
-def _makeResourceTopic(EInfo : dict, CompInfo : dict, dict_to_construct : dict):
-    """If the resource is a sensor or an actuator, add the MQTT topics to the dictionary."""
+    Arguments:\n
+    `dict_to_construct (dict)`: The dictionary of the resource.\n
+    `EInfo (dict)`: The dictionary containing the information of the resource.\n
+    `CompInfo (dict)`: The dictionary containing the information of the company of the resource.\n    
+    """
 
     if "ID" not in dict_to_construct:
         raise InfoException("ID is missing")
 
-    MQTT_info = {
-                "serviceType" : "MQTT", 
-                "subscribedTopics": [],
-                "publishedTopics": []
-                }
+    subscribedTopics = []
+    publishedTopics = []
 
-    BaseTopic = CompInfo['CompanyName'].replace(" ", "_")
+    BaseTopic = CompanyName.replace(" ", "_")
     if "isActuator" in EInfo and EInfo["isActuator"] == True:
         if "actuatorType" not in EInfo:
             raise InfoException("Actuators names is missing")
         for actuator in EInfo["actuatorType"]:
-            MQTT_info["subscribedTopics"].append(f"{BaseTopic}/{EInfo['field']}/{dict_to_construct['ID']}/{actuator}")
+            subscribedTopics.append(f"{BaseTopic}/{EInfo['field']}/{dict_to_construct['ID']}/{actuator}")
 
     if "isSensor" in EInfo and EInfo["isSensor"] == True:
         if "measureType" not in EInfo:
             raise InfoException("Measure type is missing")
         for measure in EInfo["measureType"]:
-            MQTT_info["publishedTopics"].append(f"{BaseTopic}/{EInfo['field']}/{dict_to_construct['ID']}/{measure}")
+            publishedTopics.append(f"{BaseTopic}/{EInfo['field']}/{dict_to_construct['ID']}/{measure}")
 
-    _addService(dict_to_construct, "MQTT", MQTT_info)
+    _addMQTT(dict_to_construct, subscribedTopics=subscribedTopics, publishedTopics=publishedTopics)
 
 
-def _makeResource(EInfo : dict, CompInfo : dict, info : dict = {}):
+def _makeResource(info : dict, EInfo : dict):
     """Construct the dictionary of a resource according to the specification of the catalog."""
 
     info["availableServices"] = []
     info["servicesDetails"] = []
-
-    if "CompanyName" not in CompInfo:
-        raise InfoException("Company name is missing")
 
     if "deviceName" not in EInfo:
         raise InfoException("Device name is missing")
@@ -198,54 +176,66 @@ def _makeResource(EInfo : dict, CompInfo : dict, info : dict = {}):
         info["isSensor"] = False
         info["measureType"] = []
 
+
+def _makeService(EInfo : dict, info : dict = {}):
+    if "serviceName" not in EInfo:
+        raise InfoException("Service name is missing")
+    info["serviceName"] = EInfo["serviceName"]
+
+    info["availableServices"] = []
+    info["servicesDetails"] = []
+
+    if "availableServices" in EInfo:
+        if "MQTT" in EInfo["availableServices"]:
+            _addMQTT(info, **EInfo)
+        if "REST" in EInfo["availableServices"]:
+            _addREST(info, **EInfo)
+        
+
+    if "IPaddress" in EInfo:
+        _addREST(info, **EInfo)
+    
     return info.copy()
 
-def _setIPport(local_ip : str,  IPport : int, dict_ : dict = {}):
+def _addREST(dict_ : dict, **kwargs):
     """Add the REST service information to the dictionary."""
+    
+    local_ip = kwargs["IPaddress"]
 
+    if "IPport" in kwargs:
+        IPport = kwargs["IPport"]
+    else:
+        IPport = 8080
+
+    service = {
+        "serviceType" : "REST",
+        "serviceIP" : ""
+    }
     service = {
         "serviceType" : "REST",
         "serviceIP" : f"http://{local_ip}:{IPport}" }
     if "servicesDetails" in dict_ and "availableServices" in dict_:
         dict_["servicesDetails"].append(service)
-        dict_["availableServices"].append("REST")
+        if "REST" not in dict_["availableServices"]:
+            dict_["availableServices"].append("REST")
     return service
 
-def _addService(dict_ : dict, service : str, serviceInfo : dict = {}):
-    """Add a service to the dictionary."""
-    
-    if "serviceType" in serviceInfo and serviceInfo["serviceType"] != service:
-        raise InfoException("Service type and service name are different")
+def _addMQTT(dict_ : dict, **kwargs):
+    """Add the MQTT service information to the dictionary."""
 
-    dict_["availableServices"].append(service)
+    service = {
+        "serviceType" : "MQTT",
+        "subscribedTopics" : [],
+        "publishedTopics" : []
+    }
 
-    my_info = {}
-    if service == "MQTT":
-        my_info["serviceType"] = "MQTT"
-        if "subscribedTopics" in serviceInfo:
-            my_info["subscribedTopics"] = serviceInfo["subscribedTopics"]
-        else:
-            my_info["subscribedTopics"] = []
+    if "subscribedTopics" in kwargs:
+        service["subscribedTopics"] = kwargs["subscribedTopics"]
 
-        if "publishedTopics" in serviceInfo:
-            my_info["publishedTopics"] = serviceInfo["publishedTopics"]
-        else:
-            my_info["publishedTopics"] = []
+    if "publishedTopics" in kwargs:
+        service["publishedTopics"] = kwargs["publishedTopics"]
 
-    elif service == "REST":
-        my_info["serviceType"] = "REST"
-        if "serviceIP" in serviceInfo:
-            my_info["serviceIP"] = serviceInfo["serviceIP"]
-        elif "IPaddress" in serviceInfo and "IPport" in serviceInfo:
-            my_info["serviceIP"] = f"http://{serviceInfo['IPaddress']}:{serviceInfo['IPport']}"
-        else:
-            raise InfoException("Service IP is missing")
-            
-    else:
-        if "serviceType" in serviceInfo:
-            my_info.update(serviceInfo)
-        else:
-            my_info["serviceType"] = service
-            my_info.update(serviceInfo)
-
-    dict_["servicesDetails"].append(my_info)
+    if "servicesDetails" in dict_ and "availableServices" in dict_:
+        dict_["servicesDetails"].append(service)
+        if "MQTT" not in dict_["availableServices"]:
+            dict_["availableServices"].append("MQTT")

@@ -12,7 +12,7 @@ class BaseResource() :
     def __init__(self, settings: dict):
         """Initialize the BaseResource class."""
 
-        self._CompanyInfo = settings["CompanyInfo"]
+        self.CompanyName = settings["CompanyName"]
         self.platform_url = settings["IoTomatoes_url"]
         self.start()
 
@@ -23,7 +23,7 @@ class BaseResource() :
         self._EndpointInfo = self.register()
         self._RefreshThread = RefreshThread(self.platform_url + "/rc/", self, CompanyName=self.CompanyName)
         if self.isMQTT:
-            self._MQTTClient = BaseMQTTClient(self.platform_url, self._EndpointInfo, self.CompanyName)
+            self._MQTTClient = BaseMQTTClient(self.platform_url, self._EndpointInfo, self.platform_url)
             self._MQTTClient.startMQTT()
 
     def restart(self):
@@ -61,10 +61,6 @@ class BaseResource() :
     @property
     def ID(self) -> int:
         return self._EndpointInfo["ID"]
-    
-    @property
-    def CompanyName(self) -> str:
-        return self._CompanyInfo["CompanyName"]
     
     @property
     def isMQTT(self) -> bool:

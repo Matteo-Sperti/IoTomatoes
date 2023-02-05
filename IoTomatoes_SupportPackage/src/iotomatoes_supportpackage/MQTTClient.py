@@ -5,7 +5,7 @@ import json
 from iotomatoes_supportpackage.ItemInfo import subscribedTopics, publishedTopics
 
 class BaseMQTTClient(): 
-    def __init__(self, url : str, EndpointInfo: dict, CompanyName : str = ""):
+    def __init__(self, url : str, EndpointInfo: dict, broker : str = ""):
         """BaseMQTTClient class. It is the base class for the MQTT client.
 
         Arguments:\n
@@ -16,7 +16,7 @@ class BaseMQTTClient():
 
         self._url = url
         self._EndpointInfo = EndpointInfo
-        self._CompanyName = CompanyName
+        self._broker = broker
 
     def stopMQTT(self):
         """Stop the endpoint."""
@@ -32,7 +32,9 @@ class BaseMQTTClient():
 
         import paho.mqtt.client as PahoMQTT
 
-        self._broker, self._port, self._baseTopic = self.get_broker()
+        broker, self._port, self._baseTopic = self.get_broker()
+        if self._broker == "":
+            self._broker = broker
         self.MQTTclientID = f"IoTomatoes_ID{self._EndpointInfo['ID']}"
         self._isSubscriber = False
         # create an instance of paho.mqtt.client

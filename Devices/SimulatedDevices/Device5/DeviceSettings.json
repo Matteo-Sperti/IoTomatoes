@@ -3,10 +3,7 @@
     "field" : 2,
     "isSensor" : true,
     "measureType" : ["temperature", "humidity", "light"],
-    "CompanyInfo" : {
-        "CompanyName" : "PatataNovella",
-        "CompanyToken" : "123"
-    },
+    "CompanyName" : "PatataNovella",
     "Location" : {
         "latitude" : 44.996, 
         "longitude" : 7.481

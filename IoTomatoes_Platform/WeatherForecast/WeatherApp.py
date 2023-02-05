@@ -1,10 +1,10 @@
 import requests
 import json
 import time
-from socket import gethostname, gethostbyname
 import cherrypy
 
 from iotomatoes_supportpackage.BaseService import BaseService
+from iotomatoes_supportpackage.ItemInfo import setREST
 
 
 def validateJSON(jsonData):
@@ -84,11 +84,9 @@ class WheaterService(BaseService):
 
 
 if __name__ == '__main__':
-	settings=json.load(open("WeatherForecastSettings.json","r"))
+	settings = json.load(open("WeatherForecastSettings.json","r"))
 
-	ip_address = gethostbyname(gethostname())
-	port = settings["IPport"]
-	settings["IPaddress"] = ip_address
+	ip_address, port = setREST(settings)
 
 	print("Starting server...")
 

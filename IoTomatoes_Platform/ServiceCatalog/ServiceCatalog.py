@@ -321,8 +321,6 @@ signal.signal(signal.SIGTERM, sigterm_handler)
 if __name__ == "__main__":
     settings = json.load(open("ServiceCatalogSettings.json"))
 
-    port = settings["IPport"]
-
     Catalog = RESTServiceCatalog(settings)
 
     conf = {
@@ -333,5 +331,4 @@ if __name__ == "__main__":
     }
     cherrypy.tree.mount(Catalog, '/', conf)
     cherrypy.config.update({'server.socket_host': "0.0.0.0"})
-    cherrypy.config.update({'server.socket_port': port})
     cherrypy.engine.start()

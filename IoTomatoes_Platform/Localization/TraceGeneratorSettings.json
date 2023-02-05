@@ -4,9 +4,9 @@
     "view_url": "http://api.openstreetmap.org/api/0.6/trace",
     "serviceName": "localization",
     "password": "SW9Ub21hdG9lczpJb1RvbWF0b2Vz",
-    "IPport": 8080,
     "availableServices": [
-        "MQTT"
+        "MQTT",
+        "REST"
     ],
     "servicesDetails": [
         {

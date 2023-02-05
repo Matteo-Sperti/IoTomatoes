@@ -2,12 +2,11 @@ import json
 import time
 import cherrypy
 import signal
-from socket import gethostname, gethostbyname
 
 from iotomatoes_supportpackage.BaseService import BaseService
 from iotomatoes_supportpackage.MyExceptions import web_exception, InfoException
 from iotomatoes_supportpackage.ItemInfo import (
-    constructResource, measureType, actuatorType, publishedTopics)
+    constructResource, measureType, actuatorType, publishedTopics, setREST)
 from iotomatoes_supportpackage.MyIDGenerator import IDs
 from iotomatoes_supportpackage.MyThread import MyThread
 
@@ -617,9 +616,7 @@ signal.signal(signal.SIGTERM, sigterm_handler)
 if __name__ == "__main__":
     settings = json.load(open("ResourceCatalogSettings.json", "r"))
 
-    ip_address = gethostbyname(gethostname())
-    port = settings["IPport"]
-    settings["IPaddress"] = ip_address
+    ip_address, port = setREST(settings)
 
     try:
         Catalog = RESTResourceCatalog(settings)

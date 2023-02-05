@@ -6,10 +6,10 @@ import cherrypy
 import requests
 from matplotlib import pyplot as plt
 import datetime
-from socket import gethostname, gethostbyname
 
 from iotomatoes_supportpackage.BaseService import BaseService
 from iotomatoes_supportpackage.MyExceptions import web_exception
+from iotomatoes_supportpackage.ItemInfo import setREST
 
 class MongoConnection():
 	def __init__(self, ResourceCatalog_url : str, MongoDB_url : str, PointsPerGraph : int):
@@ -357,9 +357,7 @@ class RESTConnector(BaseService):
 if __name__ == "__main__":
 	settings = json.load(open("ConnectorSettings.json"))
 
-	ip_address = gethostbyname(gethostname())
-	port = settings["IPport"]
-	settings["IPaddress"] = ip_address
+	ip_address, port = setREST(settings)
 
 	WebService = RESTConnector(settings)
 	conf = {

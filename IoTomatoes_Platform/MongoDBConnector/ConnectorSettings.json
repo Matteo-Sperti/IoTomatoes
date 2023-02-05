@@ -1,10 +1,10 @@
 {
     "ServiceCatalog_url" : "http://service_catalog:8080",
     "serviceName": "mongodb_connector",
-    "IPport": 8080,
     "PointsPerGraph": 7,
     "availableServices": [
-        "MQTT"
+        "MQTT",
+        "REST"
     ],
     "servicesDetails": [
         {

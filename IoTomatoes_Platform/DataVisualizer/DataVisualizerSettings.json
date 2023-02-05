@@ -1,5 +1,4 @@
 {
     "ServiceCatalog_url": "http://service_catalog:8080",
-    "serviceName": "data_visualizer",
-    "IPport": 8080
+    "serviceName": "data_visualizer"
 }

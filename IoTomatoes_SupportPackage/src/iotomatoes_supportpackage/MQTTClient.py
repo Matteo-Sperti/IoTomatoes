@@ -32,7 +32,7 @@ class BaseMQTTClient():
 
         import paho.mqtt.client as PahoMQTT
 
-        broker, self._port, self._baseTopic = self.get_broker()
+        broker, self._port = self.get_broker()
         if self._broker == "":
             self._broker = broker
         self.MQTTclientID = f"IoTomatoes_ID{self._EndpointInfo['ID']}"
@@ -48,7 +48,7 @@ class BaseMQTTClient():
         time.sleep(1)
         # subscribe the topics
         for topic in self.subscribedTopics:
-            self.mySubscribe(self._baseTopic + topic)
+            self.mySubscribe(topic)
 
     def myOnConnect(self,client,userdata,flags,rc):
         """It provides information about Connection result with the broker"""
@@ -72,7 +72,7 @@ class BaseMQTTClient():
         """It publishes a dictionary message `msg` in `topic`"""
 
         # publish a message with a certain topic
-        self._paho_mqtt.publish(self._baseTopic + topic, json.dumps(msg), 2)
+        self._paho_mqtt.publish(topic, json.dumps(msg), 2)
 
     def mySubscribe(self, topic):
         """It subscribes to `topic`"""
@@ -88,8 +88,7 @@ class BaseMQTTClient():
 
         if (self._isSubscriber):
             # remember to unsuscribe if it is working also as subscriber
-            for topic in self.subscribedTopics:
-                self._paho_mqtt.unsubscribe(self._baseTopic + topic)
+            self._paho_mqtt.unsubscribe(self.subscribedTopics)
 
     def get_broker(self):
         """Get the broker information from the Service Catalog."""
@@ -104,7 +103,7 @@ class BaseMQTTClient():
                 time.sleep(1)
             else:
                 try:
-                    return broker["IP"], broker["port"], broker["baseTopic"]
+                    return broker["IP"], broker["port"]
                 except:
                     print(f"Error in the broker information\nRetrying connection\n")
                     time.sleep(1)

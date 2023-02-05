@@ -17,14 +17,12 @@ class RefreshThread(MyThread):
         super().__init__(self.refresh_item, interval, **kwargs)
 
 
-    def refresh_item(self, **kwargs):
+    def refresh_item(self):
         """Refresh item `ID` in the Catalog at `url`."""
         refreshed = False
         while not refreshed :
             try:
                 param = {"ID": self.endpoint.ID}
-                if "CompanyName" in kwargs:
-                    param.update(kwargs["CompanyName"])
                 res = requests.put(self._url + "/refresh", params=param)
                 res.raise_for_status()
                 stat = res.json()

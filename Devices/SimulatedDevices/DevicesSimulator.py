@@ -27,16 +27,11 @@ class SimDevices_Manager():
 
     def populateField(self, number : int = 5):
         CompanyName = input("Insert Company Name: ")
-        CompanyToken = input("Insert Company Token: ")
         fieldNumber = query_int("Insert field number: ")
 
-        CompanyInfo = {
-            "CompanyName" : CompanyName,
-            "CompanyToken" : CompanyToken
-        }
-        latitude, longitude = self.getCompanyPosition(CompanyInfo)
+        latitude, longitude = self.getCompanyPosition(CompanyName)
         for i in range(number):
-            self.Sensors.append(self.createDevice(CompanyInfo, fieldNumber, latitude, longitude))
+            self.Sensors.append(self.createDevice(CompanyName, fieldNumber, latitude, longitude))
 
     def createDevice(self, CompanyInfo : dict, fieldNumber : int, latitude : float, longitude : float):
         ID = self.DevicesIDs.get_ID()

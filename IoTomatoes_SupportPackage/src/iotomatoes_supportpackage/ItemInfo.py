@@ -84,25 +84,25 @@ def constructResource(ID : int, CompName : str, EInfo : dict):
     `EInfo (dict)`: The dictionary containing the information of the resource.\n
 
     Returns:\n
-    `info (dict)`: The dictionary of the resource.\n
+    `dictInformation (dict)`: The dictionary of the resource.\n
     """
-    info = {}
-    info["ID"] = ID
-    _makeResource(info, EInfo)
-    _makeResourceTopic(info, EInfo, CompName)
-    info["lastUpdate"] = time.time()
-    return info
+    dictInformation = {}
+    dictInformation["ID"] = ID
+    _makeResource(dictInformation, EInfo)
+    _makeResourceTopic(dictInformation, EInfo, CompName)
+    dictInformation["lastUpdate"] = time.time()
+    return dictInformation
 
-def _makeResourceTopic(dict_to_construct: dict, EInfo : dict, CompanyName : str):
+def _makeResourceTopic(dictInformation: dict, EInfo : dict, CompanyName : str):
     """If the resource is a sensor or an actuator, add the MQTT topics to the dictionary.
     
     Arguments:\n
-    `dict_to_construct (dict)`: The dictionary of the resource.\n
+    `dictInformation (dict)`: The dictionary of the resource.\n
     `EInfo (dict)`: The dictionary containing the information of the resource.\n
     `CompInfo (dict)`: The dictionary containing the information of the company of the resource.\n    
     """
 
-    if "ID" not in dict_to_construct:
+    if "ID" not in dictInformation:
         raise InfoException("ID is missing")
 
     subscribedTopics = []
@@ -113,77 +113,77 @@ def _makeResourceTopic(dict_to_construct: dict, EInfo : dict, CompanyName : str)
         if "actuatorType" not in EInfo:
             raise InfoException("Actuators names is missing")
         for actuator in EInfo["actuatorType"]:
-            subscribedTopics.append(f"{CompanyTopic}/{EInfo['field']}/{dict_to_construct['ID']}/{actuator}")
+            subscribedTopics.append(f"{CompanyTopic}/{EInfo['field']}/{dictInformation['ID']}/{actuator}")
 
     if "isSensor" in EInfo and EInfo["isSensor"] == True:
         if "measureType" not in EInfo:
             raise InfoException("Measure type is missing")
         for measure in EInfo["measureType"]:
-            publishedTopics.append(f"{CompanyTopic}/{EInfo['field']}/{dict_to_construct['ID']}/{measure}")
+            publishedTopics.append(f"{CompanyTopic}/{EInfo['field']}/{dictInformation['ID']}/{measure}")
 
-    _addMQTT(dict_to_construct, subscribedTopics=subscribedTopics, publishedTopics=publishedTopics)
+    _addMQTT(dictInformation, subscribedTopics=subscribedTopics, publishedTopics=publishedTopics)
 
 
-def _makeResource(info : dict, EInfo : dict):
+def _makeResource(dictInformation : dict, EInfo : dict):
     """Construct the dictionary of a resource according to the specification of the catalog."""
 
-    info["availableServices"] = []
-    info["servicesDetails"] = []
+    dictInformation["availableServices"] = []
+    dictInformation["servicesDetails"] = []
 
     if "deviceName" not in EInfo:
         raise InfoException("Device name is missing")
     else:
-        info["deviceName"] = EInfo["deviceName"]
+        dictInformation["deviceName"] = EInfo["deviceName"]
     
     if "field" in EInfo:
-        info["field"] = EInfo["field"]
+        dictInformation["field"] = EInfo["field"]
     else: 
-        info["field"] = 1 
+        dictInformation["field"] = 1 
 
     if "latitude" in EInfo and "longitude" in EInfo:
-        info["Location"] = {
+        dictInformation["Location"] = {
             "latitude" : EInfo["latitude"],
             "longitude" : EInfo["longitude"]
         }
     elif "Location" in EInfo and "latitude" in EInfo["Location"] and "longitude" in EInfo["Location"]:
-        info["Location"] = EInfo["Location"]
+        dictInformation["Location"] = EInfo["Location"]
     else:
-        info["Location"] = {
+        dictInformation["Location"] = {
             "latitude" : -1,
             "longitude" : -1
         }
     
     if "PowerConsumption_kW" in EInfo:
-        info["PowerConsumption_kW"] = EInfo["PowerConsumption_kW"]
+        dictInformation["PowerConsumption_kW"] = EInfo["PowerConsumption_kW"]
     else:
-        info["PowerConsumption_kW"] = 0
+        dictInformation["PowerConsumption_kW"] = 0
 
     if "isActuator" in EInfo and EInfo["isActuator"] == True:
         if "actuatorType" not in EInfo:
             raise InfoException("Actuators names is missing")
-        info["isActuator"] = True
-        info["actuatorType"] = EInfo["actuatorType"]
+        dictInformation["isActuator"] = True
+        dictInformation["actuatorType"] = EInfo["actuatorType"]
     else:
-        info["isActuator"] = False
-        info["actuatorType"] = []
+        dictInformation["isActuator"] = False
+        dictInformation["actuatorType"] = []
 
     if "isSensor" in EInfo and EInfo["isSensor"] == True:
         if "measureType" not in EInfo:
             raise InfoException("Measure type is missing")
-        info["isSensor"] = True
-        info["measureType"] = EInfo["measureType"]
+        dictInformation["isSensor"] = True
+        dictInformation["measureType"] = EInfo["measureType"]
     else:
-        info["isSensor"] = False
-        info["measureType"] = []
+        dictInformation["isSensor"] = False
+        dictInformation["measureType"] = []
 
 
-def _makeService(EInfo : dict, info : dict = {}):
+def _makeService(dictInformation : dict, EInfo : dict):
     if "serviceName" not in EInfo:
         raise InfoException("Service name is missing")
-    info["serviceName"] = EInfo["serviceName"]
+    dictInformation["serviceName"] = EInfo["serviceName"]
 
-    info["availableServices"] = []
-    info["servicesDetails"] = []
+    dictInformation["availableServices"] = []
+    dictInformation["servicesDetails"] = []
 
     if "availableServices" in EInfo:
         if "MQTT" in EInfo["availableServices"]:
@@ -193,19 +193,17 @@ def _makeService(EInfo : dict, info : dict = {}):
                     if "serviceType" in service and service["serviceType"] == "MQTT":
                         serviceInfo = service
                         break
-            _addMQTT(info, **serviceInfo)
+            _addMQTT(dictInformation, **serviceInfo)
         if "REST" in EInfo["availableServices"]:
             serviceInfo = {}
-            if "serviceDetails" in EInfo:
+            if "servicesDetails" in EInfo:
                 for service in EInfo["servicesDetails"]:
                     if "serviceType" in service and service["serviceType"] == "REST":
                         serviceInfo = service
                         break
-            _addREST(info, **serviceInfo)
-    
-    return info.copy()
+            _addREST(dictInformation, **serviceInfo)
 
-def _addREST(dict_ : dict, **kwargs):
+def _addREST(dictInformation : dict, **kwargs):
     """Add the REST service information to the dictionary."""
     
     if "serviceIP" in kwargs:
@@ -226,15 +224,15 @@ def _addREST(dict_ : dict, **kwargs):
             "serviceType" : "REST",
             "serviceIP" : f"http://{local_ip}:{IPport}" }
 
-    _addService(dict_, service)
+    _addService(dictInformation, service)
 
-def _addMQTT(dict_ : dict, **kwargs):
+def _addMQTT(dictInformation : dict, **kwargs):
     """Add the MQTT service information to the dictionary."""
     if kwargs == {}:
-        if "availableServices" in dict_:
-            dict_["availableServices"].append("MQTT")
+        if "availableServices" in dictInformation:
+            dictInformation["availableServices"].append("MQTT")
         else:
-            dict_["availableServices"]= ["MQTT"]
+            dictInformation["availableServices"]= ["MQTT"]
     else:
         service = {
             "serviceType" : "MQTT",
@@ -248,20 +246,20 @@ def _addMQTT(dict_ : dict, **kwargs):
         if "publishedTopics" in kwargs:
             service["publishedTopics"] = kwargs["publishedTopics"]
 
-        _addService(dict_, service)
+        _addService(dictInformation, service)
 
-def _addService(dict_ : dict, service2add : dict):
-    if "servicesDetails" in dict_:
-        dict_["servicesDetails"].append(service2add)
+def _addService(dictInformation : dict, service2add : dict):
+    if "servicesDetails" in dictInformation:
+        dictInformation["servicesDetails"].append(service2add)
     else:
-        dict_["servicesDetails"] = [service2add]
+        dictInformation["servicesDetails"] = [service2add]
 
     serviceName = service2add["serviceType"]
-    if "availableServices" in dict_:
-        if serviceName not in dict_["availableServices"]:
-            dict_["availableServices"].append(serviceName)
+    if "availableServices" in dictInformation:
+        if serviceName not in dictInformation["availableServices"]:
+            dictInformation["availableServices"].append(serviceName)
     else:
-        dict_["availableServices"]= [serviceName]
+        dictInformation["availableServices"]= [serviceName]
 
 # set REST information
 def setREST(settings: dict):

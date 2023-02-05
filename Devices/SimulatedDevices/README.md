@@ -15,7 +15,7 @@ It is possible to simulate a single device in a container (closest solution to t
 ### Configuration
 In the [DeviceSettings.json](DeviceSettings.json) configuration file you must specify (same configuration file of a real device):
 - **ServiceCatalog_url:**: the IP address of the IoTomatoes platform
-- **CompanyInfo:** the Company information ("CompanyName" and "CompanyToken")
+- **CompanyName:** the Company name
 - **field:** the field number in which the sensor is installed
 - the type of sensor or actuator (in this case ["humidity", "temperature"])
 

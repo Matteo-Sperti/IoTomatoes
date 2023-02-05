@@ -21,11 +21,10 @@ class ResourceCatalogManager():
         """Initialize the catalog manager.
     
         Arguments:\n
-        `heading` -- the heading of the catalog.\n
-        `filename` -- the name of the file where the catalog is saved. \n
-        `autoDeleteTime` -- the time in seconds after which the items are 
-        deleted from the catalog (default 120 seconds).\n
-        `IDs` -- the IDs generator (default integer number > 100).
+        `heading (dict)`: the heading of the catalog.\n
+        `filename (str)`: the name of the file where the catalog is saved.\n
+        `autoDeleteTime (int)`: the time in seconds between two auto delete of the items.\n
+        `IDs (IDs)`: the IDs generator. Default is all integers from 100.
         """
         self.catalog = heading.copy()
         self.catalog["lastUpdate"] = time.time()
@@ -73,48 +72,28 @@ class ResourceCatalogManager():
                 else:
                     raise web_exception(401, "Wrong credentials")
             else:
-                return True
+                return False
         else:
             return False
-
-    def accessInfo(self, params : dict):
-        """Return the access info of a device.
-
-        Arguments:\n
-        `params` -- a dictionary with the parameters of the request.
-        Must contain the `CompanyName` and `CompanyToken`.\n
-        Return:\n
-        JSON with the access info of the device, or an error message.
-        """
-        if "CompanyName" in params:
-            if "CompanyToken" in params:
-                CompanyInfo = {"CompanyName": params["CompanyName"], "CompanyToken": params["CompanyToken"]}
-                return CompanyInfo
-            else:
-                CompanyInfo = {"CompanyName": params["CompanyName"]}
-                return CompanyInfo
-
-        raise web_exception(400, "Error in the access information")
     
-    def findCompany(self, CompanyInfo):
+    def findCompany(self, CompanyName : str):
         """Return the pointer to the company specified in `CompanyInfo`.
         
         Arguments:\n
-        `CompanyInfo` -- the information about the company.
-        Must contain the `CompanyName` and `CompanyToken`."""
+        `CompanyName (str)`: the name of the company to find.
+        """
 
         for company in self.catalog[companyList_name]:
-            if self.isAuthorize(company, CompanyInfo):
+            if company["CompanyName"] == CompanyName:
                 return company
         return None
 
-    def find_list(self, CompanyInfo : dict, IDvalue : int):
+    def find_list(self, CompanyName : str, IDvalue : int):
         """Return the list where the item with the ID `IDvalue` is present.
-        `CompanyInfo` is used to check if the request is authorized.
-        Must contain the `CompanyName` and `CompanyToken`.
+        `CompanyName (str)`: the name of the company to find.
         """
 
-        company = self.findCompany(CompanyInfo)
+        company = self.findCompany(CompanyName)
         if company != None:
             for key in [usersList_name, devicesList_name]:
                 for item in company[key]:
@@ -122,11 +101,12 @@ class ResourceCatalogManager():
                         return company[key]
         return None
 
-    def find_item(self, CompanyInfo : dict, IDvalue : int) :
+    def find_item(self, CompanyName : str, IDvalue : int) :
         """Return the item with the ID `IDvalue`.
-        `CompanyInfo` is used to check if the request is authorized."""
+        `CompanyName` -- the name of the company to find.
+        """
 
-        company = self.findCompany(CompanyInfo)
+        company = self.findCompany(CompanyName)
         if company != None:
             for key in [usersList_name, devicesList_name]:
                 for item in company[key]:
@@ -144,54 +124,27 @@ class ResourceCatalogManager():
 
         return json.dumps([company["CompanyName"] for company in self.catalog[companyList_name]], indent=4)
 
-    def getItem(self, CompanyInfo : dict, ID : int):
-        """Return the information of item `ID` in json format.
-
-        Arguments:
-        `CompanyInfo` -- the information about the company.
-        Must contain the `CompanyName` and `CompanyToken`.\n
-        `ID` -- the ID of the item.
-        """
-        item = self.find_item(CompanyInfo, ID)
-
-        if item != None:
-            return json.dumps(item, indent=4)
-        raise web_exception(404, "Service info not found")
-
-    def getCompany(self, CompanyInfo : dict):
-        """Return the information of the company specified in `CompanyInfo` in json format.
-
-        Arguments:
-        `CompanyInfo` -- the information about the company.
-        Must contain the `CompanyName` and `CompanyToken`.
-        """
-        company = self.findCompany(CompanyInfo)
-        if company != None:
-            return json.dumps(company, indent=4)
-        raise web_exception(404, "Company not found")
-
-    def getList(self, CompanyInfo : dict, listName : str):
+    def getList(self, CompanyName : str, listName : str):
         """Return the list of items of the company specified in `CompanyInfo` in json format.
 
         Arguments: \n
-        `CompanyInfo` -- the information about the company.
-        Must contain the `CompanyName` and `CompanyToken`.\n
-        `listName` -- the name of the list to return.
+        `CompanyName (str)`: the name of the company to find.\n
+        `listName (str)`: the name of the list to return.
         """
 
-        company = self.findCompany(CompanyInfo)
+        company = self.findCompany(CompanyName)
         if company != None:
             return json.dumps(company[listName], indent=4)
         raise web_exception(404, "Company not found")
 
-    def getTopics(self, CompanyInfo : dict, field : str, ResourceType : str):
-        """Return the list of topics of the company specified in `CompanyInfo` in json format.
+    def getTopics(self, CompanyName : str, params : dict):
+        """Return the list of topics of the company `CompanyName` in json format.
 
         Arguments: \n
-        `CompanyInfo` -- the information about the company.
-        Must contain the `CompanyName` and `CompanyToken`.
+        `CompanyName (str)`: the name of the company to find.\n
+        `params (dict)`: the parameters to filter the topics.
         """
-        company = self.findCompany(CompanyInfo)
+        company = self.findCompany(CompanyName)
         if company != None:
             for item in company[devicesList_name]:
                 if item["field"] == field:
@@ -199,39 +152,27 @@ class ResourceCatalogManager():
                         return json.dumps(publishedTopics(item), indent=4)
         raise web_exception(404, "Company not found")
 
-    def getCompanyToken(self, dict_ : dict):
-        """Return the token of the company specified by `CompanyName` in json format.
 
-        Arguments: \n
-        `dict_` -- the information about the company.
-        Must contain the `CompanyName`
-        """
-        company = self.findCompany(dict_)
-        if company != None:
-            return json.dumps({"CompanyToken": company["CompanyToken"]}, indent=4)
-        raise web_exception(404, "Company not found")
+    def getLocation(self, CompanyName : str):
+        """Return the location of the company `CompanyName` in json format."""
 
-    def getLocation(self, CompanyInfo : dict):
-        """Return the location of the company in json format.
-
-        Arguments:
-        `CompanyInfo` -- the information about the company.
-        Must contain the `CompanyName` and `CompanyToken`.\n
-        """
-        item = self.findCompany(CompanyInfo)
+        item = self.findCompany(CompanyName)
         if item != None:
             return json.dumps({"Location": item["Location"]}, indent=4)
         raise web_exception(404, "Service info not found")
 
     def isRegistered(self, params : dict):
-        """Return True if the company specified in `CompanyInfo` is registered in the catalog.
+        """Return the name of the company if the `telegramID` is registered, 
+            otherwise return an empty string.
 
         Arguments: \n
-        `params (dict)` -- must contain the  `telegramID`.
+        `params (dict)`: must contain the  `telegramID`.
         """
         
         out = {"CompanyName": ""}
-        if "telegramID" in params:
+        if "telegramID" not in params:
+            raise web_exception(400, "Missing telegramID")
+        else:
             CompanyName = self.findUserByTelegramID(params["telegramID"])
             if CompanyName != None:
                 out["CompanyName"] = CompanyName
@@ -239,10 +180,15 @@ class ResourceCatalogManager():
             else:
                 out["CompanyName"] = ""
                 return json.dumps(out, indent=4)
-        else:
-            raise web_exception(400, "Missing telegramID")
 
     def findUserByTelegramID(self, telegramID : str):
+        """Return the name of the company if the `telegramID` is registered,
+            otherwise return `None`.
+
+        Arguments: \n
+        `telegramID (str)` -- the telegramID to find.
+        """
+
         try:
             chatID = int(telegramID)
         except:
@@ -305,16 +251,24 @@ class ResourceCatalogManager():
         
         return json.dumps(out, indent=4)
 
-    def insertDevice(self, CompanyInfo : dict, deviceInfo : dict):
-        company = self.findCompany(CompanyInfo)
-        if company != None:
+    def insertDevice(self, CompanyName : str, deviceInfo : dict):
+        """Insert a new device in the catalog.
+
+        Arguments:\n
+        `CompanyName (str)`: the name of the company of the device.\n
+        `deviceInfo (dict)`: the information about the device.\n
+        """
+        company = self.findCompany(CompanyName)
+        if company == None:
+            raise web_exception(500, "No Company found")
+        else:
             ID = self._IDs.get_ID()
             if ID == -1:
                 raise web_exception(500, "No more IDs available")
             else:
                 self.catalog["lastUpdate"] =  time.time() 
                 try:
-                    new_item = constructResource(ID, CompanyInfo, deviceInfo)
+                    new_item = constructResource(ID, CompanyName, deviceInfo)
                 except InfoException as e:
                     raise web_exception(500, e.message)
 
@@ -322,57 +276,51 @@ class ResourceCatalogManager():
                     raise web_exception(400, "Field number not valid")
                 company[devicesList_name].append(new_item)
                 return json.dumps(new_item, indent=4)
-        else:
-            raise web_exception(500, "No Company found")
 
-    def insertUser(self, CompanyInfo : dict, userInfo : dict):
+    def insertUser(self, CompanyName : str, userInfo : dict):
         """Insert a new user in the catalog.
 
         Arguments:\n
-        `CompanyInfo` -- the information about the company.
-        Must contain the `CompanyName` and `CompanyToken`.\n
-        `userInfo` -- the information about the user.\n
-        
-        Return:\n
-        JSON with the ID of the user, or an error message.
-        """
-        company = self.findCompany(CompanyInfo)
-        print(company)
-        if company != None:
-            print(userInfo)
-            if "telegramID" not in userInfo:
-                raise web_exception(400, "Missing telegramID")
-
-            CompanyName = self.findUserByTelegramID(userInfo["telegramID"])
-            print(CompanyName)
-            if CompanyName != None:
-                raise web_exception(403, f"User already registered in {CompanyName}")
-
-            ID = self._IDs.get_ID()
-            if ID == -1:
-                raise web_exception(500, "No more IDs available")
-            else:
-                self.catalog["lastUpdate"] =  time.time() 
-                new_item = userInfo
-                new_item["ID"] = ID
-                new_item["lastUpdate"] =  time.time()
-                company[usersList_name].append(new_item)
-                out = {"ID": ID}
-                return json.dumps(out, indent=4)
-        else:
-            raise web_exception(500, "No Company found")
-
-    def updateField(self, params : dict) : 
-        """Update a field in the catalog.
-
-        Arguments:\n
-        `params` -- the parameters of the request.\n
-        Must contain the `CompanyName`, `CompanyToken`, `fieldNumber` and `plant`.\n
+        `CompanyName (str)`: the name of the company of the user.\n
+        `userInfo (dict)`: the information about the user.\n
 
         Return:\n
         JSON with the status of the operation.
         """
-        company = self.findCompany(params)
+        company = self.findCompany(CompanyName)
+        if company == None:
+            raise web_exception(500, "No Company found")
+
+        if "telegramID" not in userInfo:
+            raise web_exception(400, "Missing telegramID")
+
+        CompanyName = self.findUserByTelegramID(userInfo["telegramID"])
+        if CompanyName != None:
+            raise web_exception(403, f"User already registered in {CompanyName}")
+
+        ID = self._IDs.get_ID()
+        if ID == -1:
+            raise web_exception(500, "No more IDs available")
+        else:
+            self.catalog["lastUpdate"] =  time.time() 
+            new_item = userInfo
+            new_item["ID"] = ID
+            new_item["lastUpdate"] =  time.time()
+            company[usersList_name].append(new_item)
+            return json.dumps(new_item, indent=4)
+
+
+    def updateField(self, CompanyName : str, params : dict) : 
+        """Update a field in the catalog.
+
+        Arguments:\n
+        `CompanyName (str)`: the name of the company of the field.\n
+        `params (dict)`: the information about the field.\n
+
+        Return:\n
+        JSON with the status of the operation.
+        """
+        company = self.findCompany(CompanyName)
         if company == None:
             raise web_exception(404, "No Company found")
         
@@ -395,7 +343,6 @@ class ResourceCatalogManager():
     def deleteCompany(self, dict_info : dict):
         """Delete a company from the catalog. """
 
-        print(dict_info)
         if "CompanyName" not in dict_info or "CompanyToken" not in dict_info:
             raise web_exception(400, "Missing CompanyName or CompanyToken")
         else:
@@ -403,7 +350,7 @@ class ResourceCatalogManager():
                 "CompanyName": dict_info["CompanyName"],
                 "CompanyToken": dict_info["CompanyToken"]
             }
-        print("Sto convertendo telegramID")
+
         if "telegramID" not in dict_info:
             raise web_exception(400, "Missing telegramID")
         try:
@@ -411,11 +358,10 @@ class ResourceCatalogManager():
         except ValueError:
             raise web_exception(400, "Invalid telegramID")
 
-        print("Sto cercando la company")
-        company = self.findCompany(CompanyInfo)
+        company = self.findCompany(CompanyInfo["CompanyName"])
         if company == None:
             raise web_exception(404, "Company not found")
-        print("SIUUUUus")
+
         AdminID = company["adminID"]
         for user in company[usersList_name]:
             if user["telegramID"] == chatID:
@@ -433,17 +379,16 @@ class ResourceCatalogManager():
         
         raise web_exception(403, "You are not a user of this company")
 
-    def refreshItem(self, CompanyInfo : dict, IDvalue : int):
+    def refreshItem(self, CompanyName : str, IDvalue : int):
         """Refresh the lastUpdate field of a device.
         Return a json with the status of the operation.
 
         Aarguments:
-        `CompanyInfo` -- the information about the company.
-        Must contain the `CompanyName` and `CompanyToken`.\n
-        `IDvalue` -- the ID of the item to refresh.\n
+        `CompanyName (str)`: the name of the company of the device.\n
+        `IDvalue (int)`: the ID of the device.\n
         """
 
-        item = self.find_item(CompanyInfo, IDvalue)
+        item = self.find_item(CompanyName, IDvalue)
         if item != None:
             actualtime = time.time()
             self.catalog["lastUpdate"] = actualtime
@@ -495,46 +440,37 @@ class RESTResourceCatalog(BaseService):
         """GET method for the REST API.
         Return a json with the requested information.
         
-        Allowed commands: \n
-        `/getCompany`: return the company information. The parameters are `CompanyName` and `CompanyToken`.\n
-        `/get`: return the device information. The parameters are `ID`, `CompanyName` and `CompanyToken`.\n
-        `/devices`: return the list of devices. The parameters are `CompanyName` and `CompanyToken`.\n
-        `/users`: return the list of users. The parameters are `CompanyName` and `CompanyToken`.\n
-        `/topics/led`: return the list of led topics. The parameters are `field`,  `CompanyName` and `CompanyToken`.\n
+        Allowed URLs: \n
+        `/companies` : return the list of all the companies.\n
+        `/companies/names` : return the list of the names of all the companies.\n
+        `/<CompanyName>/devices` : return the list of all the devices of the company.\n
+        `/<CompanyName>/users` : return the list of all the users of the company.\n
+        `/<CompanyName>/fields` : return the list of all the fields of the company.\n
+        `/<CompanyName>/location` : return the location of the company.\n
+        `/isRegistered?telegramID=<telegramID>` : return the 'CompanyName' if the telegramID 
+        is already registered in a company, an empty string otherwise.\n
+        `/<CompanyName>/topics` : return the list of all the topics of the company. In the 
+        parameters you can specify the fieldNumber to get the topics of a specific field.\n
+        
         """
         try:
             if len(uri) > 0:
-                if len(uri) == 1 and uri[0] == "getCompany":
-                    CompanyInfo = self.catalog.accessInfo(params)
-                    return self.catalog.getCompany(CompanyInfo)
-                elif len(uri) == 1 and uri[0] == "companiesName":
-                    return self.catalog.getCompanyNameList()    
-                elif len(uri) == 1 and uri[0] == "CompanyToken":
-                    return self.catalog.getCompanyToken(params)
-                elif len(uri) == 1 and uri[0] == "isRegistered":
+                if len(uri) == 1 and uri[0] == "isRegistered":
                     return self.catalog.isRegistered(params)
-                elif len(uri) == 1 and uri[0] == "all":
+                elif len(uri) == 1 and uri[0] == "companies":
                     return self.catalog.getAll()
-                elif len(uri) == 1 and uri[0] == "get":
-                    if "ID" in params:
-                        CompanyInfo = self.catalog.accessInfo(params)
-                        return self.catalog.getItem(CompanyInfo, int(params["ID"]))
-                elif len(uri) == 1 and uri[0] == "devices":
-                    CompanyInfo = self.catalog.accessInfo(params)
-                    return self.catalog.getList(CompanyInfo, devicesList_name)
-                elif len(uri) == 1 and uri[0] == "users":
-                    CompanyInfo = self.catalog.accessInfo(params)
-                    return self.catalog.getList(CompanyInfo, usersList_name)
-                elif len(uri) == 1 and uri[0] == "fields":
-                    CompanyInfo = self.catalog.accessInfo(params)
-                    return self.catalog.getList(CompanyInfo, fieldsList_name)
-                elif len(uri) == 1 and uri[0] == "location":
-                    CompanyInfo = self.catalog.accessInfo(params)
-                    return self.catalog.getLocation(CompanyInfo)
-                elif len(uri) == 2 and uri[0] == "topics":
-                    if "field" in params:
-                        CompanyInfo = self.catalog.accessInfo(params)
-                        return self.catalog.getTopics(CompanyInfo, params["field"], uri[1])
+                if len(uri) == 2 and uri[0] == "companies" and uri[1] == "names":
+                    return self.catalog.getCompanyNameList()    
+                elif len(uri) == 2 and uri[1] == "devices":
+                    return self.catalog.getList(uri[0], devicesList_name)
+                elif len(uri) == 2 and uri[1] == "users":
+                    return self.catalog.getList(uri[0], usersList_name)
+                elif len(uri) == 2 and uri[1] == "fields":
+                    return self.catalog.getList(uri[0], fieldsList_name)
+                elif len(uri) == 2 and uri[1] == "location":
+                    return self.catalog.getLocation(uri[0])
+                elif len(uri) == 2 and uri[1] == "topics":
+                    return self.catalog.getTopics(uri[0], params)
 
             raise web_exception(404, "Resource not found.")
         except web_exception as e:
@@ -546,21 +482,22 @@ class RESTResourceCatalog(BaseService):
         """POST method for the REST API.
         Return a json with the status of the operation.
         
-        Allowed commands:
+        Allowed URLs:
         `/company`: insert a new company in the catalog. 
         The body must contain the company information and the Administrator information.\n
-        `/device`: insert a new device in the catalog. The parameters are the device information.\n
-        `/user`: insert a new user in the catalog. The parameters are the user information.\n
+        `/<CompanyName>/device`: insert a new device in the catalog. The parameters are the device information.\n
+        `/<CompanyName>/user`: insert a new user in the catalog. The parameters are the user information.\n
         """
         try:
-            if len(uri) == 1:
+            if len(uri) == 1 and uri[0] == "company":
                 body_dict = json.loads(cherrypy.request.body.read())
-                if  uri[0] == "company":
-                    return self.catalog.insertCompany(body_dict)
-                elif uri[0] == "user":
-                        return self.catalog.insertUser(params, body_dict)
-                elif uri[0] == "device":
-                    return self.catalog.insertDevice(params, body_dict)
+                return self.catalog.insertCompany(body_dict)
+            elif len(uri) == 2:
+                body_dict = json.loads(cherrypy.request.body.read())
+                if uri[1] == "user":
+                        return self.catalog.insertUser(uri[0], body_dict)
+                elif uri[1] == "device":
+                    return self.catalog.insertDevice(uri[0], body_dict)
             raise web_exception(404, "Resource not found.")
         except web_exception as e:
             raise cherrypy.HTTPError(e.code, e.message)
@@ -570,17 +507,19 @@ class RESTResourceCatalog(BaseService):
     def PUT(self, *uri, **params):
         """PUT method for the REST API.
 
-        Allowed commands:
-        `/refresh`: update the device information. 
+        Allowed URLs:
+        `/<CompanyName>/refresh`: update the device information. 
         The parameters are `ID`, `CompanyName`.\n
+        `/<CompanyName>/field`: update the field information. 
+        In the parameters must be the field number and the new plant.\n
         """
         try:
             if len(uri) > 0:
-                if len(uri) == 1 and uri[0] == "refresh":
-                    if all(key in params for key in ["ID", "CompanyName"]):
-                        return self.catalog.refreshItem(params["CompanyName"], int(params["ID"]))
-                if len(uri) == 1 and uri[0] == "field":
-                    return self.catalog.updateField(params)
+                if len(uri) == 2 and uri[1] == "refresh":
+                    if "ID" in params:
+                        return self.catalog.refreshItem(uri[0], int(params["ID"]))
+                if len(uri) == 2 and uri[1] == "field":
+                    return self.catalog.updateField(uri[0], params)
             raise web_exception(404, "Resource not found.")
         except web_exception as e:
             return cherrypy.HTTPError(e.code, e.message)
@@ -590,7 +529,7 @@ class RESTResourceCatalog(BaseService):
     def DELETE(self, *uri, **params):
         """DELETE method for the REST API.
 
-        Allowed commands:
+        Allowed URLs:
         `/company`: delete the company from the platform. 
         The parameters are `telegramID`, `CompanyName` and `CompanyToken`.\n
         """

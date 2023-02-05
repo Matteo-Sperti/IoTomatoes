@@ -117,7 +117,7 @@ class MongoConnection():
 	def checkNewCompany(self):
 			'''check if a new company is added by making a GET request to the Resource Catalog'''
 			while True:
-				response = requests.get(self._() + "/CompaniesName")
+				response = requests.get(self._() + "/companies/names")
 				list = json.loads(response)
 				for i in list:
 					if i not in self.client.list_database_names():

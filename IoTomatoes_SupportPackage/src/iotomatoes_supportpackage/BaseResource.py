@@ -21,7 +21,7 @@ class BaseResource() :
         It registers the resource to the Resource Catalog and starts the RefreshThread."""
 
         self._EndpointInfo = self.register()
-        self._RefreshThread = RefreshThread(self.platform_url + "/rc/", self, CompanyName=self.CompanyName)
+        self._RefreshThread = RefreshThread(self.platform_url + "/rc/" + self.CompanyName, self)
         if self.isMQTT:
             self._MQTTClient = BaseMQTTClient(self.platform_url, self._EndpointInfo, self.platform_url)
             self._MQTTClient.startMQTT()
@@ -40,8 +40,8 @@ class BaseResource() :
 
         while True:
             try:
-                res = requests.post(self.platform_url + "/rc/device", 
-                                        params=self.CompanyName, json = self._EndpointInfo)
+                res = requests.post(self.platform_url + "/rc/" + self.CompanyName + "/device", 
+                                        json = self._EndpointInfo)
                 res.raise_for_status()
                 res_dict = res.json()
             except requests.exceptions.HTTPError as err:

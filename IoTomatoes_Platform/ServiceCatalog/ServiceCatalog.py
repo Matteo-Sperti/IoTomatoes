@@ -204,7 +204,6 @@ class RESTServiceCatalog():
             "broker": settings["broker"],
             "telegramToken" : settings["telegramToken"]
             }
-        self._systemToken = settings["SystemToken"]
         self.ServiceCatalog = ServiceCatalogManager(heading, settings["filename"], settings["autoDeleteTime"])
 
     def close(self):

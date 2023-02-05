@@ -509,21 +509,17 @@ class ChangePlant():
 
     def change_plant(self):
         try:
-            params = {"CompanyName" : self.CompanyName, 
-                    "CompanyToken" : self.CompanyToken,
+            params = {
                     "fieldNumber" : self.FieldNumber,
-                    "plant" : self.newplant}
-            res = requests.put(self._connector.ResourceCatalog_url + "/field", 
+                    "plant" : self.newplant
+            }
+            res = requests.put(f"{self._connector.ResourceCatalog_url}/{self.CompanyName}/field", 
                                     params=params)
             res.raise_for_status()
             dict_ = res.json()
         except requests.exceptions.HTTPError as err:
             if err.response.status_code == 404:
                 self._bot.sendMessage("Company not registered")
-            elif err.response.status_code == 401:
-                self._bot.sendMessage("CompanyToken not valid")
-            elif err.response.status_code == 403:
-                self._bot.sendMessage("You are not authorized to delete this company.\nContact your administrator.")
             else:
                 print(f"{err.response.status_code} : {err.response.reason}")
             return False
@@ -539,7 +535,6 @@ class ChangePlant():
 class CustomPlot():
     def __init__(self, CompanyName : str, sender, connector):
         self.CompanyName = CompanyName
-        self.CompanyToken = ""
         self._connector = connector
         self._bot = sender
         self._status = 0

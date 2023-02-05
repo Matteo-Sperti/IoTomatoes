@@ -232,7 +232,7 @@ class IoTBot(BaseService):
 
         try:
             params = {"CompanyName": CompanyName}
-            res = requests.get(self.ResourceCatalog_url + "/" + listType, params=params)
+            res = requests.get(f"{self.ResourceCatalog_url}/{CompanyName}/{listType}", params=params)
             res.raise_for_status()
             res_dict = res.json()
         except:

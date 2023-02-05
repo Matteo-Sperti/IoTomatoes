@@ -15,7 +15,7 @@ class BaseService() :
         """Return the complete list of the companies from the Resource Catalog""" 
 
         try:
-            r = requests.get(self.ResourceCatalog_url+"/all")
+            r = requests.get(self.ResourceCatalog_url+"/companies")
             r.raise_for_status()
             companyList = r.json()
         except:
@@ -71,6 +71,7 @@ class BaseService() :
                         return res_dict
                 except:
                     print(f"Error in the response\n")  
+                    time.sleep(1)
 
     def getOtherServiceURL(self, serviceName: str):
         """Return the URL of the service `serviceName`"""

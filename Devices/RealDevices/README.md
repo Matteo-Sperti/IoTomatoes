@@ -13,7 +13,7 @@ On your RaspberryPy you must install:
 ## Configuration
 In the [DeviceSettings.json](DeviceSettings.json) configuration file you must specify:
 - **ServiceCatalog_url:**: the IP address of the IoTomatoes platform
-- **CompanyInfo:** the Company information ("CompanyName" and "CompanyToken")
+- **CompanyName:** the Company name
 - **field:** the field number in which the sensor is installed
 - the type of sensor or actuator (in this case ["humidity", "temperature"])
 

@@ -1,15 +1,15 @@
 import datetime
 import json
+import time
 import paho.mqtt.client as PahoMQTT
 
 brokerIP = "localhost"
 brokerPort = 1883
-baseTopic =  "IoTomatoes/"
 
 class Listener():
     def __init__(self):
-        self._broker, self._port, self._baseTopic = brokerIP, brokerPort, baseTopic
-        self.topic = self._baseTopic + "#"
+        self._broker, self._port = brokerIP, brokerPort
+        self.topic = "#"
 
     def stop(self):
         self._paho_mqtt.unsubscribe(self.topic)
@@ -20,7 +20,6 @@ class Listener():
         """Start the MQTT client.
         It subscribes the topics and starts the MQTT client loop.
         """
-        self._broker, self._port, self._baseTopic = brokerIP, brokerPort, baseTopic
         self.MQTTclientID = f"ListenEverithing"
 
         # create an instance of paho.mqtt.client
@@ -65,6 +64,7 @@ if __name__ == "__main__":
     listener = Listener()
     listener.start()
 
+    time.sleep(5)
     try:
         input("Press Enter to stop listening")
     except KeyboardInterrupt:

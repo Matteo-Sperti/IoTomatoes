@@ -1,10 +1,10 @@
-import time
 import json
 import random
 import requests
 
-
 from FakeDevice import SimDevice
+import sys
+sys.path.append("../../IoTomatoes_SupportPackage/src/")
 from iotomatoes_supportpackage.MyIDGenerator import IDs
 
 HelpMessage = """
@@ -18,7 +18,7 @@ exit: exit the program
 
 class SimDevices_Manager():
     def __init__(self, settings : dict):
-        self._Platform_url = settings["IoTomatoes_url"]
+        self._platform_url = settings["IoTomatoes_url"]
         self._measuresType = settings["MeasuresType"]
         self._actuatorsType = settings["ActuatorsType"]
         self.DevicesIDs = IDs(1)
@@ -33,7 +33,7 @@ class SimDevices_Manager():
         for i in range(number):
             self.Sensors.append(self.createDevice(CompanyName, fieldNumber, latitude, longitude))
 
-    def createDevice(self, CompanyInfo : dict, fieldNumber : int, latitude : float, longitude : float):
+    def createDevice(self, CompanyName : str, fieldNumber : int, latitude : float, longitude : float):
         ID = self.DevicesIDs.get_ID()
 
         if random.randint(0, 1) == 0:
@@ -58,9 +58,8 @@ class SimDevices_Manager():
             "measureType" : measures,
             "actuatorType" : actuators,
             "PowerConsumption_kW" : PowerConsumption_kW,
-            "CompanyName" : CompanyInfo["CompanyName"],
-            "CompanyToken" : CompanyInfo["CompanyToken"],
-            "ServiceCatalog_url" : self._ServiceCatalog_url
+            "CompanyName" : CompanyName,
+            "IoTomatoes_url" : self._platform_url
         }
         
         dev_latitude, dev_longitude = self.generatePosition(latitude, longitude, fieldNumber)
@@ -71,9 +70,9 @@ class SimDevices_Manager():
             }
         return SimDevice(Device_information)
 
-    def getCompanyPosition(self, Companyinfo : dict):
+    def getCompanyPosition(self, CompanyName : str):
         try:
-            response = requests.get(f"{self._ResourceCatalog_url}/location", params = Companyinfo)
+            response = requests.get(f"{self._platform_url}/rc/{CompanyName}/location")
             response.raise_for_status()
             r_dict = response.json()["Location"]
             latitude = r_dict["latitude"]

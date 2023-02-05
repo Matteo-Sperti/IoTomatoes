@@ -43,6 +43,7 @@ class BaseMQTTClient():
         self._paho_mqtt.on_connect = self.myOnConnect
         self._paho_mqtt.on_message = self.myOnMessageReceived
         # manage connection to broker
+        print(f"Connecting to {self._broker} at port {self._port}...")
         self._paho_mqtt.connect(self._broker, self._port)
         self._paho_mqtt.loop_start()
         time.sleep(1)

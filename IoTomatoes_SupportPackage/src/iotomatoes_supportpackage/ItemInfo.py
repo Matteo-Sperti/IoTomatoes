@@ -188,7 +188,7 @@ def _makeService(dictInformation : dict, EInfo : dict):
     if "availableServices" in EInfo:
         if "MQTT" in EInfo["availableServices"]:
             serviceInfo = {}
-            if "serviceDetails" in EInfo:
+            if "servicesDetails" in EInfo:
                 for service in EInfo["servicesDetails"]:
                     if "serviceType" in service and service["serviceType"] == "MQTT":
                         serviceInfo = service

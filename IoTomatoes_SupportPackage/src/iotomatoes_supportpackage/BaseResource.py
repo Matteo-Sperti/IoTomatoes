@@ -14,13 +14,13 @@ class BaseResource() :
 
         self.CompanyName = settings["CompanyName"]
         self.platform_url = settings["IoTomatoes_url"]
-        self.start()
+        self.start(settings)
 
-    def start(self) :        
+    def start(self, info: dict) :        
         """ Start the endpoint as a resource.
         It registers the resource to the Resource Catalog and starts the RefreshThread."""
 
-        self._EndpointInfo = self.register()
+        self._EndpointInfo = self.register(info)
         self._RefreshThread = RefreshThread(self.platform_url + "/rc/" + self.CompanyName, self)
         if self.isMQTT:
             self._MQTTClient = BaseMQTTClient(self.platform_url, self._EndpointInfo, self.platform_url)
@@ -28,20 +28,21 @@ class BaseResource() :
 
     def restart(self):
         self.stop()
-        self.start()
+        self.start(self._EndpointInfo)
 
     def stop(self):
         self._RefreshThread.stop()
         if self.isMQTT:
             self._MQTTClient.stopMQTT()
 
-    def register(self) -> dict:
+    def register(self, info : dict) -> dict:
         """Register the resource to the Resource Catalog."""
 
         while True:
             try:
-                res = requests.post(self.platform_url + "/rc/" + self.CompanyName + "/device", 
-                                        json = self._EndpointInfo)
+                url = self.platform_url + "/rc/" + self.CompanyName + "/device"
+                print(f"Registering to {url} ...")
+                res = requests.post(url, json = info)
                 res.raise_for_status()
                 res_dict = res.json()
             except requests.exceptions.HTTPError as err:

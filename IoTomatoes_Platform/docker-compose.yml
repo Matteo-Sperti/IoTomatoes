@@ -13,6 +13,8 @@ volumes:
       device: /home/matte/Desktop/PoliTO/ProgrammingIOT/IoTomatoes/IoTomatoes_SupportPackage/src/iotomatoes_supportpackage/
       o: bind
   node-red-data: 
+  mosquitto-data:
+  mosquitto-log:
 
 services:
   mosquitto:
@@ -20,6 +22,8 @@ services:
     image: eclipse-mosquitto:2
     volumes:
       - ./mosquitto.conf:/mosquitto/config/mosquitto.conf:ro
+      - mosquitto-data:/mosquitto/data
+      - mosquitto-log:/mosquitto/log
     ports:
       - 1883:1883
       - 9001:9001

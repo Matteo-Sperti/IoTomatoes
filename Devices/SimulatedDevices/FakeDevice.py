@@ -1,5 +1,7 @@
 import json
 import time
+import sys
+sys.path.append("../../IoTomatoes_SupportPackage/src/")
 from iotomatoes_supportpackage.AmbientSimulator import AmbientSimulator
 from iotomatoes_supportpackage.IoTDevice import IoTDevice
 

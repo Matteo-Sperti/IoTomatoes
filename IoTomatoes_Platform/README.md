@@ -9,6 +9,10 @@ The proposed IoT platform for Smart Farming is built on the base of the microser
 ## Launcher
 The **[docker-compose.yml](./docker-compose.yml)** file is a script that allows to build and run all the microservices of the IoT platform in a single command. In the configuration it uses a bridge network to allow the communication between the microservices. It also uses the host network to allow the communication between the services and the devices on the Raspberry Pi board.
 
+Together with all the microservices, it also launches:
+- the NGINX server that works as a reverse proxy to allow the communication between the services in the platform and the external world.
+- the MOSQUITTO broker that works as a MQTT broker to allow the communication between the services in the platform and the external devices.
+
 ## Device Connector
 Device connector for Raspberry Pi: It works as a device connector integrating the low-level technology of sensors  and actuators into the platform. The Raspberry Pi board communicates using low-energy communication protocols with temperature, humidity, air quality, solar radiations, soil moisture sensors located in the field, to retrieve environmental and soil information, or with leds and pumps. It communicates with the Catalog through REST and it works as a MQTT publisher to send the data collected, or as a MQTT subscriber to receive the actuation commands. It can be also used to integrate pre-existing sensors in the platform.
 

@@ -26,6 +26,9 @@ class SimDevices_Manager():
         self.Sensors = []
 
     def populateField(self, number : int = 5):
+        """Insert a `number` (default is 5) of devices in a field.
+        The devices are randomly generated.
+        """
         CompanyName = input("Insert Company Name: ")
         fieldNumber = query_int("Insert field number: ")
 
@@ -34,6 +37,8 @@ class SimDevices_Manager():
             self.Sensors.append(self.createDevice(CompanyName, fieldNumber, latitude, longitude))
 
     def createDevice(self, CompanyName : str, fieldNumber : int, latitude : float, longitude : float):
+        """Create a device with random parameters."""
+
         ID = self.DevicesIDs.get_ID()
 
         if random.randint(0, 1) == 0:
@@ -71,6 +76,11 @@ class SimDevices_Manager():
         return SimDevice(Device_information)
 
     def getCompanyPosition(self, CompanyName : str):
+        """Get the position of the company from the Resource Catalog.
+        
+        Arguments:
+        - `CompanyName (str)`: the name of the company"""
+
         try:
             response = requests.get(f"{self._platform_url}/rc/{CompanyName}/location")
             response.raise_for_status()
@@ -85,6 +95,7 @@ class SimDevices_Manager():
 
     def generatePosition(self, latitude : float, longitude : float, fieldNumber : int):
         """Generate a random position inside a field"""
+
         if fieldNumber == 1:
             dev_latitude = latitude + random.uniform(0, 0.005)
             dev_longitude = longitude + random.uniform(0, 0.005)
@@ -104,6 +115,8 @@ class SimDevices_Manager():
         return dev_latitude, dev_longitude
 
     def stopDevice(self):
+        """Stop a device"""
+
         CompanyName = input("Insert Company Name: ")
         field = query_int("Insert field number: ")
 
@@ -117,6 +130,8 @@ class SimDevices_Manager():
         print("No device found with the given information")
 
     def run(self) :
+        """Menu of the simulator."""
+
         print("\nType 'help' for the list of available commands")
         while True :
             command = input(">> ").lower()
@@ -142,6 +157,15 @@ class SimDevices_Manager():
 
 def query_int(question):
     """Ask a question via input() and return the int answer"""
+    
+    def _is_integer(n):
+        try:
+            float(n)
+        except ValueError:
+            return False
+        else:
+            return float(n).is_integer()
+
     while True:
         resp = input(question)
         if _is_integer(resp):
@@ -149,13 +173,7 @@ def query_int(question):
         else:
             print(f"Please respond with a integer number\n")
 
-def _is_integer(n):
-    try:
-        float(n)
-    except ValueError:
-        return False
-    else:
-        return float(n).is_integer()
+
 
 if __name__ == "__main__":
     settings = json.load(open("DevicesSimulatorSettings.json", "r"))

@@ -10,7 +10,7 @@ import signal
 
 from Commands import *
 from iotomatoes_supportpackage.BaseService import BaseService
-from iotomatoes_supportpackage.MyThread import custom_thread
+from iotomatoes_supportpackage.MyThread import SimpleThread
 
 HelpMessage = """Help message to the IoTomatoesBot!
 
@@ -126,11 +126,13 @@ class MessageHandler(telepot.helper.ChatHandler):
 
 class ChatBox(telepot.DelegatorBot):
     def __init__(self, token : str, connector):
-        """Initialize the delegator bot.\n
-        Arguments:\n
-        `token (str)`: the token of the bot\n
-        `connector`: the endpoint object uses to connect to other services\n
+        """Initialize the delegator bot.
+
+        Arguments:
+        - `token (str)`: the token of the bot
+        - `connector`: the endpoint object uses to connect to other services
         """
+
         self._seen = set()
         self._companyList = []
         self._connector = connector
@@ -203,9 +205,10 @@ class IoTBot(BaseService):
 
     def isRegistered(self, chatID : int):
         """Return the name of the company if the chatID is already registered.
-        Otherwise return an empty string.\n
-        Arguments:\n
-        `chatID (int)`: telegramID of the user\n
+        Otherwise return an empty string.
+
+        Arguments:
+        - `chatID (int)`: telegramID of the user
         """
         try:
             params = {"telegramID": chatID}
@@ -223,10 +226,11 @@ class IoTBot(BaseService):
 
     def getList(self, CompanyName : str, listType : str):
         """Return the list of users, devices or fields of a company.
-        If the list is empty, return an empty list. If an error occurs, return None.\n
-        Arguments:\n
-        `CompanyName (str)`: name of the company\n
-        `listType (str)`: type of the list to return. It can be "users", "devices" or "fields"
+        If the list is empty, return an empty list. If an error occurs, return None.
+        
+        Arguments:
+        - `CompanyName (str)`: name of the company\n
+        - `listType (str)`: type of the list to return. It can be "users", "devices" or "fields"
         """
         if listType not in ["users", "devices", "fields"]:
             return None
@@ -246,7 +250,7 @@ class IoTBot(BaseService):
 
     def notify(self, topic, msg):
         """Notify the user of the message received from the broker"""
-        print(f"Received message from {topic}")
+
         try:
             timestamp = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(msg["t"]))
             message = (f"\nMessage from {msg['bn']} at {timestamp}:\n")
@@ -274,6 +278,20 @@ class IoTBot(BaseService):
                             self.bot.sendMessage(chatID, text=message)
                         except:
                             print("Invalid chatID from catalog")
+
+def custom_thread(func):
+    def f(seed_tuple):
+        target = func(seed_tuple)
+
+        if type(target) is tuple:
+            run, args, kwargs = target
+            t = SimpleThread(target=run, args=args, kwargs=kwargs)
+        else:
+            t = SimpleThread(target=target)
+
+        return t
+    return f
+
 
 def sigterm_handler(signal, frame):
     IoTomatoesBOT.stop()

@@ -8,6 +8,7 @@ from iotomatoes_supportpackage.MQTTClient import BaseMQTTClient
 class BaseService() :
     def __init__(self, settings: dict):
         """Initialize the BaseService class."""
+        
         self._ServiceCatalog_url = settings["ServiceCatalog_url"]
         self.start(settings)
 
@@ -28,7 +29,7 @@ class BaseService() :
         """ Start the endpoint as a service.
         It registers the service to the Service Catalog and starts the RefreshThread."""
 
-        self._EndpointInfo = self.register(info)
+        self.EndpointInfo = self.register(info)
         self._RefreshThread = RefreshThread(self._ServiceCatalog_url, self)
         if self.serviceName != "ResourceCatalog":
             self.ResourceCatalog_url = self.getOtherServiceURL("resource_catalog", True)
@@ -42,7 +43,7 @@ class BaseService() :
         It stops the RefreshThread and the MQTTClient and starts them again."""
 
         self.stop()
-        self.start(self._EndpointInfo)
+        self.start(self.EndpointInfo)
 
     def stop(self):
         self._RefreshThread.stop()
@@ -93,14 +94,14 @@ class BaseService() :
     
     @property
     def serviceName(self) -> str:
-        return self._EndpointInfo["serviceName"]
+        return self.EndpointInfo["serviceName"]
     
     @property
     def ID(self) -> int:
-        return self._EndpointInfo["ID"]
+        return self.EndpointInfo["ID"]
     
     @property
     def isMQTT(self) -> bool:
-        return isMQTT(self._EndpointInfo)
+        return isMQTT(self.EndpointInfo)
 
     

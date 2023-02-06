@@ -1,20 +1,24 @@
 import time
 
-"""Functions:\n
+"""
+Functions:\n
 	- createDeviceList (list of dict, bool) -> list of dict\n
 	- checkUpdate (str, str, str, list of dict, bool) -> None\n
 	- inList (list of dict, int) -> bool\n
 	- compare_dicts (dict, dict, list of str) -> bool\n
-	"""
+"""
 
 def createDeviceList(companyList : list, isActuator: bool = False):
-	"""Create a list of all devices integrating informations about the last time a message was received from a device\n
-	Arguments:\n
-	`companyList (list of dict)`: List of all companies and their devices\n
-	`isActuator (bool)`: True if the list should contain only actuators, False if the list should contain only sensors\n
-	Return: \n
-	`deviceList (list of dict)`: List of all devices updated
+	"""Create a list of all devices integrating informations about the last time a message was received from a device
+
+	Arguments:
+	- `companyList (list of dict)`: List of all companies and their devices
+	- `isActuator (bool)`: True if the list should contain only actuators, False if the list should contain only sensors
+	
+	Return:
+	- `deviceList (list of dict)`: List of all devices updated
 	"""
+
 	deviceList = []
 	for comp in companyList:
 		for dev in comp['devicesList']:
@@ -73,14 +77,16 @@ def checkUpdate(Connector, isActuator: bool):
 			Connector._MQTTClient.myPublish(f"{old_dev['CompanyName']}/{Connector._MQTTClient.publishedTopics[0]}", payload)
 
 def inList(deviceID : int, deviceList : list):
-	"""Check if an actuator is in the list of the actuators\n
-	Arguments:\n
-	`deviceID (int)`: ID of the device to check\n
-	`deviceList (list of dict)`: List of all devices\n
-	Return: CheckResult object with:\n
-	`error (bool)`: ".is_error"\n
-	`message (str)`: ".message"\n
-	`topic (str)`: ".topic" 
+	"""Check if an actuator is in the list of the actuators
+
+	Arguments:
+	- `deviceID (int)`: ID of the device to check
+	- `deviceList (list of dict)`: List of all devices
+
+	Return: `CheckResult` object with:
+	- `error (bool)`: ".is_error"
+	- `message (str)`: ".message"
+	- `topic (str)`: ".topic" 
 	"""
 
 	for dev in deviceList:

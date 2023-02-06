@@ -20,7 +20,7 @@ class BaseResource() :
         """ Start the endpoint as a resource.
         It registers the resource to the Resource Catalog and starts the RefreshThread."""
 
-        self._EndpointInfo = self.register(info)
+        self.EndpointInfo = self.register(info)
         self._RefreshThread = RefreshThread(self.platform_url + "/rc/" + self.CompanyName, self)
         if self.isMQTT:
             brokerip = self.platform_url.split(":")[1].replace("//", "")
@@ -29,7 +29,7 @@ class BaseResource() :
 
     def restart(self):
         self.stop()
-        self.start(self._EndpointInfo)
+        self.start(self.EndpointInfo)
 
     def stop(self):
         self._RefreshThread.stop()
@@ -62,45 +62,45 @@ class BaseResource() :
 
     @property
     def ID(self) -> int:
-        return self._EndpointInfo["ID"]
+        return self.EndpointInfo["ID"]
     
     @property
     def isMQTT(self) -> bool:
-        return isMQTT(self._EndpointInfo)
+        return isMQTT(self.EndpointInfo)
 
     @property
     def field(self) -> int:
         """Return the field of the resource."""
         try:
-            return self._EndpointInfo["fieldNumber"]
+            return self.EndpointInfo["fieldNumber"]
         except:
             return -1
 
     @property
     def isActuator(self) -> bool:
-        if "isActuator" not in self._EndpointInfo:
+        if "isActuator" not in self.EndpointInfo:
             return False
         else:
-            return self._EndpointInfo["isActuator"]
+            return self.EndpointInfo["isActuator"]
 
     @property
     def isSensor(self) -> bool:
-        if "isSensor" not in self._EndpointInfo:
+        if "isSensor" not in self.EndpointInfo:
             return False
         else:
-            return self._EndpointInfo["isSensor"]
+            return self.EndpointInfo["isSensor"]
 
     @property
     def measureType(self) -> list:
-        return measureType(self._EndpointInfo)
+        return measureType(self.EndpointInfo)
 
     @property
     def actuatorType(self) -> list:
-        return actuatorType(self._EndpointInfo)
+        return actuatorType(self.EndpointInfo)
 
     @property
     def PowerConsumption_kW(self) -> int:
-        return PowerConsumption_kW(self._EndpointInfo)
+        return PowerConsumption_kW(self.EndpointInfo)
 
     def __str__(self):
         """Return a string with the information of the resource."""
@@ -108,7 +108,7 @@ class BaseResource() :
         dict = {
             "ID": self.ID,
             "CompanyName": self.CompanyName,
-            "EndpointInfo": self._EndpointInfo
+            "EndpointInfo": self.EndpointInfo
         }
 
         return json.dumps(dict, indent=4)

@@ -12,9 +12,9 @@ class SmartIrrigation(BaseService):
     def __init__(self, settings : dict, plantInfo : dict):
         """It initializes the service with the settings and the plantInfo
         
-        Arguments:\n
-        `settings (dict)`: the settings of the service\n
-        `plantInfo (dict)`: dictionary with the plants threshold values\n
+        Arguments:
+        - `settings (dict)`: the settings of the service
+        - `plantInfo (dict)`: dictionary with the plants threshold values
         """
         super().__init__(settings)
 
@@ -39,10 +39,10 @@ class SmartIrrigation(BaseService):
       
     def control(self):
         """It performs:
-        - Call to resource catalog -> to retrieve information about each field for each company
-        - Call to MongoDB to retrieve information about last hour measures (currentSoilMoisture) 
+        1. Call to resource catalog -> to retrieve information about each field for each company
+        2. Call to MongoDB to retrieve information about last hour measures (currentSoilMoisture) 
             and previoius hour measures (previousSoilMoisture)
-        - Call to Weather forecast service to retrieve information about precipitation during the day
+        3. Call to Weather forecast service to retrieve information about precipitation during the day
         With these information it performs a control strategy with an hysteresis law in order to send 
         the command ON when the soil moisture mesaure decrease and is under a specific low threshold 
         and to send command OFF in the opposite case"""
@@ -72,14 +72,13 @@ class SmartIrrigation(BaseService):
                     continue
                     
                 currentTime = datetime.datetime.now().time()
-                soilMoistureForecast, dailyPrecipitationSum = self.callWeatherService(currentTime.hour)
+                soilMoistureForecast, dailyPrecipitationSum = self.callWeatherService(CompanyName, currentTime.hour)
                 if soilMoistureForecast == None or dailyPrecipitationSum == None:
                     print("No weather forecast available")
-                    self.sendCommand(CompanyName, fieldID, actuatorTopicsForField, 0)
-                    continue
-                
-                #integration sensor measure with the weather forecast one
-                currentSoilMoisture = round((3*currentSoilMoisture+soilMoistureForecast)/4,2) 
+                    dailyPrecipitationSum = 0
+                else:
+                    currentSoilMoisture = round(0.75*currentSoilMoisture + 0.25*soilMoistureForecast,2) 
+
                 maxLimitTemp = datetime.time(23,59,0)
                 minLimitTemp = datetime.time(20,0,0)  #da cambiare per poter eseguire le prove sul controllo
                 
@@ -150,7 +149,7 @@ class SmartIrrigation(BaseService):
 
         print(f"\nActuators topics list= {topicList}\n")
         for singleTopic in topicList:    
-            message["bn"] = self._EndpointInfo["serviceName"]
+            message["bn"] = self.EndpointInfo["serviceName"]
             message["cn"] = CompanyName
             message["fieldNumber"] = fieldID
             message["e"][-1]["v"] = command
@@ -175,8 +174,8 @@ class SmartIrrigation(BaseService):
         #Check if the crop is in our json file:
         if plant in list(self.plantInfo.keys()):
             limits=self.plantInfo[plant]
-            minSoilMoisture=limits["soilMoistureLimit"]["min"]    #extract the ideal min value of soil moisture for the given plant from the json file 
-            maxSoilMoisture=limits["soilMoistureLimit"]["max"]    #extract the ideal max value of soil moisture for the given plant from the json file
+            minSoilMoisture=limits["soilMoistureLimit"]["min"]    
+            maxSoilMoisture=limits["soilMoistureLimit"]["max"]
             precipitationLimit=limits["precipitationLimit"]["max"]
         else:
             print("No crop with the specified name. \nDefault limits will be used") 
@@ -206,7 +205,7 @@ class SmartIrrigation(BaseService):
         else:
             return previousSoilMoisture, currentSoilMoisture
 
-    def callWeatherService(self,hour):
+    def callWeatherService(self, CompanyName : str, hour):
         """It gets precipitations informations from weather forecast service and extract:
             - daily precipitation sum
             - soil moisture forecast
@@ -217,31 +216,20 @@ class SmartIrrigation(BaseService):
             print("ERROR: Weather Forecast service not found!")
             return None, None
 
-        #-ESEGUE LA GET AL WEATHER FORECAST SERVICE (da verificare come implementa Luca la gestione della chiamata):
-        #     try:
-        #         weatherService_data=requests.get(weatherForecast_url+"/Irrigation")
-        #         weatherService_data.raise_for_status()
-        #     except requests.exceptions.InvalidURL as errURL:
-        #         print(f"ERROR: invalid URL for Weather Forecast service!\n\n{errURL})
-        #         time.sleep(1)
-        #     except requests.exceptions.HTTPError as errHTTP:
-        #         print(f"ERROR: something went wrong with Weather Forecast service!\n\n{errHTTP}")
-        #         time.sleep(1)
-        #     except requests.exceptions.ConnectionError:
-        #         print("503: Connection error. Weather Forecast service unavailable")
-        #         time.sleep(1)
-
-        #     else:
-        #         weatherService_data=weatherService_data.json()
-        #         daily_precipitation_sum=weatherService_data["daily"]["precipitation_sum"][0]
-        #         soil_moisture_forecast=weatherService_data["hourly"]["soil_moisture_3_9cm"][hour]
-        #         return [soil_moisture_forecast,daily_precipitation_sum]
-        
-        #PER ORA I DATI SONO PRESI SEMPLICEMENTE DA UN FILE:
-        weatherService_r=json.load(open("outputWeatherForecast.json"))
-        daily_precipitation_sum=weatherService_r["daily"]["precipitation_sum"][0]
-        soil_moisture_forecast=weatherService_r["hourly"]["soil_moisture_3_9cm"][hour]
-        return soil_moisture_forecast,daily_precipitation_sum              
+        try:
+            weatherService_data = requests.get(f"{weatherForecast_url}/{CompanyName}/irrigation")
+            weatherService_data.raise_for_status()
+            weatherService_data=weatherService_data.json()
+        except:
+            print("ERROR: Weather Forecast service not available!")
+            return None, None
+        else:
+            if weatherService_data == {}:
+                return None, None
+            
+            daily_precipitation_sum = weatherService_data["daily"]["precipitation_sum"][0]
+            soil_moisture_forecast = weatherService_data["hourly"]["soil_moisture_3_9cm"][hour]
+            return soil_moisture_forecast, daily_precipitation_sum              
                      
 def sigterm_handler(signal, frame):
     irrigation.stop()
@@ -257,7 +245,6 @@ if __name__=="__main__":
         print("ERROR: files not found")
     else:
         irrigation = SmartIrrigation(settings, plantDatabase)
-
         controlTimeInterval = settings["controlTimeInterval"]
 
         while True:

@@ -14,7 +14,7 @@ class FaultDetector(BaseService):
 
 		super().__init__(settings)
 		self._message = {
-					'bn' : self._EndpointInfo['serviceName'],
+					'bn' : self.EndpointInfo['serviceName'],
 					'cn': '',
 					'msgType': '',
 					'msg': '', 
@@ -24,9 +24,10 @@ class FaultDetector(BaseService):
 		self.deviceList = DM.createDeviceList(companyList, isActuator=False)
 
 	def updateStatus(self, deviceID : int):
-		"""Update the status of a device in the deviceList\n
-		Arguments:\n
-		`deviceID (int)`: ID of the device to update
+		"""Update the status of a device in the deviceList
+		
+		Arguments:
+		- `deviceID (int)`: ID of the device to update
 		"""
 		
 		for dev in self.deviceList:
@@ -35,14 +36,15 @@ class FaultDetector(BaseService):
 				break
 
 	def checkStatus(self, device : dict):
-		"""Check if a device has not sent a message for more than 5 minutes\n
-		Arguments:\n
-		`device (dict)`: Device to check\n
-		Return:\n
-		`CheckResult` object with:\n
-		`error (bool)`: ".is_error"\n
-		`message (str)`: ".message"\n
-		`topic (str)`: ".topic" 
+		"""Check if a device has not sent a message for more than 5 minutes
+
+		Arguments:
+		- `device (dict)`: Device to check
+
+		Return: `CheckResult` object with:
+		- `error (bool)`: ".is_error"\n
+		- `message (str)`: ".message"\n
+		- `topic (str)`: ".topic" 
 		"""
 
 		currentTime = datetime.datetime.now()
@@ -57,16 +59,17 @@ class FaultDetector(BaseService):
 		return DM.CheckResult(is_error=False)
 
 	def checkMeasure(self, deviceID: int, measureType: str,  measure : float, unit : str):
-		"""Check if a measure is out of the thresholds\n
+		"""Check if a measure is out of the thresholds.
+
 		Arguments:\n
-		`deviceID (int)`: ID of the device\n
-		`measureType (str)`: Type of the measure to check\n
-		`measure (float)`: Value of the measure to check\n
-		Return:\n
-		`CheckResult` object with:\n
-		`error (bool)`: ".is_error"\n
-		`message (str)`: ".message"\n
-		`topic (str)`: ".topic" 
+		- `deviceID (int)`: ID of the device
+		- `measureType (str)`: Type of the measure to check
+		- `measure (float)`: Value of the measure to check
+
+		Return: `CheckResult` object with:
+		- `error (bool)`: ".is_error"
+		- `message (str)`: ".message"
+		- `topic (str)`: ".topic" 
 		"""
 		device = None
 		if unit != self.thresholds[measureType]['unit']:

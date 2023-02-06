@@ -2,10 +2,7 @@
     "ServiceCatalog_url" : "http://service_catalog:8080",
     "WeatherUrl": "https://api.open-meteo.com/v1/forecast",
     "serviceName": "weather_forecast",
-    "PointsPerGraph": 7,
     "IrrigationDict": {
-        "latitude": 52.5,
-        "longitude": 13.41,
         "hourly": [
             "relativehumidity_2m",
             "dewpoint_2m",
@@ -20,8 +17,6 @@
         "timezone": "auto"
     },
     "LightingDict":{
-        "latitude": 52.5,
-        "longitude": 13.41,
         "hourly": [
             "shortwave_radiation",
             "direct_radiation",

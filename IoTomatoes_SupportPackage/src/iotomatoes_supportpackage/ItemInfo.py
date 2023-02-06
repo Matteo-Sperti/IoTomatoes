@@ -62,28 +62,28 @@ def getIPaddress(dict_ : dict) -> str:
 def constructService(ID : int, EInfo : dict):
     """ Construct the dictionary of a service according to the specification of the catalog.
 
-    Arguments:\n
-    `ID (int)`: The ID of the service.\n
-    `EInfo (dict)`: The dictionary containing the information of the service.\n
+    Arguments:
+    - `ID (int)`: The ID of the service.
+    - `EInfo (dict)`: The dictionary containing the information of the service.
 
-    Returns:\n
-    `info` (dict)`: The dictionary of the service.\n
+    Returns:
+    - `dictInformation (dict)`: The dictionary of the service.
     """
-    info = {}
-    info["ID"] = ID
-    _makeService(info, EInfo)
-    info["lastUpdate"] = time.time()
-    return info
+    dictInformation = {}
+    dictInformation["ID"] = ID
+    _makeService(dictInformation, EInfo)
+    dictInformation["lastUpdate"] = time.time()
+    return dictInformation
 
 def constructResource(ID : int, CompName : str, EInfo : dict):
     """ Construct the dictionary of a resource according to the specification of the catalog.
 
-    Arguments:\n
-    `ID (int)`: The ID of the resource.\n
-    `CompName (str)`: The name of the company of the resource.\n
-    `EInfo (dict)`: The dictionary containing the information of the resource.\n
+    Arguments:
+    - `ID (int)`: The ID of the resource.
+    - `CompName (str)`: The name of the company of the resource.
+    - `EInfo (dict)`: The dictionary containing the information of the resource.
 
-    Returns:\n
+    Returns:
     `dictInformation (dict)`: The dictionary of the resource.\n
     """
     dictInformation = {}
@@ -96,10 +96,10 @@ def constructResource(ID : int, CompName : str, EInfo : dict):
 def _makeResourceTopic(dictInformation: dict, EInfo : dict, CompanyName : str):
     """If the resource is a sensor or an actuator, add the MQTT topics to the dictionary.
     
-    Arguments:\n
-    `dictInformation (dict)`: The dictionary of the resource.\n
-    `EInfo (dict)`: The dictionary containing the information of the resource.\n
-    `CompInfo (dict)`: The dictionary containing the information of the company of the resource.\n    
+    Arguments:
+    - `dictInformation (dict)`: The dictionary of the resource to be modified.
+    - `EInfo (dict)`: The dictionary containing the information of the resource.
+    - `CompanyName (str)`: The name of the company of the resource.
     """
 
     if "ID" not in dictInformation:
@@ -125,7 +125,12 @@ def _makeResourceTopic(dictInformation: dict, EInfo : dict, CompanyName : str):
 
 
 def _makeResource(dictInformation : dict, EInfo : dict):
-    """Construct the dictionary of a resource according to the specification of the catalog."""
+    """Construct the dictionary of a resource according to the specification of the catalog.
+    
+    Arguments:
+    - `dictInformation (dict)`: The dictionary of the resource to be modified.
+    - `EInfo (dict)`: The dictionary containing the information of the resource.
+    """
 
     dictInformation["availableServices"] = []
     dictInformation["servicesDetails"] = []
@@ -178,6 +183,13 @@ def _makeResource(dictInformation : dict, EInfo : dict):
 
 
 def _makeService(dictInformation : dict, EInfo : dict):
+    """Construct the dictionary of a service according to the specification of the catalog.
+
+    Arguments:
+    - `dictInformation (dict)`: The dictionary of the service to be modified.
+    - `EInfo (dict)`: The dictionary containing the information of the service.
+    """
+
     if "serviceName" not in EInfo:
         raise InfoException("Service name is missing")
     dictInformation["serviceName"] = EInfo["serviceName"]
@@ -228,6 +240,7 @@ def _addREST(dictInformation : dict, **kwargs):
 
 def _addMQTT(dictInformation : dict, **kwargs):
     """Add the MQTT service information to the dictionary."""
+
     if kwargs == {}:
         if "availableServices" in dictInformation:
             dictInformation["availableServices"].append("MQTT")
@@ -249,6 +262,14 @@ def _addMQTT(dictInformation : dict, **kwargs):
         _addService(dictInformation, service)
 
 def _addService(dictInformation : dict, service2add : dict):
+    """Add the service information to the dictionary.
+
+    Arguments:\n
+    - `dictInformation (dict)`: The dictionary of the resource to be modified.
+    - `service2add (dict)`: The dictionary containing the information of 
+    the service to be added
+    """
+
     if "servicesDetails" in dictInformation:
         dictInformation["servicesDetails"].append(service2add)
     else:
@@ -261,8 +282,13 @@ def _addService(dictInformation : dict, service2add : dict):
     else:
         dictInformation["availableServices"]= [serviceName]
 
-# set REST information
 def setREST(settings: dict):
+    """Set the REST service information.
+
+    Arguments:
+    - `settings (dict)`: The dictionary containing the information of the service.
+    This dictionary is modified by the function.
+    """
     ip_address = gethostbyname(gethostname())
 
     if "IPport" in settings:

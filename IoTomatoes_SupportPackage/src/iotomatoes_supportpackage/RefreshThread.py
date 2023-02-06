@@ -7,9 +7,9 @@ class RefreshThread(MyThread):
     def __init__(self, url : str, endpoint, interval=60, **kwargs):
         """RefreshThread class. Refresh the Catalog every `interval` seconds.
         
-        `url (str)`: Catalog URL.\n
-        `endpoint (object)`: Endpoint to be refreshed.\n
-        `interval (int): refresh interval in seconds (default = 60).\n
+        - `url (str)`: Catalog URL.
+        - `endpoint (object)`: Endpoint to be refreshed.
+        - `interval (int)`: refresh interval in seconds (default = 60).
         """
 
         self._url = url
@@ -19,6 +19,7 @@ class RefreshThread(MyThread):
 
     def refresh_item(self):
         """Refresh item `ID` in the Catalog at `url`."""
+
         refreshed = False
         while not refreshed :
             try:

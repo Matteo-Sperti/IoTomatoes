@@ -12,9 +12,9 @@ class SmartLighting(BaseService):
     def __init__(self, settings : dict, plantInfo : dict):
         """It initializes the service with the settings and the plantInfo
         
-        Arguments:\n
-        `settings (dict)`: the settings of the service\n
-        `plantInfo (dict)`: dictionary with the plants threshold values\n
+        Arguments:
+        - `settings (dict)`: the settings of the service
+        - `plantInfo (dict)`: dictionary with the plants threshold values
         """
         super().__init__(settings)
 
@@ -26,7 +26,7 @@ class SmartLighting(BaseService):
 
         self.plantInfo = plantInfo   
         self._message = {
-            "bn": self._EndpointInfo["serviceName"],
+            "bn": self.EndpointInfo["serviceName"],
             "cn":"",
             "fieldNumber":"",
             "e": [{
@@ -37,14 +37,14 @@ class SmartLighting(BaseService):
             }]
         }
 
-
     def control(self):
         """It performs:
-        - Call to resource catalog -> to retrieve information about each field for each company
-        - Call to MongoDB to retrieve information about last hour measures (currentLigh) and previous hour measures 
+        1. Call to resource catalog -> to retrieve information about each field for each company
+        2. Call to MongoDB to retrieve information about last hour measures (currentLigh) and previous hour measures 
           (previousLight)
-        - Call to Weather forecast service to retrieve information about current cloudcover percentage, light, 
+        3. Call to Weather forecast service to retrieve information about current cloudcover percentage, light, 
         sunrise hour and sunset hour. 
+
         With these information it integrates the forecast light with sensor measures and performs a simple control 
         strategy to check if the light is under a fixed threshold"""
 
@@ -65,26 +65,23 @@ class SmartLighting(BaseService):
                     continue
                 
                 minLight, maxLight = self.getPlantLimit(plant)
-                if minLight == None or maxLight == None:
-                    print("No previous or current light measure")
-                    self.sendCommand(CompanyName, fieldID, actuatorTopicsForField, 0)
-                    continue 
 
-                currentLight = self.getMongoDBdata()
+                currentLight = self.getMongoDBdata(CompanyName, fieldID)
                 if currentLight == None:
                     print("No previous or current soil moisture measure")
                     self.sendCommand(CompanyName, fieldID, actuatorTopicsForField, 0)
                     continue   
 
                 currentTime = datetime.datetime.now().time()
-                cloudCover, lightForecast, Sunrise, Sunset = self.callWeatherService(currentTime.hour)
+                cloudCover, lightForecast, Sunrise, Sunset = self.callWeatherService(CompanyName, currentTime.hour)
                 if cloudCover == None or lightForecast == None or Sunrise == None or Sunset == None:
                     print("No weather forecast available")
-                    self.sendCommand(CompanyName, fieldID, actuatorTopicsForField, 0)
-                    continue
-                
-                #integration sensor measures with the weather forecast one
-                currentLight=round((3*currentLight+lightForecast)/4,2) 
+                    #default values
+                    Sunrise = datetime.time(6,0,0)
+                    Sunset = datetime.time(18,0,0)
+                    cloudCover = 100
+                else:
+                    currentLight = round(0.75*currentLight + 0.25*lightForecast,2) 
 
                 #CONTROL ALGORITHM:
                 #controllo schedulato dall'inizio dell'alba al tramonto (LA NOTTE NO, COSI SI LASCIA UN
@@ -118,6 +115,8 @@ class SmartLighting(BaseService):
 
 
     def sendCommand(self, CompanyName : str, fieldID : int, topicList : list, command : int):
+        """It sends the command to the actuators of the field"""
+
         message=self._message.copy()
 
         print(f"\nActuators topics list= {topicList}\n")
@@ -133,7 +132,9 @@ class SmartLighting(BaseService):
             self._MQTTClient.myPublish(commandTopic, message)
 
     def getTopics(self, company, fieldNumber : int): 
-        """Return the list of the subscribed topics for a field in the company"""
+        """Return the list of the subscribed topics for all the LED actuator in a
+          field in the company"""
+
         topics = []
         for device in company["devicesList"]:
             if fieldNumber == device["fieldNumber"] and device["isActuator"]==True:
@@ -146,8 +147,10 @@ class SmartLighting(BaseService):
         #Check if the crop is in our json file:
         if plant in list(self.plantInfo.keys()):
             limits=self.plantInfo[plant]
-            minLight=limits["lightLimit"]["min"]    #ideal min value of light for the given plant
-            maxLight=limits["lightLimit"]["max"]    #ideal max value of light for the given plant
+            #ideal min value of light for the given plant
+            minLight=limits["lightLimit"]["min"]  
+            #ideal max value of light for the given plant  
+            maxLight=limits["lightLimit"]["max"]    
         else:
             print("No crop with the specified name. \nDefault limits will be used") 
             limits=self.plantInfo["default"]
@@ -156,25 +159,24 @@ class SmartLighting(BaseService):
 
         return minLight, maxLight            
 
-    def getMongoDBdata(self):
+    def getMongoDBdata(self, CompanyName : str, fieldID : int):
         mongoDB_url = self.getOtherServiceURL(self.mongoToCall)
 
         if mongoDB_url == None or mongoDB_url == "":
             print("ERROR: MongoDB service not found!")
-            return None, None
+            return None
 
-        ###ESEGUE LA GET AL MONGODB
         try:
-            r=requests.get("http://127.0.0.1:8080/decreasing")
+            r=requests.get(f"{mongoDB_url}/{CompanyName}/{fieldID}/light")
             r.raise_for_status()
             rValues=list((r.json()).values())
             currentLight=float(rValues[0])
         except:
-            return None,
+            return None
         else:
             return currentLight        
 
-    def callWeatherService(self,hour):
+    def callWeatherService(self, CompanyName : str, hour):
         """It gets informations from weather forecast service and extract:
             - cloudCover percentage
             - light
@@ -188,62 +190,35 @@ class SmartLighting(BaseService):
             print("ERROR: Weather Forecast service not found!")
             return None, None, None, None
 
-        #
-        #-ESEGUE LA GET AL WEATHER FORECAST SERVICE (da verificare come implementa Luca la gestione della chiamata):
-        #     try:
-        #         weatherService_data=requests.get(weatherForecast_url+"/Lighting")
-        #         weatherService_data.raise_for_status()
-        #     except requests.exceptions.InvalidURL as errURL:
-        #         print(f"ERROR: invalid URL for Weather Forecast service!\n\n{errURL})
-        #         time.sleep(1)
-        #     except requests.exceptions.HTTPError as errHTTP:
-        #         print(f"ERROR: something went wrong with Weather Forecast service!\n\n{errHTTP}")
-        #         time.sleep(1)
-        #     except requests.exceptions.ConnectionError:
-        #         print("503: Connection error. Weather Forecast service unavailable")
-        #         time.sleep(1)
+        try:
+            weatherService_data = requests.get(f"{weatherForecast_url}/{CompanyName}/lighting")
+            weatherService_data.raise_for_status()
+            weatherService_data=weatherService_data.json()
+        except:
+            print("ERROR: Weather Forecast service not available!")
+            return None, None, None, None
+        else:
+            if weatherService_data == {}:
+                return None, None, None, None
+            
+            light=weatherService_data["hourly"]["sunLight"][hour]
 
-        #     else:
-        #         weatherService_data=weatherService_data.json()
-        #         light=weatherService_data["hourly"]["sunLight"][hour]
-
-        #         #Estrazione e costruzione orario alba:
-        #         sunrise=weatherService_data["daily"]["sunrise"][0]
-        #         sunrise=sunrise.split("T")[1]
-        #         sunriseHour=int(sunrise.split(":")[0]) #retrieves sunrise hour
-        #         sunriseMinutes=int(sunrise.split(":")[1]) #retrieves sunrise minutes
-        #         sunrise=datetime.time(sunriseHour,sunriseMinutes,0) #crea un oggetto "data" con per avere l'ora dell'alba
-        
-        #         #Estrazione e costruzione orario tramonto:
-        #         sunset=weatherService_data["daily"]["sunset"][0]
-        #         sunset=sunset.split("T")[1]
-        #         sunsetHour=int(sunset.split(":")[0]) #retrieves sunset hour
-        #         sunsetMinutes=int(sunset.split(":")[1]) #retrieves sunset minutes
-        #         sunset=datetime.time(sunsetHour,sunsetMinutes,0) #crea un oggetto "data" per avere l'ora del tramonto
-        
-        #         cloudCover=weatherService_data["hourly"]["cloudcover"][hour]
-        #         return [cloudCover,light,sunrise,sunset]
-        
-        #PER ORA I DATI SONO PRESI SEMPLICEMENTE DA UN FILE
-        weatherService_r=json.load(open("outputLighting.json"))
-        light=weatherService_r["hourly"]["sunLight"][hour]
-
-        #Estrazione e costruzione orario alba:
-        sunrise=weatherService_r["daily"]["sunrise"][0]
-        sunrise=sunrise.split("T")[1]
-        sunriseHour=int(sunrise.split(":")[0]) #retrieves sunrise hour
-        sunriseMinutes=int(sunrise.split(":")[1]) #retrieves sunrise minutes
-        sunrise=datetime.time(sunriseHour,sunriseMinutes,0) #crea un oggetto "data" con per avere l'ora dell'alba
-        
-        #Estrazione e costruzione orario tramonto:
-        sunset=weatherService_r["daily"]["sunset"][0]
-        sunset=sunset.split("T")[1]
-        sunsetHour=int(sunset.split(":")[0]) #retrieves sunset hour
-        sunsetMinutes=int(sunset.split(":")[1]) #retrieves sunset minutes
-        sunset=datetime.time(sunsetHour,sunsetMinutes,0) #crea un oggetto "data" per avere l'ora del tramonto
-        
-        cloudCover=weatherService_r["hourly"]["cloudcover"][hour]
-        return cloudCover,light,sunrise,sunset                      
+            #Estrazione e costruzione orario alba:
+            sunrise=weatherService_data["daily"]["sunrise"][0]
+            sunrise=sunrise.split("T")[1]
+            sunriseHour=int(sunrise.split(":")[0]) #retrieves sunrise hour
+            sunriseMinutes=int(sunrise.split(":")[1]) #retrieves sunrise minutes
+            sunrise=datetime.time(sunriseHour,sunriseMinutes,0) #crea un oggetto "data" con per avere l'ora dell'alba
+    
+            #Estrazione e costruzione orario tramonto:
+            sunset=weatherService_data["daily"]["sunset"][0]
+            sunset=sunset.split("T")[1]
+            sunsetHour=int(sunset.split(":")[0]) #retrieves sunset hour
+            sunsetMinutes=int(sunset.split(":")[1]) #retrieves sunset minutes
+            sunset=datetime.time(sunsetHour,sunsetMinutes,0) #crea un oggetto "data" per avere l'ora del tramonto
+    
+            cloudCover=weatherService_data["hourly"]["cloudcover"][hour]
+            return [cloudCover,light,sunrise,sunset]                    
 
 def sigterm_handler(signal, frame):
     lighting.stop()

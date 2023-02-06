@@ -38,8 +38,7 @@ In the [DevicesSimulatorSettings.json](DevicesSimulatorSettings.json) configurat
 - the set of sensors and actuators.
 - the measure time interval for each sensor
 - the URL of the IoTomatoes platform
-- the System Token of the IoTomatoes platform used to access a priori some information about a company (e.g. its location)
 
-The script will create a ranodm set of devices and will start to send measures to the IoTomatoes platform.
+The script will create a random set of devices and will start to send measures to the IoTomatoes platform.
 
 **[Code >>](DevicesSimulator.py)**

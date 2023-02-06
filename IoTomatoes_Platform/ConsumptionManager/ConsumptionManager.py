@@ -12,7 +12,7 @@ class ConsumptionManager (BaseService):
 
 		super().__init__(settings)
 		self._message = {
-					'bn' : self._EndpointInfo['serviceName'],
+					'bn' : self.EndpointInfo['serviceName'],
 					'cn': "",
 					'msgType': '',
 					'msg': "", 
@@ -58,10 +58,11 @@ class ConsumptionManager (BaseService):
 				self._MQTTClient.myPublish(f"{dev['CompanyName']}/consumption", dev_consumption)
 
 	def updateStatus (self, actuatorID: int, command: str):
-		"""Update the status of the actuator, if it is turned OFF calculates its consumption\n
-		Arguments:\n
-		`actuatorID (str)` : ID of the actuator\n
-		`command (str)` : Command sent to the actuator\n
+		"""Update the status of the actuator, if it is turned OFF calculates its consumption.
+
+		Arguments:
+		- `actuatorID (str)` : ID of the actuator
+		- `command (str)` : Command sent to the actuator
 		"""
 		for dev in self.deviceList:
 			if dev['ID'] == actuatorID:
@@ -81,9 +82,10 @@ class ConsumptionManager (BaseService):
 		return DM.CheckResult(is_error=True, messageType="Error", message="Actuator not found.")
 
 	def notify (self, topic, payload):
-		"""Parse the message received and control the topic\n
-			Subscribed topics format:\n
-				- IoTomatoes/CompanyName/Field/ActuatorID/actuatorType
+		"""Parse the message received and control the topic
+
+		Subscribed topics format:
+		- IoTomatoes/CompanyName/Field/ActuatorID/actuatorType
 		"""
 		topic_list = topic.split('/')
 		ActuatorID = int(topic_list[-2])

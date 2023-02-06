@@ -7,32 +7,80 @@ import signal
 from iotomatoes_supportpackage.BaseService import BaseService
 from iotomatoes_supportpackage.ItemInfo import setREST
 
-
-def validateJSON(jsonData):
-	try:
-		json.loads(jsonData)
-	except ValueError:
-		return False
-	return True
-
 class WeatherApp:
-	'''handles the weather requests'''
-	def __init__(self,settings):
-		self.settings = settings
-		self.url = self.settings["WeatherUrl"]
+	"""Handles the weather requests"""
 
-	def makeRequest(self,dictInput):
-		'''handles an API request based on the JSON input file(forwards a getRequest to the weather API)'''
-		response = requests.get(self.url, params=dictInput) #makes the request, the parameters are in the input file
-		return response
+	def __init__(self, ResourceCatalogUrl : str, weatherUrl: str, IrrigationDict: dict, LightingDict: dict):
+		"""Constructor of the class
+		
+		Arguments:
+		- `ResourceCatalogUrl (str)`: the url of the Resource Catalog
+		- `weatherUrl (str)`: the url of the weather API
+		- `IrrigationDict (dict)`: the dictionary containing the parameters for the irrigation service
+		- `LightingDict (dict)`: the dictionary containing the parameters for the lighting service
+		"""
 
-	def IrrigationData(self):
-		'''gets the data from the weather API for the irrigation service'''
-		return self.makeRequest(self.settings["IrrigationDict"]) #makes the request 
+		self.ResourceCatalogUrl = ResourceCatalogUrl
+		self.weatherUrl = weatherUrl
+		self.IrrigationDict = IrrigationDict
+		self.LightingDict = LightingDict
+
+	def makeRequest(self, dictInput):
+		"""handles an API request based on the JSON input file (forwards a getRequest to the weather API)"""
+		try:
+			response = requests.get(self.weatherUrl, params=dictInput) #makes the request, the parameters are in the input file
+			response.raise_for_status() #checks if the request was successful
+			res_dict = response.json()
+		except:
+			print("Error in the Weather API")
+			return None
+		else:
+			return res_dict
+
+	def getLocation(self, CompanyName: str):
+		"""Gets the location of the company from the Resource Catalog"""
+		try:
+			response = requests.get(f"{self.ResourceCatalogUrl}/{CompanyName}/location")
+			response.raise_for_status()
+			res_dict = response.json()["Location"]
+			latitude = res_dict["latitude"]
+			longitude = res_dict["longitude"]
+		except:
+			print("Error in the Resource Catalog")
+			return None, None
+		else:
+			return latitude, longitude
+
+	def IrrigationData(self, CompanyName: str):
+		"""Gets the data from the weather API for the irrigation service"""
+
+		latitude, longitude = self.getLocation(CompanyName)
+		if latitude is None or longitude is None:
+			return {}
+		
+		InputDict = self.IrrigationDict.copy()
+		InputDict["latitude"] = latitude
+		InputDict["longitude"] = longitude
+		response = self.makeRequest(InputDict)
+		if response is None:
+			return {}
+		
+		return response #DA SISTEMARE
 	
-	def LightingData(self):
-		'''gets the data from the weather API for the lighting service'''
-		response = self.makeRequest(self.settings["LightingDict"]) #makes the request
+	def LightingData(self, CompanyName: str):
+		"""Gets the data from the weather API for the lighting service"""
+
+		latitude, longitude = self.getLocation(CompanyName)
+		if latitude is None or longitude is None:
+			return {}
+		
+		InputDict = self.LightingDict.copy()
+		InputDict["latitude"] = latitude
+		InputDict["longitude"] = longitude
+		response = self.makeRequest(InputDict)
+		if response is None:
+			return {}
+
 		listToBeConverted = (response["hourly"].pop("shortwave_radiation"))
 		convertedList = [x/0.0079 for x in listToBeConverted] #converts the shortwave radiation to lux
 		response["hourly"]["Illumination"]=convertedList
@@ -43,13 +91,7 @@ class WeatherApp:
 		response["hourly_units"].pop("shortwave_radiation")
 		response["daily_units"]["Illumination_sum"]="lux"
 		response["daily_units"].pop("shortwave_radiation_sum")
-		return response #makes the 
-	
-	# def CustomData(self):
-	# 	'''gets the data from the weather API for a  custom user request'''
-	# 	return self.makeRequest(self.settings["CustomDict"]) for now deprecated
-
-
+		return response
 
 class WheaterService(BaseService):
 	exposed = True
@@ -61,27 +103,25 @@ class WheaterService(BaseService):
 		`settings (dict)`: the settings of the service
 		"""
 		super().__init__(settings)
-		self.weather= WeatherApp(settings)
+		self.weather= WeatherApp(self.ResourceCatalog_url, settings["WeatherUrl"], 
+			   settings["IrrigationDict"], settings["LightingDict"])
 
 	def GET(self,*uri,**params):
-		if len(uri) != 0:
-			if uri[0] == "Irrigation":
-				return json.dumps(self.weather.IrrigationData())
-			elif uri[0] == "Lighting":
-				return json.dumps(self.weather.LightingData())
-			elif uri[0] == "Custom":
-				data = json.dumps(self.weather.CustomData())
-				if data == "Null":
-					raise cherrypy.HTTPError(400, "Wrong request")
-				elif validateJSON(data) == False:
-					raise cherrypy.HTTPError(400, "Wrong request")
-				else:
-					return json.dumps(data)
-			
+		"""Handles the GET requests
+
+		Allowed URLs:
+		- /<CompanyName>/Irrigation to get the data for the irrigation service
+		- /<CompanyName>//Lighting to get the data for the lighting service
+		"""
+		if len(uri) != 2:
+			raise cherrypy.HTTPError(404, "Please specify the service you want to use")
+		else:
+			if uri[0] == "irrigation":
+				return json.dumps(self.weather.IrrigationData(uri[0]))
+			elif uri[0] == "lighting":
+				return json.dumps(self.weather.LightingData(uri[0]))
 			else:
 				raise cherrypy.HTTPError(404,"Wrong URL")
-		else:
-			raise cherrypy.HTTPError(404, "Please specify the service you want to use")
 
 
 def sigterm_handler(signal, frame):

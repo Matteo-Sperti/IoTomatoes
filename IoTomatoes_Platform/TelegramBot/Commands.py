@@ -10,11 +10,12 @@ keyboardYESNO = InlineKeyboardMarkup(inline_keyboard=[[
 class InsertNewCompany():
     def __init__(self, chatID, sender, connector):
         """This class is used to insert a new company in the system.
-        It is used by the /insertNewCompany command.\n
-        Arguments:\n
-        `chatID` : the ID of the chat with the user\n
-        `sender` : the TelegramBot object\n
-        `connector` : the IoTBot object used to comunicate with other services.\n
+        It is used by the /insertNewCompany command.
+
+        Arguments:
+        - `chatID` : the ID of the chat with the user
+        - `sender` : the TelegramBot object
+        - `connector` : the IoTBot object used to comunicate with other services.
         """
         self.chatID = chatID
         self._connector = connector
@@ -40,11 +41,14 @@ class InsertNewCompany():
         return self.response["Location"]
 
     def update(self, message : str): 
-        """Update the status of the command.\n
-        Arguments:\n
-        `message (str)` : the message received from the user.\n
-        Return:\n
-        `True` if the command is finished, `False` otherwise.
+        """Update the status of the chat.
+
+        Arguments:
+        - `message (str)` : the message received from the user.
+
+        Return:
+        - `True` if the command is finished, 
+        - `False` otherwise.
         """
         if self._status == 0:
             self._bot.sendMessage("Insert your Company Name")
@@ -165,10 +169,11 @@ class InsertNewCompany():
             return True
             
     def insert_company(self): 
-        """Insert the company in the Resource Catalog.\n
-        Returns:\n
-        `True` if the company is correctly inserted in the Resource Catalog.\n
-        `False` otherwise.\n
+        """Insert the company in the Resource Catalog.
+        
+        Returns:
+        - `True` if the company is correctly inserted in the Resource Catalog.
+        - `False` otherwise.
         """
         try:
             body = {"CompanyInfo" : self.company,
@@ -207,11 +212,12 @@ class InsertNewCompany():
 
 class RegisterNewUser():
     def __init__(self, chatID, sender, connector):
-        """This class is used to register a new user in the Resource Catalog.\n
-        Arguments:\n
-        `chatID` : the telegram ID of the user.\n
-        `sender` : the object used to send messages to the user.\n
-        `connector` : the IoTBot object used to connect to the Resource Catalog.\n
+        """This class is used to register a new user in the Resource Catalog.
+
+        Arguments:
+        - `chatID` : the telegram ID of the user.
+        - `sender` : the object used to send messages to the user.
+        - `connector` : the IoTBot object used to connect to the Resource Catalog.
         """
         self.chatID = chatID
         self._connector = connector
@@ -235,12 +241,14 @@ class RegisterNewUser():
                 "CompanyToken" : self.response["CompanyToken"]}
 
     def update(self, message):   
-        """Update the status of the registration.\n
-        Arguments:\n
-        `message` : the message received from the user.\n
-        Returns:\n
-        `True` if the registration is completed.\n
-        `False` otherwise.\n
+        """Update the status of the registration.
+
+        Arguments:
+        - `message` : the message received from the user.
+
+        Returns:
+        - `True` if the registration is completed.
+        - `False` otherwise.
         """
         if self._status == 0:
             self._bot.sendMessage("Insert your Company Name")
@@ -284,10 +292,11 @@ class RegisterNewUser():
             return True
 
     def insert_user(self):
-        """Insert the user in the Resource Catalog.\n
-        Returns:\n
-        `True` if the user is correctly inserted in the Resource Catalog.\n
-        `False` otherwise.\n
+        """Insert the user in the Resource Catalog.
+
+        Returns:
+        - `True` if the user is correctly inserted in the Resource Catalog.
+        - `False` otherwise.
         """
         try:
             res = requests.post(self._connector.ResourceCatalog_url + f"/user", 
@@ -318,11 +327,12 @@ class RegisterNewUser():
                 return False
 
 def getUsers(CompanyName : str, bot, connector) -> None:
-    """Get the list of users registered in the Resource Catalog.\n
-    Arguments:\n
-    `CompanyName` : the name of the company.\n
-    `bot` : the object used to send messages to the user.\n
-    `connector` : the IoTBot object used to connect to the Resource Catalog.\n
+    """Get the list of users registered in the Resource Catalog.
+
+    Arguments:
+    - `CompanyName (str)` : the name of the company.
+    - `bot` : the object used to send messages to the user.
+    - `connector` : the IoTBot object used to connect to the Resource Catalog.
     """
     users = connector.getList(CompanyName, "users")
     if users is None:
@@ -340,11 +350,12 @@ def getUsers(CompanyName : str, bot, connector) -> None:
         
 
 def getDevices(CompanyName : str, bot, connector) -> None:
-    """Get the list of devices registered in the Resource Catalog.\n
-    Arguments:\n
-    `CompanyName` : the name of the company.\n
-    `bot` : the object used to send messages to the user.\n
-    `connector` : the IoTBot object used to connect to the Resource Catalog.\n
+    """Get the list of devices registered in the Resource Catalog.
+
+    Arguments:
+    - `CompanyName (str)` : the name of the company.
+    - `bot` : the object used to send messages to the user.
+    - `connector` : the IoTBot object used to connect to the Resource Catalog.
     """
     devices = connector.getList(CompanyName, "devices")
     if devices is None:
@@ -369,11 +380,12 @@ def getDevices(CompanyName : str, bot, connector) -> None:
                 bot.sendMessage(message)
 
 def getFields(CompanyName : str, bot, connector) -> None:
-    """Get the list of fields registered in the Resource Catalog.\n
-    Arguments:\n
-    `CompanyName` : the name of the company.\n
-    `bot` : the object used to send messages to the user.\n
-    `connector` : the IoTBot object used to connect to the Resource Catalog.\n
+    """Get the list of fields registered in the Resource Catalog.
+
+    Arguments:
+    - `CompanyName (str)` : the name of the company.
+    - `bot` : the object used to send messages to the user.
+    - `connector` : the IoTBot object used to connect to the Resource Catalog.
     """
     fields = connector.getList(CompanyName, "fields")
     if fields is None:
@@ -391,6 +403,14 @@ def getFields(CompanyName : str, bot, connector) -> None:
 
 class DeleteCompany():
     def __init__(self, CompanyName : str, chatID, sender, connector):
+        """Delete a company from the Resource Catalog.
+        
+        Arguments:
+        - `CompanyName (str)` : the name of the company.
+        - `chatID (int)` : the chatID of the user.
+        - `sender` : the object used to send messages to the user.
+        - `connector` : the IoTBot object used to connect to the Resource Catalog.
+        """
         self.chatID = chatID
         self.CompanyName = CompanyName
         self.CompanyToken = ""
@@ -399,6 +419,16 @@ class DeleteCompany():
         self._status = 0
 
     def update(self, message):
+        """Update the status of the deletion.
+
+        Arguments:
+        - `message (str)` : the message received from the user.
+
+        Returns:
+        - `True` if the deletion is completed.
+        - `False` otherwise.
+        """
+
         if self._status == 0:
             self._bot.sendMessage("You are going to delete company " + self.CompanyName)
             self._bot.sendMessage("Insert your Company Token")
@@ -420,6 +450,8 @@ class DeleteCompany():
             return True
 
     def delete_company(self):
+        """Delete the company from the Resource Catalog."""
+
         try:
             params = {"CompanyName" : self.CompanyName, "CompanyToken" : self.CompanyToken, "telegramID" : self.chatID}
             res = requests.delete(self._connector.ResourceCatalog_url + "/company", 
@@ -447,6 +479,13 @@ class DeleteCompany():
 
 class ChangePlant():
     def __init__(self, CompanyName : str, sender, connector):
+        """Change the plant of a field.
+
+        Arguments:
+        - `CompanyName (str)` : the name of the company.
+        - `sender` : the object used to send messages to the user.
+        - `connector` : the IoTBot object used to connect to the Resource Catalog.
+        """
         self.CompanyName = CompanyName
         self.FieldNumber = ""
         self.newplant = ""
@@ -455,6 +494,16 @@ class ChangePlant():
         self._status = 0
 
     def update(self, message):
+        """Update the status of the change.
+
+        Arguments:
+        - `message (str)` : the message received from the user.
+
+        Returns:
+        - `True` if the procedure is completed.
+        - `False` otherwise.
+        """
+
         if self._status == 0:
             fields = self._connector.getList(self.CompanyName, "fields")
             if fields == None:
@@ -502,6 +551,8 @@ class ChangePlant():
             return True
 
     def change_plant(self):
+        """Change the plant of a field in the Resource Catalog."""
+
         try:
             params = {
                     "fieldNumber" : self.FieldNumber,
@@ -528,6 +579,13 @@ class ChangePlant():
 
 class CustomPlot():
     def __init__(self, CompanyName : str, sender, connector):
+        """Create a custom plot.
+
+        Arguments:
+        - `CompanyName (str)` : the name of the company.
+        - `sender` : the object used to send messages to the user.
+        - `connector` : the IoTBot object used to connect to the Resource Catalog.
+        """
         self.CompanyName = CompanyName
         self._connector = connector
         self._bot = sender

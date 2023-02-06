@@ -11,12 +11,12 @@ class IoTDevice(BaseResource):
         
         It will also initialize the thread used to get the sensor readings.
         
-        Arguments:\n
-        `DeviceInfo` : dictionary containing the information about the device.\n
-        `sensor` : sensor object used to get the sensor readings. 
+        Arguments:
+        - `DeviceInfo` : dictionary containing the information about the device.
+        - `sensor` : sensor object used to get the sensor readings. 
         It is None if the device is not a sensor.
-        It must have the `get_<measure>` function for each measure specified in the ResourceCatalog.\n
-        `actuator` : actuator object used to set the actuator state.
+        It must have the `get_<measure>` function for each measure specified in the ResourceCatalog.
+        - `actuator` : actuator object used to set the actuator state.
         It is None if the device is not an actuator.
         It must have the `setActuator` function.
         """
@@ -67,7 +67,7 @@ class IoTDevice(BaseResource):
                     f"Topic: {topic}\n"
                     f"Message: {msg}")
         else:
-            actuator_info = actuatorType(self._EndpointInfo)
+            actuator_info = actuatorType(self.EndpointInfo)
             actuator_topic = topic.split("/")[-1]
 
             if actuator_topic not in actuator_info:
@@ -91,7 +91,7 @@ class IoTDevice(BaseResource):
         It will publish the readings on the topics specified in the ResourceCatalog.
         """
 
-        for topic in publishedTopics(self._EndpointInfo):
+        for topic in publishedTopics(self.EndpointInfo):
             measureType = topic.split("/")[-1]
             
             if measureType == "temperature":

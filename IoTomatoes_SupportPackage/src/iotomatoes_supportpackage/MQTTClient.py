@@ -8,10 +8,11 @@ class BaseMQTTClient():
     def __init__(self, url : str, connector, broker : str = ""):
         """BaseMQTTClient class. It is the base class for the MQTT client.
 
-        Arguments:\n
-        `url (str)`: Catalog URL.\n
-        `EndpointInfo (dict)`: Dictionary containing the information of the resource or service.\n
-        `CompanyName (str)`: Name of the company.
+        Arguments:
+        - `url (str)`: Catalog URL.
+        - `connector (obj)`: Base Resource or Base Service object.
+        It must contain the `notify` method and the `ID` attribute.
+        - `broker (str)`: MQTT broker address. If not specified the Sevice Catalog will be asked.
         """
 
         self._url = url
@@ -26,7 +27,7 @@ class BaseMQTTClient():
         self._paho_mqtt.disconnect()                             
 
     def startMQTT(self) :
-        """If the Endpoint is MQTT, starts the MQTT client.
+        """Starts the MQTT client.
         It subscribes the topics and starts the MQTT client loop.
         """
 
@@ -35,7 +36,7 @@ class BaseMQTTClient():
         broker, self._port = self.get_broker()
         if self._broker == "":
             self._broker = broker
-        self.MQTTclientID = f"IoTomatoes_ID{self._connector._EndpointInfo['ID']}"
+        self.MQTTclientID = f"IoTomatoes_ID{self._connector.ID}"
         self._isSubscriber = False
         # create an instance of paho.mqtt.client
         self._paho_mqtt = PahoMQTT.Client(self.MQTTclientID, True)
@@ -111,8 +112,8 @@ class BaseMQTTClient():
 
     @property
     def subscribedTopics(self) -> list:
-        return subscribedTopics(self._connector._EndpointInfo)
+        return subscribedTopics(self._connector.EndpointInfo)
 
     @property
     def publishedTopics(self) -> list:
-        return publishedTopics(self._connector._EndpointInfo)
+        return publishedTopics(self._connector.EndpointInfo)

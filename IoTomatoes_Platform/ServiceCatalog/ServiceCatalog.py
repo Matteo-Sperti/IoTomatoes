@@ -15,26 +15,27 @@ class ServiceCatalogManager:
     def __init__(self, heading : dict, filename = "catalog.json", autoDeleteTime = 120, IDs = IDs(1,99)):
         """Initialize the catalog manager.
 
-        Arguments: \n
-        `heading` is a dictionary with the heading of the catalog.\n
-        `filename` is the name of the file to save the catalog in.\n
-        `autoDeleteTime` is the time in seconds after which the items are deleted from the catalog if not refreshed (default is 120). \n
-        `IDs` is the ID generator object to use for the services (default is integer from 1 to 99).\n
+        Arguments:
+        - `heading` is a dictionary with the heading of the catalog.
+        - `filename` is the name of the file to save the catalog in.
+        - `autoDeleteTime` is the time in seconds after which the items are deleted from the catalog if not refreshed (default is 120).
+        - `IDs` is the ID generator object to use for the services (default is integer from 1 to 99).
         """
-        self.filename = filename
-        self.autoDeleteTime = autoDeleteTime
-        self.IDs = IDs
+
         self.catalog = heading.copy()
         self.catalog["lastUpdate"] = time.time()
         self.catalog[serviceList_Name] = []
-        self.autoDeleteItemsThread = MyThread(self.autoDeleteItems, interval=self.autoDeleteTime)
+        self._autoDeleteTime = autoDeleteTime
+        self._filename = filename
+        self._IDs = IDs
+        self._autoDeleteItemsThread = MyThread(self.autoDeleteItems, interval=self._autoDeleteTime)
 
     def save(self):
         """Save the catalog in the file specified in the initialization. 
 
         Return: json with the status of the operation."""
         
-        json.dump(self.catalog, open(self.filename, "w"), indent=4)
+        json.dump(self.catalog, open(self._filename, "w"), indent=4)
         print("Catalog saved!\n")
         return json.dumps({"Status": True}, indent=4)
 
@@ -92,10 +93,10 @@ class ServiceCatalogManager:
         Return a json with the status of the operation.
         
         Arguments:
-        `item_dict` is the service in json format to insert.
+        - `item_dict` is the service in json format to insert.
         """
         try:
-            ID = self.IDs.get_ID()
+            ID = self._IDs.get_ID()
             if ID == -1:
                 raise web_exception(500, "No more IDs available")
             else:
@@ -114,7 +115,7 @@ class ServiceCatalogManager:
         Return a json with the status of the operation.
         
         Arguments:
-        `IDvalue` is the ID of the service to delete.
+        - `IDvalue` is the ID of the service to delete.
         """
         try:
             item = self.find_item(ID=IDvalue)
@@ -122,7 +123,7 @@ class ServiceCatalogManager:
                 actualtime = time.time()
                 self.catalog["lastUpdate"] = actualtime
                 self.catalog[serviceList_Name].remove(item)
-                self.IDs.free_ID(IDvalue)
+                self._IDs.free_ID(IDvalue)
                 out = {"Status": True}
             else:
                 out = {"Status": False}
@@ -154,7 +155,7 @@ class ServiceCatalogManager:
         Return a json with the status of the operation.
 
         Arguments:
-        `IDvalue` is the ID of the service to refresh.
+        - `IDvalue` is the ID of the service to refresh.
         """
 
         item = self.find_item(ID=IDvalue)
@@ -175,8 +176,8 @@ class ServiceCatalogManager:
             if isinstance(self.catalog[key], list):
                 for device in self.catalog[key]:
                     try:
-                        if actualtime - device["lastUpdate"] > self.autoDeleteTime:
-                            self.IDs.free_ID(device["ID"])
+                        if actualtime - device["lastUpdate"] > self._autoDeleteTime:
+                            self._IDs.free_ID(device["ID"])
                             print(f"""Device {device["ID"]} removed""")
                             self.catalog[key].remove(device)
                     except KeyError:
@@ -191,12 +192,11 @@ class RESTServiceCatalog():
     def __init__(self, settings : dict):
         """ Initialize the RESTServiceCatalog class.
 
-        Arguments:\n
-        `settings (dict)` is a dictionary with the following keys:\n
-        - `owner` is the owner of the catalog.\n
-        - `CatalogName` is the name of the catalog.\n
-        - `broker` is the broker info.\n
-        - `telegramToken` is the telegram token.\n
+        `settings (dict)` is a dictionary with the following keys:
+        - `owner` is the owner of the catalog.
+        - `CatalogName` is the name of the catalog.
+        - `broker` is the broker info.
+        - `telegramToken` is the telegram token.
         """
         heading = {
             "owner": settings["owner"], 
@@ -209,17 +209,17 @@ class RESTServiceCatalog():
     def close(self):
         """Close the endpoint and save the catalog."""
 
-        self.ServiceCatalog.autoDeleteItemsThread.stop()
+        self.ServiceCatalog._autoDeleteItemsThread.stop()
         self.ServiceCatalog.save()
 
     def GET(self, *uri, **params):
         """REST GET method.
 
-        Allowed commands:\n
-        `/all` to get all the services.\n
-        `/broker` to get the broker info.\n
-        `/telegram` to get the telegram token.\n
-        `/<servicename>/url to get the url of a service
+        Allowed URI:
+        - `/all` to get all the services.
+        - `/broker` to get the broker info.
+        - `/telegram` to get the telegram token.
+        - `/<servicename>/url to get the url of a service
         """
         try:
             if len(uri) == 0:
@@ -246,8 +246,8 @@ class RESTServiceCatalog():
     def PUT(self, *uri, **params):
         """PUT REST method.
 
-        Allowed commands:\n
-        `/refresh?ID=<ID>` to refresh the lastUpdate field of a service by ID.\n
+        Allowed URI:
+        - `/refresh?ID=<ID>` to refresh the lastUpdate field of a service by ID.
         """
         if len(uri) == 1 and uri[0] == "refresh":
             if "ID" not in params:
@@ -267,9 +267,9 @@ class RESTServiceCatalog():
     def POST(self, *uri, **params):
         """POST REST method.
         
-        Allowed commands:\n
-        `/save` to save the catalog in the file.\n
-        `/insert` to insert a new service in the catalog. 
+        Allowed URI:
+        - `/save` to save the catalog in the file.
+        - `/insert` to insert a new service in the catalog. 
         The body of the request must contain the new service info.
         """
         try:
@@ -291,8 +291,8 @@ class RESTServiceCatalog():
     def DELETE(self, *uri, **params):
         """DELETE REST method.
 
-        Allowed commands:\n
-        `/delete?ID=<ID>` to delete a service by ID.
+        Allowed URI:\n
+        - `/delete?ID=<ID>` to delete a service by ID.
         """
         if len(uri) == 1 and uri[0] == "delete":
             if "ID" not in params:

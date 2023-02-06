@@ -5,9 +5,9 @@ class MyThread(threading.Thread):
     def __init__(self, target, interval = 1, *args, **kwargs):
         """MyThread class. Run a function in a daemon thread every interval seconds.
         
-        ``target {function}``: function to be executed in the thread,
-         ``args {tuple}``: arguments for the function and
-         ``interval {int}``: interval in seconds between executions"""
+        - `target (function)`: function to be executed in the thread,
+        - `args (tuple)`: arguments for the function
+        - `interval (int)`: interval in seconds between executions"""
 
         super().__init__()
         self.target = target
@@ -36,21 +36,6 @@ class MyThread(threading.Thread):
             time.sleep(self.interval)
 
         
-class CustomThread(threading.Thread):
+class SimpleThread(threading.Thread):
     def start(self):
-        super(CustomThread, self).start()
-
-# Note how this function wraps around the `call()` function below to implement
-# a custom thread for delegation.
-def custom_thread(func):
-    def f(seed_tuple):
-        target = func(seed_tuple)
-
-        if type(target) is tuple:
-            run, args, kwargs = target
-            t = CustomThread(target=run, args=args, kwargs=kwargs)
-        else:
-            t = CustomThread(target=target)
-
-        return t
-    return f
+        super(SimpleThread, self).start()

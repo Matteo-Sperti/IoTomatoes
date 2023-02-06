@@ -1,94 +1,219 @@
+<!DOCTYPE html>
 <html>
-  <head>
-    <link rel="icon" type="image/x-icon" href="favicon.ico">
+
+<head>
+    <link rel="icon" type="image/x-icon" href="./img/favicon.ico">
     <title>IoTomatoes</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <style>
-      body {
-        background-color: #f5d394;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        margin-top: 60px;
-      }
-      
-      header {
-        position: fixed;
-        top: 0;
-        left: 0;
-        right: 0;
-        display: flex;
-        align-items: center;
-        background-color: rgb(196, 52, 52);
-        color: #fff;
-        padding: 20px;
-        box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.2);
-        z-index: 1;
-      }
-      
-      img {
-        width: 50px;
-        height: auto;
-        margin-right: 20px;
-      }
-      
-      h1 {
-        font-size: 36px;
-        font-weight: bold;
-        margin: 0;
-      }
-      
-      .section {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        background-color: #fff;
-        color: #333;
-        padding: 40px;
-        border-radius: 10px;
-        box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.2);
-        margin-bottom: 20px;
-        width: 80%;
-      }
+        html,
+        body,
+        h1,
+        h2,
+        h3,
+        h4 {
+            font-family: "Lato", sans-serif
+        }
 
+        .mySlides {
+            display: none
+        }
 
-      button {
-        font-size: 16px;
-        background-color: rgb(255, 208, 53);
-        color: rgb(0, 0, 0);
-        padding: 10px 20px;
-        border: none;
-        cursor: pointer;
-        border-radius: 25px;
-        box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.2);
-        margin-right: 10px;
-        margin-left: 10px;
-      }
-      
-      button:hover {
-        background-color: #f2f2f2;
-        color: #333;
-      }
+        .w3-tag,
+        .fa {
+            cursor: pointer
+        }
+
+        .w3-tag {
+            height: 15px;
+            width: 15px;
+            padding: 0;
+            margin-top: 6px
+        }
     </style>
-  </head>
-  <body>
-    <header>
-      <img src="icon.png" alt="IoTomatoes logo">
-      <h1>IoTomatoes</h1>
-      <button onclick="window.location.href='/ui/'">Personal Area</button>
-      <button onclick="window.location.href='https://t.me/IoTomatoes_bot'">Telegram Bot</button>
-      <button onclick="window.location.href='/about.html'">About</button>
-    </header>
-    <section class="section">
-      <h2>A platform for smart agriculture</h2>
-      <p>IoTomatoes is a platform for smart agriculture. It allows you to monitor your plants and get notifications when something is wrong.</p>
-    </section>
-    <section class="section">
-      <div class="section-text">
-        <h3>Personal Area</h3>
-        <p>Access your dashboard and manage your data.</p>
-      </div>
-      <img src="dashboard.jpeg" alt="Personal Area">
-    </section>    
-    <section class="section">
-      <h3>Telegram Bot</h3>
-      <p>Join our community and ask questions.</p>
+</head>
+
+<body>
+
+    <!-- Links (sit on top) -->
+    <div class="w3-top">
+        <div class="w3-row w3-large w3-light-grey">
+            <div class="w3-col s3">
+                <a href="#" class="w3-button w3-block">Home</a>
+            </div>
+            <div class="w3-col s3">
+                <a href="#about" class="w3-button w3-block">About</a>
+            </div>
+            <div class="w3-col s3">
+                <a href="/ui/" class="w3-button w3-block">Personal Area</a>
+            </div>
+            <div class="w3-col s3">
+                <a href="https://t.me/IoTomatoes_bot" class="w3-button w3-block">TelegramBOT</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Content -->
+    <div class="w3-content" style="max-width:1100px;margin-top:80px;margin-bottom:80px">
+
+        <div class="w3-row w3-panel">
+            <div class="w3-container w3-third">
+                <img src="./img/logo.png" alt="logo" style="width:100%">
+            </div>
+            <div class="w3-twothird">
+                <h1><b>IoTomatoes</b></h1>
+                <p>A smart agriculture platform</p>
+            </div>
+        </div>
+
+        <!-- Grid -->
+        <div class="w3-row w3-container" id="about">
+            <div class="w3-center w3-padding-64">
+                <span class="w3-xlarge w3-bottombar w3-border-dark-grey w3-padding-16">What We Offer</span>
+            </div>
+
+            <div class="w3-col l3 m6 w3-light-grey w3-container w3-padding-16">
+                <h3>Cloud solution</h3>
+                <p>Phasellus eget enim eu lectus faucibus vestibulum. Suspendisse sodales pellentesque elementum.</p>
+            </div>
+
+            <div class="w3-col l3 m6 w3-grey w3-container w3-padding-16">
+                <h3>Smart Irrigation </h3>
+                <p>Phasellus eget enim eu lectus faucibus vestibulum. Suspendisse sodales pellentesque elementum.</p>
+            </div>
+
+            <div class="w3-col l3 m6 w3-dark-grey w3-container w3-padding-16">
+                <h3>Smart Lighting</h3>
+                <p>Phasellus eget enim eu lectus faucibus vestibulum. Suspendisse sodales pellentesque elementum.</p>
+            </div>
+
+            <div class="w3-col l3 m6 w3-black w3-container w3-padding-16">
+                <h3>Localization</h3>
+                <p>Phasellus eget enim eu lectus faucibus vestibulum. Suspendisse sodales pellentesque elementum.</p>
+            </div>
+        </div>
+
+
+        <!-- Grid -->
+        <div class="w3-row w3-container">
+            <div class="w3-center w3-padding-64">
+                <span class="w3-xlarge w3-bottombar w3-border-dark-grey w3-padding-16">Our Dashboard</span>
+            </div>
+
+            <div class="w3-row">
+                <div class="w3-container w3-twothird">
+                    <p>Phasellus eget enim eu lectus faucibus vestibulum. Suspendisse sodales pellentesque elementum.</p>
+                </div>
+                <div class="w3-container w3-third">
+                    <img src="./img/dashboard.jpeg" alt="Dashboard" style="width:100%">
+                </div>
+            </div>
+        </div>
+
+        <!-- Grid -->
+        <div class="w3-row-padding">
+            <div class="w3-center w3-padding-64">
+                <span class="w3-xlarge w3-bottombar w3-border-dark-grey w3-padding-16">Who We Are</span>
+            </div>
+
+            <div class="w3-quarter w3-margin-bottom">
+                <div class="w3-card-4">
+                    <img src="./img/matte.jpeg" alt="Matte" style="width:100%">
+                    <div class="w3-container">
+                        <h3>Matteo Sperti</h3>
+                        <p class="w3-opacity">CEO & Founder</p>
+                        <p>Phasellus eget enim eu lectus faucibus vestibulum. Suspendisse sodales pellentesque
+                            elementum.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="w3-quarter w3-margin-bottom">
+                <div class="w3-card-4">
+                    <img src="/w3images/team2.jpg" alt="Fede" style="width:100%">
+                    <div class="w3-container">
+                        <h3>Federico Moscato</h3>
+                        <p class="w3-opacity">Art Director</p>
+                        <p>Phasellus eget enim eu lectus faucibus vestibulum. Suspendisse sodales pellentesque
+                            elementum.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="w3-quarter w3-margin-bottom">
+                <div class="w3-card-4">
+                    <img src="/w3images/team3.jpg" alt="Andrea" style="width:100%">
+                    <div class="w3-container">
+                        <h3>Andrea Usai</h3>
+                        <p class="w3-opacity">Designer</p>
+                        <p>Phasellus eget enim eu lectus faucibus vestibulum. Suspendisse sodales pellentesque
+                            elementum.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="w3-quarter w3-margin-bottom">
+                <div class="w3-card-4">
+                    <img src="/w3images/team3.jpg" alt="Luca" style="width:100%">
+                    <div class="w3-container">
+                        <h3>Luca Zanetti</h3>
+                        <p class="w3-opacity">Designer</p>
+                        <p>Phasellus eget enim eu lectus faucibus vestibulum. Suspendisse sodales pellentesque
+                            elementum.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+
+    <footer class="w3-container w3-padding-32 w3-light-grey w3-center">
+        <h4>IoTomatoes Project</h4>
+        <p> Torino, Corso Duca degli Abruzzi, 4, 10100</p>
+        <a href="#" class="w3-button w3-black w3-margin"><i class="fa fa-arrow-up w3-margin-right"></i>To the top</a>
+        <div class="w3-xlarge w3-section">
+            <i class="fa fa-instagram w3-hover-opacity"></i>
+            <i class="fa fa-twitter w3-hover-opacity"></i>
+            <i class="fa fa-linkedin w3-hover-opacity"></i>
+        </div>
+    </footer>
+
+
+    <script>
+        // Slideshow
+        var slideIndex = 1;
+        showDivs(slideIndex);
+
+        function plusDivs(n) {
+            showDivs(slideIndex += n);
+        }
+
+        function currentDiv(n) {
+            showDivs(slideIndex = n);
+        }
+
+        function showDivs(n) {
+            var i;
+            var x = document.getElementsByClassName("mySlides");
+            var dots = document.getElementsByClassName("demodots");
+            if (n > x.length) { slideIndex = 1 }
+            if (n < 1) { slideIndex = x.length };
+            for (i = 0; i < x.length; i++) {
+                x[i].style.display = "none";
+            }
+            for (i = 0; i < dots.length; i++) {
+                dots[i].className = dots[i].className.replace(" w3-white", "");
+            }
+            x[slideIndex - 1].style.display = "block";
+            dots[slideIndex - 1].className += " w3-white";
+        }
+    </script>
+
+</body>
+
+</html>

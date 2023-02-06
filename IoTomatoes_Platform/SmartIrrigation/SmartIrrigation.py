@@ -9,13 +9,8 @@ from iotomatoes_supportpackage.ItemInfo import subscribedTopics
 
 class SmartIrrigation(BaseService):
 
-    def __init__(self, settings : dict, plantInfo : dict):
-        """It initializes the service with the settings and the plantInfo
-        
-        Arguments:
-        - `settings (dict)`: the settings of the service
-        - `plantInfo (dict)`: dictionary with the plants threshold values
-        """
+    def __init__(self, settings : dict):
+        """It initializes the service with its `settings (dict)`"""
         super().__init__(settings)
 
         if "WeatherForecast_ServiceName" in settings:
@@ -24,7 +19,6 @@ class SmartIrrigation(BaseService):
         if "MongoDB_ServiceName" in settings:
             self.mongoToCall = settings["MongoDB_ServiceName"]
 
-        self.plantInfo = plantInfo   
         self._message={
             "bn":"",
             "cn":"",
@@ -63,8 +57,7 @@ class SmartIrrigation(BaseService):
                     print("No actuator topics for the field ", fieldID)
                     continue
                 
-                minSoilMoisture, maxSoilMoisture, precipitationLimit = self.getPlantLimit(plant)
-            
+                minSoilMoisture, maxSoilMoisture, precipitationLimit = self.getPlantLimit(plant)            
                 previousSoilMoisture, currentSoilMoisture = self.getMongoDBdata()
                 if previousSoilMoisture == None or currentSoilMoisture == None:
                     print("No previous or current soil moisture measure")
@@ -172,19 +165,24 @@ class SmartIrrigation(BaseService):
 
     def getPlantLimit(self, plant : str) :
         #Check if the crop is in our json file:
-        if plant in list(self.plantInfo.keys()):
-            limits=self.plantInfo[plant]
-            minSoilMoisture=limits["soilMoistureLimit"]["min"]    
-            maxSoilMoisture=limits["soilMoistureLimit"]["max"]
-            precipitationLimit=limits["precipitationLimit"]["max"]
-        else:
-            print("No crop with the specified name. \nDefault limits will be used") 
-            limits=self.plantInfo["default"]
-            minSoilMoisture=limits["soilMoistureLimit"]["min"]    
-            maxSoilMoisture=limits["soilMoistureLimit"]["max"]  
-            precipitationLimit=limits["precipitationLimit"]["max"] 
+        mongoDB_url = self.getOtherServiceURL(self.mongoToCall)
+        if mongoDB_url == None or mongoDB_url == "":
+            print("ERROR: MongoDB service not found!")
+            return minSoilMoisture_default, maxSoilMoisture_default, precipitationLimit_default
 
-        return minSoilMoisture, maxSoilMoisture, precipitationLimit
+        try:
+            r = requests.get(f"{mongoDB_url}/{plant}/soilMoistureLimit")
+            r.raise_for_status()
+            soilMoistureLimit = r.json()
+        except:
+            print("ERROR: MongoDB service not found!")
+            return minSoilMoisture_default, maxSoilMoisture_default, precipitationLimit_default
+        else:
+            minSoilMoisture = soilMoistureLimit["min"]    
+            maxSoilMoisture = soilMoistureLimit["max"]
+            precipitationLimit=limits["precipitationLimit"]["max"]
+
+            return minSoilMoisture, maxSoilMoisture, precipitationLimit
 
     def getMongoDBdata(self):
         mongoDB_url = self.getOtherServiceURL(self.mongoToCall)
@@ -240,11 +238,10 @@ signal.signal(signal.SIGTERM, sigterm_handler)
 if __name__=="__main__":
     try:
         settings = json.load(open("SmartIrrigationSettings.json", 'r'))
-        plantDatabase = json.load(open("plantThreshold.json", 'r'))
     except FileNotFoundError:
         print("ERROR: files not found")
     else:
-        irrigation = SmartIrrigation(settings, plantDatabase)
+        irrigation = SmartIrrigation(settings)
         controlTimeInterval = settings["controlTimeInterval"]
 
         while True:

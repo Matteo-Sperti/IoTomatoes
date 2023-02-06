@@ -218,6 +218,7 @@ def _makeService(dictInformation : dict, EInfo : dict):
 def _addREST(dictInformation : dict, **kwargs):
     """Add the REST service information to the dictionary."""
     
+    print(kwargs)
     if "serviceIP" in kwargs:
         service = {
             "serviceType" : "REST",

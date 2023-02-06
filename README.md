@@ -1,7 +1,8 @@
 # IoTomatoes
 
 IoT project for smart-agriculture.
-IoTomatoes allows support to farmers and agri-service providers in order to increase productivity, optimize use of water and light, reducing the impact on the environment.
+IoTomatoes provides support to agri-service providers in order to enhance productivity, 
+optimize water and light usage, and minimize environmental impact.
 
 The proposed IoT platform integrates different IoT devices in order to provide a suitable control strategy and data analysis for agricultural holdings management and grow different types of crops. It also guarantees standardized communication interfaces (REST and MQTT) to easily communicate with pre-existing sensors.
 
@@ -44,6 +45,9 @@ Moreover it is suggested to install the IoT support package [IoTomatoes_SupportP
 
 - the [Tests](./Tests/README.md) folder; it contains some tests for the IoT platform.
 
+# Disclaimer
+
+This project is a research project and it is not intended for commercial use. The authors are not responsible for any damage caused by the use of this software. The security of the IoT platform is not guaranteed as it is not the main focus of the project.
 
 # Authors
 

@@ -143,7 +143,8 @@ def _makeResource(dictInformation : dict, EInfo : dict):
     if "fieldNumber" in EInfo:
         dictInformation["fieldNumber"] = EInfo["fieldNumber"]
     else: 
-        dictInformation["fieldNumber"] = 1 
+        dictInformation["fieldNumber"] = 0
+        EInfo["fieldNumber"] = 0
 
     if "latitude" in EInfo and "longitude" in EInfo:
         dictInformation["Location"] = {

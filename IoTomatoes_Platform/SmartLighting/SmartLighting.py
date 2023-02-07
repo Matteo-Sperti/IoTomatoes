@@ -9,13 +9,9 @@ from iotomatoes_supportpackage.ItemInfo import subscribedTopics
 
 class SmartLighting(BaseService):
 
-    def __init__(self, settings : dict, plantInfo : dict):
-        """It initializes the service with the settings and the plantInfo
+    def __init__(self, settings : dict):
+        """It initializes the service with the `settings (dict)`."""
         
-        Arguments:
-        - `settings (dict)`: the settings of the service
-        - `plantInfo (dict)`: dictionary with the plants threshold values
-        """
         super().__init__(settings)
 
         if "WeatherForecast_ServiceName" in settings:
@@ -23,8 +19,7 @@ class SmartLighting(BaseService):
 
         if "MongoDB_ServiceName" in settings:
             self.mongoToCall = settings["MongoDB_ServiceName"]
-
-        self.plantInfo = plantInfo   
+ 
         self._message = {
             "bn": self.EndpointInfo["serviceName"],
             "cn":"",
@@ -231,11 +226,10 @@ signal.signal(signal.SIGTERM, sigterm_handler)
 if __name__=="__main__":
     try:
         settings = json.load(open("SmartLightingSettings.json", 'r'))
-        plantDatabase = json.load(open("lightThreshold.json", 'r'))
     except FileNotFoundError:
         print("ERROR: files not found")
     else:
-        lighting = SmartLighting(settings, plantDatabase)
+        lighting = SmartLighting(settings)
 
         controlTimeInterval = settings["controlTimeInterval"]
 

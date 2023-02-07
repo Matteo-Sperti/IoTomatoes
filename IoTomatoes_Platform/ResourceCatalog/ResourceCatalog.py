@@ -283,7 +283,7 @@ class ResourceCatalogManager():
                 except InfoException as e:
                     raise web_exception(500, e.message)
 
-                if not (new_item["fieldNumber"] > 0 
+                if not (new_item["fieldNumber"] >= 0 
                         and new_item["fieldNumber"] <= company["NumberOfFields"]):
                     raise web_exception(400, "Field number not valid")
                 company[devicesList_name].append(new_item)

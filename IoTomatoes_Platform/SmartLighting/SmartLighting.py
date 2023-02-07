@@ -64,10 +64,9 @@ class SmartLighting(BaseService):
                     print("No actuator topics for the field ", fieldID)
                     continue
                 
-                minLight, maxLight = self.getPlantLimit(plant)
-
+                minLight, _ = self.getPlantLimit(plant)
                 currentLight = self.getMongoDBdata(CompanyName, fieldID)
-                if currentLight == None:
+                if currentLight == None or minLight == None:
                     print("No previous or current soil moisture measure")
                     self.sendCommand(CompanyName, fieldID, actuatorTopicsForField, 0)
                     continue   
@@ -144,20 +143,23 @@ class SmartLighting(BaseService):
         return topics
 
     def getPlantLimit(self, plant : str) :
-        #Check if the crop is in our json file:
-        if plant in list(self.plantInfo.keys()):
-            limits=self.plantInfo[plant]
-            #ideal min value of light for the given plant
-            minLight=limits["lightLimit"]["min"]  
-            #ideal max value of light for the given plant  
-            maxLight=limits["lightLimit"]["max"]    
-        else:
-            print("No crop with the specified name. \nDefault limits will be used") 
-            limits=self.plantInfo["default"]
-            minLight=limits["lightLimit"]["min"]
-            maxLight=limits["lightLimit"]["max"]  
+        mongoDB_url = self.getOtherServiceURL(self.mongoToCall)
+        if mongoDB_url == None or mongoDB_url == "":
+            print("ERROR: MongoDB service not found!")
+            return None, None
 
-        return minLight, maxLight            
+        try:
+            r = requests.get(f"{mongoDB_url}/{plant}/lightLimit")
+            r.raise_for_status()
+            lightLimit = r.json()
+        except:
+            print("ERROR: MongoDB service not found!")
+            return None, None
+        else:
+            minLightLimit = lightLimit["min"]    
+            maxLightLimit = lightLimit["max"]
+
+            return minLightLimit, maxLightLimit         
 
     def getMongoDBdata(self, CompanyName : str, fieldID : int):
         mongoDB_url = self.getOtherServiceURL(self.mongoToCall)

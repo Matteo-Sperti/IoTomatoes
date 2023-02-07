@@ -59,7 +59,8 @@ class SmartIrrigation(BaseService):
                 
                 minSoilMoisture, maxSoilMoisture, precipitationLimit = self.getPlantLimit(plant)            
                 previousSoilMoisture, currentSoilMoisture = self.getMongoDBdata()
-                if previousSoilMoisture == None or currentSoilMoisture == None:
+                if (previousSoilMoisture == None or currentSoilMoisture == None or 
+                    minSoilMoisture == None or maxSoilMoisture == None or precipitationLimit == None):
                     print("No previous or current soil moisture measure")
                     self.sendCommand(CompanyName, fieldID, actuatorTopicsForField, 0)
                     continue
@@ -164,23 +165,26 @@ class SmartIrrigation(BaseService):
         return topics
 
     def getPlantLimit(self, plant : str) :
-        #Check if the crop is in our json file:
         mongoDB_url = self.getOtherServiceURL(self.mongoToCall)
         if mongoDB_url == None or mongoDB_url == "":
             print("ERROR: MongoDB service not found!")
-            return minSoilMoisture_default, maxSoilMoisture_default, precipitationLimit_default
+            return None, None, None
 
         try:
             r = requests.get(f"{mongoDB_url}/{plant}/soilMoistureLimit")
             r.raise_for_status()
             soilMoistureLimit = r.json()
+
+            r = requests.get(f"{mongoDB_url}/{plant}/precipitationLimit")
+            r.raise_for_status()
+            precipitationLimit = r.json()
         except:
             print("ERROR: MongoDB service not found!")
-            return minSoilMoisture_default, maxSoilMoisture_default, precipitationLimit_default
+            return None, None, None
         else:
             minSoilMoisture = soilMoistureLimit["min"]    
             maxSoilMoisture = soilMoistureLimit["max"]
-            precipitationLimit=limits["precipitationLimit"]["max"]
+            precipitationLimit = precipitationLimit["max"]
 
             return minSoilMoisture, maxSoilMoisture, precipitationLimit
 

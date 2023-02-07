@@ -7,9 +7,9 @@ name = "IoTomatoes_SupportPackage"
 version = "0.0.7"
 authors = [
   { name="Matteo Sperti", mail="matteo.sperti@studenti.polito.it"},
-  { name="Luca Zanetti"},
-  { name="Andrea Usai"},
-  { name="Federico Moscato"}
+  { name="Luca Zanetti", mail="luca.zanett.99@gmail.com"},
+  { name="Andrea Usai", mail="andreausai98.lavoro@gmail.com"},
+  { name="Federico Moscato", mail="federico.moscato22@gmail.com"}
 ]
 description = "Small IoT support package for IoTomatoes project"
 readme = "README.md"

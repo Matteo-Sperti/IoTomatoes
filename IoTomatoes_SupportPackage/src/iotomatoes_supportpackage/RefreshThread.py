@@ -1,7 +1,7 @@
 import time
 import requests
 
-from iotomatoes_supportpackage.MyThread import MyThread
+from .MyThread import MyThread
 
 class RefreshThread(MyThread):
     def __init__(self, url : str, endpoint, interval=60, **kwargs):

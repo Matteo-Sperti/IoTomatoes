@@ -1,6 +1,6 @@
 import time
 from socket import gethostname, gethostbyname
-from iotomatoes_supportpackage.MyExceptions import InfoException
+from .MyExceptions import InfoException
 
 ### Get item information from a dictionary ###
 

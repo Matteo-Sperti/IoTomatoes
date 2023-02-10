@@ -1,9 +1,9 @@
 import requests
 import time
 
-from iotomatoes_supportpackage.ItemInfo import isMQTT
-from iotomatoes_supportpackage.RefreshThread import RefreshThread
-from iotomatoes_supportpackage.MQTTClient import BaseMQTTClient
+from .ItemInfo import isMQTT
+from .RefreshThread import RefreshThread
+from .MQTTClient import BaseMQTTClient
 
 class BaseService() :
     def __init__(self, settings: dict):

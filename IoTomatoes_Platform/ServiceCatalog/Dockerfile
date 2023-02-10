@@ -7,7 +7,7 @@ ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
 
 # Install pip requirements
-COPY ./ServiceCatalog/requirements.txt .
+COPY ./requirements.txt .
 RUN python -m pip install -r requirements.txt
 
 #RUN python -m pip install -i https://test.pypi.org/simple/ IoTomatoes-SupportPackage --no-deps
@@ -18,6 +18,6 @@ WORKDIR /app
 RUN adduser -u 8080 --disabled-password --gecos "" appuser && chown -R appuser /app
 USER appuser
 
-COPY ./ServiceCatalog/ /app/
+COPY . /app/
 
 CMD ["python","/app/ServiceCatalog.py"]

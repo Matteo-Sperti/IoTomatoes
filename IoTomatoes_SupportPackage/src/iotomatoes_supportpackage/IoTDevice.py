@@ -1,7 +1,7 @@
 import time
-from iotomatoes_supportpackage.BaseResource import BaseResource
-from iotomatoes_supportpackage.MyThread import MyThread
-from iotomatoes_supportpackage.ItemInfo import publishedTopics, actuatorType
+from .BaseResource import BaseResource
+from .MyThread import MyThread
+from .ItemInfo import publishedTopics, actuatorType
 
 class IoTDevice(BaseResource):
     def __init__(self, DeviceInfo : dict, sensor = None, actuator = None):

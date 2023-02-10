@@ -2,9 +2,9 @@ import json
 import requests
 import time
 
-from iotomatoes_supportpackage.RefreshThread import RefreshThread
-from iotomatoes_supportpackage.MQTTClient import BaseMQTTClient
-from iotomatoes_supportpackage.ItemInfo import (
+from .RefreshThread import RefreshThread
+from .MQTTClient import BaseMQTTClient
+from .ItemInfo import (
     isMQTT, measureType, actuatorType, PowerConsumption_kW
 )
 

@@ -1,5 +1,12 @@
 [
     {
+        "id": "f6f2187d.f17ca8",
+        "type": "tab",
+        "label": "Flow 1",
+        "disabled": false,
+        "info": ""
+    },
+    {
         "id": "02cb3553ae92b013",
         "type": "tab",
         "label": "Flow 2",
@@ -236,15 +243,14 @@
         "nodes": [
             "8ee10aa00402e9ce",
             "201f92e42113fc5a",
-            "daee4126e083aec1",
             "fddd325bfca8b637",
             "848218af9bd22a54",
             "c2fd5d57dc6d0bb3"
         ],
         "x": 14,
-        "y": 339,
+        "y": 379,
         "w": 1032,
-        "h": 162
+        "h": 82
     },
     {
         "id": "c26214e6e68e6bbb",
@@ -398,6 +404,355 @@
         "h": 82
     },
     {
+        "id": "31de8e5b82691490",
+        "type": "ui_group",
+        "name": "Weather",
+        "tab": "698e01817b646764",
+        "order": 2,
+        "disp": false,
+        "width": "7",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "cdd0e15889b1286d",
+        "type": "ui_group",
+        "name": "Home",
+        "tab": "698e01817b646764",
+        "order": 1,
+        "disp": false,
+        "width": "7",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "dc85dc3382f47ab2",
+        "type": "ui_group",
+        "name": "Localization",
+        "tab": "698e01817b646764",
+        "order": 5,
+        "disp": false,
+        "width": "7",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "f1b999f5373c31d8",
+        "type": "ui_group",
+        "name": "Actuators",
+        "tab": "cfbf5bffbaa84de7",
+        "order": 1,
+        "disp": true,
+        "width": "7",
+        "collapse": true,
+        "className": ""
+    },
+    {
+        "id": "5e32d1811541c3ed",
+        "type": "ui_group",
+        "name": "Actuators",
+        "tab": "915f7ddef7cd3dd6",
+        "order": 1,
+        "disp": true,
+        "width": "7",
+        "collapse": true,
+        "className": ""
+    },
+    {
+        "id": "d4d16815f75585a6",
+        "type": "ui_group",
+        "name": "Actuators",
+        "tab": "86c8368f92b091d5",
+        "order": 1,
+        "disp": true,
+        "width": "7",
+        "collapse": true,
+        "className": ""
+    },
+    {
+        "id": "63c960e3ff3fcba6",
+        "type": "ui_group",
+        "name": "Actuators",
+        "tab": "5109d4cb16cb06c6",
+        "order": 1,
+        "disp": true,
+        "width": "7",
+        "collapse": true,
+        "className": ""
+    },
+    {
+        "id": "78956960e46b2a2e",
+        "type": "ui_group",
+        "name": "Sensors",
+        "tab": "cfbf5bffbaa84de7",
+        "order": 3,
+        "disp": true,
+        "width": "7",
+        "collapse": true,
+        "className": ""
+    },
+    {
+        "id": "99dca6761e2d9c28",
+        "type": "ui_group",
+        "name": "Sensors",
+        "tab": "915f7ddef7cd3dd6",
+        "order": 3,
+        "disp": true,
+        "width": "7",
+        "collapse": true,
+        "className": ""
+    },
+    {
+        "id": "76c122f563a2790b",
+        "type": "ui_group",
+        "name": "Sensors",
+        "tab": "86c8368f92b091d5",
+        "order": 3,
+        "disp": true,
+        "width": "7",
+        "collapse": true,
+        "className": ""
+    },
+    {
+        "id": "dca27f708d79a283",
+        "type": "ui_group",
+        "name": "Sensors",
+        "tab": "5109d4cb16cb06c6",
+        "order": 3,
+        "disp": true,
+        "width": "7",
+        "collapse": true,
+        "className": ""
+    },
+    {
+        "id": "034412fb686048d4",
+        "type": "ui_group",
+        "name": "Consumption",
+        "tab": "698e01817b646764",
+        "order": 4,
+        "disp": false,
+        "width": 7,
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "2a745e6b.07df92",
+        "type": "ui_group",
+        "name": "Default",
+        "tab": "e63bce2d.68925",
+        "order": 1,
+        "disp": true,
+        "width": "6",
+        "collapse": true
+    },
+    {
+        "id": "6fd2c0e41aa3f4f8",
+        "type": "ui_group",
+        "name": "Messages",
+        "tab": "698e01817b646764",
+        "order": 3,
+        "disp": false,
+        "width": "7",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "698e01817b646764",
+        "type": "ui_tab",
+        "name": "Home",
+        "icon": "fa-th",
+        "order": 1,
+        "disabled": false,
+        "hidden": false
+    },
+    {
+        "id": "cfbf5bffbaa84de7",
+        "type": "ui_tab",
+        "name": "Field 1",
+        "icon": "fa-tree",
+        "order": 5,
+        "disabled": false,
+        "hidden": false
+    },
+    {
+        "id": "915f7ddef7cd3dd6",
+        "type": "ui_tab",
+        "name": "Field 2",
+        "icon": "fa-tree",
+        "order": 6,
+        "disabled": false,
+        "hidden": false
+    },
+    {
+        "id": "86c8368f92b091d5",
+        "type": "ui_tab",
+        "name": "Field 3",
+        "icon": "fa-tree",
+        "order": 7,
+        "disabled": false,
+        "hidden": false
+    },
+    {
+        "id": "5109d4cb16cb06c6",
+        "type": "ui_tab",
+        "name": "Field 4",
+        "icon": "fa-tree",
+        "order": 8,
+        "disabled": false,
+        "hidden": false
+    },
+    {
+        "id": "e63bce2d.68925",
+        "type": "ui_tab",
+        "name": "Denon",
+        "icon": "dashboard",
+        "order": 4,
+        "disabled": false,
+        "hidden": true
+    },
+    {
+        "id": "5484241809e5cbeb",
+        "type": "ui_base",
+        "theme": {
+            "name": "theme-dark",
+            "lightTheme": {
+                "default": "#0094CE",
+                "baseColor": "#6dbd66",
+                "baseFont": "-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Oxygen-Sans,Ubuntu,Cantarell,Helvetica Neue,sans-serif",
+                "edited": true,
+                "reset": false
+            },
+            "darkTheme": {
+                "default": "#097479",
+                "baseColor": "#6dbd66",
+                "baseFont": "-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Oxygen-Sans,Ubuntu,Cantarell,Helvetica Neue,sans-serif",
+                "edited": true,
+                "reset": false
+            },
+            "customTheme": {
+                "name": "Untitled Theme 1",
+                "default": "#4B7930",
+                "baseColor": "#4B7930",
+                "baseFont": "-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Oxygen-Sans,Ubuntu,Cantarell,Helvetica Neue,sans-serif"
+            },
+            "themeState": {
+                "base-color": {
+                    "default": "#097479",
+                    "value": "#6dbd66",
+                    "edited": true
+                },
+                "page-titlebar-backgroundColor": {
+                    "value": "#6dbd66",
+                    "edited": false
+                },
+                "page-backgroundColor": {
+                    "value": "#111111",
+                    "edited": false
+                },
+                "page-sidebar-backgroundColor": {
+                    "value": "#ffffff",
+                    "edited": false
+                },
+                "group-textColor": {
+                    "value": "#a0d49b",
+                    "edited": false
+                },
+                "group-borderColor": {
+                    "value": "#555555",
+                    "edited": false
+                },
+                "group-backgroundColor": {
+                    "value": "#333333",
+                    "edited": false
+                },
+                "widget-textColor": {
+                    "value": "#eeeeee",
+                    "edited": false
+                },
+                "widget-backgroundColor": {
+                    "value": "#6dbd66",
+                    "edited": false
+                },
+                "widget-borderColor": {
+                    "value": "#333333",
+                    "edited": false
+                },
+                "base-font": {
+                    "value": "-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Oxygen-Sans,Ubuntu,Cantarell,Helvetica Neue,sans-serif"
+                }
+            },
+            "angularTheme": {
+                "primary": "indigo",
+                "accents": "blue",
+                "warn": "red",
+                "background": "grey",
+                "palette": "light"
+            }
+        },
+        "site": {
+            "name": "IoTomatoes Dashboard",
+            "hideToolbar": "false",
+            "allowSwipe": "menu",
+            "lockMenu": "false",
+            "allowTempTheme": "true",
+            "dateFormat": "DD/MM/YYYY",
+            "sizes": {
+                "sx": 48,
+                "sy": 48,
+                "gx": 200,
+                "gy": 6,
+                "cx": 6,
+                "cy": 6,
+                "px": 0,
+                "py": 0
+            }
+        }
+    },
+    {
+        "id": "1d8feee67b7c7521",
+        "type": "users_config",
+        "appPath": "/users",
+        "jwtCookieName": "nr.nodeUsers.jwt",
+        "jwtHttpsOnly": false
+    },
+    {
+        "id": "c438e2733a8f6696",
+        "type": "mqtt-broker",
+        "name": "internal",
+        "broker": "http://mosquitto:1883",
+        "port": "1883",
+        "clientid": "",
+        "autoConnect": true,
+        "usetls": false,
+        "protocolVersion": "4",
+        "keepalive": "60",
+        "cleansession": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthPayload": "",
+        "birthMsg": {},
+        "closeTopic": "",
+        "closeQos": "0",
+        "closePayload": "",
+        "closeMsg": {},
+        "willTopic": "",
+        "willQos": "0",
+        "willPayload": "",
+        "willMsg": {},
+        "userProps": "",
+        "sessionExpiry": ""
+    },
+    {
+        "id": "3cc11d24.ff01a2",
+        "type": "comment",
+        "z": "f6f2187d.f17ca8",
+        "name": "WARNING: please check you have started this container with a volume that is mounted to /data\\n otherwise any flow changes are lost when you redeploy or upgrade the container\\n (e.g. upgrade to a more recent node-red docker image).\\n  If you are using named volumes you can ignore this warning.\\n Double click or see info side panel to learn how to start Node-RED in Docker to save your work",
+        "info": "\nTo start docker with a bind mount volume (-v option), for example:\n\n```\ndocker run -it -p 1880:1880 -v /home/user/node_red_data:/data --name mynodered nodered/node-red\n```\n\nwhere `/home/user/node_red_data` is a directory on your host machine where you want to store your flows.\n\nIf you do not do this then you can experiment and redploy flows, but if you restart or upgrade the container the flows will be disconnected and lost. \n\nThey will still exist in a hidden data volume, which can be recovered using standard docker techniques, but that is much more complex than just starting with a named volume as described above.",
+        "x": 350,
+        "y": 80,
+        "wires": []
+    },
+    {
         "id": "9c7caea06b2f7488",
         "type": "function",
         "z": "02cb3553ae92b013",
@@ -425,7 +780,7 @@
         "topic": "",
         "qos": "2",
         "datatype": "auto-detect",
-        "broker": "3ea229243d5c5f4e",
+        "broker": "c438e2733a8f6696",
         "nl": false,
         "rap": true,
         "rh": 0,
@@ -786,7 +1141,8 @@
         "tosidebar": true,
         "console": false,
         "tostatus": false,
-        "complete": "false",
+        "complete": "payload",
+        "targetType": "msg",
         "statusVal": "",
         "statusType": "auto",
         "x": 840,
@@ -1440,7 +1796,7 @@
         "type": "function",
         "z": "02cb3553ae92b013",
         "name": "createTopic",
-        "func": "var companyName = msg.payload.user.scope\nmsg.topic = \"IoTomatoes/\" + companyName + \"/#\"\nmsg.action = \"subscribe\"\nreturn msg",
+        "func": "var companyName = msg.payload.user.scope\nmsg.topic = companyName + \"/#\"\nmsg.action = \"subscribe\"\nreturn msg",
         "outputs": 1,
         "noerr": 0,
         "initialize": "",
@@ -1459,7 +1815,7 @@
         "type": "function",
         "z": "02cb3553ae92b013",
         "name": "ParsingField",
-        "func": "if ('field' in msg.payload){\n    msg.topic = msg.payload.field \n}\n    \nreturn msg",
+        "func": "if ('fieldNumber' in msg.payload){\n    msg.topic = msg.payload.field \n}\n    \nreturn msg",
         "outputs": 1,
         "noerr": 0,
         "initialize": "",
@@ -4735,10 +5091,10 @@
         "z": "02cb3553ae92b013",
         "g": "b34e59ea24075b0f",
         "name": "",
-        "method": "GET",
-        "ret": "txt",
+        "method": "POST",
+        "ret": "obj",
         "paytoqs": "body",
-        "url": "http://service_catalog/insert",
+        "url": "http://service_catalog:8080/insert",
         "tls": "",
         "persist": false,
         "proxy": "",
@@ -4750,7 +5106,6 @@
         "y": 420,
         "wires": [
             [
-                "daee4126e083aec1",
                 "c2fd5d57dc6d0bb3"
             ]
         ]
@@ -4775,31 +5130,15 @@
         "once": true,
         "onceDelay": 0.1,
         "topic": "",
-        "payload": "{\"serviceName\":\"Dashboard\",\"availableServices\":[\"REST\",\"MQTT\"],\"serviceDetails\":[{\"serviceType\":\"MQTT\",\"subscribedTopics\":[\"#\"]},{\"serviceType\":\"REST\",\"serviceIP\":\"172.16.0.126:1880\"}]}",
+        "payload": "{\"serviceName\":\"Dashboard\",\"availableServices\":[\"REST\",\"MQTT\"],\"servicesDetails\":[{\"serviceType\":\"MQTT\",\"subscribedTopics\":[\"#\"]},{\"serviceType\":\"REST\",\"serviceIP\":\"http://dashboard:1880\"}]}",
         "payloadType": "json",
         "x": 110,
         "y": 420,
         "wires": [
-            []
+            [
+                "8ee10aa00402e9ce"
+            ]
         ]
-    },
-    {
-        "id": "daee4126e083aec1",
-        "type": "debug",
-        "z": "02cb3553ae92b013",
-        "g": "b34e59ea24075b0f",
-        "name": "debug 2",
-        "active": true,
-        "tosidebar": true,
-        "console": false,
-        "tostatus": false,
-        "complete": "true",
-        "targetType": "full",
-        "statusVal": "",
-        "statusType": "auto",
-        "x": 540,
-        "y": 380,
-        "wires": []
     },
     {
         "id": "fddd325bfca8b637",
@@ -4807,9 +5146,9 @@
         "z": "02cb3553ae92b013",
         "g": "b34e59ea24075b0f",
         "name": "",
-        "op1": "msg.payload",
+        "op1": "",
         "op2": "",
-        "op1type": "str",
+        "op1type": "pay",
         "op2type": "payl",
         "duration": "-1",
         "extend": false,
@@ -4820,9 +5159,11 @@
         "topic": "topic",
         "outputs": 1,
         "x": 750,
-        "y": 460,
+        "y": 420,
         "wires": [
-            []
+            [
+                "848218af9bd22a54"
+            ]
         ]
     },
     {
@@ -4831,10 +5172,10 @@
         "z": "02cb3553ae92b013",
         "g": "b34e59ea24075b0f",
         "name": "",
-        "method": "GET",
+        "method": "PUT",
         "ret": "txt",
         "paytoqs": "query",
-        "url": "http://service_catalog/refresh",
+        "url": "http://service_catalog:8080/refresh?ID={{payload}}",
         "tls": "",
         "persist": false,
         "proxy": "",
@@ -4843,7 +5184,7 @@
         "senderr": false,
         "headers": [],
         "x": 950,
-        "y": 460,
+        "y": 420,
         "wires": [
             []
         ]
@@ -4860,7 +5201,7 @@
                 "p": "payload",
                 "pt": "msg",
                 "to": "payload.ID",
-                "tot": "str"
+                "tot": "msg"
             }
         ],
         "action": "",
@@ -4869,7 +5210,7 @@
         "to": "",
         "reg": false,
         "x": 520,
-        "y": 460,
+        "y": 420,
         "wires": [
             [
                 "fddd325bfca8b637"
@@ -5094,8 +5435,8 @@
         "name": "",
         "method": "GET",
         "ret": "txt",
-        "paytoqs": "query",
-        "url": "http:resource_catalog:8080/getFields",
+        "paytoqs": "ignore",
+        "url": "http://resource_catalog:8080/{{payload}}/fields",
         "tls": "",
         "persist": false,
         "proxy": "",
@@ -5122,7 +5463,7 @@
                 "t": "set",
                 "p": "payload",
                 "pt": "msg",
-                "to": "msg.paylaod.user.scope",
+                "to": "payload.user.scope",
                 "tot": "msg"
             }
         ],
@@ -5135,7 +5476,8 @@
         "y": 1380,
         "wires": [
             [
-                "64b4c1209635ac49"
+                "64b4c1209635ac49",
+                "e25d2b921fe2b23a"
             ]
         ]
     },
@@ -5215,240 +5557,20 @@
         ]
     },
     {
-        "id": "3ea229243d5c5f4e",
-        "type": "mqtt-broker",
-        "name": "",
-        "broker": "mqtt.eclipseprojects.io",
-        "port": "1883",
-        "clientid": "",
-        "autoConnect": true,
-        "usetls": false,
-        "protocolVersion": "4",
-        "keepalive": "60",
-        "cleansession": true,
-        "birthTopic": "",
-        "birthQos": "0",
-        "birthRetain": "false",
-        "birthPayload": "",
-        "birthMsg": {},
-        "closeTopic": "",
-        "closeQos": "0",
-        "closeRetain": "false",
-        "closePayload": "",
-        "closeMsg": {},
-        "willTopic": "",
-        "willQos": "0",
-        "willRetain": "false",
-        "willPayload": "",
-        "willMsg": {},
-        "userProps": "",
-        "sessionExpiry": ""
-    },
-    {
-        "id": "31de8e5b82691490",
-        "type": "ui_group",
-        "name": "Weather",
-        "tab": "698e01817b646764",
-        "order": 2,
-        "disp": false,
-        "width": "7",
-        "collapse": false,
-        "className": ""
-    },
-    {
-        "id": "cdd0e15889b1286d",
-        "type": "ui_group",
-        "name": "Home",
-        "tab": "698e01817b646764",
-        "order": 1,
-        "disp": false,
-        "width": "7",
-        "collapse": false,
-        "className": ""
-    },
-    {
-        "id": "dc85dc3382f47ab2",
-        "type": "ui_group",
-        "name": "Localization",
-        "tab": "698e01817b646764",
-        "order": 5,
-        "disp": false,
-        "width": "7",
-        "collapse": false,
-        "className": ""
-    },
-    {
-        "id": "f1b999f5373c31d8",
-        "type": "ui_group",
-        "name": "Actuators",
-        "tab": "cfbf5bffbaa84de7",
-        "order": 1,
-        "disp": true,
-        "width": "7",
-        "collapse": true,
-        "className": ""
-    },
-    {
-        "id": "5e32d1811541c3ed",
-        "type": "ui_group",
-        "name": "Actuators",
-        "tab": "915f7ddef7cd3dd6",
-        "order": 1,
-        "disp": true,
-        "width": "7",
-        "collapse": true,
-        "className": ""
-    },
-    {
-        "id": "d4d16815f75585a6",
-        "type": "ui_group",
-        "name": "Actuators",
-        "tab": "86c8368f92b091d5",
-        "order": 1,
-        "disp": true,
-        "width": "7",
-        "collapse": true,
-        "className": ""
-    },
-    {
-        "id": "63c960e3ff3fcba6",
-        "type": "ui_group",
-        "name": "Actuators",
-        "tab": "5109d4cb16cb06c6",
-        "order": 1,
-        "disp": true,
-        "width": "7",
-        "collapse": true,
-        "className": ""
-    },
-    {
-        "id": "78956960e46b2a2e",
-        "type": "ui_group",
-        "name": "Sensors",
-        "tab": "cfbf5bffbaa84de7",
-        "order": 3,
-        "disp": true,
-        "width": "7",
-        "collapse": true,
-        "className": ""
-    },
-    {
-        "id": "99dca6761e2d9c28",
-        "type": "ui_group",
-        "name": "Sensors",
-        "tab": "915f7ddef7cd3dd6",
-        "order": 3,
-        "disp": true,
-        "width": "7",
-        "collapse": true,
-        "className": ""
-    },
-    {
-        "id": "76c122f563a2790b",
-        "type": "ui_group",
-        "name": "Sensors",
-        "tab": "86c8368f92b091d5",
-        "order": 3,
-        "disp": true,
-        "width": "7",
-        "collapse": true,
-        "className": ""
-    },
-    {
-        "id": "dca27f708d79a283",
-        "type": "ui_group",
-        "name": "Sensors",
-        "tab": "5109d4cb16cb06c6",
-        "order": 3,
-        "disp": true,
-        "width": "7",
-        "collapse": true,
-        "className": ""
-    },
-    {
-        "id": "034412fb686048d4",
-        "type": "ui_group",
-        "name": "Consumption",
-        "tab": "698e01817b646764",
-        "order": 4,
-        "disp": false,
-        "width": 7,
-        "collapse": false,
-        "className": ""
-    },
-    {
-        "id": "2a745e6b.07df92",
-        "type": "ui_group",
-        "name": "Default",
-        "tab": "e63bce2d.68925",
-        "order": 1,
-        "disp": true,
-        "width": "6",
-        "collapse": true
-    },
-    {
-        "id": "6fd2c0e41aa3f4f8",
-        "type": "ui_group",
-        "name": "Messages",
-        "tab": "698e01817b646764",
-        "order": 3,
-        "disp": false,
-        "width": "7",
-        "collapse": false,
-        "className": ""
-    },
-    {
-        "id": "698e01817b646764",
-        "type": "ui_tab",
-        "name": "Home",
-        "icon": "fa-th",
-        "order": 1,
-        "disabled": false,
-        "hidden": false
-    },
-    {
-        "id": "cfbf5bffbaa84de7",
-        "type": "ui_tab",
-        "name": "Field 1",
-        "icon": "fa-tree",
-        "order": 5,
-        "disabled": false,
-        "hidden": false
-    },
-    {
-        "id": "915f7ddef7cd3dd6",
-        "type": "ui_tab",
-        "name": "Field 2",
-        "icon": "fa-tree",
-        "order": 6,
-        "disabled": false,
-        "hidden": false
-    },
-    {
-        "id": "86c8368f92b091d5",
-        "type": "ui_tab",
-        "name": "Field 3",
-        "icon": "fa-tree",
-        "order": 7,
-        "disabled": false,
-        "hidden": false
-    },
-    {
-        "id": "5109d4cb16cb06c6",
-        "type": "ui_tab",
-        "name": "Field 4",
-        "icon": "fa-tree",
-        "order": 8,
-        "disabled": false,
-        "hidden": false
-    },
-    {
-        "id": "e63bce2d.68925",
-        "type": "ui_tab",
-        "name": "Denon",
-        "icon": "dashboard",
-        "order": 4,
-        "disabled": false,
-        "hidden": true
+        "id": "e25d2b921fe2b23a",
+        "type": "debug",
+        "z": "02cb3553ae92b013",
+        "name": "debug 4",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1040,
+        "y": 1260,
+        "wires": []
     }
 ]

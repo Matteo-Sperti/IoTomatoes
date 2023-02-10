@@ -2,7 +2,7 @@ import time
 import requests
 import json
 
-from iotomatoes_supportpackage.ItemInfo import subscribedTopics, publishedTopics
+from .ItemInfo import subscribedTopics, publishedTopics
 
 class BaseMQTTClient(): 
     def __init__(self, url : str, connector, broker : str = ""):

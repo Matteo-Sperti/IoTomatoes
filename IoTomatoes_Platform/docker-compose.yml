@@ -46,8 +46,8 @@ services:
   service_catalog:
     image: service_catalog
     build:
-      context: .
-      dockerfile: ./ServiceCatalog/Dockerfile
+      context: ./ServiceCatalog
+      dockerfile: Dockerfile
     networks:
       - internal
     volumes:
@@ -56,8 +56,8 @@ services:
   resource_catalog:
     image: resource_catalog
     build:
-      context: .
-      dockerfile: ./ResourceCatalog/Dockerfile
+      context: ./ResourceCatalog
+      dockerfile: Dockerfile
     depends_on:
       - service_catalog
       - mosquitto
@@ -69,8 +69,8 @@ services:
   telegram_bot:
     image: telegram_bot
     build:
-      context: .
-      dockerfile: ./TelegramBot/Dockerfile
+      context: ./TelegramBot
+      dockerfile: Dockerfile
     depends_on:
       - resource_catalog
     volumes:
@@ -80,7 +80,10 @@ services:
 
   dashboard:
     container_name: dashboard
-    image: nodered/node-red:latest
+    image: node-red
+    build: 
+      context: ./Node-RED
+      dockerfile: Dockerfile
     environment:
       - TZ=Europe/Rome
     ports:
@@ -93,8 +96,8 @@ services:
   mongodb_connector:
     image: mongodb_connector
     build:
-      context: .
-      dockerfile: ./MongoDBConnector/Dockerfile
+      context: ./MongoDBConnector
+      dockerfile: Dockerfile
     depends_on:
       - resource_catalog
     networks:
@@ -105,8 +108,8 @@ services:
   weather_forecast:
     image: weather_forecast
     build:
-      context: .
-      dockerfile: ./WeatherForecast/Dockerfile
+      context: ./WeatherForecast
+      dockerfile: Dockerfile
     depends_on:
       - resource_catalog
     networks:
@@ -117,8 +120,8 @@ services:
   smart_irrigation:
     image: smart_irrigation
     build:
-      context: .
-      dockerfile: ./SmartIrrigation/Dockerfile
+      context: ./SmartIrrigation
+      dockerfile: Dockerfile
     depends_on:
       - mongodb_connector
       - weather_forecast
@@ -130,8 +133,8 @@ services:
   smart_lighting:
     image: smart_lighting
     build:
-      context: .
-      dockerfile: ./SmartLighting/Dockerfile
+      context: ./SmartLighting
+      dockerfile: Dockerfile
     depends_on:
       - mongodb_connector
       - weather_forecast
@@ -143,8 +146,8 @@ services:
   fault_detection:
     image: fault_detection
     build:
-      context: .
-      dockerfile: ./FaultDetection/Dockerfile
+      context: ./FaultDetection
+      dockerfile: Dockerfile
     depends_on:
       - resource_catalog
     networks:
@@ -155,8 +158,8 @@ services:
   consumption_manager:
     image: consumption_manager
     build:
-      context: .
-      dockerfile: ./ConsumptionManager/Dockerfile
+      context: ./ConsumptionManager
+      dockerfile: Dockerfile
     depends_on:
       - resource_catalog
     networks:
@@ -167,8 +170,8 @@ services:
   localization:
     image: localization
     build:
-      context: .
-      dockerfile: ./Localization/Dockerfile
+      context: ./Localization
+      dockerfile: Dockerfile
     depends_on:
       - resource_catalog
     networks:
@@ -179,8 +182,8 @@ services:
   data_visualizer:
     image: data_visualizer
     build:
-      context: .
-      dockerfile: ./DataVisualizer/Dockerfile
+      context: ./DataVisualizer
+      dockerfile: Dockerfile
     depends_on:
       - mongodb_connector
     networks:

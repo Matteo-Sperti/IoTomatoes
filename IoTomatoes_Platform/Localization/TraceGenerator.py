@@ -7,13 +7,20 @@ import signal
 import requests
 import imgkit
 import base64
+
 from iotomatoes_supportpackage.BaseService import BaseService
 from iotomatoes_supportpackage.MyExceptions import web_exception
 from iotomatoes_supportpackage.ItemInfo import setREST
 
 
 class TraceGenerator(BaseService):
-    def __init__(self, settings: dict, ResourceCatalogUrl: str, MongoDbUrl: str):
+    def __init__(self, settings: dict, MongoDbUrl: str):
+        """Constructor of the TraceGenerator class.
+
+        Arguments:
+        - `settings (dict)`: Dictionary containing the settings of the service.
+        - `MongoDbUrl (str)`: Url of the MongoDB service.
+        """
 
         self.create_url = settings["create_url"]
         self.view_url = settings["view_url"]
@@ -31,17 +38,27 @@ class TraceGenerator(BaseService):
 		</gpx>"""
 
     def TruckPosition(self, CompanyName):
+        """Get the position of all the trucks of a company.
+
+        Arguments:
+        - `CompanyName (str)`: Name of the company.
+
+        Returns a dictionary containing a base64 encoded image.
+        """
+        
         fileNameHtlm = "mapPositions.html"
         fileNamePng = "mapPositionsImage.png"
-        params = {"CompanyName": CompanyName}
         try:
-            response = requests.get(self.MongoDbUrl+"/truckPosition", params)
+            response = requests.get(
+                f"{self.MongoDbUrl}/{CompanyName}/truckPosition")
             response.raise_for_status()
             dict_ = response.json()
         except:
             raise web_exception(404, "Error getting data from the database")
 
-        if dict_ != {}:
+        if dict_ == {}:
+            raise web_exception(404, "No trucks found")
+        else:
             map = folium.Map(location=[dict_[dict_.keys[0]]["latitude"], dict_[
                              dict_.keys[0]]["longitude"]])
             for key in dict_.keys():
@@ -51,22 +68,32 @@ class TraceGenerator(BaseService):
             imgkit.from_file(fileNameHtlm, fileNamePng)
             with open(fileNamePng, "rb") as image_file:
                 encoded_string = base64.b64encode(image_file.read())
-            return encoded_string
-        else:
-            raise web_exception(404, "No trucks found")
+
+            out = {"img64": encoded_string}
+            return json.dumps(out)
 
     def GenerateGPX(self, CompanyName, truckID):
+        """Generate a GPX file from the trace of a truck.
+
+        Arguments:
+        - `CompanyName (str)`: Name of the company.
+        - `truckID (str)`: ID of the truck.
+
+        Returns a dictionary containing a base64 encoded image.
+        """
+
         fileNameHtlm = "mapTrace.html"
         fileNamePng = "mapTraceImage.png"
-        params = {"CompanyName": CompanyName, "TruckID": truckID}
         try:
-            response = requests.get(
-                self.MongoDbUrl+"/truckTrace", params).json()
+            response = requests.get(f"{self.MongoDbUrl}/{CompanyName}/truckTrace",
+                                    params={"TruckID": truckID})
             response.raise_for_status()
             dict_ = response.json()
         except:
             raise web_exception(404, "Error getting data from the database")
-        if dict_ != {}:
+        if dict_ == {}:
+            raise web_exception(404, "No trucks found")
+        else:
             lat = dict_["latitude"]
             lon = dict_["longitude"]
             for i in range(len(lat)):
@@ -88,33 +115,39 @@ class TraceGenerator(BaseService):
             imgkit.from_file(fileNameHtlm, fileNamePng)
             with open(fileNamePng, "rb") as image_file:
                 encoded_string = base64.b64encode(image_file.read())
-            return encoded_string
-        else:
-            raise web_exception(404, "No trucks found")
+
+            out = {"img64": encoded_string}
+            return json.dumps(out)
 
 
-class RESTConnector(BaseService):
+class LocalizationWebService(BaseService):
     exposed = True
 
     def __init__(self, settings: dict):
+        """Constructor of the class"""
 
         super().__init__(settings)
         if "MongoDB_ServiceName" in settings:
             self.mongoToCall = settings["MongoDB_ServiceName"]
         mongoDB_url = self.getOtherServiceURL(self.mongoToCall)
         self.traceGen = TraceGenerator(
-            settings, self.ResourceCatalog_url, mongoDB_url)
+            settings, mongoDB_url)
 
     def GET(self, *uri, **params):
-        try:
-            if len(uri) > 0:
-                if len(uri) == 1 and uri[0] == "trace":
-                    return self.traceGen.GenerateGPX(params["CompanyName"], params["TruckID"])
-                if len(uri) == 1 and uri[0] == "position":
-                    return self.traceGen.TruckPosition(params["CompanyName"])
+        """GET method of the REST API
 
-                else:
-                    raise web_exception(404, "Resource not found.")
+        Allowed URIs:
+        - `/<CompanyName>/trace`: returns the trace of the truck in a map.
+        The truckID is passed as a parameter.
+        - `/<CompanyName>/position`: returns the position of the truck in a map
+        """
+        try:
+            if len(uri) == 2 and uri[1] == "trace":
+                return self.traceGen.GenerateGPX(uri[0], params["TruckID"])
+            if len(uri) == 2 and uri[1] == "position":
+                return self.traceGen.TruckPosition(uri[0])
+            else:
+                raise web_exception(404, "Resource not found.")
         except web_exception as e:
             raise cherrypy.HTTPError(e.code, e.message)
         except:
@@ -135,7 +168,7 @@ if __name__ == "__main__":
 
     ip_address, port = setREST(settings)
 
-    WebService = RESTConnector(settings)
+    WebService = LocalizationWebService(settings)
     conf = {
         '/': {
             'request.dispatch': cherrypy.dispatch.MethodDispatcher(),

@@ -151,15 +151,16 @@ class SmartLighting(BaseService):
             return None, None
 
         try:
-            r = requests.get(f"{mongoDB_url}/{plant}/lightLimit")
+            r = requests.get(f"{mongoDB_url}/plant",
+                             params={"PlantName": plant})
             r.raise_for_status()
-            lightLimit = r.json()
+            plantInfo = r.json()
         except:
             print("ERROR: MongoDB service not found!")
             return None, None
         else:
-            minLightLimit = lightLimit["min"]
-            maxLightLimit = lightLimit["max"]
+            minLightLimit = plantInfo["lightLimit"]["min"]
+            maxLightLimit = plantInfo["lightLimit"]["max"]
 
             return minLightLimit, maxLightLimit
 

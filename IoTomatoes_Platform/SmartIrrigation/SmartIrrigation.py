@@ -186,20 +186,17 @@ class SmartIrrigation(BaseService):
             return None, None, None
 
         try:
-            r = requests.get(f"{mongoDB_url}/{plant}/soilMoistureLimit")
+            r = requests.get(f"{mongoDB_url}/plant",
+                             params={"PlantName": plant})
             r.raise_for_status()
-            soilMoistureLimit = r.json()
-
-            r = requests.get(f"{mongoDB_url}/{plant}/precipitationLimit")
-            r.raise_for_status()
-            precipitationLimit = r.json()
+            plantInfo = r.json()
         except:
             print("ERROR: MongoDB service not found!")
             return None, None, None
         else:
-            minSoilMoisture = soilMoistureLimit["min"]
-            maxSoilMoisture = soilMoistureLimit["max"]
-            precipitationLimit = precipitationLimit["max"]
+            minSoilMoisture = plantInfo["soilMoistureLimit"]["min"]
+            maxSoilMoisture = plantInfo["soilMoistureLimit"]["max"]
+            precipitationLimit = plantInfo["precipitationLimit"]["max"]
 
             return minSoilMoisture, maxSoilMoisture, precipitationLimit
 

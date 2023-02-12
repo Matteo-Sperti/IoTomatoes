@@ -13,6 +13,13 @@ from iotomatoes_supportpackage.ItemInfo import setREST
 
 class MongoConnection():
     def __init__(self, ResourceCatalog_url: str, MongoDB_url: str, PlantDatabaseFileName: str):
+        """Constructor of the MongoConnection class.
+
+        Arguments:
+        - `ResourceCatalog_url (str)`: Url of the ResourceCatalog service.
+        - `MongoDB_url (str)`: Url of the MongoDB service.
+        - `PlantDatabaseFileName (str)`: Name of the file containing the plant database.
+        """
         self.ResourceCatalog_url = ResourceCatalog_url
         self.MongoDB_url = MongoDB_url
         self.PlantDatabaseFileName = PlantDatabaseFileName
@@ -23,11 +30,12 @@ class MongoConnection():
             print("Error connecting to the database")
         else:
             self.checkNewCompany()
-            self.loadPlantDatabase(self.PlantDatabaseFileName)
+            self.loadPlantDatabase()
 
-    def loadPlantDatabase(self, FileName):
-        '''load the plant database in the MongoDB'''
-        PlantDatabase = json.load(open(FileName))
+    def loadPlantDatabase(self):
+        """Load the plant database in the MongoDB service."""
+
+        PlantDatabase = json.load(open(self.PlantDatabaseFileName, "r"))
 
         if "PlantDatabase" in self.client.list_database_names():
             db = self.client["PlantDatabase"]
@@ -43,11 +51,15 @@ class MongoConnection():
             collection.insert_one(dictionary)
         print("PlantDatabase loaded")
 
-    def insertDataBase(self, CompanyName):
-        '''create a new database (company)
-         Arguments:
-         CompanyName: unique name of the company'''
-        if CompanyName not in self.client.list_database_names():
+    def insertDataBase(self, CompanyName: str):
+        """Create a database for a company.
+
+        Arguments:
+        - `CompanyName (str)`: unique name of the company.
+        """
+        if CompanyName in self.client.list_database_names():
+            print("Database already exists")
+        else:
             try:
                 db = self.client[CompanyName]
                 collection = db["CompanyData"]
@@ -57,28 +69,30 @@ class MongoConnection():
                 print("Database created")
             except errors.InvalidName:
                 print("Error in creating the database")
-        else:
-            print("Database already exists")
 
-    def deleteDatabase(self, CompanyName):
-        '''delete a database (company)
-         Arguments:
-         CompanyName: unique name of the company'''
-        if CompanyName in self.client.list_database_names():
+    def deleteDatabase(self, CompanyName: str):
+        """Delete a database (company).
+
+        Arguments:
+        - `CompanyName (str)`: unique name of the company.
+        """
+        if CompanyName not in self.client.list_database_names():
+            raise web_exception(404, "Company not found")
+        else:
             try:
                 self.client.drop_database(CompanyName)
                 print("Database deleted")
             except errors.OperationFailure:
                 raise web_exception(500, "Error in deleting the database")
-        else:
-            raise web_exception(404, "Company not found")
 
-    def insertField(self, CompanyName, CollectionName, data):
-        '''create a collection for a field (dataset for a company)/update a collection\n
-                Arguments:
-                `CompanyName`: unique name of the company\n
-                `CollectionName`: unique name of the collection\n
-                `data`: data to be inserted in the collection\n'''
+    def insertField(self, CompanyName: str, CollectionName: str, data):
+        """Create/update a collection (a.k.a a field) in the database of a company.
+
+        Arguments:
+        - `CompanyName (str)`: unique name of the company.
+        - `CollectionName (str)`: unique name of the collection(a.k.a. field).
+        - `data (dict)`: data to be inserted in the collection.
+        """
         self.insertDataBase(CompanyName)
         db = self.client[CompanyName]
         collection = db[CollectionName]
@@ -86,13 +100,15 @@ class MongoConnection():
         collection.insert_one(data)
 
     def insertDeviceData(self, CompanyName, CollectionName, ID, measure, data):
-        '''insert data in a collection\n
-                Parameters:
-                `CompanyName`-- unique name of the company
-                `CollectionName`-- unique name of the collection(a.k.a. field)
-                `ID`-- ID of the device
-                `measure`-- measure to be inserted in the collection
-                `data`-- data to be inserted in the collection'''
+        """Insert data in a collection.
+
+        Arguments:
+        - `CompanyName (str)`: unique name of the company.
+        - `CollectionName (str)`: unique name of the collection(a.k.a. field).
+        - `ID (str)`: ID of the device.
+        - `measure (str)`: measure to be inserted in the collection.
+        - `data (dict)`: data to be inserted in the collection.
+        """
         data["_id"] = data.pop("bn")
         counter = 0
 
@@ -133,12 +149,14 @@ class MongoConnection():
             self.client[CompanyName][CollectionName].update_one(
                 {"_id": ID}, {"$set": data})
 
-    def insertTruckData(self, CompanyName, TruckID, data):
-        '''insert data in a collection\n
-                Parameters:
-                `CompanyName`-- unique name of the company
-                `CollectionName`-- unique name of the collection(a.k.a. TruckID)
-                `data`-- data to be inserted in the collection'''
+    def insertTruckData(self, CompanyName: str, TruckID: str, data):
+        """Insert data in a collection.
+
+        Arguments:
+        - `CompanyName (str)`: unique name of the company.
+        - `TruckID (str)`: ID of the truck.
+        - `data (dict)`: data to be inserted in the collection.
+        """
 
         db = self.client[CompanyName]
         data["_id"] = data.pop("bn")
@@ -174,10 +192,12 @@ class MongoConnection():
                     {"_id": TruckID}, {"$set": dict_})
 
     def notify(self, topic, payload):
-        '''get data on notification
-        Parameters: \n
-        `topic` -- string containing the topic of the new message\n
-        `payload` -- string containing the payload of the new message\n'''
+        """Notify the observer that a new data has arrived.
+
+        Arguments:
+        - `topic (str)`: topic of the message.
+        - `payload (str)`: payload of the message.
+        """
 
         listTopic = topic.split("/")
         try:
@@ -195,7 +215,7 @@ class MongoConnection():
             pass
 
     def checkNewCompany(self):
-        '''check if a new company is added by making a GET request to the Resource Catalog'''
+        """Check if a new company has been added to the ResourceCatalog or if a company has been deleted."""
         while True:
             try:
                 response = requests.get(
@@ -204,24 +224,26 @@ class MongoConnection():
                 res_dict = response.json()
             except:
                 print("Error in Database")
-                return None
-            for i in res_dict:
-                if i not in list(self.client.list_databases()):
-                    self.insertDataBase(i)
-            for j in self.client.list_database_names():
-
-                if j not in res_dict and (j != "PlantDatabase" and j != "admin" and j != "local"):
-                    print(j)
-                    self.deleteDatabase(j)
-            time.sleep(20)
+                time.sleep(1)
+            else:
+                for i in res_dict:
+                    if i not in list(self.client.list_databases()):
+                        self.insertDataBase(i)
+                for j in self.client.list_database_names():
+                    if j not in res_dict and (j != "PlantDatabase" and j != "admin" and j != "local"):
+                        print(j)
+                        self.deleteDatabase(j)
+                time.sleep(1)
 
     def time_period(self, list, start, end):
-        '''get the time period of a list of dates\n
-                Parameters:\n
-                `list`-- list to be analyzed\n
-                `start` -- start date\n
-                `end` -- end date \n
-                date must be in the format "YYYY-MM-DD '''
+        """Get the time period of a list of timestamps.
+
+        Arguments:
+        - `list (list)`: list of timestamps to be analyzed.
+        - `start (str)`: start date of the period.
+        - `end (str)`: end date of the period.
+        The date must be in the format "YYYY-MM-DD".
+        """
 
         for i in range(len(list)):
             if list[i] <= start:
@@ -236,19 +258,24 @@ class MongoConnection():
         else:
             return (0, 0)
 
-    def GetAvg(self, CompanyName, CollectionName, measure, start, end):
-        '''get the average of a measure\n
-                Parameters:\n
-                `CompanyName` -- unique name of the company\n
-           `CollectionName` -- unique name of the collection\n
-                `measure` -- measure to be calculated\n
-                `start` -- start date of the period\n
-                `end` -- end date of the period\n
-                date must be in the format "YYYY-MM-DD 
-                if the last value of the timestamp is put as start, the result will be empty'''
+    def GetAvg(self, CompanyName: str, CollectionName: str, measure: str, start: str, end: str):
+        """Get the average of a measure in a period of time.
 
-        if CompanyName in self.client.list_database_names():
-            if CollectionName in self.client[CompanyName].list_collection_names():
+        Arguments:
+        - `CompanyName (str)`: unique name of the company.
+        - `CollectionName (str)`: name of the collection.
+        - `measure (str)`: name of the measure.
+        - `start (str)`: start date of the period.
+        - `end (str)`: end date of the period.
+        The date must be in the format "YYYY-MM-DD".
+        """
+
+        if CompanyName not in self.client.list_database_names():
+            raise web_exception(404, "Company not found")
+        else:
+            if CollectionName not in self.client[CompanyName].list_collection_names():
+                raise web_exception(404, "Field not found")
+            else:
                 db = self.client[CompanyName]
                 collection = db[CollectionName]
                 dict = list(collection.find())
@@ -281,19 +308,20 @@ class MongoConnection():
                         "Time Period": [start, end]
                     }
                 return json.dumps(result)
-            else:
-                raise web_exception(404, "Field not found")
-        else:
-            raise web_exception(404, "Company not found")
 
-    def getAvgAll(self, CompanyName, measure, start, end):
-        '''get the average of a measure for all the fields of a company\n
-                Parameters:\n
-                `CompanyName` -- unique name of the company\n
-                `measure` -- measure to be calculated\n
-                `start` -- start date of the period\n
-                `end` -- end date of the period\n'''
-        if CompanyName in self.client.list_database_names():
+    def getAvgAll(self, CompanyName: str, measure: str, start: str, end: str):
+        """Get the average of a measure in a period of time for all the fields of a company.
+
+        Arguments:
+        - `CompanyName (str)`: unique name of the company.
+        - `measure (str)`: name of the measure.
+        - `start (str)`: start date of the period.
+        - `end (str)`: end date of the period.
+        The date must be in the format "YYYY-MM-DD".
+        """
+        if CompanyName not in self.client.list_database_names():
+            raise web_exception(404, "Company not found")
+        else:
             db = self.client[CompanyName]
             lst = []
             unit = "No unit"
@@ -310,21 +338,24 @@ class MongoConnection():
             resultDict = {"Company": CompanyName, "Measure": measure, "Average": sum(
                 lst)/len(lst), "Unit": unit, "Timeperiod": [start, end]}
             return json.dumps(resultDict)
-        else:
-            raise web_exception(404, "No company found")
 
     def getMeasureGraphData(self, CompanyName, CollectionName, measure, start, end):
-        '''get the data needed for a graph a field of a company\n
-        Parameters:\n
-        `CompanyName` -- unique name of the company\n
-        `collectionName` -- field of the company\n
-        `measure` -- measure /actuator to plot\n
-        `start` -- start date of the period\n
-        `end` -- end date of the period\n
-        '''
+        """Get the data of a measure for a graph.
 
-        if CompanyName in self.client.list_database_names():
-            if CollectionName in self.client[CompanyName].list_collection_names():
+        Arguments:
+        - `CompanyName (str)`: unique name of the company.
+        - `CollectionName (str)`: name of the field.
+        - `measure (str)`: name of the measure.
+        - `start (str)`: start date of the period.
+        - `end (str)`: end date of the period.
+        The date must be in the format "YYYY-MM-DD".
+        """
+        if CompanyName not in self.client.list_database_names():
+            raise web_exception(404, "Company not found")
+        else:
+            if CollectionName not in self.client[CompanyName].list_collection_names():
+                raise web_exception(404, "Field not found")
+            else:
                 db = self.client[CompanyName]
                 collection = db[CollectionName]
                 dict_ = list(collection.find())
@@ -347,16 +378,14 @@ class MongoConnection():
                     resultDict[dict_[i]["_id"]] = {
                         "values": lst, "timestamps": timestamps, "unit": unit}
                 return json.dumps(resultDict)
-            else:
-                raise web_exception(404, "Field not found")
-        else:
-            raise web_exception(404, "Company not found")
 
     def insertConsumptionData(self, CompanyName, data):
-        '''insert data coming from the consumption service\n
-        Parameters:\n
-        `companyName`-- unique name of the company\n
-        `data`-- JSON coming from the consumption service\n'''
+        """Insert the consumption data in the database.
+
+        Arguments:
+        - `CompanyName (str)`: unique name of the company.
+        - `data (dict)`: dictionary containing the data to insert.
+        """
         db = self.client[CompanyName]
         data["_id"] = data.pop("bn")
         ID = data["_id"]
@@ -402,13 +431,16 @@ class MongoConnection():
             collection.update_one({"_id": ID}, {"$set": dict[ID]})
 
     def getConsumptionData(self, CompanyName, start, end):
-        '''get the consumption data of a field of a company\n
-        Parameters:\n
-        `CompanyName`-- unique name of the company\n
-        `CollectionName`-- field of the company\n
-        `start`-- start date of the period\n
-        `end`-- end date of the period\n'''
-        if CompanyName in self.client.list_database_names():
+        """Get the consumption data of a company
+
+        Arguments:
+        - `CompanyName (str)`: unique name of the company
+        - `start (str)`: start date of the period
+        - `end (str)`: end date of the period
+        """
+        if CompanyName not in self.client.list_database_names():
+            raise web_exception(404, "Company not found")
+        else:
             for CollectionName in self.client[CompanyName].list_collection_names():
                 if "Field" in CollectionName:
                     db = self.client[CompanyName]
@@ -437,13 +469,13 @@ class MongoConnection():
                     if resultDict == {}:
                         raise web_exception(404, "No consumption data found")
                     return json.dumps(resultDict)
-        else:
-            raise web_exception(404, "No company found")
 
-    def getPlant(self, PlantName):
-        '''get the plant informations\n
-        Parameters:\n
-        `PlantName`-- unique name of the plant\n'''
+    def getPlant(self, PlantName: str):
+        """Get the plant informations
+
+        Arguments:
+        - `PlantName (str)`: name of the plant
+        """
         db = self.client["PlantDatabase"]
         collection = db["PlantData"]
         dict = list(collection.find())
@@ -452,10 +484,13 @@ class MongoConnection():
                 return json.dumps(i)
         raise web_exception(404, "Plant not found")
 
-    def getTruckTrace(self, CompanyName, TruckID):
-        '''get the truck trace informations\n
-        Parameters:\n
-        `TruckID`-- unique ID of the truck\n'''
+    def getTruckTrace(self, CompanyName: str, TruckID):
+        """Get the truck trace informations
+
+        Arguments:
+        - `CompanyName (str)`: name of the company
+        - `TruckID (str)`: id of the truck
+        """
 
         dict_ = self.client[CompanyName]["TruckData"].find_one(
             {"TruckID": TruckID})
@@ -466,8 +501,12 @@ class MongoConnection():
         else:
             raise web_exception(404, "Truck not found")
 
-    def getTruckPosition(self, CompanyName):
-        '''get the truck trace informations\n'''
+    def getTruckPosition(self, CompanyName: str):
+        """Get the truck position informations
+
+        Arguments:
+        - `CompanyName (str)`: name of the company
+        """
         dict_ = self.client[CompanyName]["Trucks"].find()
         returnDict = {}
         for i in dict_:
@@ -480,40 +519,47 @@ class RESTConnector(BaseService):
     exposed = True
 
     def __init__(self, settings: dict):
-
+        """Constructor of the RESTConnector class"""
         super().__init__(settings)
         self.mongo = MongoConnection(
             self.ResourceCatalog_url, settings["MongoDB_Url"], settings["PlantDatabaseName"])
 
     def GET(self, *uri, **params):
-        """GET method for the REST API\n
-        Returns a JSON with the requested information\n
-        Allowed URI:\n
-        `/Avg`: returns the average of the measures requested.\n 
-        The parameters are "CompanyName", "Field" and "measure", "starting date", "end date"\n
-        if `params["Field"]` == "all" returns the average of all field of corresponding company\n
-        `/plant`: returns the plant informations\n
-        The parameter is "PlantName"\n"""
+        """GET method for the REST API
+
+        Allowed URI:
+        - `/<CompanyName>/avg` : get the average of a field of a company.
+        The parameters are: `Field`, `measure`, `start_date`, `end_date`. 
+        If `Field` is `all`, the average of all the fields is returned.
+        - `/<CompanyName>/truckTrace` : get the trace of a truck.
+        The parameter is: `TruckID`.
+        - `/<CompanyName>/truckPosition` : get the position of all the trucks.
+        - `/<CompanyName>/graph` : get the graph data of a field of a company.
+        The parameters are: `Field`, `measure`, `start_date`, `end_date`.
+        - `/<CompanyName>/consumption` : get the consumption data of a company.
+        The parameters are: `start_date`, `end_date`.
+        - '/plant' : get the plant informations. The parameter is: `PlantName`.
+        """
 
         try:
-            if len(uri) > 0:
-                if len(uri) == 1 and uri[0] == "avg" and params["Field"] != "all":
-                    return self.mongo.GetAvg(params["CompanyName"], params["Field"], params["measure"], params["start_date"], params["end_date"])
-                elif len(uri) == 1 and uri[0] == "avg" and params["Field"] == "all":
-                    return self.mongo.getAvgAll(params["CompanyName"], params["measure"], params["start_date"], params["end_date"])
-                elif len(uri) == 1 and uri[0] == "plant":
-                    return self.mongo.getPlant(params["PlantName"])
-                elif len(uri) == 1 and uri[0] == "truckTrace":
-                    return self.mongo.getTruckTrace(params["CompanyName"], params["TruckID"])
-                elif len(uri) == 1 and uri[0] == "truckPosition":
-                    return self.mongo.getTruckPosition(params["CompanyName"])
-                elif len(uri) == 1 and uri[0] == "graph":
-                    return self.mongo.getMeasureGraphData(params["CompanyName"], params["Field"], params["measure"], params["start_date"], params["end_date"])
-                elif len(uri) == 1 and uri[0] == "consumption":
-                    return self.mongo.getConsumptionData(params["CompanyName"], params["start_date"], params["end_date"])
-
-                else:
-                    raise web_exception(404, "Resource not found.")
+            if len(uri) == 2 and uri[1] == "avg" and params["Field"] != "all":
+                return self.mongo.GetAvg(uri[0], params["Field"], params["measure"],
+                                         params["start_date"], params["end_date"])
+            elif len(uri) == 2 and uri[1] == "avg" and params["Field"] == "all":
+                return self.mongo.getAvgAll(uri[0], params["measure"], params["start_date"], params["end_date"])
+            elif len(uri) == 2 and uri[1] == "truckTrace":
+                return self.mongo.getTruckTrace(uri[0], params["TruckID"])
+            elif len(uri) == 2 and uri[1] == "truckPosition":
+                return self.mongo.getTruckPosition(uri[0])
+            elif len(uri) == 2 and uri[1] == "graph":
+                return self.mongo.getMeasureGraphData(uri[0], params["Field"], params["measure"],
+                                                      params["start_date"], params["end_date"])
+            elif len(uri) == 2 and uri[1] == "consumption":
+                return self.mongo.getConsumptionData(uri[0], params["start_date"], params["end_date"])
+            elif len(uri) == 1 and uri[0] == "plant":
+                return self.mongo.getPlant(params["PlantName"])
+            else:
+                raise web_exception(404, "Resource not found.")
         except web_exception as e:
             raise cherrypy.HTTPError(e.code, e.message)
         except:

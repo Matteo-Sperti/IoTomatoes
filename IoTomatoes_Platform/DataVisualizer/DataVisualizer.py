@@ -38,13 +38,13 @@ class DataVisualizer():
         lst = []
         try:
             params = {
-                "CompanyName": CompanyName,
                 "CollectionName": CollectionName,
                 "measure": measure,
                 "start_date": start,
                 "end_date": end
             }
-            response = requests.get(self.MongoDB_url+"/graph", params=params)
+            response = requests.get(
+                f"{self.MongoDB_url}/{CompanyName}/graph", params=params)
             response.raise_for_status()
             dataDict = response.json()
         except:
@@ -59,7 +59,6 @@ class DataVisualizer():
             for i in range(len(timestamps)):
                 try:
                     params = {
-                        "CompanyName": CompanyName,
                         "CollectionName": CollectionName,
                         "measure": measure,
                         "start_date": start,
@@ -67,7 +66,7 @@ class DataVisualizer():
                         "timestamp": timestamps[i]
                     }
                     response = requests.get(
-                        self.MongoDB_url+"/average", params=params)
+                        f"{self.MongoDB_url}/{CompanyName}/avg", params=params)
                     response.raise_for_status()
                     avg = response.json()
                 except:
@@ -87,7 +86,9 @@ class DataVisualizer():
             plt.savefig(fileName)
             with open(fileName, "rb") as image2string:
                 converted_string = base64.b64encode(image2string.read())
-            return (converted_string)
+           
+            out = {"img64": converted_string}
+            return json.dumps(out)
         else:
             raise web_exception(404, "Not enough data to plot the graph")
 
@@ -102,10 +103,9 @@ class DataVisualizer():
         """
         fileName = "graphConsumption.png"
         try:
-            params = {"CompanyName": CompanyName,
-                      "start_date": start, "end_date": end}
-            response = requests.get(
-                self.MongoDB_url+"/consumption", params=params)
+            params = {"start_date": start, "end_date": end}
+            response = requests.get(f"{self.MongoDB_url}/{CompanyName}/consumption",
+                                    params=params)
             response.raise_for_status()
             dict_ = response.json()
         except:
@@ -155,10 +155,10 @@ class WebService(BaseService):
         """GET method for the REST API
 
         Allowed URI:
-        - `<CompanyName>/measure`: returns the graph of the measures requested.
+        - `/<CompanyName>/measure`: returns the graph of the measures requested.
         The parameters are "Field" and "measure", "starting date", "end date".
         if `params["Field"]` == "all" returns the average of all field of corresponding company.
-        - `<CompanyName>/consumption`: returns the graph of the consumption of the fields of the 
+        - `/<CompanyName>/consumption`: returns the graph of the consumption of the fields of the 
         company requested. The parameters are "starting date", "end date".
         """
         try:

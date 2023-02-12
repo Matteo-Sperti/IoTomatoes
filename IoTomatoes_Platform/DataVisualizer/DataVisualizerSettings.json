@@ -1,4 +1,6 @@
 {
     "ServiceCatalog_url": "http://service_catalog:8080",
-    "serviceName": "data_visualizer"
+    "serviceName": "data_visualizer",
+    "PointsPerGraph": 7,
+    "MongoDB_ServiceName" : "mongodb_connector"
 }

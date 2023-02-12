@@ -56,6 +56,14 @@ class InsertNewCompany():
             return False
         
         elif self._status == 1:
+            if " " in message:
+                self._bot.sendMessage("Invalid Company Name, please do not use spaces")
+                self._bot.sendMessage("Insert your Company Name")
+                return False
+            if message == "admin" or message == "company":
+                self._bot.sendMessage("Invalid Company Name, please do not use 'admin' or 'local' as Company Name")
+                self._bot.sendMessage("Insert your Company Name")
+                return False
             self.response["CompanyName"] = message
             self._bot.sendMessage("Insert your Name")
             self._status += 1

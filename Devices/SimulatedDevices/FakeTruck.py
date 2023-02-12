@@ -1,5 +1,6 @@
 import json
 import time
+import signal
 
 from iotomatoes_supportpackage.GPSgenerator import GPSgenerator
 from iotomatoes_supportpackage.IoTDevice import IoTDevice
@@ -11,14 +12,20 @@ class SimTruck(IoTDevice):
         and it subscribes to the topics specified in the ResourceCatalog.
         Finally it starts the simulator of the ambient conditions."""
 
-        self.tractor = GPSgenerator()
-        self.tractor.shape(64)
         super().__init__(DeviceInfo, sensor = self)
+        self.tractor = GPSgenerator(self.platform_url, self.CompanyName)
 
     def get_position(self):
         """This function is used to get the temperature reading from the AmbientSimulator."""
 
         return self.tractor.get_position()
+
+def sigterm_handler(signal, frame):
+    IoTSensor.close()
+    IoTSensor.tractor.TruckStop()
+    print("Truck stopped")
+
+signal.signal(signal.SIGTERM, sigterm_handler)
 
 if __name__ == "__main__":
     try:
@@ -27,8 +34,5 @@ if __name__ == "__main__":
     except Exception as e:
         print(e)
     else:
-        try:
-            while True:
-                time.sleep(10)
-        except KeyboardInterrupt or SystemExit:
-                IoTSensor.close()
+        while True:
+            time.sleep(10)

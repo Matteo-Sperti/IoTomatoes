@@ -1,19 +1,12 @@
 {
+    "serviceName": "localization",
     "ServiceCatalog_url" : "http://service_catalog:8080",
     "create_url": "http://api.openstreetmap.org/api/0.6/gpx/create",
     "view_url": "http://api.openstreetmap.org/api/0.6/trace",
-    "serviceName": "localization",
     "password": "SW9Ub21hdG9lczpJb1RvbWF0b2Vz",
-    "availableServices": [
-        "MQTT",
-        "REST"
-    ],
-    "servicesDetails": [
-        {
-            "serviceType": "MQTT",
-            "subscribedTopics": [
+    "MongoDB_ServiceName" : "mongodb_connector",
 
-            ]
-        }
+    "availableServices": [
+        "REST"
     ]
 }

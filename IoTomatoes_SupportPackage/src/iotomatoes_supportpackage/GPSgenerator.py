@@ -1,54 +1,56 @@
 import random
 import json
-import math
+import requests
 
 class GPSgenerator():
-    def __init__(self):
-        settings = json.load(open('TruckSettings.json'))
+    def __init__(self, platformUlr : str, CompanyName : str, 
+                    fileName : str = "TruckSettings.json"):
+        self.fileName = fileName
+        settings = json.load(open(self.fileName, 'r'))
         self.lat = settings["Location"]["latitude"]
         self.lon = settings["Location"]["longitude"]
-        self.trace = {"latitude":[],"longitude":[]}
+        self.isFirstTime(platformUlr, CompanyName)
 
-    def isFirstTime(self):
-        if self.lat == 0 and self.lon == 0:
-            # ask catalog for company location center and set it as start location
-            # next time the truck will start from there
-            pass
+    def isFirstTime(self, ResourceCatalog_url, Company_name):
+        if self.lat == -1 and self.lon == -1:
+            LocationDict = self.getCompanyLocation(ResourceCatalog_url, Company_name)
+            if LocationDict is None:
+                print("ERROR: Company location not found!")
+                return
+            else:
+                self.lat = LocationDict["latitude"]
+                self.lon = LocationDict["longitude"]
+                self.savePosition()
+
+    def getCompanyLocation(self, ResourceCatalog_url : str, CompanyName : str):
+        try:
+            res = requests.get(ResourceCatalog_url + "/" + CompanyName + "/location")
+            res.raise_for_status()
+            res_dict = res.json()
+        except Exception as e:
+            print(e)
+            return None
+        else:
+            if "latitude" not in res_dict or "longitude" not in res_dict:
+                print("ERROR: Company location not found!")
+                return None
+            return res_dict
 
     def randomPath(self):
-        #generate random path and publish it
-
         max_deviation = 0.01 # 1.1 meter
         
         self.lat = self.lat + random.uniform(-max_deviation, max_deviation)
         self.lon = self.lon + random.uniform(-max_deviation, max_deviation)
-        self.trace["latitude"].append(self.lat)
-        self.trace["longitude"].append(self.lon)
-        print(self.trace)
-        #self.myPublish(self.topic,json.dumps(dict))
-        
-    def shape(self,num_points):
-        for i in range(num_points):
-            freq = math.pi/32*i
-            self.lat = 16*math.sin(freq)**3
-            self.lon = 13*math.cos(freq) - 5*math.cos(2*freq) - 2*math.cos(3*freq) - math.cos(4*freq)
-            self.trace["latitude"].append(self.lat)
-            self.trace["longitude"].append(self.lon)
-            
+              
     def TruckStop(self):
-        #publish stop message
-        dict = json.load(open('TruckSettings.json'))
-        dict["Location"]["latitude"]=self.lat
+        self.savePosition()
+
+    def savePosition(self):
+        dict = json.load(open(self.fileName))
+        dict["Location"]["latitude"] = self.lat
         dict["Location"]["longitude"] = self.lon
-        
-        json.dump(dict,open('TruckSettings.json',"w"))
-        
-        json.dump(self.trace,open('trace.json',"w"))
+        json.dump(dict,open(self.fileName,"w"))
 
     def get_position(self):
-        return self.lat,self.lon
-        
-
-
-        
-        
+        self.randomPath()        
+        return {"latitude":self.lat,"longitude":self.lon}

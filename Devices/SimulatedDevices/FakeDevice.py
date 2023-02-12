@@ -1,7 +1,7 @@
 import json
 import time
-import sys
-sys.path.append("../../IoTomatoes_SupportPackage/src/")
+import signal
+
 from iotomatoes_supportpackage.AmbientSimulator import AmbientSimulator
 from iotomatoes_supportpackage.IoTDevice import IoTDevice
 
@@ -44,6 +44,12 @@ class SimDevice(IoTDevice):
         
         return self._Ambient.get_soilMoisture()
 
+def sigterm_handler(signal, frame):
+    IoTSensor.close()
+    print("Device stopped")
+
+signal.signal(signal.SIGTERM, sigterm_handler)
+
 if __name__ == "__main__":
     try:
         settings = json.load(open("DeviceSettings.json"))
@@ -51,8 +57,5 @@ if __name__ == "__main__":
     except Exception as e:
         print(e)
     else:
-        try:
-            while True:
-                time.sleep(10)
-        except KeyboardInterrupt or SystemExit:
-                IoTSensor.close()
+        while True:
+            time.sleep(10)

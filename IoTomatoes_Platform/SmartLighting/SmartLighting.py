@@ -103,7 +103,7 @@ class SmartLighting(BaseService):
                         
                         else:
                             print("light set to OFF")
-                            command = 1
+                            command = 0
 
                         self.sendCommand(CompanyName, fieldID, actuatorTopicsForField, command)
 

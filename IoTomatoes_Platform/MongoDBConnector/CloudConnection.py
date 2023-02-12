@@ -29,8 +29,8 @@ class MongoConnection():
         except errors.AutoReconnect:
             print("Error connecting to the database")
         else:
-            self.checkNewCompany()
             self.loadPlantDatabase()
+            self.checkNewCompany()
 
     def loadPlantDatabase(self):
         """Load the plant database in the MongoDB service."""
@@ -224,7 +224,7 @@ class MongoConnection():
                 res_dict = response.json()
             except:
                 print("Error in Database")
-                time.sleep(1)
+                time.sleep(5)
             else:
                 for i in res_dict:
                     if i not in list(self.client.list_databases()):
@@ -233,7 +233,7 @@ class MongoConnection():
                     if j not in res_dict and (j != "PlantDatabase" and j != "admin" and j != "local"):
                         print(j)
                         self.deleteDatabase(j)
-                time.sleep(1)
+                time.sleep(30)
 
     def time_period(self, list, start, end):
         """Get the time period of a list of timestamps.
@@ -567,6 +567,7 @@ class RESTConnector(BaseService):
 
 
 def sigterm_handler(signal, frame):
+    WebService.mongo.client.close()
     WebService.stop()
     cherrypy.engine.stop()
     cherrypy.engine.exit()

@@ -1,10 +1,11 @@
 import threading
 import time
 
+
 class MyThread(threading.Thread):
-    def __init__(self, target, interval = 1, *args, **kwargs):
+    def __init__(self, target, interval: int = 1, *args, **kwargs):
         """MyThread class. Run a function in a daemon thread every interval seconds.
-        
+
         - `target (function)`: function to be executed in the thread,
         - `args (tuple)`: arguments for the function
         - `interval (int)`: interval in seconds between executions"""
@@ -30,12 +31,12 @@ class MyThread(threading.Thread):
 
     def run(self):
         """Run the thread."""
-        
+
         while not self.is_stopped():
             self.target(*self.args, **self.kwargs)
             time.sleep(self.interval)
 
-        
+
 class SimpleThread(threading.Thread):
     def start(self):
         super(SimpleThread, self).start()

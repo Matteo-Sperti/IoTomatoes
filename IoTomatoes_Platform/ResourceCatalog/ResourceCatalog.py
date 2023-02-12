@@ -15,11 +15,12 @@ devicesList_name = "devicesList"
 usersList_name = "usersList"
 fieldsList_name = "fieldsList"
 
+
 class ResourceCatalogManager():
-    def __init__(self, heading : dict, filename = "CompanyCatalog.json", autoDeleteTime = 120, 
-                    IDs = IDs(100)):
+    def __init__(self, heading: dict, filename="CompanyCatalog.json", autoDeleteTime: int = 120,
+                 IDs=IDs(100)):
         """Initialize the catalog manager.
-    
+
         Arguments: 
         - `heading (dict)`: the heading of the catalog. 
         - `filename (str)`: the name of the file where the catalog is saved. 
@@ -29,11 +30,12 @@ class ResourceCatalogManager():
         self.catalog = heading.copy()
         self.catalog["lastUpdate"] = time.time()
         self.catalog[companyList_name] = []
-        
+
         self._filename = filename
         self._IDs = IDs
         self._autoDeleteTime = autoDeleteTime
-        self._autoDeleteItemsThread = MyThread(self.autoDeleteItems, interval=self._autoDeleteTime)
+        self._autoDeleteItemsThread = MyThread(
+            self.autoDeleteItems, interval=self._autoDeleteTime)
 
     def save(self):
         """Save the catalog to the file specified in the initialization."""
@@ -52,12 +54,12 @@ class ResourceCatalogManager():
 
     # def isAuthorize(self, company : dict, credentials : dict):
     #     """Check if the credentials are correct for the company.
-        
-    #     Arguments: 
-    #     `company` -- the company to check. 
-    #     `credentials` -- the credentials to access the `company`. 
-        
-    #     Return: 
+
+    #     Arguments:
+    #     `company` -- the company to check.
+    #     `credentials` -- the credentials to access the `company`.
+
+    #     Return:
     #     `True` if the credentials are correct, `False` if the credential are for different company.
     #     Raise an exception is the `CompanyToken` is not correct.
     #     """
@@ -75,10 +77,10 @@ class ResourceCatalogManager():
     #             return False
     #     else:
     #         return False
-    
-    def findCompany(self, CompanyName : str):
+
+    def findCompany(self, CompanyName: str):
         """Return the pointer to the company specified in `CompanyInfo`.
-        
+
         Arguments: 
         - `CompanyName (str)`: the name of the company to find.
         """
@@ -88,7 +90,7 @@ class ResourceCatalogManager():
                 return company
         return None
 
-    def find_list(self, CompanyName : str, IDvalue : int):
+    def find_list(self, CompanyName: str, IDvalue: int):
         """Return the list where the item with the ID `IDvalue` is present.
 
         Arguments:  
@@ -104,7 +106,7 @@ class ResourceCatalogManager():
                         return company[key]
         return None
 
-    def find_item(self, CompanyName : str, IDvalue : int) :
+    def find_item(self, CompanyName: str, IDvalue: int):
         """Return the item with the ID `IDvalue`.
 
         Arguments: 
@@ -119,7 +121,7 @@ class ResourceCatalogManager():
                     if item["ID"] == IDvalue:
                         return item
         return None
-    
+
     def getAll(self):
         """Return a json with the list of all the companies in the catalog."""
 
@@ -130,7 +132,7 @@ class ResourceCatalogManager():
 
         return json.dumps([company["CompanyName"] for company in self.catalog[companyList_name]], indent=4)
 
-    def getList(self, CompanyName : str, listName : str):
+    def getList(self, CompanyName: str, listName: str):
         """Return the list of items of the company specified in `CompanyInfo` in json format.
 
         Arguments:  
@@ -143,7 +145,7 @@ class ResourceCatalogManager():
             return json.dumps(company[listName], indent=4)
         raise web_exception(404, "Company not found")
 
-    def getTopics(self, CompanyName : str, params : dict):
+    def getTopics(self, CompanyName: str, params: dict):
         """Return the list of topics of the company `CompanyName` in json format.
 
         Arguments:  
@@ -161,7 +163,7 @@ class ResourceCatalogManager():
                         outlist.append(publishedTopics(item))
             return json.dumps(outlist, indent=4)
 
-    def getLocation(self, CompanyName : str):
+    def getLocation(self, CompanyName: str):
         """Return the location of the company `CompanyName` in json format."""
 
         item = self.findCompany(CompanyName)
@@ -176,7 +178,7 @@ class ResourceCatalogManager():
         Arguments:  
         - `telegramID (str)`: the telegramID to find.
         """
-        
+
         out = {"CompanyName": ""}
         if "telegramID" not in params:
             raise web_exception(400, "Missing telegramID")
@@ -189,7 +191,7 @@ class ResourceCatalogManager():
                 out["CompanyName"] = ""
                 return json.dumps(out, indent=4)
 
-    def findUserByTelegramID(self, telegramID : str):
+    def findUserByTelegramID(self, telegramID: str):
         """Return the name of the company if the `telegramID` is registered,
             otherwise return `None`.
 
@@ -225,7 +227,8 @@ class ResourceCatalogManager():
             AdminInfo = kwargs["AdminInfo"]
             Fieldlist = kwargs["fieldsList"]
         except:
-            raise web_exception(400, "Missing CompanyInfo, AdminInfo or fieldsList")
+            raise web_exception(
+                400, "Missing CompanyInfo, AdminInfo or fieldsList")
 
         out = {}
         if self.findCompany(CompanyInfo) != None:
@@ -243,7 +246,7 @@ class ResourceCatalogManager():
                         "CompanyName": CompanyInfo["CompanyName"],
                         "CompanyToken": str(CompanyInfo["CompanyToken"]),
                         "Location": CompanyInfo["Location"],
-                        "NumberOfFields" : int(CompanyInfo["NumberOfFields"]),
+                        "NumberOfFields": int(CompanyInfo["NumberOfFields"]),
                         "adminID": AdminID,
                         usersList_name: [],
                         devicesList_name: [],
@@ -251,18 +254,18 @@ class ResourceCatalogManager():
                     }
                     new_item = AdminInfo
                     new_item["ID"] = AdminID
-                    new_item["lastUpdate"] =  time.time()
+                    new_item["lastUpdate"] = time.time()
                     NewCompany[usersList_name].append(new_item)
                     self.catalog[companyList_name].append(NewCompany)
-                    self.catalog["lastUpdate"] =  time.time() 
-                    out = {"Status": True, 
-                            "CompanyID": ID, 
-                            "CompanyToken": CompanyInfo["CompanyToken"]
-                            }
-        
+                    self.catalog["lastUpdate"] = time.time()
+                    out = {"Status": True,
+                           "CompanyID": ID,
+                           "CompanyToken": CompanyInfo["CompanyToken"]
+                           }
+
         return json.dumps(out, indent=4)
 
-    def insertDevice(self, CompanyName : str, deviceInfo : dict):
+    def insertDevice(self, CompanyName: str, deviceInfo: dict):
         """Insert a new device in the catalog.
 
         Arguments: 
@@ -277,19 +280,19 @@ class ResourceCatalogManager():
             if ID == -1:
                 raise web_exception(500, "No more IDs available")
             else:
-                self.catalog["lastUpdate"] =  time.time() 
+                self.catalog["lastUpdate"] = time.time()
                 try:
                     new_item = constructResource(ID, CompanyName, deviceInfo)
                 except InfoException as e:
                     raise web_exception(500, e.message)
 
-                if not (new_item["fieldNumber"] >= 0 
+                if not (new_item["fieldNumber"] >= 0
                         and new_item["fieldNumber"] <= company["NumberOfFields"]):
                     raise web_exception(400, "Field number not valid")
                 company[devicesList_name].append(new_item)
                 return json.dumps(new_item, indent=4)
 
-    def insertUser(self, CompanyName : str, userInfo : dict):
+    def insertUser(self, CompanyName: str, userInfo: dict):
         """Insert a new user in the catalog.
 
         Arguments: 
@@ -308,21 +311,21 @@ class ResourceCatalogManager():
         else:
             NewCompanyName = self.findUserByTelegramID(userInfo["telegramID"])
             if NewCompanyName != None:
-                raise web_exception(403, f"User already registered in {NewCompanyName}")
+                raise web_exception(
+                    403, f"User already registered in {NewCompanyName}")
 
         ID = self._IDs.get_ID()
         if ID == -1:
             raise web_exception(500, "No more IDs available")
         else:
-            self.catalog["lastUpdate"] =  time.time() 
+            self.catalog["lastUpdate"] = time.time()
             new_item = userInfo
             new_item["ID"] = ID
-            new_item["lastUpdate"] =  time.time()
+            new_item["lastUpdate"] = time.time()
             company[usersList_name].append(new_item)
             return json.dumps(new_item, indent=4)
 
-
-    def updateField(self, CompanyName : str, params : dict) : 
+    def updateField(self, CompanyName: str, params: dict):
         """Update a field in the catalog.
 
         Arguments: 
@@ -335,10 +338,10 @@ class ResourceCatalogManager():
         company = self.findCompany(CompanyName)
         if company == None:
             raise web_exception(404, "No Company found")
-        
+
         if "fieldNumber" not in params or "plant" not in params:
             raise web_exception(400, "Missing fieldNumber or plant")
-        
+
         try:
             fieldNumber = int(params["fieldNumber"])
         except ValueError:
@@ -352,7 +355,7 @@ class ResourceCatalogManager():
 
         raise web_exception(404, "Field not found")
 
-    def deleteCompany(self, dict_info : dict):
+    def deleteCompany(self, dict_info: dict):
         """Delete a company from the catalog. """
 
         if "CompanyName" not in dict_info or "CompanyToken" not in dict_info:
@@ -387,11 +390,12 @@ class ResourceCatalogManager():
                     out = {"Status": True}
                     return json.dumps(out, indent=4)
                 else:
-                    raise web_exception(403, "You are not the admin of this company")
-        
+                    raise web_exception(
+                        403, "You are not the admin of this company")
+
         raise web_exception(403, "You are not a user of this company")
 
-    def refreshItem(self, CompanyName : str, IDvalue : int):
+    def refreshItem(self, CompanyName: str, IDvalue: int):
         """Refresh the lastUpdate field of a device.
         Return a json with the status of the operation.
 
@@ -427,10 +431,11 @@ class ResourceCatalogManager():
         self.catalog["lastUpdate"] = actualtime
         self.save()
 
+
 class RESTResourceCatalog(BaseService):
     exposed = True
 
-    def __init__(self, settings : dict): 
+    def __init__(self, settings: dict):
         """Initialize the REST endpoint.
 
         Arguments:
@@ -439,7 +444,8 @@ class RESTResourceCatalog(BaseService):
         filename = settings["filename"]
         autoDeleteTime = settings["autoDeleteTime"]
         super().__init__(settings)
-        self.catalog = ResourceCatalogManager(self.EndpointInfo, filename, autoDeleteTime)
+        self.catalog = ResourceCatalogManager(
+            self.EndpointInfo, filename, autoDeleteTime)
 
     def close(self):
         """Close the endpoint and save the catalog."""
@@ -451,7 +457,7 @@ class RESTResourceCatalog(BaseService):
     def GET(self, *uri, **params):
         """GET method for the REST API.
         Return a json with the requested information.
-        
+
         Allowed URLs:
         - `/companies` : return the list of all the companies.
         - `/companies/names` : return the list of the names of all the companies.
@@ -463,7 +469,7 @@ class RESTResourceCatalog(BaseService):
         is already registered in a company, an empty string otherwise.
         - `/<CompanyName>/topics` : return the list of all the topics of the company. In the 
         parameters you can specify the fieldNumber to get the topics of a specific field.
-        
+
         """
         try:
             if len(uri) == 1 and uri[0] == "isRegistered":
@@ -471,7 +477,7 @@ class RESTResourceCatalog(BaseService):
             elif len(uri) == 1 and uri[0] == "companies":
                 return self.catalog.getAll()
             if len(uri) == 2 and uri[0] == "companies" and uri[1] == "names":
-                return self.catalog.getCompanyNameList()    
+                return self.catalog.getCompanyNameList()
             elif len(uri) == 2 and uri[1] == "devices":
                 return self.catalog.getList(uri[0], devicesList_name)
             elif len(uri) == 2 and uri[1] == "users":
@@ -492,7 +498,7 @@ class RESTResourceCatalog(BaseService):
     def POST(self, *uri, **params):
         """POST method for the REST API.
         Return a json with the status of the operation.
-        
+
         Allowed URLs:
         - `/company`: insert a new company in the catalog. 
         The body must contain the company information and the Administrator information.
@@ -508,7 +514,7 @@ class RESTResourceCatalog(BaseService):
             elif len(uri) == 2:
                 body_dict = json.loads(cherrypy.request.body.read())
                 if uri[1] == "user":
-                        return self.catalog.insertUser(uri[0], body_dict)
+                    return self.catalog.insertUser(uri[0], body_dict)
                 elif uri[1] == "device":
                     return self.catalog.insertDevice(uri[0], body_dict)
             raise web_exception(404, "Resource not found.")
@@ -516,7 +522,7 @@ class RESTResourceCatalog(BaseService):
             raise cherrypy.HTTPError(e.code, e.message)
         except:
             raise cherrypy.HTTPError(500, "Internal Server Error.")
-    
+
     def PUT(self, *uri, **params):
         """PUT method for the REST API.
 
@@ -556,11 +562,13 @@ class RESTResourceCatalog(BaseService):
 
         raise cherrypy.HTTPError(400, "Unrecognized command.")
 
+
 def sigterm_handler(signal, frame):
     Catalog.close()
     cherrypy.engine.stop()
     cherrypy.engine.exit()
     print("Server stopped")
+
 
 signal.signal(signal.SIGTERM, sigterm_handler)
 
@@ -573,7 +581,7 @@ if __name__ == "__main__":
         Catalog = RESTResourceCatalog(settings)
     except:
         print("Error while creating the catalog")
-    else:        
+    else:
         conf = {
             '/': {
                 'request.dispatch': cherrypy.dispatch.MethodDispatcher(),

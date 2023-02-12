@@ -4,6 +4,7 @@ from .MyThread import MyThread
 
 noiseAmplitude = 1
 
+
 class AmbientSimulator():
     def __init__(self):
         """Simulates the ambient. Initialize the values of the sensors 
@@ -60,16 +61,16 @@ class AmbientSimulator():
 
     def get_light(self):
         return self._light + self.noiseValue()
-    
+
     def get_soilMoisture(self):
         return self._soilMoisture + self.noiseValue()
 
     def noiseValue(self):
         """Return a random value between -noiseAmplitude and noiseAmplitude"""
-        
-        return  random.uniform(-noiseAmplitude, noiseAmplitude)
 
-    def setActuator(self, actuator : str, state : bool):
+        return random.uniform(-noiseAmplitude, noiseAmplitude)
+
+    def setActuator(self, actuator: str, state: bool):
         """Set the state of the actuator"""
 
         if actuator == "led":

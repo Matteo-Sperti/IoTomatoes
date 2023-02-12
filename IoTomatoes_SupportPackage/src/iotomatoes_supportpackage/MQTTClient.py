@@ -4,8 +4,9 @@ import json
 
 from .ItemInfo import subscribedTopics, publishedTopics
 
-class BaseMQTTClient(): 
-    def __init__(self, url : str, connector, broker : str = ""):
+
+class BaseMQTTClient():
+    def __init__(self, url: str, connector, broker: str = ""):
         """BaseMQTTClient class. It is the base class for the MQTT client.
 
         Arguments:
@@ -24,9 +25,9 @@ class BaseMQTTClient():
 
         self.unsubscribe_all()
         self._paho_mqtt.loop_stop()
-        self._paho_mqtt.disconnect()                             
+        self._paho_mqtt.disconnect()
 
-    def startMQTT(self) :
+    def startMQTT(self):
         """Starts the MQTT client.
         It subscribes the topics and starts the MQTT client loop.
         """
@@ -52,15 +53,15 @@ class BaseMQTTClient():
         for topic in self.subscribedTopics:
             self.mySubscribe(topic)
 
-    def myOnConnect(self,client,userdata,flags,rc):
+    def myOnConnect(self, client, userdata, flags, rc):
         """It provides information about Connection result with the broker"""
 
-        dic={
-            "0":f"Connection successful to {self._broker}",
-            "1":f"Connection to {self._broker} refused - incorrect protocol version",
-            "2":f"Connection to {self._broker} refused - invalid client identifier",
-            "3":f"Connection to {self._broker} refused - server unavailable",
-        }             
+        dic = {
+            "0": f"Connection successful to {self._broker}",
+            "1": f"Connection to {self._broker} refused - incorrect protocol version",
+            "2": f"Connection to {self._broker} refused - invalid client identifier",
+            "3": f"Connection to {self._broker} refused - server unavailable",
+        }
         print(dic[str(rc)])
 
     def myOnMessageReceived(self, paho_mqtt, userdata, msg):
@@ -68,7 +69,8 @@ class BaseMQTTClient():
         It redirects the message to the notify method (which must be implemented by the user)"""
 
         # A new message is received
-        self._connector.notify(msg.topic, json.loads(msg.payload)) # type: ignore
+        self._connector.notify(
+            msg.topic, json.loads(msg.payload))
 
     def myPublish(self, topic, msg):
         """It publishes a dictionary message `msg` in `topic`"""
@@ -89,7 +91,6 @@ class BaseMQTTClient():
         """It unsubscribes all the topics"""
 
         if (self._isSubscriber):
-            # remember to unsuscribe if it is working also as subscriber
             self._paho_mqtt.unsubscribe(self.subscribedTopics)
 
     def get_broker(self):

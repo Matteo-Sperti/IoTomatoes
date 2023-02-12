@@ -8,7 +8,8 @@ from .ItemInfo import (
     isMQTT, measureType, actuatorType, PowerConsumption_kW
 )
 
-class BaseResource() :
+
+class BaseResource():
     def __init__(self, settings: dict):
         """Initialize the BaseResource class."""
 
@@ -16,15 +17,17 @@ class BaseResource() :
         self.platform_url = settings["IoTomatoes_url"]
         self.start(settings)
 
-    def start(self, info: dict) :        
+    def start(self, info: dict):
         """ Start the endpoint as a resource.
         It registers the resource to the Resource Catalog and starts the RefreshThread."""
 
         self.EndpointInfo = self.register(info)
-        self._RefreshThread = RefreshThread(self.platform_url + "/rc/" + self.CompanyName, self)
+        self._RefreshThread = RefreshThread(
+            self.platform_url + "/rc/" + self.CompanyName, self)
         if self.isMQTT:
             brokerip = self.platform_url.split(":")[1].replace("//", "")
-            self._MQTTClient = BaseMQTTClient(self.platform_url, self, brokerip)
+            self._MQTTClient = BaseMQTTClient(
+                self.platform_url, self, brokerip)
             self._MQTTClient.startMQTT()
 
     def restart(self):
@@ -36,14 +39,14 @@ class BaseResource() :
         if self.isMQTT:
             self._MQTTClient.stopMQTT()
 
-    def register(self, info : dict) -> dict:
+    def register(self, info: dict) -> dict:
         """Register the resource to the Resource Catalog."""
 
         while True:
             try:
                 url = self.platform_url + "/rc/" + self.CompanyName + "/device"
                 print(f"Registering to {url} ...")
-                res = requests.post(url, json = info)
+                res = requests.post(url, json=info)
                 res.raise_for_status()
                 res_dict = res.json()
             except requests.exceptions.HTTPError as err:
@@ -52,7 +55,7 @@ class BaseResource() :
             except:
                 print(f"Connection Error\nRetrying connection\n")
                 time.sleep(1)
-            else:               
+            else:
                 if "ID" in res_dict:
                     print("Resource registered to the Resource Catalog")
                     return res_dict
@@ -63,7 +66,7 @@ class BaseResource() :
     @property
     def ID(self) -> int:
         return self.EndpointInfo["ID"]
-    
+
     @property
     def isMQTT(self) -> bool:
         return isMQTT(self.EndpointInfo)

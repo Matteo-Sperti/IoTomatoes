@@ -35,6 +35,7 @@ If your company is already registered, you can register your account to your com
 /register_user to register yourself in an existing company.
 """
 
+
 class MessageHandler(telepot.helper.ChatHandler):
     def __init__(self, seed_tuple, connector, **kwargs):
         """Construct a new MessageHandler instance. 
@@ -48,30 +49,34 @@ class MessageHandler(telepot.helper.ChatHandler):
             self._chat_id = seed_tuple[1]['chat']['id']
         except:
             self._chat_id = 0
-            
+
         self._CompanyName = self._connector.isRegistered(self._chat_id)
 
     def on_chat_message(self, msg):
         """Handle the received message"""
 
         content_type, _, chat_ID = telepot.glance(msg)  # type: ignore
-        
+
         if content_type != 'text':
-            self.sender.sendMessage("I don't understand non-text messages.") 
+            self.sender.sendMessage("I don't understand non-text messages.")
             return
 
         message = msg['text']
         if self._command is None:
             if self._CompanyName == "":
                 if message == "/insert_company":
-                    self._command = InsertNewCompany(chat_ID, self.sender, self._connector)
+                    self._command = InsertNewCompany(
+                        chat_ID, self.sender, self._connector)
                 elif message == "/register_user":
-                    self._command = RegisterNewUser(chat_ID, self.sender, self._connector)
+                    self._command = RegisterNewUser(
+                        chat_ID, self.sender, self._connector)
                 elif message in ["/help", "/start"]:
-                    self.sender.sendMessage(WelcomeMessage)                    
+                    self.sender.sendMessage(WelcomeMessage)
                 else:
-                    self.sender.sendMessage(f"You need to register your company first or register yourself in an existing company.\n"
-                                            f"Type /insert_company to register your company or /help for more info.")
+                    self.sender.sendMessage(
+                        "You need to register your company first "
+                        "or register yourself in an existing company.\n"
+                        "Type /insert_company to register your company or /help for more info.")
             else:
                 if message == "/users":
                     getUsers(self._CompanyName, self.sender, self._connector)
@@ -80,29 +85,32 @@ class MessageHandler(telepot.helper.ChatHandler):
                 elif message == "/fields":
                     getFields(self._CompanyName, self.sender, self._connector)
                 elif message == "/delete_company":
-                    self._command = DeleteCompany(self._CompanyName, self._chat_id, self.sender, self._connector)
+                    self._command = DeleteCompany(
+                        self._CompanyName, self._chat_id, self.sender, self._connector)
                 elif message in ["/help", "/start"]:
-                    self.sender.sendMessage(HelpMessage.format(self._CompanyName))   
+                    self.sender.sendMessage(
+                        HelpMessage.format(self._CompanyName))
                 elif message == "/change_plant":
-                    self._command = ChangePlant(self._CompanyName, self.sender, self._connector)
+                    self._command = ChangePlant(
+                        self._CompanyName, self.sender, self._connector)
                 elif message == "plot":
-                    self._command = CustomPlot(self._CompanyName, self.sender, self._connector)   
+                    self._command = CustomPlot(
+                        self._CompanyName, self.sender, self._connector)
                 else:
                     self.sender.sendMessage(f"Command not found or not permitted.\n"
                                             f"Type /help for more info.")
-        
+
         if self._command is not None:
             completed = self._command.update(message)
             if completed:
                 self.close()
         else:
             self.close()
-            
 
-    def on_callback_query(self,msg):
+    def on_callback_query(self, msg):
         """Handle the callback query"""
 
-        _ , chat_ID , query_data = telepot.glance(msg,flavor='callback_query')
+        _, chat_ID, query_data = telepot.glance(msg, flavor='callback_query')
 
         if self._command is not None:
             completed = self._command.update(query_data)
@@ -114,7 +122,8 @@ class MessageHandler(telepot.helper.ChatHandler):
     def on__idle(self, event):
         """Close the delegate if the user is idle for too long"""
 
-        self.sender.sendMessage("You have been idle for too long. Closing section.")
+        self.sender.sendMessage(
+            "You have been idle for too long. Closing section.")
         self.close()
 
     def on_close(self, ex):
@@ -125,7 +134,7 @@ class MessageHandler(telepot.helper.ChatHandler):
 
 
 class ChatBox(telepot.DelegatorBot):
-    def __init__(self, token : str, connector):
+    def __init__(self, token: str, connector):
         """Initialize the delegator bot.
 
         Arguments:
@@ -141,8 +150,9 @@ class ChatBox(telepot.DelegatorBot):
             # Distribute all messages to all chat_ids, via `per_chat_id_in()`.
             include_callback_query_chat_id(
                 pave_event_space())(
-                    per_chat_id_in(self._seen, types='private'), create_open, MessageHandler, 
-                                    self._connector, timeout=300),
+                    per_chat_id_in(
+                        self._seen, types='private'), create_open, MessageHandler,
+                self._connector, timeout=300),
 
             # For senders never seen before, send him a welcome message.
             (self._is_newcomer, custom_thread(call(self._send_welcome))),
@@ -163,7 +173,8 @@ class ChatBox(telepot.DelegatorBot):
             return None  # No delegate spawned
 
         self._seen.add(chat_id)
-        return []  # non-hashable ==> delegates are independent, no seed association is made.
+        # non-hashable ==> delegates are independent, no seed association is made.
+        return []
 
     def _send_welcome(self, seed_tuple):
         """Send a welcome message to new users"""
@@ -173,13 +184,13 @@ class ChatBox(telepot.DelegatorBot):
 
 
 class IoTBot(BaseService):
-    def __init__(self, settings :dict):
+    def __init__(self, settings: dict):
         """Initialize the IoTBot service"""
 
         super().__init__(settings)
 
-        self._message = {'bn': "", 'e': [{'n': "",'v': "", 'u': "", 't': ""}]}
-        #TelegramBot
+        self._message = {'bn': "", 'e': [{'n': "", 'v': "", 'u': "", 't': ""}]}
+        # TelegramBot
         self.tokenBot = self.get_token()
         self.bot = ChatBox(self.tokenBot, self)
 
@@ -192,8 +203,9 @@ class IoTBot(BaseService):
             try:
                 res = requests.get(self._ServiceCatalog_url + "/telegram")
                 res.raise_for_status()
-            except :
-                print(f"Error in the connection with the Service Catalog\nRetrying connection\n")
+            except:
+                print(
+                    f"Error in the connection with the Service Catalog\nRetrying connection\n")
                 time.sleep(1)
             else:
                 try:
@@ -203,7 +215,7 @@ class IoTBot(BaseService):
                     print(f"Error in the broker information\nRetrying connection\n")
                     time.sleep(1)
 
-    def isRegistered(self, chatID : int):
+    def isRegistered(self, chatID: int):
         """Return the name of the company if the chatID is already registered.
         Otherwise return an empty string.
 
@@ -212,7 +224,8 @@ class IoTBot(BaseService):
         """
         try:
             params = {"telegramID": chatID}
-            res = requests.get(self.ResourceCatalog_url + "/isRegistered", params=params)
+            res = requests.get(self.ResourceCatalog_url +
+                               "/isRegistered", params=params)
             res.raise_for_status()
         except:
             print("Connection Error\nImpossibile to reach the ResourceCatalog")
@@ -224,10 +237,10 @@ class IoTBot(BaseService):
             else:
                 return ""
 
-    def getList(self, CompanyName : str, listType : str):
+    def getList(self, CompanyName: str, listType: str):
         """Return the list of users, devices or fields of a company.
         If the list is empty, return an empty list. If an error occurs, return None.
-        
+
         Arguments:
         - `CompanyName (str)`: name of the company\n
         - `listType (str)`: type of the list to return. It can be "users", "devices" or "fields"
@@ -236,7 +249,8 @@ class IoTBot(BaseService):
             return None
 
         try:
-            res = requests.get(f"{self.ResourceCatalog_url}/{CompanyName}/{listType}")
+            res = requests.get(
+                f"{self.ResourceCatalog_url}/{CompanyName}/{listType}")
             res.raise_for_status()
             res_dict = res.json()
         except:
@@ -252,7 +266,8 @@ class IoTBot(BaseService):
         """Notify the user of the message received from the broker"""
 
         try:
-            timestamp = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(msg["t"]))
+            timestamp = time.strftime(
+                '%Y-%m-%d %H:%M:%S', time.localtime(msg["t"]))
             message = (f"\nMessage from {msg['bn']} at {timestamp}:\n")
             for key, value in msg.items():
                 if key not in ["bn", "t", "cn"]:
@@ -279,6 +294,7 @@ class IoTBot(BaseService):
                         except:
                             print("Invalid chatID from catalog")
 
+
 def custom_thread(func):
     def f(seed_tuple):
         target = func(seed_tuple)
@@ -297,12 +313,13 @@ def sigterm_handler(signal, frame):
     IoTomatoesBOT.stop()
     print("Server stopped")
 
+
 signal.signal(signal.SIGTERM, sigterm_handler)
 
 if __name__ == "__main__":
     try:
         settings = json.load(open("TelegramSettings.json"))
-        
+
         IoTomatoesBOT = IoTBot(settings)
     except Exception as e:
         print(e)

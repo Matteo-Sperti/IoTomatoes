@@ -3,14 +3,15 @@ from .BaseResource import BaseResource
 from .MyThread import MyThread
 from .ItemInfo import publishedTopics, actuatorType
 
+
 class IoTDevice(BaseResource):
-    def __init__(self, DeviceInfo : dict, sensor = None, actuator = None):
+    def __init__(self, DeviceInfo: dict, sensor=None, actuator=None):
         """Constructor of a generic device. It will initialize the device and
         the MQTT client, it will register itself to the ResourceCatalog and to the broker
         and it will subscribe to the topics specified in the ResourceCatalog.
-        
+
         It will also initialize the thread used to get the sensor readings.
-        
+
         Arguments:
         - `DeviceInfo` : dictionary containing the information about the device.
         - `sensor` : sensor object used to get the sensor readings. 
@@ -35,18 +36,19 @@ class IoTDevice(BaseResource):
                 self._measureTimeInterval = DeviceInfo["measureTimeInterval"]
             else:
                 self._measureTimeInterval = 5
-            self._message={
-                "cn" : self.CompanyName,
-                "bn" : self.ID,
-                "fieldNumber" : self.field,
-                "e" : [{
+            self._message = {
+                "cn": self.CompanyName,
+                "bn": self.ID,
+                "fieldNumber": self.field,
+                "e": [{
                     "n": "",
                     "v": None,
-                    "u": "",       
+                    "u": "",
                     "t": None
                 }]
             }
-            self._SendThread = MyThread(self.get_measures, self._measureTimeInterval, sensor)
+            self._SendThread = MyThread(
+                self.get_measures, self._measureTimeInterval, sensor)
 
     def close(self):
         """This function is used to close the MQTT client and the thread 
@@ -64,8 +66,8 @@ class IoTDevice(BaseResource):
 
         if not self.isActuator:
             print("Resource is not an actuator.\n"
-                    f"Topic: {topic}\n"
-                    f"Message: {msg}")
+                  f"Topic: {topic}\n"
+                  f"Message: {msg}")
         else:
             actuator_info = actuatorType(self.EndpointInfo)
             actuator_topic = topic.split("/")[-1]
@@ -83,9 +85,9 @@ class IoTDevice(BaseResource):
                     elif state == 1:
                         self._Actuator.setActuator(actuator_topic, False)
                     else:
-                        print(f"Resource {self.ID}: {actuator_topic} state not valid")
+                        print(
+                            f"Resource {self.ID}: {actuator_topic} state not valid")
 
-            
     def get_measures(self, sensor):
         """This function is called periodically in order to get the sensor readings.
         It will publish the readings on the topics specified in the ResourceCatalog.
@@ -93,7 +95,7 @@ class IoTDevice(BaseResource):
 
         for topic in publishedTopics(self.EndpointInfo):
             measureType = topic.split("/")[-1]
-            
+
             if measureType == "temperature":
                 msg = self.construct_message(measureType, "C")
                 v = sensor.get_temperature()
@@ -111,12 +113,12 @@ class IoTDevice(BaseResource):
                 v = sensor.get_position()
             else:
                 continue
-                
+
             if v is not None:
                 msg["e"][-1]["v"] = v
                 self._MQTTClient.myPublish(topic, msg)
-    
-    def construct_message(self, measure : str, unit : str) :
+
+    def construct_message(self, measure: str, unit: str):
         """This function is used to construct the message to be published on the topics."""
 
         msg = self._message.copy()

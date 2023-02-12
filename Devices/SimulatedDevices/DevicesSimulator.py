@@ -1,3 +1,4 @@
+from iotomatoes_supportpackage.MyIDGenerator import IDs
 import json
 import random
 import requests
@@ -5,7 +6,6 @@ import requests
 from FakeDevice import SimDevice
 import sys
 sys.path.append("../../IoTomatoes_SupportPackage/src/")
-from iotomatoes_supportpackage.MyIDGenerator import IDs
 
 HelpMessage = """
 Devices Simulator.
@@ -16,8 +16,9 @@ kill: remove a device
 exit: exit the program
 """
 
+
 class SimDevices_Manager():
-    def __init__(self, settings : dict):
+    def __init__(self, settings: dict):
         self._platform_url = settings["IoTomatoes_url"]
         self._measuresType = settings["MeasuresType"]
         self._actuatorsType = settings["ActuatorsType"]
@@ -25,7 +26,7 @@ class SimDevices_Manager():
 
         self.Sensors = []
 
-    def populateField(self, number : int = 5):
+    def populateField(self, number: int = 5):
         """Insert a `number` (default is 5) of devices in a field.
         The devices are randomly generated.
         """
@@ -34,9 +35,10 @@ class SimDevices_Manager():
 
         latitude, longitude = self.getCompanyPosition(CompanyName)
         for i in range(number):
-            self.Sensors.append(self.createDevice(CompanyName, fieldNumber, latitude, longitude))
+            self.Sensors.append(self.createDevice(
+                CompanyName, fieldNumber, latitude, longitude))
 
-    def createDevice(self, CompanyName : str, fieldNumber : int, latitude : float, longitude : float):
+    def createDevice(self, CompanyName: str, fieldNumber: int, latitude: float, longitude: float):
         """Create a device with random parameters."""
 
         ID = self.DevicesIDs.get_ID()
@@ -46,7 +48,8 @@ class SimDevices_Manager():
             actuators = []
             PowerConsumption_kW = 0
 
-            measures = random.sample(self._measuresType, random.randint(1, len(self._measuresType)))
+            measures = random.sample(
+                self._measuresType, random.randint(1, len(self._measuresType)))
             isSensor = True
         else:
             isActuator = True
@@ -56,33 +59,35 @@ class SimDevices_Manager():
             measures = []
 
         Device_information = {
-            "deviceName" : f"SimDevice_{ID}",
-            "fieldNumber" : fieldNumber,
-            "isSensor" : isSensor,
-            "isActuator" : isActuator,
-            "measureType" : measures,
-            "actuatorType" : actuators,
-            "PowerConsumption_kW" : PowerConsumption_kW,
-            "CompanyName" : CompanyName,
-            "IoTomatoes_url" : self._platform_url
+            "deviceName": f"SimDevice_{ID}",
+            "fieldNumber": fieldNumber,
+            "isSensor": isSensor,
+            "isActuator": isActuator,
+            "measureType": measures,
+            "actuatorType": actuators,
+            "PowerConsumption_kW": PowerConsumption_kW,
+            "CompanyName": CompanyName,
+            "IoTomatoes_url": self._platform_url
         }
-        
-        dev_latitude, dev_longitude = self.generatePosition(latitude, longitude, fieldNumber)
+
+        dev_latitude, dev_longitude = self.generatePosition(
+            latitude, longitude, fieldNumber)
         if dev_latitude != -1 and dev_longitude != -1:
             Device_information["Location"] = {
-                "latitude" : dev_latitude,
-                "longitude" : dev_longitude
+                "latitude": dev_latitude,
+                "longitude": dev_longitude
             }
         return SimDevice(Device_information)
 
-    def getCompanyPosition(self, CompanyName : str):
+    def getCompanyPosition(self, CompanyName: str):
         """Get the position of the company from the Resource Catalog.
-        
+
         Arguments:
         - `CompanyName (str)`: the name of the company"""
 
         try:
-            response = requests.get(f"{self._platform_url}/rc/{CompanyName}/location")
+            response = requests.get(
+                f"{self._platform_url}/rc/{CompanyName}/location")
             response.raise_for_status()
             r_dict = response.json()["Location"]
             latitude = r_dict["latitude"]
@@ -93,7 +98,7 @@ class SimDevices_Manager():
         else:
             return latitude, longitude
 
-    def generatePosition(self, latitude : float, longitude : float, fieldNumber : int):
+    def generatePosition(self, latitude: float, longitude: float, fieldNumber: int):
         """Generate a random position inside a field"""
 
         if fieldNumber == 1:
@@ -129,35 +134,36 @@ class SimDevices_Manager():
 
         print("No device found with the given information")
 
-    def run(self) :
+    def run(self):
         """Menu of the simulator."""
 
         print("\nType 'help' for the list of available commands")
-        while True :
+        while True:
             command = input(">> ").lower()
-            if command == "exit" :
+            if command == "exit":
                 self.exit()
                 return False
-            elif command == "help" :
+            elif command == "help":
                 print(HelpMessage)
                 return True
-            elif command == "adddevices" :
+            elif command == "adddevices":
                 self.populateField()
                 return True
-            elif command == "kill" :
+            elif command == "kill":
                 self.stopDevice()
                 return True
-            else :
+            else:
                 print("Command not found")
                 return True
-    
+
     def exit(self):
         for sensor in self.Sensors:
             sensor.close()
 
+
 def query_int(question):
     """Ask a question via input() and return the int answer"""
-    
+
     def _is_integer(n):
         try:
             float(n)
@@ -174,7 +180,6 @@ def query_int(question):
             print(f"Please respond with a integer number\n")
 
 
-
 if __name__ == "__main__":
     settings = json.load(open("DevicesSimulatorSettings.json", "r"))
 
@@ -183,7 +188,7 @@ if __name__ == "__main__":
     print(HelpMessage)
     while True:
         run = Simulator.run()
-        if not run :
-            break   
-    
+        if not run:
+            break
+
     print("End of the simulator")

@@ -3,9 +3,10 @@ import requests
 from telepot.namedtuple import InlineKeyboardMarkup, InlineKeyboardButton
 
 keyboardYESNO = InlineKeyboardMarkup(inline_keyboard=[[
-                InlineKeyboardButton(text='YES ✅', callback_data='yes'),
-                InlineKeyboardButton(text='NO ❌', callback_data='no'),
-            ]])
+    InlineKeyboardButton(text='YES ✅', callback_data='yes'),
+    InlineKeyboardButton(text='NO ❌', callback_data='no'),
+]])
+
 
 class InsertNewCompany():
     def __init__(self, chatID, sender, connector):
@@ -25,22 +26,22 @@ class InsertNewCompany():
 
     @property
     def adminInfo(self):
-        return {"Name" : self.response["Name"], 
-                "Surname" : self.response["Surname"], 
-                "telegramID" : self.chatID}
+        return {"Name": self.response["Name"],
+                "Surname": self.response["Surname"],
+                "telegramID": self.chatID}
 
     @property
     def company(self):
-        return {"CompanyName": self.response["CompanyName"], 
+        return {"CompanyName": self.response["CompanyName"],
                 "CompanyToken": self.response["CompanyToken"],
-                "Location" : self.location,
-                "NumberOfFields" : self.response["NumberOfFields"]}
+                "Location": self.location,
+                "NumberOfFields": self.response["NumberOfFields"]}
 
     @property
     def location(self):
         return self.response["Location"]
 
-    def update(self, message : str): 
+    def update(self, message: str):
         """Update the status of the chat.
 
         Arguments:
@@ -54,14 +55,16 @@ class InsertNewCompany():
             self._bot.sendMessage("Insert your Company Name")
             self._status += 1
             return False
-        
+
         elif self._status == 1:
             if " " in message:
-                self._bot.sendMessage("Invalid Company Name, please do not use spaces")
+                self._bot.sendMessage(
+                    "Invalid Company Name, please do not use spaces")
                 self._bot.sendMessage("Insert your Company Name")
                 return False
             if message == "admin" or message == "company":
-                self._bot.sendMessage("Invalid Company Name, please do not use 'admin' or 'local' as Company Name")
+                self._bot.sendMessage(
+                    "Invalid Company Name, please do not use 'admin' or 'local' as Company Name")
                 self._bot.sendMessage("Insert your Company Name")
                 return False
             self.response["CompanyName"] = message
@@ -74,7 +77,7 @@ class InsertNewCompany():
             self._bot.sendMessage("Insert your Surname")
             self._status += 1
             return False
-        
+
         elif self._status == 3:
             self.response["Surname"] = message
             self._bot.sendMessage("Insert your Company Token")
@@ -84,13 +87,14 @@ class InsertNewCompany():
         elif self._status == 4:
             self.response["CompanyToken"] = message
             self._bot.sendMessage(f"Your Company Token is: {message}\nProceed with the registration?",
-                                    reply_markup=keyboardYESNO)
+                                  reply_markup=keyboardYESNO)
             self._status += 1
             return False
 
         elif self._status == 5:
             if message == "yes":
-                self._bot.sendMessage("Insert your location as couple of coordinates:")
+                self._bot.sendMessage(
+                    "Insert your location as couple of coordinates:")
                 self._status += 1
             else:
                 self._bot.sendMessage("Insert your Company Token")
@@ -102,26 +106,31 @@ class InsertNewCompany():
                 message.replace(" ", "")
                 latitude, longitude = message.split(",")
                 self.response["Location"] = {
-                    "longitude" : float(longitude),
-                    "latitude" : float(latitude)
-                }           
-                self._bot.sendLocation(self.location["latitude"], self.location["longitude"])
+                    "longitude": float(longitude),
+                    "latitude": float(latitude)
+                }
+                self._bot.sendLocation(
+                    self.location["latitude"], self.location["longitude"])
             except:
                 self._bot.sendMessage("Invalid location")
-                self._bot.sendMessage("Insert your location as couple of coordinates:")
+                self._bot.sendMessage(
+                    "Insert your location as couple of coordinates:")
                 self._status = 6
                 return False
             else:
-                self._bot.sendMessage(f"Is this your location?", reply_markup=keyboardYESNO)
+                self._bot.sendMessage(
+                    f"Is this your location?", reply_markup=keyboardYESNO)
                 self._status += 1
                 return False
 
         elif self._status == 7:
             if message == "yes":
-                self._bot.sendMessage("How many indipendent fields do you have in your company?")
+                self._bot.sendMessage(
+                    "How many indipendent fields do you have in your company?")
                 self._status += 1
             else:
-                self._bot.sendMessage("Insert your location as couple coordinates:")
+                self._bot.sendMessage(
+                    "Insert your location as couple coordinates:")
                 self._status = 6
             return False
 
@@ -129,12 +138,15 @@ class InsertNewCompany():
             try:
                 self.response["NumberOfFields"] = int(message)
             except:
-                self._bot.sendMessage("Invalid number, please insert a positive integer number")
-                self._bot.sendMessage("How many indipendent fields do you have in your company?")
+                self._bot.sendMessage(
+                    "Invalid number, please insert a positive integer number")
+                self._bot.sendMessage(
+                    "How many indipendent fields do you have in your company?")
                 self._status = 8
                 return False
             else:
-                self._bot.sendMessage("Insert the colture of your fields, separated by a comma")
+                self._bot.sendMessage(
+                    "Insert the colture of your fields, separated by a comma")
                 self._status += 1
                 return False
 
@@ -147,22 +159,24 @@ class InsertNewCompany():
                 self.response["fieldsList"] = []
                 for i, field in enumerate(fields):
                     self.response["fieldsList"].append({
-                        "fieldNumber" : i+1,
-                        "plant" : field.lower().strip()
+                        "fieldNumber": i+1,
+                        "plant": field.lower().strip()
                     })
             except:
                 self._bot.sendMessage("Invalid input")
-                self._bot.sendMessage("Insert the colture of your fields, separated by a comma")
+                self._bot.sendMessage(
+                    "Insert the colture of your fields, separated by a comma")
                 self._status = 9
                 return False
             else:
                 summary = (f"You are going to register the following company:\n"
-                            f"Company Name: {self.response['CompanyName']}\n"
-                            f"Company Token: {self.response['CompanyToken']}\n"
-                            f"Location: {self.location['latitude']}, {self.location['longitude']}\n\n"
-                            f"{self.response['Name']} {self.response['Surname']} will be the admin of this company\n")
+                           f"Company Name: {self.response['CompanyName']}\n"
+                           f"Company Token: {self.response['CompanyToken']}\n"
+                           f"Location: {self.location['latitude']}, {self.location['longitude']}\n\n"
+                           f"{self.response['Name']} {self.response['Surname']} will be the admin of this company\n")
                 self._bot.sendMessage(summary)
-                self._bot.sendMessage("Confirm your registration?", reply_markup=keyboardYESNO)
+                self._bot.sendMessage(
+                    "Confirm your registration?", reply_markup=keyboardYESNO)
                 self._status += 1
                 return False
 
@@ -175,20 +189,20 @@ class InsertNewCompany():
             else:
                 self._bot.sendMessage("Registration canceled")
             return True
-            
-    def insert_company(self): 
+
+    def insert_company(self):
         """Insert the company in the Resource Catalog.
-        
+
         Returns:
         - `True` if the company is correctly inserted in the Resource Catalog.
         - `False` otherwise.
         """
         try:
-            body = {"CompanyInfo" : self.company,
-                    "AdminInfo" : self.adminInfo, 
-                    "fieldsList" : self.response["fieldsList"]}
+            body = {"CompanyInfo": self.company,
+                    "AdminInfo": self.adminInfo,
+                    "fieldsList": self.response["fieldsList"]}
             res = requests.post(self._connector.ResourceCatalog_url + "/company",
-                                    data= json.dumps(body))
+                                data=json.dumps(body))
             res.raise_for_status()
         except requests.exceptions.HTTPError as err:
             print(f"{err.response.status_code} : {err.response.reason}")
@@ -203,9 +217,9 @@ class InsertNewCompany():
                     CompanyID = res_dict["CompanyID"]
                     CompanyToken = res_dict["CompanyToken"]
                     message = (f"""Company {self.company["CompanyName"]} registered\n"""
-                            "Welcome to IoTomatoes Platform\n\n"
-                            f"CompanyID: {CompanyID}\n"
-                            f"CompanyToken: {CompanyToken}")
+                               "Welcome to IoTomatoes Platform\n\n"
+                               f"CompanyID: {CompanyID}\n"
+                               f"CompanyToken: {CompanyToken}")
                     self._bot.sendMessage(message)
                     return True
                 else:
@@ -217,6 +231,7 @@ class InsertNewCompany():
             except:
                 print(f"Error in the information\n")
                 return False
+
 
 class RegisterNewUser():
     def __init__(self, chatID, sender, connector):
@@ -235,9 +250,9 @@ class RegisterNewUser():
 
     @property
     def UserInfo(self):
-        return {"Name" : self.response["Name"], 
-                "Surname" : self.response["Surname"], 
-                "telegramID" : self.chatID}
+        return {"Name": self.response["Name"],
+                "Surname": self.response["Surname"],
+                "telegramID": self.chatID}
 
     @property
     def completeName(self):
@@ -245,10 +260,10 @@ class RegisterNewUser():
 
     @property
     def company(self):
-        return {"CompanyName": self.response["CompanyName"], 
-                "CompanyToken" : self.response["CompanyToken"]}
+        return {"CompanyName": self.response["CompanyName"],
+                "CompanyToken": self.response["CompanyToken"]}
 
-    def update(self, message):   
+    def update(self, message):
         """Update the status of the registration.
 
         Arguments:
@@ -267,14 +282,14 @@ class RegisterNewUser():
             self.response["CompanyName"] = message
             self._bot.sendMessage("Insert your Name")
             self._status += 1
-            return False            
+            return False
 
         elif self._status == 2:
             self.response["Name"] = message
             self._bot.sendMessage("Insert your Surname")
             self._status += 1
             return False
-        
+
         elif self._status == 3:
             self.response["Surname"] = message
             self._bot.sendMessage("Insert your Company Token")
@@ -284,8 +299,9 @@ class RegisterNewUser():
         elif self._status == 4:
             self.response["CompanyToken"] = message
             summary = (f"You are going to register {self.completeName} as a new user of {self.response['CompanyName']}\n"
-                        f"Company Token: {self.response['CompanyToken']}\n")
-            self._bot.sendMessage(f"{summary}\nConfirm your registration?", reply_markup=keyboardYESNO)
+                       f"Company Token: {self.response['CompanyToken']}\n")
+            self._bot.sendMessage(
+                f"{summary}\nConfirm your registration?", reply_markup=keyboardYESNO)
             self._status += 1
             return False
 
@@ -307,8 +323,8 @@ class RegisterNewUser():
         - `False` otherwise.
         """
         try:
-            res = requests.post(self._connector.ResourceCatalog_url + f"/user", 
-                                    params=self.company, json=self.UserInfo)
+            res = requests.post(self._connector.ResourceCatalog_url + f"/user",
+                                params=self.company, json=self.UserInfo)
             res.raise_for_status()
         except requests.exceptions.HTTPError as err:
             if err.response.status_code == 404:
@@ -326,15 +342,16 @@ class RegisterNewUser():
                 res_dict = res.json()
                 UserID = res_dict["ID"]
                 message = (f"""User {self.completeName} registered in company {self.company["CompanyName"]}\n"""
-                        "Welcome to IoTomatoes Platform\n\n"
-                        f"UserID: {UserID}\n")
+                           "Welcome to IoTomatoes Platform\n\n"
+                           f"UserID: {UserID}\n")
                 self._bot.sendMessage(message)
                 return True
             except:
                 print(f"Error in the information\n")
                 return False
 
-def getUsers(CompanyName : str, bot, connector) -> None:
+
+def getUsers(CompanyName: str, bot, connector) -> None:
     """Get the list of users registered in the Resource Catalog.
 
     Arguments:
@@ -352,12 +369,12 @@ def getUsers(CompanyName : str, bot, connector) -> None:
         bot.sendMessage(message)
         for user in users:
             message = (f"Name: {user['Name']}\n"
-                                f"Surname: {user['Surname']}\n"
-                                f"UserID: {user['ID']}\n\n")
+                       f"Surname: {user['Surname']}\n"
+                       f"UserID: {user['ID']}\n\n")
             bot.sendMessage(message)
-        
 
-def getDevices(CompanyName : str, bot, connector) -> None:
+
+def getDevices(CompanyName: str, bot, connector) -> None:
     """Get the list of devices registered in the Resource Catalog.
 
     Arguments:
@@ -376,18 +393,20 @@ def getDevices(CompanyName : str, bot, connector) -> None:
             bot.sendMessage(message)
             for device in devices:
                 message = (f"Device Name: {device['deviceName']}\n"
-                            f"DeviceID: {device['ID']}\n"
-                            f"Field: {device['fieldNumber']}\n"
-                            f"Location: {device['Location']['latitude']}, {device['Location']['longitude']}\n")
+                           f"DeviceID: {device['ID']}\n"
+                           f"Field: {device['fieldNumber']}\n"
+                           f"Location: {device['Location']['latitude']}, {device['Location']['longitude']}\n")
                 if device["isActuator"]:
-                    act_msg = f"Actuators: " + ", ".join(device["actuatorType"])
-                    message = message + act_msg +"\n"
+                    act_msg = f"Actuators: " + \
+                        ", ".join(device["actuatorType"])
+                    message = message + act_msg + "\n"
                 if device["isSensor"]:
                     sens_msg = f"Sensors: " + ", ".join(device["measureType"])
-                    message = message + sens_msg +"\n"
+                    message = message + sens_msg + "\n"
                 bot.sendMessage(message)
 
-def getFields(CompanyName : str, bot, connector) -> None:
+
+def getFields(CompanyName: str, bot, connector) -> None:
     """Get the list of fields registered in the Resource Catalog.
 
     Arguments:
@@ -406,13 +425,14 @@ def getFields(CompanyName : str, bot, connector) -> None:
             bot.sendMessage(message)
             for field in fields:
                 message = (f"Field number: {field['fieldNumber']}\n"
-                            f"plant: {field['plant']}\n")
+                           f"plant: {field['plant']}\n")
                 bot.sendMessage(message)
 
+
 class DeleteCompany():
-    def __init__(self, CompanyName : str, chatID, sender, connector):
+    def __init__(self, CompanyName: str, chatID, sender, connector):
         """Delete a company from the Resource Catalog.
-        
+
         Arguments:
         - `CompanyName (str)` : the name of the company.
         - `chatID (int)` : the chatID of the user.
@@ -438,13 +458,15 @@ class DeleteCompany():
         """
 
         if self._status == 0:
-            self._bot.sendMessage("You are going to delete company " + self.CompanyName)
+            self._bot.sendMessage(
+                "You are going to delete company " + self.CompanyName)
             self._bot.sendMessage("Insert your Company Token")
             self._status += 1
-        
+
         elif self._status == 1:
             self.CompanyToken = message
-            self._bot.sendMessage("Confirm your deletion?", reply_markup=keyboardYESNO)
+            self._bot.sendMessage("Confirm your deletion?",
+                                  reply_markup=keyboardYESNO)
             self._status += 1
 
         elif self._status == 2:
@@ -461,9 +483,10 @@ class DeleteCompany():
         """Delete the company from the Resource Catalog."""
 
         try:
-            params = {"CompanyName" : self.CompanyName, "CompanyToken" : self.CompanyToken, "telegramID" : self.chatID}
-            res = requests.delete(self._connector.ResourceCatalog_url + "/company", 
-                                    params=params)
+            params = {"CompanyName": self.CompanyName,
+                      "CompanyToken": self.CompanyToken, "telegramID": self.chatID}
+            res = requests.delete(self._connector.ResourceCatalog_url + "/company",
+                                  params=params)
             res.raise_for_status()
             dict_ = res.json()
         except requests.exceptions.HTTPError as err:
@@ -472,12 +495,14 @@ class DeleteCompany():
             elif err.response.status_code == 401:
                 self._bot.sendMessage("CompanyToken not valid")
             elif err.response.status_code == 403:
-                self._bot.sendMessage("You are not authorized to delete this company.\nContact your administrator.")
+                self._bot.sendMessage(
+                    "You are not authorized to delete this company.\nContact your administrator.")
             else:
                 print(f"{err.response.status_code} : {err.response.reason}")
             return False
         except:
-            self._bot.sendMessage("Error in the connection with the Resource Catalog")
+            self._bot.sendMessage(
+                "Error in the connection with the Resource Catalog")
             return False
         else:
             if "Status" in dict_ and dict_["Status"]:
@@ -485,8 +510,9 @@ class DeleteCompany():
             else:
                 return False
 
+
 class ChangePlant():
-    def __init__(self, CompanyName : str, sender, connector):
+    def __init__(self, CompanyName: str, sender, connector):
         """Change the plant of a field.
 
         Arguments:
@@ -515,7 +541,8 @@ class ChangePlant():
         if self._status == 0:
             fields = self._connector.getList(self.CompanyName, "fields")
             if fields == None:
-                self._bot.sendMessage("Error in the connection with the Resource Catalog")
+                self._bot.sendMessage(
+                    "Error in the connection with the Resource Catalog")
                 return True
             elif len(fields) == 0:
                 self._bot.sendMessage("No fields registered")
@@ -525,15 +552,17 @@ class ChangePlant():
                 for field in fields:
                     number = field['fieldNumber']
                     plant = field['plant']
-                    button = InlineKeyboardButton(text=f"Field {number} : {plant}", callback_data=f"{number}")
+                    button = InlineKeyboardButton(
+                        text=f"Field {number} : {plant}", callback_data=f"{number}")
                     inline_keyboard_.append([button])
-                keyboard = InlineKeyboardMarkup(inline_keyboard=inline_keyboard_)
+                keyboard = InlineKeyboardMarkup(
+                    inline_keyboard=inline_keyboard_)
                 self._bot.sendMessage(f"Which field of company {self.CompanyName} do you want to change?",
-                                        reply_markup=keyboard)
+                                      reply_markup=keyboard)
                 self._status += 1
-        
+
         elif self._status == 1:
-            try: 
+            try:
                 self.FieldNumber = int(message)
             except:
                 self._bot.sendMessage("Field number must be an integer")
@@ -545,7 +574,8 @@ class ChangePlant():
         elif self._status == 2:
             self.newplant = message
             change = f"You are changing the plant of field {self.FieldNumber} of company {self.CompanyName} to {self.newplant}"
-            self._bot.sendMessage(f"{change}\nConfirm your change?", reply_markup=keyboardYESNO)
+            self._bot.sendMessage(
+                f"{change}\nConfirm your change?", reply_markup=keyboardYESNO)
             self._status += 1
 
         elif self._status == 3:
@@ -563,11 +593,11 @@ class ChangePlant():
 
         try:
             params = {
-                    "fieldNumber" : self.FieldNumber,
-                    "plant" : self.newplant
+                "fieldNumber": self.FieldNumber,
+                "plant": self.newplant
             }
-            res = requests.put(f"{self._connector.ResourceCatalog_url}/{self.CompanyName}/field", 
-                                    params=params)
+            res = requests.put(f"{self._connector.ResourceCatalog_url}/{self.CompanyName}/field",
+                               params=params)
             res.raise_for_status()
             dict_ = res.json()
         except requests.exceptions.HTTPError as err:
@@ -577,7 +607,8 @@ class ChangePlant():
                 print(f"{err.response.status_code} : {err.response.reason}")
             return False
         except:
-            self._bot.sendMessage("Error in the connection with the Resource Catalog")
+            self._bot.sendMessage(
+                "Error in the connection with the Resource Catalog")
             return False
         else:
             if "Status" in dict_ and dict_["Status"]:
@@ -585,8 +616,9 @@ class ChangePlant():
             else:
                 return False
 
+
 class CustomPlot():
-    def __init__(self, CompanyName : str, sender, connector):
+    def __init__(self, CompanyName: str, sender, connector):
         """Create a custom plot.
 
         Arguments:

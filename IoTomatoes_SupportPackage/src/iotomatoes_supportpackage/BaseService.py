@@ -5,15 +5,16 @@ from .ItemInfo import isMQTT
 from .RefreshThread import RefreshThread
 from .MQTTClient import BaseMQTTClient
 
-class BaseService() :
+
+class BaseService():
     def __init__(self, settings: dict):
         """Initialize the BaseService class."""
-        
+
         self._ServiceCatalog_url = settings["ServiceCatalog_url"]
         self.start(settings)
 
     def getCompaniesList(self):
-        """Return the complete list of the companies from the Resource Catalog""" 
+        """Return the complete list of the companies from the Resource Catalog"""
 
         try:
             r = requests.get(self.ResourceCatalog_url+"/companies")
@@ -32,11 +33,11 @@ class BaseService() :
         self.EndpointInfo = self.register(info)
         self._RefreshThread = RefreshThread(self._ServiceCatalog_url, self)
         if self.serviceName != "ResourceCatalog":
-            self.ResourceCatalog_url = self.getOtherServiceURL("resource_catalog", True)
+            self.ResourceCatalog_url = self.getOtherServiceURL(
+                "resource_catalog", True)
         if self.isMQTT:
             self._MQTTClient = BaseMQTTClient(self._ServiceCatalog_url, self)
             self._MQTTClient.startMQTT()
-
 
     def restart(self):
         """Restart the endpoint as a service.
@@ -55,8 +56,8 @@ class BaseService() :
 
         while True:
             try:
-                res = requests.post(self._ServiceCatalog_url + "/insert", 
-                                        json = info)
+                res = requests.post(self._ServiceCatalog_url + "/insert",
+                                    json=info)
                 res.raise_for_status()
                 res_dict = res.json()
             except requests.exceptions.HTTPError as err:
@@ -66,20 +67,21 @@ class BaseService() :
                 print(f"Connection Error\nRetrying connection\n")
                 time.sleep(1)
             else:
-                try:                    
+                try:
                     if "ID" in res_dict:
                         print("Service registered to the Service Catalog")
                         return res_dict
                 except:
-                    print(f"Error in the response\n")  
+                    print(f"Error in the response\n")
                     time.sleep(1)
 
-    def getOtherServiceURL(self, serviceName: str, repeat : bool = False):
+    def getOtherServiceURL(self, serviceName: str, repeat: bool = False):
         """Return the URL of the service `serviceName`"""
 
         while repeat:
             try:
-                r = requests.get(self._ServiceCatalog_url +"/" + serviceName + "/url")
+                r = requests.get(self._ServiceCatalog_url +
+                                 "/" + serviceName + "/url")
                 r.raise_for_status()
                 res_dict = r.json()
             except:
@@ -91,17 +93,15 @@ class BaseService() :
                 else:
                     time.sleep(1)
         return ""
-    
+
     @property
     def serviceName(self) -> str:
         return self.EndpointInfo["serviceName"]
-    
+
     @property
     def ID(self) -> int:
         return self.EndpointInfo["ID"]
-    
+
     @property
     def isMQTT(self) -> bool:
         return isMQTT(self.EndpointInfo)
-
-    

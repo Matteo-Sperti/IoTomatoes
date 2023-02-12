@@ -11,8 +11,9 @@ from iotomatoes_supportpackage.ItemInfo import getIPaddress, constructService
 
 serviceList_Name = "servicesList"
 
+
 class ServiceCatalogManager:
-    def __init__(self, heading : dict, filename = "catalog.json", autoDeleteTime = 120, IDs = IDs(1,99)):
+    def __init__(self, heading: dict, filename="catalog.json", autoDeleteTime=120, IDs=IDs(1, 99)):
         """Initialize the catalog manager.
 
         Arguments:
@@ -28,20 +29,21 @@ class ServiceCatalogManager:
         self._autoDeleteTime = autoDeleteTime
         self._filename = filename
         self._IDs = IDs
-        self._autoDeleteItemsThread = MyThread(self.autoDeleteItems, interval=self._autoDeleteTime)
+        self._autoDeleteItemsThread = MyThread(
+            self.autoDeleteItems, interval=self._autoDeleteTime)
 
     def save(self):
         """Save the catalog in the file specified in the initialization. 
 
         Return: json with the status of the operation."""
-        
+
         json.dump(self.catalog, open(self._filename, "w"), indent=4)
         print("Catalog saved!\n")
         return json.dumps({"Status": True}, indent=4)
 
     def print_catalog(self):
         """Return the catalog in json format."""
-        
+
         return json.dumps(self.catalog, indent=4)
 
     @property
@@ -52,7 +54,7 @@ class ServiceCatalogManager:
             return json.dumps(self.catalog["broker"], indent=4)
         except KeyError:
             raise web_exception(404, "Broker info not found")
-        
+
     @property
     def telegramToken(self):
         """Return the telegram token in json format."""
@@ -70,7 +72,7 @@ class ServiceCatalogManager:
         except KeyError:
             raise web_exception(404, "List not found")
 
-    def getService_url(self, service : str):
+    def getService_url(self, service: str):
         """Return the url of item `service` in json format.
 
         `service` is:
@@ -88,10 +90,10 @@ class ServiceCatalogManager:
             return json.dumps(out, indent=4)
         raise web_exception(404, "Service info not found")
 
-    def insert(self, item_dict : dict):
+    def insert(self, item_dict: dict):
         """Insert a new service in the catalog.
         Return a json with the status of the operation.
-        
+
         Arguments:
         - `item_dict` is the service in json format to insert.
         """
@@ -100,7 +102,7 @@ class ServiceCatalogManager:
             if ID == -1:
                 raise web_exception(500, "No more IDs available")
             else:
-                self.catalog["lastUpdate"] = time.time() 
+                self.catalog["lastUpdate"] = time.time()
                 try:
                     new_item = constructService(ID, item_dict)
                 except InfoException as e:
@@ -110,16 +112,16 @@ class ServiceCatalogManager:
         except KeyError:
             raise web_exception(500, "Invalid key")
 
-    def delete(self, IDvalue : int):
+    def delete(self, IDvalue: int):
         """Delete a service from the catalog.
         Return a json with the status of the operation.
-        
+
         Arguments:
         - `IDvalue` is the ID of the service to delete.
         """
         try:
             item = self.find_item(ID=IDvalue)
-            if item != None : 
+            if item != None:
                 actualtime = time.time()
                 self.catalog["lastUpdate"] = actualtime
                 self.catalog[serviceList_Name].remove(item)
@@ -131,26 +133,25 @@ class ServiceCatalogManager:
         except KeyError:
             raise web_exception(500, "Invalid key")
 
-
     def find_item(self, **kwargs):
         """Return the service with the ID `IDvalue` or the 
             corresponding `serviceName`."""
 
         if "ID" in kwargs:
             key = "ID"
-            value =  int(kwargs["ID"])
+            value = int(kwargs["ID"])
         elif "serviceName" in kwargs:
             value = kwargs["serviceName"]
             key = "serviceName"
         else:
             return None
-        
+
         for item in self.catalog[serviceList_Name]:
             if item[key] == value:
                 return item
         return None
 
-    def refreshItem(self, IDvalue : int):
+    def refreshItem(self, IDvalue: int):
         """Refresh the lastUpdate field of a service.
         Return a json with the status of the operation.
 
@@ -186,10 +187,11 @@ class ServiceCatalogManager:
         self.catalog["lastUpdate"] = actualtime
         self.save()
 
+
 class RESTServiceCatalog():
     exposed = True
 
-    def __init__(self, settings : dict):
+    def __init__(self, settings: dict):
         """ Initialize the RESTServiceCatalog class.
 
         `settings (dict)` is a dictionary with the following keys:
@@ -199,12 +201,13 @@ class RESTServiceCatalog():
         - `telegramToken` is the telegram token.
         """
         heading = {
-            "owner": settings["owner"], 
+            "owner": settings["owner"],
             "CatalogName": settings["CatalogName"],
             "broker": settings["broker"],
-            "telegramToken" : settings["telegramToken"]
-            }
-        self.ServiceCatalog = ServiceCatalogManager(heading, settings["filename"], settings["autoDeleteTime"])
+            "telegramToken": settings["telegramToken"]
+        }
+        self.ServiceCatalog = ServiceCatalogManager(
+            heading, settings["filename"], settings["autoDeleteTime"])
 
     def close(self):
         """Close the endpoint and save the catalog."""
@@ -242,7 +245,7 @@ class RESTServiceCatalog():
             e_string = "Server error"
             print(e_string)
             raise cherrypy.HTTPError(500, e_string)
-        
+
     def PUT(self, *uri, **params):
         """PUT REST method.
 
@@ -266,7 +269,7 @@ class RESTServiceCatalog():
 
     def POST(self, *uri, **params):
         """POST REST method.
-        
+
         Allowed URI:
         - `/save` to save the catalog in the file.
         - `/insert` to insert a new service in the catalog. 
@@ -309,11 +312,13 @@ class RESTServiceCatalog():
         else:
             raise web_exception(404, "Invalid command")
 
+
 def sigterm_handler(signal, frame):
     Catalog.close()
     cherrypy.engine.stop()
     cherrypy.engine.exit()
     print("Server stopped")
+
 
 signal.signal(signal.SIGTERM, sigterm_handler)
 

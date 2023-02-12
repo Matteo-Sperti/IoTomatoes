@@ -6,20 +6,21 @@ from iotomatoes_supportpackage.IoTDevice import IoTDevice
 
 sensor = Adafruit_DHT.DHT11
 
+
 class RasPySensor(IoTDevice):
-    def __init__(self, DeviceInfo : dict):
+    def __init__(self, DeviceInfo: dict):
         """Constructor of the Raspberry Pi sensor. It will initialize the sensor and
         the MQTT client, it will register the sensor to the ResourceCatalog and to the broker 
         and it will subscribe to the topics specified in the ResourceCatalog."""
 
-        super().__init__(DeviceInfo, sensor = self)
+        super().__init__(DeviceInfo, sensor=self)
 
         self.pin = settings["PIN_IN"]
 
     def get_temperature(self):
         """This function is called periodically in order to get the sensor readings.
         It will publish the readings on the topics specified in the ResourceCatalog.
-        
+
         In this example, the sensor is a DHT11 temperature and humidity sensor."""
 
         # Try to grab a sensor reading.  Use the read_retry method which will retry up
@@ -47,4 +48,4 @@ if __name__ == "__main__":
             while True:
                 time.sleep(10)
         except KeyboardInterrupt or SystemExit:
-                IoTSensor.close()
+            IoTSensor.close()

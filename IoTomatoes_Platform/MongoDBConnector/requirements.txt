@@ -1,5 +1,4 @@
 CherryPy==18.8.0
-matplotlib==3.5.1
 pymongo==4.3.3
 requests==2.25.1
 paho_mqtt==1.6.1

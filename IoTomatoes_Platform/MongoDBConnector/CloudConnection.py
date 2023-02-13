@@ -452,11 +452,11 @@ class MongoConnection():
         """
         db = self.client["PlantDatabase"]
         collection = db["PlantData"]
-        dict = list(collection.find())
-        for i in dict:
+        list_dict = list(collection.find())
+        for i in list_dict:
             if i["PlantName"] == PlantName:
                 return json.dumps(i)
-        raise web_exception(404, "Plant not found")
+        return json.dumps(list_dict[-1])
 
     def getTruckTrace(self, CompanyName: str, TruckID):
         """Get the truck trace informations

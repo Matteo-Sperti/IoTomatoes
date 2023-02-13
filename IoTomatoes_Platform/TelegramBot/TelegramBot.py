@@ -194,7 +194,7 @@ class IoTBot(BaseService):
         # TelegramBot
         self.tokenBot = self.get_token()
         self.bot = ChatBox(self.tokenBot, self)
-        self.DataVisualizer = self.getOtherServiceURL(settings["DataVisualizer_Service"])
+        self.DataVisualizer = settings["DataVisualizer_Service"]
         MessageLoop(self.bot).run_as_thread()
 
     def get_token(self):

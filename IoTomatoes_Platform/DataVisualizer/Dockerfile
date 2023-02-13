@@ -20,4 +20,4 @@ USER appuser
 
 COPY . /app/
 
-CMD ["python","/app/DataVisualizer.py"]
+CMD ["python","DataVisualizer.py"]

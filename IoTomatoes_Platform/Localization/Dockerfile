@@ -20,4 +20,4 @@ USER appuser
 
 COPY . /app/
 
-CMD ["python","/app/TraceGenerator.py"]
+CMD ["python","TraceGenerator.py"]

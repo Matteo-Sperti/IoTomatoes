@@ -21,4 +21,4 @@ USER appuser
 
 COPY . /app/
 
-CMD ["python","/app/TelegramBot.py"]
+CMD ["python","TelegramBot.py"]

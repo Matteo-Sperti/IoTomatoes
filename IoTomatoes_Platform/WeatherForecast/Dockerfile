@@ -21,4 +21,4 @@ USER appuser
 
 COPY . /app/
 
-CMD ["python","/app/WeatherApp.py"]
+CMD ["python","WeatherApp.py"]

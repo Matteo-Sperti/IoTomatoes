@@ -741,23 +741,19 @@ class CustomPlot():
     def get_plot(self):
         """Get the image of the custom plot from the Data Visualization Service"""
 
+        url = self._connector.getOtherServiceURL(
+            self._connector.DataVisualizer)
         try:
             params = {
                 "Field": self.FieldNumber,
                 "measure": self.Measure,
                 "start_date": self.start_date,
-                "end_date": self.end_date,
+                "end_date": self.end_date
             }
-            res = requests.put(f"{self._connector.DataVisualizer}/{self.CompanyName}/measure",
+            res = requests.get(f"{url}/{self.CompanyName}/measure",
                                params=params)
             res.raise_for_status()
             dict_ = res.json()
-        except requests.exceptions.HTTPError as err:
-            if err.response.status_code == 404:
-                self._bot.sendMessage("Company not registered")
-            else:
-                print(f"{err.response.status_code} : {err.response.reason}")
-            return False
         except:
             self._bot.sendMessage(
                 "Error in the connection with the Data Visualization Service")
@@ -775,21 +771,18 @@ class CustomPlot():
     def get_consumption(self):
         """Get the image of the consumption plot from the Data Visualization Service"""
 
+        url = self._connector.getOtherServiceURL(
+            self._connector.DataVisualizer)
+
         try:
             params = {
                 "start_date": self.start_date,
                 "end_date": self.end_date,
             }
-            res = requests.put(f"{self._connector.DataVisualizer}/{self.CompanyName}/consumption",
+            res = requests.get(f"{url}/{self.CompanyName}/consumption",
                                params=params)
             res.raise_for_status()
             dict_ = res.json()
-        except requests.exceptions.HTTPError as err:
-            if err.response.status_code == 404:
-                self._bot.sendMessage("Company not registered")
-            else:
-                print(f"{err.response.status_code} : {err.response.reason}")
-            return False
         except:
             self._bot.sendMessage(
                 "Error in the connection with the Data Visualization Service")

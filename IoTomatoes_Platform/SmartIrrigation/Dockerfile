@@ -20,4 +20,4 @@ USER appuser
 
 COPY . /app/
 
-CMD ["python","/app/SmartIrrigation.py"]
+CMD ["python","SmartIrrigation.py"]

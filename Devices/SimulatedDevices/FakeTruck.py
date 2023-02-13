@@ -34,8 +34,12 @@ def sigterm_handler(signal, frame):
 signal.signal(signal.SIGTERM, sigterm_handler)
 
 if __name__ == "__main__":
+    print("Starting Truck")
     try:
-        settings = json.load(open("TruckSettings.json", "r"))
+        fileSettings = open("TruckSettings.json", "r")
+        settings = json.load(fileSettings)
+        fileSettings.close()
+        
         IoTSensor = SimTruck(settings)
     except Exception as e:
         print(e)

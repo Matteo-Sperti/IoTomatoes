@@ -20,4 +20,4 @@ USER appuser
 
 COPY . /app/
 
-CMD ["python","/app/FaultDetection.py"]
+CMD ["python","FaultDetection.py"]

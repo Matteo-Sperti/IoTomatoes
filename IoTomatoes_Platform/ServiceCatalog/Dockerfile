@@ -20,4 +20,4 @@ USER appuser
 
 COPY . /app/
 
-CMD ["python","/app/ServiceCatalog.py"]
+CMD ["python","ServiceCatalog.py"]

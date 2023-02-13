@@ -20,4 +20,4 @@ USER appuser
 
 COPY . /app/
 
-CMD ["python","/app/ConsumptionManager.py"]
+CMD ["python","ConsumptionManager.py"]

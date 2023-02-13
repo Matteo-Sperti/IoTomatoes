@@ -108,11 +108,12 @@ class DataVisualizer():
                                     params=params)
             response.raise_for_status()
             dict_ = response.json()
+            print(dict_)
         except:
-            raise web_exception(404, "Error getting data from the database")
+            raise web_exception(500, "Error getting data from the database")
 
         if dict_ == None or dict_ == False:
-            raise web_exception(404, "No consumption data available")
+            raise web_exception(500, "No consumption data available")
         else:
             counts = []
             bins = []
@@ -146,10 +147,12 @@ class WebService(BaseService):
 
         super().__init__(settings)
         if "MongoDB_ServiceName" in settings:
-            self.mongoToCall = settings["MongoDB_ServiceName"]
-        mongoDB_url = self.getOtherServiceURL(self.mongoToCall)
-        self.visualizer = DataVisualizer(
-            mongoDB_url, settings["PointsPerGraph"])
+            mongoToCall = settings["MongoDB_ServiceName"]
+            mongoDB_url = self.getOtherServiceURL(mongoToCall)
+            self.visualizer = DataVisualizer(
+                mongoDB_url, settings["PointsPerGraph"])
+        else:
+            raise Exception("MongoDB service not found")
 
     def GET(self, *uri, **params):
         """GET method for the REST API

@@ -20,4 +20,4 @@ USER appuser
 
 COPY . /app/
 
-CMD ["python","/app/CloudConnection.py"]
+CMD ["python","CloudConnection.py"]

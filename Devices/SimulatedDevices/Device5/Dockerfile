@@ -21,4 +21,4 @@ USER appuser
 COPY ./Device5/ /app/
 COPY ./FakeDevice.py /app/
 
-CMD ["python","/app/FakeDevice.py"]
+CMD ["python","FakeDevice.py"]

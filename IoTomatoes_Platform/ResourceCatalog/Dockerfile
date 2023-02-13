@@ -20,4 +20,4 @@ USER appuser
 
 COPY . /app/
 
-CMD ["python","/app/ResourceCatalog.py"]
+CMD ["python","ResourceCatalog.py"]

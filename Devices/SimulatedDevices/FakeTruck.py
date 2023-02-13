@@ -11,7 +11,9 @@ class SimTruck(IoTDevice):
         """Constructor of the simulated sensor. It initializes the sensor and
         the MQTT client, it registers the sensor to the ResourceCatalog and to the broker
         and it subscribes to the topics specified in the ResourceCatalog."""
-
+        
+        self.platform_url = DeviceInfo["IoTomatoes_url"]
+        self.CompanyName = DeviceInfo["CompanyName"]
         self.tractor = GPSgenerator(self.platform_url, self.CompanyName)
         super().__init__(DeviceInfo, sensor=self)
 

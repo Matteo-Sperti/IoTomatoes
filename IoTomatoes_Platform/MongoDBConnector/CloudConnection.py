@@ -191,29 +191,6 @@ class MongoConnection():
                 self.client[CompanyName][CollectionName].update_one(
                     {"_id": TruckID}, {"$set": dict_})
 
-    def notify(self, topic, payload):
-        """Notify the observer that a new data has arrived.
-
-        Arguments:
-        - `topic (str)`: topic of the message.
-        - `payload (str)`: payload of the message.
-        """
-
-        listTopic = topic.split("/")
-        try:
-            if listTopic[2] == "consumption":
-                self.insertConsumptionData(listTopic[1], payload)
-                # IoTomatoes/CompanyName/consumption
-            elif isinstance(int(listTopic[2]), int):
-                self.insertDeviceData(
-                    listTopic[1], listTopic[2], listTopic[3], listTopic[4], payload)
-                # IoTomatoes/CompanyName/Field#/deviceID/measure
-            elif listTopic[2] == "truck":
-                self.insertTruckData(listTopic[1], listTopic[3], payload)
-                # IoTomatoes/CompanyName/truck/truckID
-        except IndexError:
-            pass
-
     def checkNewCompany(self):
         """Check if a new company has been added to the ResourceCatalog or if a company has been deleted."""
         try:
@@ -520,6 +497,29 @@ class RESTConnector(BaseService):
         super().__init__(settings)
         self.mongo = MongoConnection(
             self.ResourceCatalog_url, settings["MongoDB_Url"], settings["PlantDatabaseName"])
+
+    def notify(self, topic, payload):
+        """Notify the observer that a new data has arrived.
+
+        Arguments:
+        - `topic (str)`: topic of the message.
+        - `payload (str)`: payload of the message.
+        """
+
+        listTopic = topic.split("/")
+        try:
+            if listTopic[2] == "consumption":
+                self.mongo.insertConsumptionData(listTopic[1], payload)
+                # IoTomatoes/CompanyName/consumption
+            elif isinstance(int(listTopic[2]), int):
+                self.mongo.insertDeviceData(
+                    listTopic[1], listTopic[2], listTopic[3], listTopic[4], payload)
+                # IoTomatoes/CompanyName/Field#/deviceID/measure
+            elif listTopic[2] == "truck":
+                self.mongo.insertTruckData(listTopic[1], listTopic[3], payload)
+                # IoTomatoes/CompanyName/truck/truckID
+        except IndexError:
+            pass
 
     def GET(self, *uri, **params):
         """GET method for the REST API

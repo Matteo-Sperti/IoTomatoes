@@ -42,9 +42,11 @@ class GPSgenerator():
     def getCompanyLocation(self):
         """Get the company location from the catalog."""
         try:
-            res = requests.get(self.url + "/" + self.CompanyName + "/location")
+            print("Getting company location from the catalog...")
+            res = requests.get(self.url + "/rc/" + self.CompanyName + "/location")
             res.raise_for_status()
             res_dict = res.json()
+            print("Company location found!")
         except Exception as e:
             print(e)
             return None

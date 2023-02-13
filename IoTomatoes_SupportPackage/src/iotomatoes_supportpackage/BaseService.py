@@ -78,21 +78,22 @@ class BaseService():
     def getOtherServiceURL(self, serviceName: str, repeat: bool = False):
         """Return the URL of the service `serviceName`"""
 
-        while repeat:
+        print("Getting " + serviceName + " URL from the Service Catalog...")
+        while True:
             try:
                 r = requests.get(self._ServiceCatalog_url +
                                  "/" + serviceName + "/url")
                 r.raise_for_status()
                 res_dict = r.json()
+                print(res_dict)
+                return res_dict["url"]
             except:
                 print("ERROR: Service Catalog not reachable!")
-                time.sleep(1)
-            else:
-                if "url" in res_dict:
-                    return res_dict["url"]
-                else:
+                if repeat:
                     time.sleep(1)
-        return ""
+                else:
+                    return ""
+
 
     @property
     def serviceName(self) -> str:

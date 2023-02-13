@@ -439,7 +439,7 @@ class MongoConnection():
                             resultDict[CollectionName] = {"values": sum(
                                 lst), "timestamps": timestamps, "unit": unit}
                     except KeyError:
-                        pass
+                        raise web_exception(404, "No consumption data found")
                     if resultDict == {}:
                         raise web_exception(404, "No consumption data found")
                     return json.dumps(resultDict)
@@ -452,11 +452,15 @@ class MongoConnection():
         """
         db = self.client["PlantDatabase"]
         collection = db["PlantData"]
-        list_dict = list(collection.find())
-        for i in list_dict:
-            if i["PlantName"] == PlantName:
-                return json.dumps(i)
-        return json.dumps(list_dict[-1])
+        item = list(collection.find({"PlantName": PlantName}))
+
+        if item == []:
+            default = list(collection.find({"PlantName": "default"}))
+            if default == []:
+                raise web_exception(500, "Default values not found")
+            return json.dumps(default[0])
+        else:
+            return json.dumps(item[0])
 
     def getTruckTrace(self, CompanyName: str, TruckID):
         """Get the truck trace informations

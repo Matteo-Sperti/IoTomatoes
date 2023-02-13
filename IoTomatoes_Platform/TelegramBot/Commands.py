@@ -64,7 +64,7 @@ class InsertNewCompany():
                     "Invalid Company Name, please do not use spaces")
                 self._bot.sendMessage("Insert your Company Name")
                 return False
-            if message == "admin" or message == "company":
+            if message == "admin" or message == "local" or message == "PlantDatabase":
                 self._bot.sendMessage(
                     "Invalid Company Name, please do not use 'admin' or 'local' as Company Name")
                 self._bot.sendMessage("Insert your Company Name")

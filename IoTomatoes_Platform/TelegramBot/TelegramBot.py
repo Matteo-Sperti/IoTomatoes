@@ -22,6 +22,7 @@ You can use the following commands:
 /users to see all the users of your company.
 /devices to see all the active devices of your company.
 /delete_company to delete your company and all the data related to it.
+/plot to require a custom plot of your data.
 """
 
 WelcomeMessage = """Welcome to the IoTomatoesBot!
@@ -93,7 +94,7 @@ class MessageHandler(telepot.helper.ChatHandler):
                 elif message == "/change_plant":
                     self._command = ChangePlant(
                         self._CompanyName, self.sender, self._connector)
-                elif message == "plot":
+                elif message == "/plot":
                     self._command = CustomPlot(
                         self._CompanyName, self.sender, self._connector)
                 else:
@@ -193,7 +194,7 @@ class IoTBot(BaseService):
         # TelegramBot
         self.tokenBot = self.get_token()
         self.bot = ChatBox(self.tokenBot, self)
-
+        self.DataVisualizer = self.getOtherServiceURL(settings["DataVisualizer_Service"])
         MessageLoop(self.bot).run_as_thread()
 
     def get_token(self):

@@ -60,7 +60,7 @@ class SmartIrrigation(BaseService):
 
                 minSoilMoisture, maxSoilMoisture, precipitationLimit = self.getPlantLimit(
                     plant)
-                previousSoilMoisture, currentSoilMoisture = self.getMongoDBdata()
+                previousSoilMoisture, currentSoilMoisture = self.getMongoDBdata(CompanyName, fieldID)
                 if (previousSoilMoisture == None or currentSoilMoisture == None or
                         minSoilMoisture == None or maxSoilMoisture == None or precipitationLimit == None):
                     print("No previous or current soil moisture measure")
@@ -200,20 +200,31 @@ class SmartIrrigation(BaseService):
 
             return minSoilMoisture, maxSoilMoisture, precipitationLimit
 
-    def getMongoDBdata(self):
+    def getMongoDBdata(self, CompanyName: str, fieldID: int):
         mongoDB_url = self.getOtherServiceURL(self.mongoToCall)
 
         if mongoDB_url == None or mongoDB_url == "":
             print("ERROR: MongoDB service not found!")
             return None, None
-
-        # ESEGUE LA GET AL MONGODB SERVICE (da verificare)
+        
         try:
-            r = requests.get("http://127.0.0.1:8090/increasing")
+            params = {"Field": fieldID,
+                      "start_date": "lastHour",
+                      "end_date": "now",
+                      "measure": "soilMoisture"}
+            r = requests.get(f"{mongoDB_url}/{CompanyName}/avg", params=params)
             r.raise_for_status()
-            rValues = list((r.json()).values())
-            previousSoilMoisture = float(rValues[0])
-            currentSoilMoisture = float(rValues[1])
+            dict_ = r.json()
+            previousSoilMoisture = dict_["Average"]
+
+            params = {"Field": fieldID,
+                        "start_date": "now",
+                        "end_date": "now",
+                        "measure": "soilMoisture"}
+            r = requests.get(f"{mongoDB_url}/{CompanyName}/avg", params=params)
+            r.raise_for_status()
+            dict_ = r.json()
+            currentSoilMoisture = dict_["Average"]
         except:
             return None, None
         else:

@@ -216,24 +216,21 @@ class MongoConnection():
 
     def checkNewCompany(self):
         """Check if a new company has been added to the ResourceCatalog or if a company has been deleted."""
-        while True:
-            try:
-                response = requests.get(
-                    self.ResourceCatalog_url + "/companies/names")
-                response.raise_for_status()
-                res_dict = response.json()
-            except:
-                print("Error in Database")
-                time.sleep(5)
-            else:
-                for i in res_dict:
-                    if i not in list(self.client.list_databases()):
-                        self.insertDataBase(i)
-                for j in self.client.list_database_names():
-                    if j not in res_dict and (j != "PlantDatabase" and j != "admin" and j != "local"):
-                        print(j)
-                        self.deleteDatabase(j)
-                time.sleep(30)
+        try:
+            response = requests.get(
+                self.ResourceCatalog_url + "/companies/names")
+            response.raise_for_status()
+            res_dict = response.json()
+        except:
+            print("Error in Database")
+        else:
+            for i in res_dict:
+                if i not in list(self.client.list_databases()):
+                    self.insertDataBase(i)
+            for j in self.client.list_database_names():
+                if j not in res_dict and (j != "PlantDatabase" and j != "admin" and j != "local"):
+                    print(j)
+                    self.deleteDatabase(j)
 
     def time_period(self, list, start, end):
         """Get the time period of a list of timestamps.
@@ -567,6 +564,11 @@ class RESTConnector(BaseService):
 
 
 def sigterm_handler(signal, frame):
+    """Handler for the SIGTERM signal"""
+    global run
+    global WebService
+
+    run = False
     WebService.mongo.client.close()
     WebService.stop()
     cherrypy.engine.stop()
@@ -592,3 +594,8 @@ if __name__ == "__main__":
     cherrypy.config.update({'server.socket_host': ip_address})
     cherrypy.config.update({'server.socket_port': port})
     cherrypy.engine.start()
+
+    run = True
+    while run:
+        WebService.mongo.checkNewCompany()
+        time.sleep(30)

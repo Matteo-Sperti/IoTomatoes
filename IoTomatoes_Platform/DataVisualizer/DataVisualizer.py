@@ -156,10 +156,10 @@ class WebService(BaseService):
 
         Allowed URI:
         - `/<CompanyName>/measure`: returns the graph of the measures requested.
-        The parameters are "Field" and "measure", "starting date", "end date".
+        The parameters are "Field" and "measure", "start_date", "end_date".
         if `params["Field"]` == "all" returns the average of all field of corresponding company.
         - `/<CompanyName>/consumption`: returns the graph of the consumption of the fields of the 
-        company requested. The parameters are "starting date", "end date".
+        company requested. The parameters are "start_date", "end_date".
         """
         try:
             if len(uri) == 2 and uri[1] == "measure":

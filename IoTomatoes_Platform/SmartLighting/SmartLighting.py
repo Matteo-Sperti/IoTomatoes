@@ -172,10 +172,14 @@ class SmartLighting(BaseService):
             return None
 
         try:
-            r = requests.get(f"{mongoDB_url}/{CompanyName}/{fieldID}/light")
+            params = {"Field": fieldID,
+                      "start_date": "lastHour",
+                      "end_date": "now",
+                      "measure": "light"}
+            r = requests.get(f"{mongoDB_url}/{CompanyName}/avg", params=params)
             r.raise_for_status()
-            rValues = list((r.json()).values())
-            currentLight = float(rValues[0])
+            dict_ = r.json()
+            currentLight = dict_["Average"]
         except:
             return None
         else:
@@ -232,6 +236,9 @@ class SmartLighting(BaseService):
 
 
 def sigterm_handler(signal, frame):
+    """Handler for the SIGTERM signal."""
+    global lighting
+
     lighting.stop()
     print("SmartLighting stopped")
 

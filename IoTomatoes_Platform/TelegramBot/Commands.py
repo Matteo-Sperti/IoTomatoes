@@ -1,5 +1,7 @@
 import json
 import requests
+import base64
+import datetime
 from telepot.namedtuple import InlineKeyboardMarkup, InlineKeyboardButton
 
 keyboardYESNO = InlineKeyboardMarkup(inline_keyboard=[[
@@ -627,11 +629,177 @@ class CustomPlot():
         - `connector` : the IoTBot object used to connect to the Resource Catalog.
         """
         self.CompanyName = CompanyName
+        self.FieldNumber = -1
+        self.Measure = ""
+        self.start_date = ""
+        self.end_date = ""
         self._connector = connector
         self._bot = sender
         self._status = 0
 
-        self._bot.sendMessage("not implemented yet")
-
     def update(self, message):
-        return True
+        """Update the status of the change.
+
+        Arguments:
+        - `message (str)` : the message received from the user.
+
+        Returns:
+        - `True` if the procedure is completed.
+        - `False` otherwise.
+        """
+
+        if self._status == 0:
+            self._bot.sendMessage("Insert the measurement you want to plot")
+            self._status += 1
+            return False
+
+        elif self._status == 1:
+            if message == "consumption":
+                self.Measure = "consumption"
+                self._bot.sendMessage(
+                    "Insert the start date (format YYYY-MM-DD)")
+                self._status = 3
+                return False
+            else:
+                self.Measure = message
+                fields = self._connector.getList(self.CompanyName, "fields")
+                if fields == None:
+                    self._bot.sendMessage(
+                        "Error in the connection with the Resource Catalog")
+                    return True
+                elif len(fields) == 0:
+                    self._bot.sendMessage("No fields registered")
+                    return True
+                else:
+                    inline_keyboard_ = []
+                    for field in fields:
+                        number = field['fieldNumber']
+                        plant = field['plant']
+                        button = InlineKeyboardButton(
+                            text=f"Field {number} : {plant}", callback_data=f"{number}")
+                        inline_keyboard_.append([button])
+                    keyboard = InlineKeyboardMarkup(
+                        inline_keyboard=inline_keyboard_)
+                    self._bot.sendMessage(f"Choose field of company {self.CompanyName}!",
+                                          reply_markup=keyboard)
+                    self._status += 1
+                    return False
+
+        elif self._status == 2:
+            try:
+                self.FieldNumber = int(message)
+            except:
+                self._bot.sendMessage("Field number must be an integer")
+                return False
+            else:
+                self._bot.sendMessage(
+                    "Insert the start date (format YYYY-MM-DD)")
+                self._status += 1
+                return False
+
+        elif self._status == 3:
+            try:
+                datetime.datetime.strptime(message, '%Y-%m-%d')
+            except ValueError:
+                self._bot.sendMessage(
+                    "Incorrect date format, should be YYYY-MM-DD")
+                self._bot.sendMessage(
+                    "Insert the start date (format YYYY-MM-DD)")
+                return False
+            else:
+                self.start_date = message
+                self._bot.sendMessage(
+                    "Insert the end date (format YYYY-MM-DD)")
+                self._status += 1
+                return False
+
+        elif self._status == 4:
+            try:
+                datetime.datetime.strptime(message, '%Y-%m-%d')
+            except ValueError:
+                self._bot.sendMessage(
+                    "Incorrect date format, should be YYYY-MM-DD")
+                self._bot.sendMessage(
+                    "Insert the end date (format YYYY-MM-DD)")
+                return False
+            else:
+                self.end_date = message
+
+                if self.Measure == "consumption":
+                    out = self.get_consumption()
+                else:
+                    out = self.get_plot()
+
+                if not out:
+                    self._bot.sendMessage("Error in the creation of the plot")
+
+                return True
+
+        else:
+            return True
+
+    def get_plot(self):
+        """Get the image of the custom plot from the Data Visualization Service"""
+
+        try:
+            params = {
+                "Field": self.FieldNumber,
+                "measure": self.Measure,
+                "start_date": self.start_date,
+                "end_date": self.end_date,
+            }
+            res = requests.put(f"{self._connector.DataVisualizer}/{self.CompanyName}/measure",
+                               params=params)
+            res.raise_for_status()
+            dict_ = res.json()
+        except requests.exceptions.HTTPError as err:
+            if err.response.status_code == 404:
+                self._bot.sendMessage("Company not registered")
+            else:
+                print(f"{err.response.status_code} : {err.response.reason}")
+            return False
+        except:
+            self._bot.sendMessage(
+                "Error in the connection with the Data Visualization Service")
+            return False
+        else:
+            if "img64" in dict_:
+                fileName = "plot.png"
+                with open(fileName, "wb") as fh:
+                    fh.write(base64.b64decode(dict_["img64"]))
+                self._bot.sendPhoto(fileName)
+                return True
+            else:
+                return False
+
+    def get_consumption(self):
+        """Get the image of the consumption plot from the Data Visualization Service"""
+
+        try:
+            params = {
+                "start_date": self.start_date,
+                "end_date": self.end_date,
+            }
+            res = requests.put(f"{self._connector.DataVisualizer}/{self.CompanyName}/consumption",
+                               params=params)
+            res.raise_for_status()
+            dict_ = res.json()
+        except requests.exceptions.HTTPError as err:
+            if err.response.status_code == 404:
+                self._bot.sendMessage("Company not registered")
+            else:
+                print(f"{err.response.status_code} : {err.response.reason}")
+            return False
+        except:
+            self._bot.sendMessage(
+                "Error in the connection with the Data Visualization Service")
+            return False
+        else:
+            if "img64" in dict_:
+                fileName = "plot.png"
+                with open(fileName, "wb") as fh:
+                    fh.write(base64.b64decode(dict_["img64"]))
+                self._bot.sendPhoto(fileName)
+                return True
+            else:
+                return False

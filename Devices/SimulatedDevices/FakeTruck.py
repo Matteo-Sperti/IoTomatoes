@@ -10,19 +10,20 @@ class SimTruck(IoTDevice):
     def __init__(self, DeviceInfo: dict):
         """Constructor of the simulated sensor. It initializes the sensor and
         the MQTT client, it registers the sensor to the ResourceCatalog and to the broker
-        and it subscribes to the topics specified in the ResourceCatalog.
-        Finally it starts the simulator of the ambient conditions."""
+        and it subscribes to the topics specified in the ResourceCatalog."""
 
-        super().__init__(DeviceInfo, sensor=self)
         self.tractor = GPSgenerator(self.platform_url, self.CompanyName)
+        super().__init__(DeviceInfo, sensor=self)
 
     def get_position(self):
-        """This function is used to get the temperature reading from the AmbientSimulator."""
+        """This function is used to get the GPS reading from the GPSgenerator."""
 
         return self.tractor.get_position()
 
 
 def sigterm_handler(signal, frame):
+    """Handler for the SIGTERM signal. It closes the MQTT client and the sensor."""
+
     IoTSensor.close()
     IoTSensor.tractor.TruckStop()
     print("Truck stopped")

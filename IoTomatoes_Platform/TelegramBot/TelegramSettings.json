@@ -9,5 +9,6 @@
             "serviceType": "MQTT",
             "subscribedTopics": ["+/Users/#"]
         }
-    ]
+    ],
+    "DataVisualizer_Service": "data_visualizer"
 }

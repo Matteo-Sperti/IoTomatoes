@@ -62,12 +62,17 @@ class MongoConnection():
         else:
             try:
                 db = self.client[CompanyName]
-                collection = db["CompanyData"]
-                data = {"Company": CompanyName,
-                        "Database Creation Time": time.ctime()}
-                collection.insert_one(data)
+                db.create_collection("TruckData")
+
+                response = requests.get(
+                    f"{self.ResourceCatalog_url}/{CompanyName}/fields")
+                response.raise_for_status()
+                list_fields = response.json()
+                for j in list_fields:
+                    self.insertField(CompanyName, str(j["fieldNumber"]))
+
                 print("Database created")
-            except errors.InvalidName:
+            except:
                 print("Error in creating the database")
 
     def deleteDatabase(self, CompanyName: str):
@@ -85,69 +90,68 @@ class MongoConnection():
             except errors.OperationFailure:
                 raise web_exception(500, "Error in deleting the database")
 
-    def insertField(self, CompanyName: str, CollectionName: str, data):
+    def insertField(self, CompanyName: str, CollectionName: str):
         """Create/update a collection (a.k.a a field) in the database of a company.
 
         Arguments:
         - `CompanyName (str)`: unique name of the company.
         - `CollectionName (str)`: unique name of the collection(a.k.a. field).
-        - `data (dict)`: data to be inserted in the collection.
         """
         self.insertDataBase(CompanyName)
         db = self.client[CompanyName]
-        collection = db[CollectionName]
-        data["_id"] = data.pop("bn")
-        collection.insert_one(data)
+        if CollectionName in db.list_collection_names():
+            print("Collection already exists")
+        else:
+            db.create_collection(CollectionName)
 
-    def insertDeviceData(self, CompanyName, CollectionName, ID, measure, data):
+    def insertDeviceData(self, data: dict):
         """Insert data in a collection.
 
         Arguments:
-        - `CompanyName (str)`: unique name of the company.
-        - `CollectionName (str)`: unique name of the collection(a.k.a. field).
-        - `ID (str)`: ID of the device.
-        - `measure (str)`: measure to be inserted in the collection.
         - `data (dict)`: data to be inserted in the collection.
         """
-        data["_id"] = data.pop("bn")
+        ID = data.pop("bn")
+        data["_id"] = str(ID)
         counter = 0
+        CompanyName = data.pop("CompanyName")
+        fieldNumber = str(data.pop("fieldNumber"))
 
-        try:
-            dict_ = self.client[CompanyName][CollectionName].find_one({
-                                                                      "_id": ID})
-            if dict_ == None or "e" not in dict_:
-                raise KeyError
+        collection = self.client[CompanyName][fieldNumber]
 
-            found = 0
-            for i in dict_["e"]:
-                if measure not in dict_["e"][i]["name"]:
-                    counter += 1
-                else:
-                    found = i
+        dict_ = collection.find_one({"_id": ID})
 
-            if counter == len(dict_["e"]):
-                dict_["e"].append(data["e"][0])
-                return
-            if isinstance(dict_["e"][found]["value"], list) == False:
-                dict_["e"][found]["value"] = [dict_["e"][found]["value"]]
-            if isinstance(dict_["e"][found]["value"], list) == False:
-                dict_["e"][found]["timestamp"] = [
-                    dict_["e"][found]["timestamp"]]
-            if isinstance(dict_["e"], list) == False:
-                dict_["e"] = [dict_["e"]]
-            dict_["e"][found]["value"].extend([data["e"][0]["value"]])
-            dict_[ID]["e"][found]["timestamp"].extend(
-                [data["e"][0]["timestamp"]])
+        if dict_ == None:
+            collection.insert_one(data)
+            return
 
-        except errors.InvalidOperation:
-            # means that the device is not in the database, so it is added
-            self.client[CompanyName][CollectionName].insert_one(data)
-        except KeyError:
-            # means that the consumption key of the device was created before the other keys, so it
-            # is copied on the data dictionary and the object of the collection is updated
+        if "e" not in dict_:
             dict_ = {"consumption": data["consumption"]}
-            self.client[CompanyName][CollectionName].update_one(
-                {"_id": ID}, {"$set": data})
+            collection.update_one({"_id": ID}, {"$set": data})
+            return
+        else:
+            measure = data["e"][0]["name"]
+
+        found = 0
+        for i in dict_["e"]:
+            if measure not in dict_["e"][i]["name"]:
+                counter += 1
+            else:
+                found = i
+
+        if counter == len(dict_["e"]):
+            dict_["e"].append(data["e"][0])
+            return
+        if isinstance(dict_["e"][found]["value"], list) == False:
+            dict_["e"][found]["value"] = [dict_["e"][found]["value"]]
+        if isinstance(dict_["e"][found]["value"], list) == False:
+            dict_["e"][found]["timestamp"] = [
+                dict_["e"][found]["timestamp"]]
+        if isinstance(dict_["e"], list) == False:
+            dict_["e"] = [dict_["e"]]
+        dict_["e"][found]["value"].extend([data["e"][0]["value"]])
+        dict_[ID]["e"][found]["timestamp"].extend(
+            [data["e"][0]["timestamp"]])
+
 
     def insertTruckData(self, CompanyName: str, TruckID: str, data):
         """Insert data in a collection.
@@ -158,7 +162,6 @@ class MongoConnection():
         - `data (dict)`: data to be inserted in the collection.
         """
 
-        db = self.client[CompanyName]
         data["_id"] = data.pop("bn")
         CollectionName = "Trucks"
         dict_ = self.client[CompanyName][CollectionName].find_one({
@@ -191,169 +194,7 @@ class MongoConnection():
                 self.client[CompanyName][CollectionName].update_one(
                     {"_id": TruckID}, {"$set": dict_})
 
-    def checkNewCompany(self):
-        """Check if a new company has been added to the ResourceCatalog or if a company has been deleted."""
-        try:
-            response = requests.get(
-                self.ResourceCatalog_url + "/companies/names")
-            response.raise_for_status()
-            res_dict = response.json()
-        except:
-            print("Error in Database")
-        else:
-            for i in res_dict:
-                if i not in list(self.client.list_databases()):
-                    self.insertDataBase(i)
-            for j in self.client.list_database_names():
-                if j not in res_dict and (j != "PlantDatabase" and j != "admin" and j != "local"):
-                    print(j)
-                    self.deleteDatabase(j)
-
-    def time_period(self, list, start, end):
-        """Get the time period of a list of timestamps.
-
-        Arguments:
-        - `list (list)`: list of timestamps to be analyzed.
-        - `start (str)`: start date of the period.
-        - `end (str)`: end date of the period.
-        The date must be in the format "YYYY-MM-DD".
-        """
-
-        for i in range(len(list)):
-            if list[i] <= start:
-                start = i
-            if list[i] >= end:
-                end = i
-        if start == (len(list)-1):
-            return (start, start)
-        elif start == end:
-            end += 1
-            return (start, end)
-        else:
-            return (0, 0)
-
-    def GetAvg(self, CompanyName: str, CollectionName: str, measure: str, start: str, end: str):
-        """Get the average of a measure in a period of time.
-
-        Arguments:
-        - `CompanyName (str)`: unique name of the company.
-        - `CollectionName (str)`: name of the collection.
-        - `measure (str)`: name of the measure.
-        - `start (str)`: start date of the period.
-        - `end (str)`: end date of the period.
-        The date must be in the format "YYYY-MM-DD".
-        """
-
-        if CompanyName not in self.client.list_database_names():
-            raise web_exception(404, "Company not found")
-        else:
-            if CollectionName not in self.client[CompanyName].list_collection_names():
-                raise web_exception(404, "Field not found")
-            else:
-                db = self.client[CompanyName]
-                collection = db[CollectionName]
-                dict = list(collection.find())
-                lst = []
-                avg = 0
-                flag = 0
-                indexes_to_get_unit = []
-                for i in range(len(dict)):
-
-                    for j in range(len(dict[i]["e"])):
-                        if dict[i]["e"][j]["name"] == measure:
-                            indexes = self.time_period(
-                                dict[i]["e"][j]["timestamp"], start, end)
-                            avg = sum(dict[i]["e"][j]["value"][indexes[0]:indexes[1]]) / \
-                                len(dict[i]["e"][j]["value"]
-                                    [indexes[0]:indexes[1]])
-                            lst.append(avg)
-                            indexes_to_get_unit = [i, j]
-                            flag = 1
-
-                if len(lst) == 0 or flag == 0:
-                    return False
-                else:
-                    result = {
-                        "Company": CompanyName,
-                        "Field": CollectionName,
-                        "Measure": measure,
-                        "Average": sum(lst)/len(lst),
-                        "Unit": dict[indexes_to_get_unit[0]]["e"][indexes_to_get_unit[1]]["unit"],
-                        "Time Period": [start, end]
-                    }
-                return json.dumps(result)
-
-    def getAvgAll(self, CompanyName: str, measure: str, start: str, end: str):
-        """Get the average of a measure in a period of time for all the fields of a company.
-
-        Arguments:
-        - `CompanyName (str)`: unique name of the company.
-        - `measure (str)`: name of the measure.
-        - `start (str)`: start date of the period.
-        - `end (str)`: end date of the period.
-        The date must be in the format "YYYY-MM-DD".
-        """
-        if CompanyName not in self.client.list_database_names():
-            raise web_exception(404, "Company not found")
-        else:
-            db = self.client[CompanyName]
-            lst = []
-            unit = "No unit"
-            for i in db.list_collection_names():
-                if "Field" in i:
-                    result = self.GetAvg(CompanyName, i, measure, start, end)
-                    if result is not False and result is not None:
-                        result = json.loads(result)
-                        lst.append(result["Average"])
-                        unit = result["Unit"]
-            if len == [] or unit == "No unit":
-                raise web_exception(404, "No data found")
-
-            resultDict = {"Company": CompanyName, "Measure": measure, "Average": sum(
-                lst)/len(lst), "Unit": unit, "Timeperiod": [start, end]}
-            return json.dumps(resultDict)
-
-    def getMeasureGraphData(self, CompanyName, CollectionName, measure, start, end):
-        """Get the data of a measure for a graph.
-
-        Arguments:
-        - `CompanyName (str)`: unique name of the company.
-        - `CollectionName (str)`: name of the field.
-        - `measure (str)`: name of the measure.
-        - `start (str)`: start date of the period.
-        - `end (str)`: end date of the period.
-        The date must be in the format "YYYY-MM-DD".
-        """
-        if CompanyName not in self.client.list_database_names():
-            raise web_exception(404, "Company not found")
-        else:
-            if CollectionName not in self.client[CompanyName].list_collection_names():
-                raise web_exception(404, "Field not found")
-            else:
-                db = self.client[CompanyName]
-                collection = db[CollectionName]
-                dict_ = list(collection.find())
-                lst = []
-                timestamps = []
-                resultDict = {}
-                unit = "No unit"
-                for i in range(len(dict_)):
-                    lst = []
-                    timestamps = []
-                    for j in range(len(dict_[i]["e"])):
-                        if dict_[i]["e"][j]["name"] == measure:
-                            indexes = self.time_period(
-                                dict_[i]["e"][j]["timestamp"], start, end)
-                            lst.extend(dict_[i]["e"][j]["value"]
-                                       [indexes[0]:indexes[1]])
-                            timestamps.extend(
-                                dict_[i]["e"][j]["timestamp"][indexes[0]:indexes[1]])
-                            unit = dict_[i]["e"][j]["unit"]
-                    resultDict[dict_[i]["_id"]] = {
-                        "values": lst, "timestamps": timestamps, "unit": unit}
-                return json.dumps(resultDict)
-
-    def insertConsumptionData(self, CompanyName, data):
+    def insertConsumptionData(self, CompanyName : str, data: dict):
         """Insert the consumption data in the database.
 
         Arguments:
@@ -404,6 +245,172 @@ class MongoConnection():
             dict[ID]["consumption"]["timestamp"].append(timestamp)
             collection.update_one({"_id": ID}, {"$set": dict[ID]})
 
+
+    def checkNewCompany(self):
+        """Check if a new company has been added to the ResourceCatalog or if a company has been deleted."""
+        try:
+            response = requests.get(
+                self.ResourceCatalog_url + "/companies/names")
+            response.raise_for_status()
+            list_names = response.json()
+
+            for i in list_names:
+                if i not in list(self.client.list_databases()):
+                    self.insertDataBase(i)
+
+            for j in self.client.list_database_names():
+                if j not in list_names and (j != "PlantDatabase" and j != "admin" and j != "local"):
+                    print(j)
+                    self.deleteDatabase(j)
+        except:
+            print("Error in Database")
+
+    def time_period(self, list, start, end):
+        """Get the time period of a list of timestamps.
+
+        Arguments:
+        - `list (list)`: list of timestamps to be analyzed.
+        - `start (str)`: start date of the period.
+        - `end (str)`: end date of the period.
+        The date must be in the format "YYYY-MM-DD".
+        """
+
+        for i in range(len(list)):
+            if list[i] <= start:
+                start = i
+            if list[i] >= end:
+                end = i
+        if start == (len(list)-1):
+            return (start, start)
+        elif start == end:
+            end += 1
+            return (start, end)
+        else:
+            return (0, 0)
+
+    def GetAvg(self, CompanyName: str, CollectionName: str, measure: str, start: str, end: str):
+        """Get the average of a measure in a period of time.
+
+        Arguments:
+        - `CompanyName (str)`: unique name of the company.
+        - `CollectionName (str)`: name of the collection.
+        - `measure (str)`: name of the measure.
+        - `start (str)`: start date of the period.
+        - `end (str)`: end date of the period.
+        The date must be in the format "YYYY-MM-DD".
+        """
+
+        if CompanyName not in self.client.list_database_names():
+            raise web_exception(404, "Company not found")
+        else:
+            if CollectionName not in self.client[CompanyName].list_collection_names():
+                raise web_exception(404, "Field not found")
+            else:
+                db = self.client[CompanyName]
+                collection = db[CollectionName]
+                dict_ = list(collection.find())
+                lst = []
+                avg = 0
+                flag = 0
+                indexes_to_get_unit = []
+                for i in range(len(dict_)):
+
+                    for j in range(len(dict_[i]["e"])):
+                        if dict_[i]["e"][j]["name"] == measure:
+                            indexes = self.time_period(
+                                dict_[i]["e"][j]["timestamp"], start, end)
+                            avg = sum(dict_[i]["e"][j]["value"][indexes[0]:indexes[1]]) / \
+                                len(dict_[i]["e"][j]["value"]
+                                    [indexes[0]:indexes[1]])
+                            lst.append(avg)
+                            indexes_to_get_unit = [i, j]
+                            flag = 1
+
+                if len(lst) == 0 or flag == 0:
+                    return False
+                else:
+                    result = {
+                        "Company": CompanyName,
+                        "Field": CollectionName,
+                        "Measure": measure,
+                        "Average": sum(lst)/len(lst),
+                        "Unit": dict_[indexes_to_get_unit[0]]["e"][indexes_to_get_unit[1]]["unit"],
+                        "Time Period": [start, end]
+                    }
+                return json.dumps(result)
+
+    def getAvgAll(self, CompanyName: str, measure: str, start: str, end: str):
+        """Get the average of a measure in a period of time for all the fields of a company.
+
+        Arguments:
+        - `CompanyName (str)`: unique name of the company.
+        - `measure (str)`: name of the measure.
+        - `start (str)`: start date of the period.
+        - `end (str)`: end date of the period.
+        The date must be in the format "YYYY-MM-DD".
+        """
+        if CompanyName not in self.client.list_database_names():
+            raise web_exception(404, "Company not found")
+        else:
+            db = self.client[CompanyName]
+            lst = []
+            unit = "No unit"
+            for i in db.list_collection_names():
+                if "Field" in i:
+                    result = self.GetAvg(CompanyName, i, measure, start, end)
+                    if result is not False and result is not None:
+                        result = json.loads(result)
+                        lst.append(result["Average"])
+                        unit = result["Unit"]
+            if len == [] or unit == "No unit":
+                raise web_exception(404, "No data found")
+
+            resultDict = {"Company": CompanyName, "Measure": measure, "Average": sum(
+                lst)/len(lst), "Unit": unit, "Timeperiod": [start, end]}
+            return json.dumps(resultDict)
+
+    def getMeasureGraphData(self, CompanyName: str, CollectionName: str, measure: str, start, end):
+        """Get the data of a measure for a graph.
+
+        Arguments:
+        - `CompanyName (str)`: unique name of the company.
+        - `CollectionName (str)`: name of the field.
+        - `measure (str)`: name of the measure.
+        - `start (str)`: start date of the period.
+        - `end (str)`: end date of the period.
+        The date must be in the format "YYYY-MM-DD".
+        """
+        if CompanyName not in self.client.list_database_names():
+            raise web_exception(404, "Company not found")
+        else:
+            print(CollectionName)
+            print(self.client[CompanyName].list_collection_names())
+            if CollectionName not in self.client[CompanyName].list_collection_names():
+                raise web_exception(404, "Field not found")
+            else:
+                db = self.client[CompanyName]
+                collection = db[CollectionName]
+                dict_ = list(collection.find())
+                lst = []
+                timestamps = []
+                resultDict = {}
+                unit = "No unit"
+                for i in range(len(dict_)):
+                    lst = []
+                    timestamps = []
+                    for j in range(len(dict_[i]["e"])):
+                        if dict_[i]["e"][j]["name"] == measure:
+                            indexes = self.time_period(
+                                dict_[i]["e"][j]["timestamp"], start, end)
+                            lst.extend(dict_[i]["e"][j]["value"]
+                                       [indexes[0]:indexes[1]])
+                            timestamps.extend(
+                                dict_[i]["e"][j]["timestamp"][indexes[0]:indexes[1]])
+                            unit = dict_[i]["e"][j]["unit"]
+                    resultDict[dict_[i]["_id"]] = {
+                        "values": lst, "timestamps": timestamps, "unit": unit}
+                return json.dumps(resultDict)
+
     def getConsumptionData(self, CompanyName, start, end):
         """Get the consumption data of a company
 
@@ -443,6 +450,7 @@ class MongoConnection():
                     if resultDict == {}:
                         raise web_exception(404, "No consumption data found")
                     return json.dumps(resultDict)
+            raise web_exception(404, "No collection found")
 
     def getPlant(self, PlantName: str):
         """Get the plant informations
@@ -452,15 +460,23 @@ class MongoConnection():
         """
         db = self.client["PlantDatabase"]
         collection = db["PlantData"]
-        item = list(collection.find({"PlantName": PlantName}))
+        item = collection.find_one({"PlantName": PlantName})
 
-        if item == []:
-            default = list(collection.find({"PlantName": "default"}))
-            if default == []:
-                raise web_exception(500, "Default values not found")
-            return json.dumps(default[0])
+        def exctractPlantInfo(dict_: dict):
+            """Extract the plant informations from the dictionary"""
+            plantInfo = {}
+            plantInfo["lightLimit"] = dict_["lightLimit"]
+            plantInfo["soilMoistureLimit"] = dict_["soilMoistureLimit"]
+            plantInfo["precipitationLimit"] = dict_["precipitationLimit"]
+            return plantInfo
+
+        if item != None:
+            return json.dumps(exctractPlantInfo(item))
         else:
-            return json.dumps(item[0])
+            default = collection.find_one({"PlantName": "default"})
+            if default == None:
+                raise web_exception(500, "Default values not found")
+            return json.dumps(exctractPlantInfo(default))
 
     def getTruckTrace(self, CompanyName: str, TruckID):
         """Get the truck trace informations
@@ -479,13 +495,13 @@ class MongoConnection():
         else:
             raise web_exception(404, "Truck not found")
 
-    def getTruckPosition(self, CompanyName: str):
-        """Get the truck position informations
+    def getTrucksPosition(self, CompanyName: str):
+        """Get the trucks position informations
 
         Arguments:
         - `CompanyName (str)`: name of the company
         """
-        dict_ = self.client[CompanyName]["Trucks"].find()
+        dict_ = self.client[CompanyName]["TruckData"].find()
         returnDict = {}
         for i in dict_:
             returnDict[dict_[i]["_id"]] = {"latitude": dict_[
@@ -512,16 +528,17 @@ class RESTConnector(BaseService):
 
         listTopic = topic.split("/")
         try:
-            if listTopic[2] == "consumption":
-                self.mongo.insertConsumptionData(listTopic[1], payload)
-                # IoTomatoes/CompanyName/consumption
-            elif isinstance(int(listTopic[2]), int):
-                self.mongo.insertDeviceData(
-                    listTopic[1], listTopic[2], listTopic[3], listTopic[4], payload)
-                # IoTomatoes/CompanyName/Field#/deviceID/measure
-            elif listTopic[2] == "truck":
-                self.mongo.insertTruckData(listTopic[1], listTopic[3], payload)
-                # IoTomatoes/CompanyName/truck/truckID
+            if listTopic[1] == "consumption":
+                self.mongo.insertConsumptionData(listTopic[0], payload)
+                # CompanyName/consumption
+            elif isinstance(int(listTopic[1]), int):
+                if int(listTopic[1]) == 0:
+                    self.mongo.insertTruckData(
+                        listTopic[0], listTopic[2], payload)
+                    # CompanyName/0/truckID
+                else:
+                    self.mongo.insertDeviceData(payload)
+                    # CompanyName/Field#/deviceID/measure
         except IndexError:
             pass
 
@@ -534,7 +551,7 @@ class RESTConnector(BaseService):
         If `Field` is `all`, the average of all the fields is returned.
         - `/<CompanyName>/truckTrace` : get the trace of a truck.
         The parameter is: `TruckID`.
-        - `/<CompanyName>/truckPosition` : get the position of all the trucks.
+        - `/<CompanyName>/trucksPosition` : get the position of all the trucks.
         - `/<CompanyName>/graph` : get the graph data of a field of a company.
         The parameters are: `Field`, `measure`, `start_date`, `end_date`.
         - `/<CompanyName>/consumption` : get the consumption data of a company.
@@ -551,7 +568,7 @@ class RESTConnector(BaseService):
             elif len(uri) == 2 and uri[1] == "truckTrace":
                 return self.mongo.getTruckTrace(uri[0], params["TruckID"])
             elif len(uri) == 2 and uri[1] == "truckPosition":
-                return self.mongo.getTruckPosition(uri[0])
+                return self.mongo.getTrucksPosition(uri[0])
             elif len(uri) == 2 and uri[1] == "graph":
                 return self.mongo.getMeasureGraphData(uri[0], params["Field"], params["measure"],
                                                       params["start_date"], params["end_date"])

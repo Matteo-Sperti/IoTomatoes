@@ -22,13 +22,13 @@ class DataVisualizer():
         self.MongoDB_url = MongoDB_url
         self.PointsPerGraph = PointsPerGraph
 
-    def getGraphMeasure(self, CompanyName: str, CollectionName: str, measure: str,
+    def getGraphMeasure(self, CompanyName: str, Field: str, measure: str,
                         start: str, end: str):
         """Get the graph of a measure for a field of a company.
 
         Arguments:
         - `CompanyName (str)`: Name of the company.
-        - `CollectionName (str)`: Name of the field.
+        - `Field (str)`: Name of the field.
         - `measure (str)`: Name of the measure.
         - `start (str)`: Start date of the period.
         - `end (str)`: End date of the period.
@@ -38,7 +38,7 @@ class DataVisualizer():
         lst = []
         try:
             params = {
-                "CollectionName": CollectionName,
+                "Field": Field,
                 "measure": measure,
                 "start_date": start,
                 "end_date": end
@@ -59,7 +59,7 @@ class DataVisualizer():
             for i in range(len(timestamps)):
                 try:
                     params = {
-                        "CollectionName": CollectionName,
+                        "Field": Field,
                         "measure": measure,
                         "start_date": start,
                         "end_date": end,
@@ -82,7 +82,7 @@ class DataVisualizer():
             plt.xlabel("Time")
             plt.ylabel(f"{measure} ({unit})")
             plt.title(
-                f"Graph of {measure} for {CollectionName} of {CompanyName}")
+                f"Graph of {measure} for Field {Field} of {CompanyName}")
             plt.savefig(fileName)
             with open(fileName, "rb") as image2string:
                 converted_string = base64.b64encode(image2string.read())

@@ -746,7 +746,7 @@ class CustomPlot():
         try:
             params = {
                 "Field": self.FieldNumber,
-                "measure": self.Measure,
+                "measure": self.Measure.lower(),
                 "start_date": self.start_date,
                 "end_date": self.end_date
             }

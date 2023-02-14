@@ -85,7 +85,6 @@ class BaseService():
                                  "/" + serviceName + "/url")
                 r.raise_for_status()
                 res_dict = r.json()
-                print(res_dict)
                 return res_dict["url"]
             except:
                 print("ERROR: Service Catalog not reachable!")

@@ -8,7 +8,7 @@
       {
           "serviceType": "MQTT",
           "subscribedTopics": ["+/+/+/temperature", "+/+/+/humidity", "+/+/+/light", "+/+/+/soilMoisture"],
-          "publishedTopics": ["Users"]
+          "publishedTopics": ["Notifications"]
       }
   ],
   "thresholds": {

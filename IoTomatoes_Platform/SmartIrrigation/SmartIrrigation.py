@@ -190,7 +190,6 @@ class SmartIrrigation(BaseService):
                              params={"PlantName": plant})
             r.raise_for_status()
             plantInfo = r.json()
-            print(plantInfo)
         except:
             print("ERROR: MongoDB service not found!")
             return None, None, None

@@ -8,7 +8,7 @@
         {
             "serviceType": "MQTT",
             "subscribedTopics": ["+/+/+/led", "+/+/+/pump"],
-            "publishedTopics": ["Users"]
+            "publishedTopics": ["Notifications"]
         }
     ]
 }

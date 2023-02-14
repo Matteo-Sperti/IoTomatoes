@@ -28,11 +28,12 @@ class ConsumptionManager (BaseService):
         for dev in self.deviceList:
             if (dev['status'] == 'OFF' and dev['control']):
                 dev_consumption = {
-                    'CompanyName': dev['CompanyName'],
+                    'cn': dev['CompanyName'],
                     'bn': dev['ID'],
                     'fieldNumber': dev['fieldNumber'],
-                    'consumption': {
-                        'consumption_value': dev['Consumption_kWh'],
+                    'e': {
+                        'name': 'Consumption',
+                        'value': dev['Consumption_kWh'],
                         'unit': 'kWh',
                         'power': dev['PowerConsumption_kW'],
                         'timestamp': time.time()
@@ -46,11 +47,12 @@ class ConsumptionManager (BaseService):
                 dev['Consumption_kWh'] = round(
                     (time.time() - dev['OnTime'])*dev['PowerConsumption_kW']/3600, 2)
                 dev_consumption = {
-                    'CompanyName': dev['CompanyName'],
+                    'cn': dev['CompanyName'],
                     'bn': dev['ID'],
                     'fieldNumber': dev['fieldNumber'],
-                    'consumption': {
-                        'consumption_value': dev['Consumption_kWh'],
+                    'e': {
+                        'name': 'Consumption',
+                        'value': dev['Consumption_kWh'],
                         'unit': 'kWh',
                         'power': dev['PowerConsumption_kW'],
                         'timestamp': time.time()
@@ -104,7 +106,7 @@ class ConsumptionManager (BaseService):
             msg['msgType'] = "Error"
             msg['t'] = time.time()
             self._MQTTClient.myPublish(
-                f"{self._MQTTClient.publishedTopics[0]}", msg)
+                f"{CompanyName}/{self._MQTTClient.publishedTopics[0]}", msg)
         else:
             DM.checkUpdate(self, True)
             check_actuator = DM.inList(ActuatorID, self.deviceList)

@@ -10,6 +10,8 @@ from iotomatoes_supportpackage.BaseService import BaseService
 from iotomatoes_supportpackage.MyExceptions import web_exception
 from iotomatoes_supportpackage.ItemInfo import setREST
 
+MAX_TIME = 86400
+
 
 class MongoConnection():
     def __init__(self, ResourceCatalog_url: str, MongoDB_url: str, PlantDatabaseFileName: str):
@@ -62,7 +64,7 @@ class MongoConnection():
         else:
             try:
                 db = self.client[CompanyName]
-                db.create_collection("TruckData")
+                db.create_collection("0")
 
                 response = requests.get(
                     f"{self.ResourceCatalog_url}/{CompanyName}/fields")
@@ -82,13 +84,13 @@ class MongoConnection():
         - `CompanyName (str)`: unique name of the company.
         """
         if CompanyName not in self.client.list_database_names():
-            raise web_exception(404, "Company not found")
+            print("Database not found")
         else:
             try:
                 self.client.drop_database(CompanyName)
                 print("Database deleted")
             except errors.OperationFailure:
-                raise web_exception(500, "Error in deleting the database")
+                print("Error in deleting the database")
 
     def insertField(self, CompanyName: str, CollectionName: str):
         """Create/update a collection (a.k.a a field) in the database of a company.
@@ -104,147 +106,68 @@ class MongoConnection():
         else:
             db.create_collection(CollectionName)
 
-    def insertDeviceData(self, data: dict):
+    def insertData(self, ID: int, data: dict):
         """Insert data in a collection.
 
         Arguments:
         - `data (dict)`: data to be inserted in the collection.
         """
-        ID = data.pop("bn")
-        data["_id"] = str(ID)
-        counter = 0
-        CompanyName = data.pop("CompanyName")
+        data["_id"] = ID
+
+        CompanyName = data.pop("cn")
         fieldNumber = str(data.pop("fieldNumber"))
+
+        if CompanyName not in self.client.list_database_names():
+            print("Company not found, failed to insert data")
+            return
+        if fieldNumber not in self.client[CompanyName].list_collection_names():
+            print("Field not found, failed to insert data")
+            return
 
         collection = self.client[CompanyName][fieldNumber]
 
         dict_ = collection.find_one({"_id": ID})
 
         if dict_ == None:
-            collection.insert_one(data)
-            return
+            new_data = {
+                "_id": ID,
+                "e": []
+            }
+            collection.insert_one(new_data)
+        elif "e" not in dict_:
+            collection.update_one({"_id": ID}, {"$set": {"e": []}})
 
-        if "e" not in dict_:
-            dict_ = {"consumption": data["consumption"]}
-            collection.update_one({"_id": ID}, {"$set": data})
-            return
-        else:
-            measure = data["e"][0]["name"]
-
-        found = 0
-        for i in dict_["e"]:
-            if measure not in dict_["e"][i]["name"]:
-                counter += 1
+        if "e" in data:
+            if isinstance(data["e"], list):
+                collection.update_one(
+                    {"_id": ID}, {"$push": {"e": {"$each": data["e"]}}})
             else:
-                found = i
-
-        if counter == len(dict_["e"]):
-            dict_["e"].append(data["e"][0])
-            return
-        if isinstance(dict_["e"][found]["value"], list) == False:
-            dict_["e"][found]["value"] = [dict_["e"][found]["value"]]
-        if isinstance(dict_["e"][found]["value"], list) == False:
-            dict_["e"][found]["timestamp"] = [
-                dict_["e"][found]["timestamp"]]
-        if isinstance(dict_["e"], list) == False:
-            dict_["e"] = [dict_["e"]]
-        dict_["e"][found]["value"].extend([data["e"][0]["value"]])
-        dict_[ID]["e"][found]["timestamp"].extend(
-            [data["e"][0]["timestamp"]])
-
-
-    def insertTruckData(self, CompanyName: str, TruckID: str, data):
-        """Insert data in a collection.
-
-        Arguments:
-        - `CompanyName (str)`: unique name of the company.
-        - `TruckID (str)`: ID of the truck.
-        - `data (dict)`: data to be inserted in the collection.
-        """
-
-        data["_id"] = data.pop("bn")
-        CollectionName = "Trucks"
-        dict_ = self.client[CompanyName][CollectionName].find_one({
-                                                                  "_id": TruckID})
-        if dict_ == None:
-            data["e"][0]["v"]["latitude"] = [data["e"][0]["v"]["latitude"]]
-            data["e"][0]["v"]["longitude"] = [data["e"][0]["v"]["longitude"]]
-            data["e"][0]["v"]["timestamp"] = [data["e"][0]["v"]["timestamp"]]
-            self.client[CompanyName][CollectionName].insert_one(data)
-
+                collection.update_one({"_id": ID}, {"$push": {"e": data["e"]}})
         else:
-            if (data["e"][0]["v"]["timestamp"] - dict_["e"][0]["v"]["timestamp"][-1]) > 3600:
-                # if the truck is not moving for more than an hour, the coordinates database is deleted
-                data["e"][0]["v"]["latitude"] = [data["e"][0]["v"]["latitude"]]
-                data["e"][0]["v"]["longitude"] = [
-                    data["e"][0]["v"]["longitude"]]
-                data["e"][0]["v"]["timestamp"] = [
-                    data["e"][0]["v"]["timestamp"]]
-                self.client[CompanyName][CollectionName].update_one(
-                    {"_id": TruckID}, {"$set": data})
-            else:
+            print("No data to insert")
 
-                dict_["e"][0]["v"]["latitude"].append(
-                    data["e"][0]["v"]["latitude"])
-                dict_["e"][0]["v"]["longitude"].append(
-                    data["e"][0]["v"]["longitude"])
-                dict_["e"][0]["v"]["timestamp"].append(
-                    data["e"][0]["v"]["timestamp"])
+    def refresh(self):
+        """Refresh the database."""
+        self.checkNewCompany()
+        self.autoDeleteOldData()
 
-                self.client[CompanyName][CollectionName].update_one(
-                    {"_id": TruckID}, {"$set": dict_})
+    def autoDeleteOldData(self):
+        """Delete old data from the database."""
 
-    def insertConsumptionData(self, CompanyName : str, data: dict):
-        """Insert the consumption data in the database.
-
-        Arguments:
-        - `CompanyName (str)`: unique name of the company.
-        - `data (dict)`: dictionary containing the data to insert.
-        """
-        db = self.client[CompanyName]
-        data["_id"] = data.pop("bn")
-        ID = data["_id"]
-        consumptionData = data["consumption"]
-        consumptionValue = consumptionData["consumption_value"]
-        timestamp = consumptionData["timestamp"]
-        power = consumptionData["power"]
-        CollectionName = data["field"]
-        collection = db[CollectionName]
-        dict = list(collection.find())
-        self.insertDataBase(CompanyName)
-
-        try:
-            # update consumption_value,power and timestamp list
-            dict[ID]["consumption"]["consumption_value"].append(
-                consumptionValue)
-            dict[ID]["consumption"]["power"].append(power)
-            dict[ID]["consumption"]["timestamp"].append(timestamp)
-            collection.update_one({"_id": ID}, {"$set": dict[ID]})
-        except KeyError:
-            # if KeyError raise, it means that the consumption dictionary is not present in the field colleciton
-            # yet, so it is created
-            dict[ID]["consumption"] = data["consumption"]
-            dict[ID]["consumption"]["consumption_value"] = [
-                dict[ID]["consumption"]["consumption_value"]]
-            dict[ID]["consumption"]["power"] = [
-                dict[ID]["consumption"]["power"]]
-            dict[ID]["consumption"]["timestamp"] = [
-                dict[ID]["consumption"]["timestamp"]]
-            collection.update_one({"_id": ID}, {"$set": dict[ID]})
-        except AttributeError:
-            # if AttributeError raise, it means that the values of the dictionary are not lists, so they are converted
-            dict[ID]["consumption"]["consumption_value"] = [
-                dict[ID]["consumption"]["consumption_value"]]
-            dict[ID]["consumption"]["power"] = [
-                dict[ID]["consumption"]["power"]]
-            dict[ID]["consumption"]["timestamp"] = [
-                dict[ID]["consumption"]["timestamp"]]
-            dict[ID]["consumption"]["consumption_value"].append(
-                consumptionValue)
-            dict[ID]["consumption"]["power"].append(power)
-            dict[ID]["consumption"]["timestamp"].append(timestamp)
-            collection.update_one({"_id": ID}, {"$set": dict[ID]})
-
+        for i in self.client.list_database_names():
+            if i != "PlantDatabase" and i != "admin" and i != "local":
+                db = self.client[i]
+                for j in db.list_collection_names():
+                    collection = db[j]
+                    for k in collection.find():
+                        if "e" in k:
+                            for l in k["e"]:
+                                if "t" in l:
+                                    if time.time() - l["t"] > MAX_TIME:
+                                        collection.update_one(
+                                            {"_id": k["_id"]}, {"$pull": {"e": l}})
+                                    else:
+                                        break
 
     def checkNewCompany(self):
         """Check if a new company has been added to the ResourceCatalog or if a company has been deleted."""
@@ -265,39 +188,42 @@ class MongoConnection():
         except:
             print("Error in Database")
 
-    def time_period(self, list, start, end):
+    def time_period(self, list: list, start: float, end: float):
         """Get the time period of a list of timestamps.
 
         Arguments:
         - `list (list)`: list of timestamps to be analyzed.
-        - `start (str)`: start date of the period.
-        - `end (str)`: end date of the period.
-        The date must be in the format "YYYY-MM-DD".
+        - `start (float)`: start time of the period.
+        - `end (float)`: end time of the period.
+        The time must be in unix timestamps".
         """
-
+        start_ind = 0
+        end_ind = 0
         for i in range(len(list)):
             if list[i] <= start:
-                start = i
+                start_ind = i
             if list[i] >= end:
-                end = i
-        if start == (len(list)-1):
-            return (start, start)
-        elif start == end:
+                end_ind = i
+                
+        if start_ind == (len(list)-1):
+            return (start_ind, start_ind)
+        elif start_ind == end_ind:
             end += 1
-            return (start, end)
+            return (start_ind, end_ind)
+        elif start_ind > end_ind:
+            raise web_exception(404, "No data in this period")
         else:
-            return (0, 0)
+            return (start_ind, end_ind)
 
-    def GetAvg(self, CompanyName: str, CollectionName: str, measure: str, start: str, end: str):
+    def GetAvg(self, CompanyName: str, CollectionName: str, measure: str, start: float, end: float):
         """Get the average of a measure in a period of time.
 
         Arguments:
         - `CompanyName (str)`: unique name of the company.
         - `CollectionName (str)`: name of the collection.
         - `measure (str)`: name of the measure.
-        - `start (str)`: start date of the period.
-        - `end (str)`: end date of the period.
-        The date must be in the format "YYYY-MM-DD".
+        - `start (float)`: start date of the period.
+        - `end (float)`: end date of the period.
         """
 
         if CompanyName not in self.client.list_database_names():
@@ -339,15 +265,14 @@ class MongoConnection():
                     }
                 return json.dumps(result)
 
-    def getAvgAll(self, CompanyName: str, measure: str, start: str, end: str):
+    def getAvgAll(self, CompanyName: str, measure: str, start: float, end: float):
         """Get the average of a measure in a period of time for all the fields of a company.
 
         Arguments:
         - `CompanyName (str)`: unique name of the company.
         - `measure (str)`: name of the measure.
-        - `start (str)`: start date of the period.
-        - `end (str)`: end date of the period.
-        The date must be in the format "YYYY-MM-DD".
+        - `start (float)`: start date of the period.
+        - `end (float)`: end date of the period.
         """
         if CompanyName not in self.client.list_database_names():
             raise web_exception(404, "Company not found")
@@ -369,16 +294,16 @@ class MongoConnection():
                 lst)/len(lst), "Unit": unit, "Timeperiod": [start, end]}
             return json.dumps(resultDict)
 
-    def getMeasureGraphData(self, CompanyName: str, CollectionName: str, measure: str, start, end):
+    def getMeasureGraphData(self, CompanyName: str, CollectionName: str, measure: str, 
+                            start: float, end: float):
         """Get the data of a measure for a graph.
 
         Arguments:
         - `CompanyName (str)`: unique name of the company.
         - `CollectionName (str)`: name of the field.
         - `measure (str)`: name of the measure.
-        - `start (str)`: start date of the period.
-        - `end (str)`: end date of the period.
-        The date must be in the format "YYYY-MM-DD".
+        - `start (float)`: start date of the period.
+        - `end (float)`: end date of the period..
         """
         if CompanyName not in self.client.list_database_names():
             raise web_exception(404, "Company not found")
@@ -411,13 +336,13 @@ class MongoConnection():
                         "values": lst, "timestamps": timestamps, "unit": unit}
                 return json.dumps(resultDict)
 
-    def getConsumptionData(self, CompanyName, start, end):
+    def getConsumptionData(self, CompanyName: str, start: float, end: float):
         """Get the consumption data of a company
 
         Arguments:
         - `CompanyName (str)`: unique name of the company
-        - `start (str)`: start date of the period
-        - `end (str)`: end date of the period
+        - `start (float)`: start date of the period
+        - `end (float)`: end date of the period
         """
         if CompanyName not in self.client.list_database_names():
             raise web_exception(404, "Company not found")
@@ -486,12 +411,18 @@ class MongoConnection():
         - `TruckID (str)`: id of the truck
         """
 
-        dict_ = self.client[CompanyName]["TruckData"].find_one(
+        dict_ = self.client[CompanyName]["0"].find_one(
             {"TruckID": TruckID})
         if dict_ != None:
-            lat = dict_["e"][0]["v"]["latitude"]
-            lon = dict_["e"][0]["v"]["longitude"]
-            return json.dumps({"latitude": lat, "longitude": lon})
+            lat = []
+            lon = []
+            timestamps = []
+            for i in dict_["e"][-min(1000, len(dict_["e"]))::]:
+                if i["name"] == "position":
+                    lat.append(i["v"]["latitude"])
+                    lon.append(i["v"]["longitude"])
+                    timestamps.append(i["timestamp"])
+            return json.dumps({"latitude": lat, "longitude": lon, "timestamp": timestamps})
         else:
             raise web_exception(404, "Truck not found")
 
@@ -505,7 +436,7 @@ class MongoConnection():
         returnDict = {}
         for i in dict_:
             returnDict[dict_[i]["_id"]] = {"latitude": dict_[
-                i]["e"][0]["v"]["latitude"], "longitude": dict_[i]["e"][0]["v"]["longitude"]}
+                i]["e"][-1]["v"]["latitude"], "longitude": dict_[i]["e"][-1]["v"]["longitude"]}
         return json.dumps(returnDict)
 
 
@@ -529,17 +460,11 @@ class RESTConnector(BaseService):
         listTopic = topic.split("/")
         try:
             if listTopic[1] == "consumption":
-                self.mongo.insertConsumptionData(listTopic[0], payload)
-                # CompanyName/consumption
-            elif isinstance(int(listTopic[1]), int):
-                if int(listTopic[1]) == 0:
-                    self.mongo.insertTruckData(
-                        listTopic[0], listTopic[2], payload)
-                    # CompanyName/0/truckID
-                else:
-                    self.mongo.insertDeviceData(payload)
-                    # CompanyName/Field#/deviceID/measure
-        except IndexError:
+                ID = int(payload["bn"])
+                self.mongo.insertData(ID, payload)
+            elif isInteger(listTopic[1]) and isInteger(listTopic[2]):
+                self.mongo.insertData(int(listTopic[2]), payload)
+        except:
             pass
 
     def GET(self, *uri, **params):
@@ -562,18 +487,18 @@ class RESTConnector(BaseService):
         try:
             if len(uri) == 2 and uri[1] == "avg" and params["Field"] != "all":
                 return self.mongo.GetAvg(uri[0], params["Field"], params["measure"],
-                                         params["start_date"], params["end_date"])
+                                         float(params["start_date"]), float(params["end_date"]))
             elif len(uri) == 2 and uri[1] == "avg" and params["Field"] == "all":
-                return self.mongo.getAvgAll(uri[0], params["measure"], params["start_date"], params["end_date"])
+                return self.mongo.getAvgAll(uri[0], params["measure"], float(params["start_date"]), float(params["end_date"]))
             elif len(uri) == 2 and uri[1] == "truckTrace":
                 return self.mongo.getTruckTrace(uri[0], params["TruckID"])
             elif len(uri) == 2 and uri[1] == "truckPosition":
                 return self.mongo.getTrucksPosition(uri[0])
             elif len(uri) == 2 and uri[1] == "graph":
                 return self.mongo.getMeasureGraphData(uri[0], params["Field"], params["measure"],
-                                                      params["start_date"], params["end_date"])
+                                                      float(params["start_date"]), float(params["end_date"]))
             elif len(uri) == 2 and uri[1] == "consumption":
-                return self.mongo.getConsumptionData(uri[0], params["start_date"], params["end_date"])
+                return self.mongo.getConsumptionData(uri[0], float(params["start_date"]), float(params["end_date"]))
             elif len(uri) == 1 and uri[0] == "plant":
                 return self.mongo.getPlant(params["PlantName"])
             else:
@@ -582,6 +507,15 @@ class RESTConnector(BaseService):
             raise cherrypy.HTTPError(e.code, e.message)
         except:
             raise cherrypy.HTTPError(500, "Internal Server Error")
+
+
+def isInteger(string: str):
+    """Check if the string is an integer"""
+    try:
+        int(string)
+        return True
+    except ValueError:
+        return False
 
 
 def sigterm_handler(signal, frame):
@@ -618,5 +552,5 @@ if __name__ == "__main__":
 
     run = True
     while run:
-        WebService.mongo.checkNewCompany()
+        WebService.mongo.refresh()
         time.sleep(30)

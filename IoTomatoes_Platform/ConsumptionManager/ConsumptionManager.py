@@ -32,11 +32,11 @@ class ConsumptionManager (BaseService):
                     'bn': dev['ID'],
                     'fieldNumber': dev['fieldNumber'],
                     'e': {
-                        'name': 'Consumption',
-                        'value': dev['Consumption_kWh'],
-                        'unit': 'kWh',
+                        'n': 'Consumption',
+                        'v': dev['Consumption_kWh'],
+                        'u': 'kWh',
                         'power': dev['PowerConsumption_kW'],
-                        'timestamp': time.time()
+                        't': time.time()
                     }
                 }
                 dev['Consumption_kWh'] = 0
@@ -51,11 +51,11 @@ class ConsumptionManager (BaseService):
                     'bn': dev['ID'],
                     'fieldNumber': dev['fieldNumber'],
                     'e': {
-                        'name': 'Consumption',
-                        'value': dev['Consumption_kWh'],
-                        'unit': 'kWh',
+                        'n': 'Consumption',
+                        'v': dev['Consumption_kWh'],
+                        'u': 'kWh',
                         'power': dev['PowerConsumption_kW'],
-                        'timestamp': time.time()
+                        't': time.time()
                     }
                 }
                 dev['OnTime'] = time.time()

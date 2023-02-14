@@ -4,7 +4,7 @@
     "availableServices" : [
         "MQTT"
     ],
-    "controlTimeInterval": 30,
+    "controlTimeInterval": 60,
     "WeatherForecast_ServiceName" : "weather_forecast",
     "MongoDB_ServiceName" : "mongodb_connector"
 }

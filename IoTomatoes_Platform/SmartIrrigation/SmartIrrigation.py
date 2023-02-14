@@ -10,10 +10,11 @@ from iotomatoes_supportpackage.ItemInfo import subscribedTopics
 
 class SmartIrrigation(BaseService):
 
-    def __init__(self, settings: dict):
+    def __init__(self, settings: dict, controlPeriod: int = 60):
         """It initializes the service with its `settings (dict)`"""
         super().__init__(settings)
 
+        self.controlPeriod = controlPeriod
         if "WeatherForecast_ServiceName" in settings:
             self.weatherToCall = settings["WeatherForecast_ServiceName"]
 
@@ -35,11 +36,11 @@ class SmartIrrigation(BaseService):
     def control(self):
         """It performs:
         1. Call to resource catalog -> to retrieve information about each field for each company
-        2. Call to MongoDB to retrieve information about last hour measures (currentSoilMoisture) 
+        2. Call to MongoDB to retrieve information about last hour measures (currentSoilMoisture)
             and previoius hour measures (previousSoilMoisture)
         3. Call to Weather forecast service to retrieve information about precipitation during the day
-        With these information it performs a control strategy with an hysteresis law in order to send 
-        the command ON when the soil moisture mesaure decrease and is under a specific low threshold 
+        With these information it performs a control strategy with an hysteresis law in order to send
+        the command ON when the soil moisture mesaure decrease and is under a specific low threshold
         and to send command OFF in the opposite case"""
 
         companyList = self.getCompaniesList()
@@ -60,7 +61,8 @@ class SmartIrrigation(BaseService):
 
                 minSoilMoisture, maxSoilMoisture, precipitationLimit = self.getPlantLimit(
                     plant)
-                previousSoilMoisture, currentSoilMoisture = self.getMongoDBdata(CompanyName, fieldID)
+                previousSoilMoisture, currentSoilMoisture = self.getMongoDBdata(
+                    CompanyName, fieldID)
                 if (previousSoilMoisture == None or currentSoilMoisture == None or
                         minSoilMoisture == None or maxSoilMoisture == None or precipitationLimit == None):
                     print("No previous or current soil moisture measure")
@@ -206,11 +208,11 @@ class SmartIrrigation(BaseService):
         if mongoDB_url == None or mongoDB_url == "":
             print("ERROR: MongoDB service not found!")
             return None, None
-        
+
         try:
             params = {"Field": fieldID,
-                      "start_date": "lastHour",
-                      "end_date": "now",
+                      "start_date": time.time() - self.controlPeriod,
+                      "end_date": time.time(),
                       "measure": "soilMoisture"}
             r = requests.get(f"{mongoDB_url}/{CompanyName}/avg", params=params)
             r.raise_for_status()
@@ -218,9 +220,9 @@ class SmartIrrigation(BaseService):
             previousSoilMoisture = dict_["Average"]
 
             params = {"Field": fieldID,
-                        "start_date": "now",
-                        "end_date": "now",
-                        "measure": "soilMoisture"}
+                      "start_date": time.time() - self.controlPeriod,
+                      "end_date": time.time(),
+                      "measure": "soilMoisture"}
             r = requests.get(f"{mongoDB_url}/{CompanyName}/avg", params=params)
             r.raise_for_status()
             dict_ = r.json()
@@ -271,8 +273,8 @@ if __name__ == "__main__":
     except FileNotFoundError:
         print("ERROR: files not found")
     else:
-        irrigation = SmartIrrigation(settings)
         controlTimeInterval = settings["controlTimeInterval"]
+        irrigation = SmartIrrigation(settings, controlTimeInterval)
 
         while True:
             irrigation.control()

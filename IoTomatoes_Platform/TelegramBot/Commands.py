@@ -747,8 +747,8 @@ class CustomPlot():
             params = {
                 "Field": self.FieldNumber,
                 "measure": self.Measure.lower(),
-                "start_date": self.start_date,
-                "end_date": self.end_date
+                "start_date": datetime.datetime.strptime(self.start_date, '%Y-%m-%d').timestamp() - 43200,
+                "end_date": datetime.datetime.strptime(self.end_date, '%Y-%m-%d').timestamp() + 43200,
             }
             res = requests.get(f"{url}/{self.CompanyName}/measure",
                                params=params)
@@ -776,8 +776,8 @@ class CustomPlot():
 
         try:
             params = {
-                "start_date": self.start_date,
-                "end_date": self.end_date,
+                "start_date": datetime.datetime.strptime(self.start_date, '%Y-%m-%d').timestamp() - 43200,
+                "end_date": datetime.datetime.strptime(self.end_date, '%Y-%m-%d').timestamp() + 43200,
             }
             res = requests.get(f"{url}/{self.CompanyName}/consumption",
                                params=params)

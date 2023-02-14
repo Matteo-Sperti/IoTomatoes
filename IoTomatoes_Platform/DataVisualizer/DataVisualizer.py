@@ -23,62 +23,48 @@ class DataVisualizer():
         self.PointsPerGraph = PointsPerGraph
 
     def getGraphMeasure(self, CompanyName: str, Field: str, measure: str,
-                        start: str, end: str):
+                        start: float, end: float):
         """Get the graph of a measure for a field of a company.
 
         Arguments:
         - `CompanyName (str)`: Name of the company.
         - `Field (str)`: Name of the field.
         - `measure (str)`: Name of the measure.
-        - `start (str)`: Start date of the period.
-        - `end (str)`: End date of the period.
+        - `start (float)`: Start date of the period.
+        - `end (float)`: End date of the period.
         """
 
         fileName = "graphMeasure.png"
-        lst = []
-        try:
-            params = {
-                "Field": Field,
-                "measure": measure,
-                "start_date": start,
-                "end_date": end
-            }
-            response = requests.get(
-                f"{self.MongoDB_url}/{CompanyName}/graph", params=params)
-            response.raise_for_status()
-            dataDict = response.json()
-        except:
-            raise web_exception(404, "Error getting data from the database")
-
-        timestamps = dataDict[max(dataDict, key=lambda x: len(
-            dataDict[x]["timestamps"]))]["timestamps"]
-        unit = dataDict[dataDict.keys()[0]]["unit"]
-        if len(timestamps)/self.PointsPerGraph > 1:
-            step = int(len(timestamps)/self.PointsPerGraph)
-            timestamps = timestamps[::step]
-            for i in range(len(timestamps)):
-                try:
-                    params = {
-                        "Field": Field,
-                        "measure": measure,
-                        "start_date": start,
-                        "end_date": end,
-                        "timestamp": timestamps[i]
-                    }
-                    response = requests.get(
-                        f"{self.MongoDB_url}/{CompanyName}/avg", params=params)
-                    response.raise_for_status()
-                    avg = response.json()
-                except:
-                    raise web_exception(
-                        404, "Error getting data from the database")
-
+        yvalues = []
+        print("start: ", start, "end: ", end, "points: ", self.PointsPerGraph)
+        timestamps = [start + x*(end-start)/self.PointsPerGraph for x in range(self.PointsPerGraph)]
+        xvalues = []
+        unit = ""
+        print(timestamps)
+        for i in range(len(timestamps) - 1):
+            try:
+                params = {
+                    "Field": Field,
+                    "measure": measure,
+                    "start_date": timestamps[i],
+                    "end_date": timestamps[i + 1],
+                }
+                response = requests.get(
+                    f"{self.MongoDB_url}/{CompanyName}/avg", params=params)
+                response.raise_for_status()
+                avg = response.json()
+            except:
+                raise web_exception(
+                    404, "Error getting data from the database")
+            else:
                 if avg != None and avg != False:
-                    lst.append(avg["Average"])
-                timestamps[i] = datetime.fromtimestamp(timestamps[i])
+                    yvalues.append(avg["Average"])
+                    xvalues.append(datetime.fromtimestamp(
+                        (timestamps[i] + timestamps[i + 1]) / 2))
+                    unit = avg["Unit"]
 
-            # plot graph
-            plt.plot(timestamps, lst)
+        if len(yvalues) > 0 and len(xvalues) > 0 and unit != "":
+            plt.plot(xvalues, yvalues)
             plt.xlabel("Time")
             plt.ylabel(f"{measure} ({unit})")
             plt.title(
@@ -86,20 +72,20 @@ class DataVisualizer():
             plt.savefig(fileName)
             with open(fileName, "rb") as image2string:
                 converted_string = base64.b64encode(image2string.read())
-           
+
             out = {"img64": converted_string}
             return json.dumps(out)
         else:
-            raise web_exception(404, "Not enough data to plot the graph")
+            raise web_exception(404, "No data available")
 
-    def getConsumptionGraph(self, CompanyName: str, start: str, end: str):
+    def getConsumptionGraph(self, CompanyName: str, start: float, end: float):
         """Construct histogram  of field consumption data a company.
         Multiple actuator can be monitored at the same time.
 
         Arguments:
         - `CompanyName (str)`: Name of the company.
-        - `start (str)`: Start date of the period.
-        - `end (str)`: End date of the period.
+        - `start (float)`: Start date of the period.
+        - `end (float)`: End date of the period.
         """
         fileName = "graphConsumption.png"
         try:
@@ -108,24 +94,17 @@ class DataVisualizer():
                                     params=params)
             response.raise_for_status()
             dict_ = response.json()
-            print(dict_)
+
+            counts = dict_["Values"]
+            bins = dict_["Fields"]
         except:
             raise web_exception(500, "Error getting data from the database")
-
-        if dict_ == None or dict_ == False:
-            raise web_exception(500, "No consumption data available")
         else:
-            counts = []
-            bins = []
-            for i in dict_.keys():
-                counts.append(dict_[i]["lvalues"])
-                bins.append(i)
-
             plt.bar(bins, counts)
             plt.xlabel("Fields")
-            plt.ylabel("Consumption (kWh)")
-            for i, v in enumerate(counts):
-                plt.text(i, v, str(v), color='blue', fontweight='bold',
+            plt.ylabel(f"{dict_['Measure']} [{dict_['Unit']}]")
+            for i in bins:
+                plt.text(i, 0, f"Field {i}", color='blue', fontweight='bold',
                          horizontalalignment='center', verticalalignment='bottom')
             plt.show()
             plt.title("Graph of consumption data")

@@ -10,11 +10,11 @@ from iotomatoes_supportpackage.ItemInfo import subscribedTopics
 
 class SmartLighting(BaseService):
 
-    def __init__(self, settings: dict):
+    def __init__(self, settings: dict, controlPeriod: int = 60):
         """It initializes the service with the `settings (dict)`."""
 
         super().__init__(settings)
-
+        self.controlPeriod = controlPeriod
         if "WeatherForecast_ServiceName" in settings:
             self.weatherToCall = settings["WeatherForecast_ServiceName"]
 
@@ -173,8 +173,8 @@ class SmartLighting(BaseService):
 
         try:
             params = {"Field": fieldID,
-                      "start_date": "lastHour",
-                      "end_date": "now",
+                      "start_date": time.time() - self.controlPeriod,
+                      "end_date": time.time(),
                       "measure": "light"}
             r = requests.get(f"{mongoDB_url}/{CompanyName}/avg", params=params)
             r.raise_for_status()
@@ -251,9 +251,8 @@ if __name__ == "__main__":
     except FileNotFoundError:
         print("ERROR: files not found")
     else:
-        lighting = SmartLighting(settings)
-
         controlTimeInterval = settings["controlTimeInterval"]
+        lighting = SmartLighting(settings, controlTimeInterval)
 
         while True:
             lighting.control()

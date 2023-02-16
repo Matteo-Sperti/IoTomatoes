@@ -29,7 +29,7 @@ class ConsumptionManager (BaseService):
             if (dev['status'] == 'OFF' and dev['control']):
                 dev_consumption = {
                     'cn': dev['CompanyName'],
-                    'bn': dev['ID'],
+                    'bn': self.serviceName,
                     'fieldNumber': dev['fieldNumber'],
                     'e': {
                         'n': 'Consumption',
@@ -41,14 +41,14 @@ class ConsumptionManager (BaseService):
                 }
                 dev['Consumption_kWh'] = 0
                 self._MQTTClient.myPublish(
-                    f"{dev['CompanyName']}/consumption", dev_consumption)
+                    f"{dev['CompanyName']}/{dev['fieldNumber']}/{dev['ID']}/consumption", dev_consumption)
 
             elif (dev['status'] == 'ON' and dev['control']):
                 dev['Consumption_kWh'] = round(
                     (time.time() - dev['OnTime'])*dev['PowerConsumption_kW']/3600, 2)
                 dev_consumption = {
                     'cn': dev['CompanyName'],
-                    'bn': dev['ID'],
+                    'bn': self.serviceName,
                     'fieldNumber': dev['fieldNumber'],
                     'e': {
                         'n': 'Consumption',
@@ -61,7 +61,7 @@ class ConsumptionManager (BaseService):
                 dev['OnTime'] = time.time()
                 dev['Consumption_kWh'] = 0
                 self._MQTTClient.myPublish(
-                    f"{dev['CompanyName']}/consumption", dev_consumption)
+                    f"{dev['CompanyName']}/{dev['fieldNumber']}/{dev['ID']}/consumption", dev_consumption)
 
     def updateStatus(self, actuatorID: int, command: str):
         """Update the status of the actuator, if it is turned OFF calculates its consumption.

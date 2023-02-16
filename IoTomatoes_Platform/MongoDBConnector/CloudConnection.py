@@ -5,6 +5,7 @@ import time
 import cherrypy
 import requests
 import signal
+import pprint
 
 from iotomatoes_supportpackage.BaseService import BaseService
 from iotomatoes_supportpackage.MyExceptions import web_exception
@@ -218,7 +219,8 @@ class MongoConnection():
             return (start_ind, end_ind)
         raise web_exception(404, "No data in the time period")
 
-    def GetAvg(self, CompanyName: str, CollectionName: str, measure: str, start: float, end: float):
+    def GetAvg(self, CompanyName: str, CollectionName: str, measure: str,
+               start: float, end: float):
         """Get the average of a measure in a period of time.
 
         Arguments:
@@ -236,35 +238,48 @@ class MongoConnection():
             raise web_exception(404, "Field not found")
 
         collection = self.client[CompanyName][CollectionName]
-        dict_ = list(collection.find())
 
-        lst = []
-        unit = ""
-        print("SIAMO QUI")
-        for i in range(len(dict_)):
-            if "e" in dict_[i]:
-                minIndex, maxIndex = self.time_period(
-                    dict_[i]["e"], start, end)
-                print(minIndex, maxIndex)
-                for j in range(minIndex, maxIndex):
-                    if dict_[i]["e"][j]["n"] == measure:
-                        lst.append(dict_[i]["e"][j]["v"])
+        res = collection.aggregate([
+            {"$match": {"e": {"$elemMatch":
+                              {"n": measure,
+                               "t": {"$gte": start, "$lte": end}}}}},
+            {"$project": {"e": {"$filter": {"input": "$e", "as": "e", "cond": {
+                "$and": [
+                    {"$eq": ["$$e.n", measure]},
+                    {"$gte": ["$$e.t", start]},
+                    {"$lte": ["$$e.t", end]}
+                ]}}}}},
+            {"$unwind": "$e"},
+            {"$project": {"t": "$e.t",
+                          "v": "$e.v",
+                          "u": "$e.u"}},
+            {"$sort": {"t": 1}},
+            {"$group": {"_id": None,
+                        "avg": {"$avg": "$v"},
+                        "u": {"$first": "$u"},
+                        "start": {"$first": "$t"},
+                        "end": {"$last": "$t"}}},
+            {"$project": {"_id": 0,
+                          "avg": 1,
+                          "u": 1,
+                          "start": 1,
+                          "end": 1}},
+        ])
+        res_list = list(res)
+        pprint.pprint(res_list)
+        print(res_list)
+        if res == None:
+            raise web_exception(404, "No data found")
 
-                        if unit == "":
-                            unit = dict_[i]["e"][j]["u"]
-
-        print(lst)
-        if len(lst) == 0:
-            raise web_exception(404, "Measure not found")
-        else:
-            result = {
-                "Company": CompanyName,
-                "Field": CollectionName,
-                "Measure": measure,
-                "Average": sum(lst)/len(lst),
-                "Unit": unit,
-                "Time Period": [start, end]
-            }
+        res_info = res_list[0]
+        result = {
+            "Company": CompanyName,
+            "Field": CollectionName,
+            "Measure": measure,
+            "Average": res_info["avg"],
+            "Unit": res_info["u"],
+            "Time Period": [res_info["start"], res_info["end"]]
+        }
         return json.dumps(result)
 
     def getAvgAll(self, CompanyName: str, measure: str, start: float, end: float):
@@ -437,10 +452,8 @@ class RESTConnector(BaseService):
 
         listTopic = topic.split("/")
         try:
-            if listTopic[1] == "consumption":
-                ID = int(payload["bn"])
-                self.mongo.insertData(ID, payload)
-            elif isInteger(listTopic[1]) and isInteger(listTopic[2]):
+            # Company/Field/ID/measure
+            if len(listTopic) >= 4 and isInteger(listTopic[1]) and isInteger(listTopic[2]):
                 self.mongo.insertData(int(listTopic[2]), payload)
         except:
             pass

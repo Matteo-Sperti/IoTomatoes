@@ -4,8 +4,7 @@ import datetime
 import json
 import signal
 
-from iotomatoes_supportpackage.BaseService import BaseService
-from iotomatoes_supportpackage.ItemInfo import subscribedTopics
+from iotomatoes_supportpackage import BaseService
 
 
 class SmartLighting(BaseService):
@@ -88,14 +87,12 @@ class SmartLighting(BaseService):
                     f"Performing control on: Company={CompanyName} field={fieldID}")
                 if currentTime < Sunrise or currentTime > Sunset:
                     print("IT'S NIGHT, NO LIGHTING TIME")
-                    print("light set to OFF")
                     self.sendCommand(CompanyName, fieldID,
                                      actuatorTopicsForField, 0)
                 else:
                     # CLOUDCOVER CONTROL
                     if cloudCover < 60:
                         print("LIGHTING DOES NOT MAKE SENSE")
-                        print("light set to OFF")
                         self.sendCommand(CompanyName, fieldID,
                                          actuatorTopicsForField, 0)
                     else:
@@ -105,11 +102,8 @@ class SmartLighting(BaseService):
                         print(f"current value light={currentLight}")
 
                         if currentLight <= minLight:
-                            print("light set to ON")
                             command = 1
-
                         else:
-                            print("light set to OFF")
                             command = 0
 
                         self.sendCommand(CompanyName, fieldID,
@@ -120,16 +114,16 @@ class SmartLighting(BaseService):
 
         message = self._message.copy()
 
-        print(f"\nActuators topics list= {topicList}\n")
+        print(f"\nActuators topics list= {topicList}")
+        print(
+            f"Setting the leds of field {fieldID} of company {CompanyName} to {'ON' if command==1 else 'OFF'}")
         for singleTopic in topicList:
             message["cn"] = CompanyName
             message["fieldNumber"] = fieldID
             message["e"][-1]["v"] = command
             message["e"][-1]["t"] = time.time()
 
-            print(f"message = {message}")
             commandTopic = str(singleTopic)
-            print(f"command Topic={commandTopic}\n")
             self._MQTTClient.myPublish(commandTopic, message)
 
     def getTopics(self, company, fieldNumber: int):
@@ -140,7 +134,7 @@ class SmartLighting(BaseService):
         for device in company["devicesList"]:
             if fieldNumber == device["fieldNumber"] and device["isActuator"] == True:
                 if "led" in device["actuatorType"]:
-                    topics += subscribedTopics(device)
+                    topics.append(f"{company['CompanyName']}/{fieldNumber}/{device['ID']}/led")
 
         return topics
 
@@ -161,7 +155,7 @@ class SmartLighting(BaseService):
         else:
             minLightLimit = plantInfo["lightLimit"]["min"]
             maxLightLimit = plantInfo["lightLimit"]["max"]
-
+            print("Retrieved plant limits from MongoDB service!")
             return minLightLimit, maxLightLimit
 
     def getMongoDBdata(self, CompanyName: str, fieldID: int):

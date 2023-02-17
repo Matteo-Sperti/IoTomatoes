@@ -3,7 +3,7 @@ import time
 import json
 import signal
 
-from iotomatoes_supportpackage.BaseService import BaseService
+from iotomatoes_supportpackage import BaseService
 import iotomatoes_supportpackage.DeviceManager as DM
 
 

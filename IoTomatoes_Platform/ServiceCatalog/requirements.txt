@@ -1,1 +1,2 @@
 CherryPy==18.8.0
+requests==2.25.1

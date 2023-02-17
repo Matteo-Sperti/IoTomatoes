@@ -3,7 +3,7 @@ import time
 import signal
 
 from iotomatoes_supportpackage.AmbientSimulator import AmbientSimulator
-from iotomatoes_supportpackage.IoTDevice import IoTDevice
+from iotomatoes_supportpackage import IoTDevice
 
 
 class SimDevice(IoTDevice):

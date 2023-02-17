@@ -1,4 +1,3 @@
-from iotomatoes_supportpackage.MyIDGenerator import IDs
 import json
 import random
 import requests
@@ -6,6 +5,7 @@ import requests
 from FakeDevice import SimDevice
 import sys
 sys.path.append("../../IoTomatoes_SupportPackage/src/")
+from iotomatoes_supportpackage.MyIDGenerator import IDs
 
 HelpMessage = """
 Devices Simulator.

@@ -4,8 +4,7 @@ import datetime
 import json
 import signal
 
-from iotomatoes_supportpackage.BaseService import BaseService
-from iotomatoes_supportpackage.ItemInfo import subscribedTopics
+from iotomatoes_supportpackage import BaseService
 
 
 class SmartIrrigation(BaseService):
@@ -90,14 +89,12 @@ class SmartIrrigation(BaseService):
                     f"Performing control on: Company={CompanyName} field={fieldID}")
                 if currentTime < minLimitTemp or currentTime > maxLimitTemp:
                     print("NO IRRIGATION TIME")
-                    print("pumps set to OFF")
                     self.sendCommand(CompanyName, fieldID,
                                      actuatorTopicsForField, 0)
                 else:
                     # PRECIPITATIONS CONTROL:
                     if dailyPrecipitationSum > precipitationLimit:  # soil too moist
                         print("IRRIGATION DOES NOT MAKE SENSE")
-                        print("pumps set to OFF")
                         self.sendCommand(CompanyName, fieldID,
                                          actuatorTopicsForField, 0)
                     else:
@@ -119,13 +116,11 @@ class SmartIrrigation(BaseService):
                             if currentSoilMoisture >= maxSoilMoisture:
                                 print(
                                     f"""current soil moisture over/on the OFF limit: {currentSoilMoisture}>={maxSoilMoisture}""")
-                                print("pumps set to OFF")
                                 command = 0
 
                             else:
                                 print(
                                     f"""current soil moisture under the OFF limit: {currentSoilMoisture}<{maxSoilMoisture}""")
-                                print("pumps set to ON")
                                 command = 1
 
                         elif currentSoilMoisture < previousSoilMoisture:
@@ -133,23 +128,19 @@ class SmartIrrigation(BaseService):
                             if currentSoilMoisture <= minSoilMoisture:
                                 print(
                                     f"""current soil moisture under/on the ON limit: {currentSoilMoisture}<={minSoilMoisture}""")
-                                print("pumps set to ON")
                                 command = 1
 
                             else:
                                 print(
                                     f"""current soil moisture over the ON limit: {currentSoilMoisture}>{minSoilMoisture}""")
-                                print("pumps set to OFF")
                                 command = 0
 
                         else:
                             print("costant soil moisture")
                             if currentSoilMoisture > maxSoilMoisture:
-                                print("pumps set to OFF")
                                 command = 0
 
                             elif currentSoilMoisture < minSoilMoisture:
-                                print("pumps set to ON")
                                 command = 1
 
                         self.sendCommand(CompanyName, fieldID,
@@ -158,7 +149,9 @@ class SmartIrrigation(BaseService):
     def sendCommand(self, CompanyName: str, fieldID: int, topicList: list, command: int):
         message = self._message.copy()
 
-        print(f"\nActuators topics list= {topicList}\n")
+        print(f"\nActuators topics list= {topicList}")
+        print(
+            f"Setting the pumps of field {fieldID} of company {CompanyName} to {'ON' if command==1 else 'OFF'}")
         for singleTopic in topicList:
             message["bn"] = self.EndpointInfo["serviceName"]
             message["cn"] = CompanyName
@@ -166,18 +159,17 @@ class SmartIrrigation(BaseService):
             message["e"][-1]["v"] = command
             message["e"][-1]["t"] = time.time()
 
-            print(f"message = {message}\n")
             commandTopic = str(singleTopic)
-            print(f"command Topic={commandTopic}\n\n")
             self._MQTTClient.myPublish(commandTopic, message)
 
-    def getTopics(self, company, fieldNumber: int):
+    def getTopics(self, company: dict, fieldNumber: int):
         """Return the list of the subscribed topics for a field in the company"""
         topics = []
         for device in company["devicesList"]:
             if fieldNumber == device["fieldNumber"] and device["isActuator"] == True:
                 if "pump" in device["actuatorType"]:
-                    topics += subscribedTopics(device)
+                    topics.append(
+                        f"{company['CompanyName']}/{fieldNumber}/{device['ID']}/pump")
 
         return topics
 
@@ -200,6 +192,7 @@ class SmartIrrigation(BaseService):
             maxSoilMoisture = plantInfo["soilMoistureLimit"]["max"]
             precipitationLimit = plantInfo["precipitationLimit"]["max"]
 
+            print("Retrieved plant limits from MongoDB service!")
             return minSoilMoisture, maxSoilMoisture, precipitationLimit
 
     def getMongoDBdata(self, CompanyName: str, fieldID: int):

@@ -9,7 +9,7 @@ import requests
 import signal
 
 from Commands import *
-from iotomatoes_supportpackage.BaseService import BaseService
+from iotomatoes_supportpackage import BaseService
 from iotomatoes_supportpackage.MyThread import SimpleThread
 
 HelpMessage = """Help message to the IoTomatoesBot!

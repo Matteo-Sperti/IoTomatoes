@@ -3,7 +3,7 @@ import time
 import signal
 
 from iotomatoes_supportpackage.GPSgenerator import GPSgenerator
-from iotomatoes_supportpackage.IoTDevice import IoTDevice
+from iotomatoes_supportpackage import IoTDevice
 
 
 class SimTruck(IoTDevice):

@@ -2,7 +2,7 @@ import json
 import time
 import Adafruit_DHT
 
-from iotomatoes_supportpackage.IoTDevice import IoTDevice
+from iotomatoes_supportpackage import IoTDevice
 
 sensor = Adafruit_DHT.DHT11
 

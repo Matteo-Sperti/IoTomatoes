@@ -2,7 +2,7 @@
     "deviceName" : "SimulatedDevice3",
     "fieldNumber" : 2,
     "isActuator" : true,
-    "actuatorType" : ["led", "pump"],
+    "actuatorType" : ["led"],
     "CompanyName" : "PatataNovella",
     "Location" : {
         "latitude" : 45.001, 

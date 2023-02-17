@@ -3,8 +3,7 @@ import time
 import cherrypy
 import signal
 
-from iotomatoes_supportpackage.BaseService import BaseService
-from iotomatoes_supportpackage.MyExceptions import web_exception, InfoException
+from iotomatoes_supportpackage import BaseService, web_exception, InfoException
 from iotomatoes_supportpackage.ItemInfo import (
     constructResource, publishedTopics, setREST)
 from iotomatoes_supportpackage.MyIDGenerator import IDs

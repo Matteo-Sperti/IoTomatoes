@@ -6,9 +6,7 @@ from datetime import datetime
 import signal
 import base64
 
-from iotomatoes_supportpackage.BaseService import BaseService
-from iotomatoes_supportpackage.MyExceptions import web_exception
-from iotomatoes_supportpackage.ItemInfo import setREST
+from iotomatoes_supportpackage import BaseService, web_exception, setREST
 
 
 class DataVisualizer():
@@ -37,7 +35,8 @@ class DataVisualizer():
         fileName = "graphMeasure.png"
         yvalues = []
         print("start: ", start, "end: ", end, "points: ", self.PointsPerGraph)
-        timestamps = [start + x*(end-start)/self.PointsPerGraph for x in range(self.PointsPerGraph)]
+        timestamps = [
+            start + x*(end-start)/self.PointsPerGraph for x in range(self.PointsPerGraph)]
         xvalues = []
         unit = ""
         print(timestamps)

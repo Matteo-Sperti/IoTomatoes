@@ -1,5 +1,4 @@
-from pymongo import MongoClient
-from pymongo import errors
+from pymongo import MongoClient, errors
 import json
 import time
 import cherrypy
@@ -7,11 +6,10 @@ import requests
 import signal
 import pprint
 
-from iotomatoes_supportpackage.BaseService import BaseService
-from iotomatoes_supportpackage.MyExceptions import web_exception
-from iotomatoes_supportpackage.ItemInfo import setREST
+from iotomatoes_supportpackage import BaseService, web_exception, setREST
 
 MAX_TIME = 86400
+MAX_TRUCK_TRACE = 1000
 
 
 class MongoConnection():
@@ -154,21 +152,14 @@ class MongoConnection():
 
     def autoDeleteOldData(self):
         """Delete old data from the database."""
-
+        current_time = time.time()
         for i in self.client.list_database_names():
             if i != "PlantDatabase" and i != "admin" and i != "local":
                 db = self.client[i]
                 for j in db.list_collection_names():
                     collection = db[j]
-                    for k in collection.find():
-                        if "e" in k:
-                            for l in k["e"]:
-                                if "t" in l:
-                                    if time.time() - l["t"] > MAX_TIME:
-                                        collection.update_one(
-                                            {"_id": k["_id"]}, {"$pull": {"e": l}})
-                                    else:
-                                        break
+                    collection.update_many(
+                        {}, {"$pull": {"e": {"t": {"$lt": current_time - MAX_TIME}}}})
 
     def checkNewCompany(self):
         """Check if a new company has been added to the ResourceCatalog or if a company has been deleted."""
@@ -188,36 +179,6 @@ class MongoConnection():
                     self.deleteDatabase(j)
         except:
             print("Error in Database")
-
-    def time_period(self, list: list, start: float, end: float):
-        """Get the time period of a list of timestamps.
-
-        Arguments:
-        - `list (list)`: list of timestamps to be analyzed.
-        - `start (float)`: start time of the period.
-        - `end (float)`: end time of the period.
-        The time must be in unix timestamps".
-        """
-        start_ind = 0
-        end_ind = 0
-
-        print("start: ", start)
-        if start > end or start > time.time() or start > list[-1]["t"]:
-            raise web_exception(404, "Start time is after end time")
-
-        for i in range(len(list)):
-            if list[i]["t"] <= start:
-                start_ind = i
-            elif list[i]["t"] <= end:
-                end_ind = i
-            else:
-                return start_ind, end_ind
-
-        print("start_ind: ", start_ind)
-        if end_ind != 0 or start_ind != 0:
-            end_ind = len(list) - 1
-            return (start_ind, end_ind)
-        raise web_exception(404, "No data in the time period")
 
     def GetAvg(self, CompanyName: str, CollectionName: str, measure: str,
                start: float, end: float):
@@ -240,46 +201,36 @@ class MongoConnection():
         collection = self.client[CompanyName][CollectionName]
 
         res = collection.aggregate([
-            {"$match": {"e": {"$elemMatch":
-                              {"n": measure,
-                               "t": {"$gte": start, "$lte": end}}}}},
-            {"$project": {"e": {"$filter": {"input": "$e", "as": "e", "cond": {
-                "$and": [
-                    {"$eq": ["$$e.n", measure]},
-                    {"$gte": ["$$e.t", start]},
-                    {"$lte": ["$$e.t", end]}
-                ]}}}}},
+            {"$match": {"e.n": measure, "e.t": {"$gte": start, "$lte": end}}},
             {"$unwind": "$e"},
-            {"$project": {"t": "$e.t",
-                          "v": "$e.v",
-                          "u": "$e.u"}},
-            {"$sort": {"t": 1}},
-            {"$group": {"_id": None,
-                        "avg": {"$avg": "$v"},
-                        "u": {"$first": "$u"},
-                        "start": {"$first": "$t"},
-                        "end": {"$last": "$t"}}},
-            {"$project": {"_id": 0,
-                          "avg": 1,
-                          "u": 1,
-                          "start": 1,
-                          "end": 1}},
+            {"$match": {"e.n": measure, "e.t": {"$gte": start, "$lte": end}}},
+            {"$group": {
+                "_id": None,
+                "Average": {"$avg": "$e.v"},
+                "Unit": {"$first": "$e.u"},
+                "Measure": {"$first": "$e.n"},
+                "StartTime": {"$min": "$e.t"},
+                "EndTime": {"$max": "$e.t"}
+            }},
+            {"$project": {
+                "_id": 0,
+                "Average": 1,
+                "Unit": 1,
+                "Measure": 1,
+                "StartTime": 1,
+                "EndTime": 1
+            }}
         ])
         res_list = list(res)
-        pprint.pprint(res_list)
-        print(res_list)
-        if res == None:
+        if res == None or len(res_list) == 0:
             raise web_exception(404, "No data found")
 
         res_info = res_list[0]
         result = {
             "Company": CompanyName,
-            "Field": CollectionName,
-            "Measure": measure,
-            "Average": res_info["avg"],
-            "Unit": res_info["u"],
-            "Time Period": [res_info["start"], res_info["end"]]
+            "Field": CollectionName
         }
+        result.update(res_info)
         return json.dumps(result)
 
     def getAvgAll(self, CompanyName: str, measure: str, start: float, end: float):
@@ -299,15 +250,15 @@ class MongoConnection():
             unit = ""
             for i in db.list_collection_names():
                 try:
-                    result = self.GetAvg(CompanyName, i, measure, start, end)
+                    res = self.GetAvg(CompanyName, i, measure, start, end)
                 except:
                     pass
                 else:
-                    result = json.loads(result)
+                    result = json.loads(res)
                     lst.append(result["Average"])
                     unit = result["Unit"]
 
-            if len == []:
+            if len(lst) == 0:
                 raise web_exception(404, "No data found")
 
             resultDict = {
@@ -340,22 +291,28 @@ class MongoConnection():
 
         for CollectionName in self.client[CompanyName].list_collection_names():
             collection = self.client[CompanyName][CollectionName]
-            dict_ = list(collection.find())
-
-            field_consumption = 0
-            for i in range(len(dict_)):
-                if "e" in dict_[i]:
-                    indexes = self.time_period(
-                        dict_[i]["e"], start, end)
-                    for j in range(indexes[0], indexes[1]):
-                        if dict_[i]["e"][j]["n"] == "consumption":
-                            field_consumption += dict_[i]["e"][j]["v"]
-                            if unit == "":
-                                unit = dict_[i]["e"][j]["unit"]
-
-            if field_consumption != 0:
-                consumption.append(field_consumption)
+            res = collection.aggregate([
+                {"$match": {"e.n": "consumption", "e.t": {"$gte": start, "$lte": end}}},
+                {"$unwind": "$e"},
+                {"$match": {"e.n": "consumption", "e.t": {"$gte": start, "$lte": end}}},
+                {"$group": {
+                    "_id": None,
+                    "total": {"$sum": "$e.v"},
+                    "unit": {"$first": "$e.u"},
+                }},
+                {"$project": {
+                    "_id": 0,
+                    "total": 1,
+                    "unit": 1,
+                }}
+            ])
+            res_list = list(res)
+            if res_list != []:
+                res_info = res_list[0]
+                consumption.append(res_info["total"])
                 fields.append(CollectionName)
+                if unit == "":
+                    unit = res_info["unit"]
 
         if len(consumption) == 0:
             raise web_exception(404, "Measure not found")
@@ -401,22 +358,41 @@ class MongoConnection():
 
         Arguments:
         - `CompanyName (str)`: name of the company
-        - `TruckID (str)`: id of the truck
+        - `TruckID (int)`: id of the truck
         """
 
-        dict_ = self.client[CompanyName]["0"].find_one(
-            {"TruckID": TruckID})
-        if dict_ != None:
-            lat = []
-            lon = []
-            timestamps = []
-            for i in dict_["e"][-min(1000, len(dict_["e"]))::]:
-                if i["name"] == "position":
-                    lat.append(i["v"]["latitude"])
-                    lon.append(i["v"]["longitude"])
-                    timestamps.append(i["timestamp"])
-            return json.dumps({"latitude": lat, "longitude": lon, "timestamp": timestamps})
-        else:
+        collection = self.client[CompanyName]["0"]
+
+        res = collection.aggregate([
+            {"$match": {"_id": TruckID, "e.n": "position"}},
+            {"$unwind": "$e"},
+            {"$match": {"e.n": "position"}},
+            {"$sort": {"e.t": -1}},
+            {"$limit": MAX_TRUCK_TRACE},
+            {"$project": {
+                "_id": 0,
+                "latitude": "$e.v.latitude",
+                "longitude": "$e.v.longitude",
+                "timestamps": "$e.t"
+            }},
+            {"$group": {
+                "_id": None,
+                "latitude": {"$push": "$latitude"},
+                "longitude": {"$push": "$longitude"},
+                "timestamps": {"$push": "$timestamps"}
+            }},
+            {"$project": {
+                "_id": 0,
+                "latitude": "$latitude",
+                "longitude": "$longitude",
+                "timestamps": "$timestamps"
+            }}
+        ])
+
+        try:
+            res_info = list(res)[0]
+            return json.dumps(res_info)
+        except:
             raise web_exception(404, "Truck not found")
 
     def getTrucksPosition(self, CompanyName: str):
@@ -425,12 +401,54 @@ class MongoConnection():
         Arguments:
         - `CompanyName (str)`: name of the company
         """
-        dict_ = self.client[CompanyName]["TruckData"].find()
-        returnDict = {}
-        for i in dict_:
-            returnDict[dict_[i]["_id"]] = {"latitude": dict_[
-                i]["e"][-1]["v"]["latitude"], "longitude": dict_[i]["e"][-1]["v"]["longitude"]}
-        return json.dumps(returnDict)
+        collection = self.client[CompanyName]["0"]
+
+        res = collection.aggregate([
+            {"$match": {"e.n": "position"}},
+            {"$unwind": "$e"},
+            {"$match": {"e.n": "position"}},
+            {"$group": {
+                "_id": "$_id",
+                "e": {"$last": "$e"},
+            }},
+            {"$group": {
+                "_id": None,
+                "docs": {
+                    "$push": {
+                        "id": "$_id",
+                        "lat": "$e.v.latitude",
+                        "lon": "$e.v.longitude",
+                        "u": "$e.u",
+                        "t": "$e.t"
+                    }
+                }
+            }},
+            {"$project": {
+                "_id": 0,
+                "data": {
+                    "$arrayToObject": {
+                        "$map": {
+                            "input": "$docs",
+                            "in": {
+                                "k": {"$toString": "$$this.id"},
+                                "v": {
+                                    "latitude": "$$this.lat",
+                                    "longitude": "$$this.lon",
+                                    "u": "$$this.u",
+                                    "t": "$$this.t"
+                                }
+                            }
+                        }
+                    }
+                }
+            }}
+        ])
+        res_list = list(res)
+
+        try:
+            return json.dumps(res_list[0]["data"])
+        except:
+            raise web_exception(404, "No data found")
 
 
 class RESTConnector(BaseService):

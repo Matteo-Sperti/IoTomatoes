@@ -1,0 +1,45 @@
+// MongoDB Playground
+// To disable this template go to Settings | MongoDB | Use Default Template For Playground.
+// Make sure you are connected to enable completions and to be able to run a playground.
+// Use Ctrl+Space inside a snippet or a string literal to trigger completions.
+
+// Select the database to use.
+use('PatataNovella');
+
+// Select the collection to use.
+var collection = db.getCollection('0');
+
+var start = 1577836800.0;
+var end = 2000000000.0;
+var measure = "temperature";
+current_time = 1676626432.0;
+MAX_TIME = 3600.0;
+
+// Run the aggregation and open a cursor to the results.
+// Use toArray() to exhaust the cursor to return the whole result set.
+// You can use hasNext()/next() to iterate through the cursor page by page.
+collection.aggregate([
+    {"$match": {"_id": 106, "e.n": "position"}},
+    {"$unwind": "$e"},
+    {"$match": {"e.n": "position"}},
+    {"$sort": {"e.t": -1}},
+    {"$limit": 1000},
+    {"$project": {
+        "_id": 0,
+        "latitude": "$e.v.latitude",
+        "longitude": "$e.v.longitude",
+        "timestamps": "$e.t"
+    }},
+    {"$group": {
+        "_id": null,
+        "latitude": {"$push": "$latitude"},
+        "longitude": {"$push": "$longitude"},
+        "timestamps": {"$push": "$timestamps"}
+    }},
+    {"$project": {
+        "_id": 0,
+        "latitude": "$latitude",
+        "longitude": "$longitude",
+        "timestamps": "$timestamps"
+    }}
+])

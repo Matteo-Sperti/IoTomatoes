@@ -4,8 +4,7 @@ import time
 import cherrypy
 import signal
 
-from iotomatoes_supportpackage.BaseService import BaseService
-from iotomatoes_supportpackage.ItemInfo import setREST
+from iotomatoes_supportpackage import BaseService, web_exception, setREST
 
 
 class WeatherApp:

@@ -3,7 +3,7 @@ import cherrypy
 import time
 import signal
 
-from iotomatoes_supportpackage.MyExceptions import web_exception, InfoException
+from iotomatoes_supportpackage import web_exception, InfoException
 from iotomatoes_supportpackage.MyThread import MyThread
 from iotomatoes_supportpackage.MyIDGenerator import IDs
 from iotomatoes_supportpackage.ItemInfo import getIPaddress, constructService

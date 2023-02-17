@@ -8,9 +8,7 @@ import requests
 import imgkit
 import base64
 
-from iotomatoes_supportpackage.BaseService import BaseService
-from iotomatoes_supportpackage.MyExceptions import web_exception
-from iotomatoes_supportpackage.ItemInfo import setREST
+from iotomatoes_supportpackage import BaseService, web_exception, setREST
 
 
 class TraceGenerator(BaseService):
@@ -45,7 +43,7 @@ class TraceGenerator(BaseService):
 
         Returns a dictionary containing a base64 encoded image.
         """
-        
+
         fileNameHtlm = "mapPositions.html"
         fileNamePng = "mapPositionsImage.png"
         try:

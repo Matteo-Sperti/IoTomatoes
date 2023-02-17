@@ -51,32 +51,6 @@ class ResourceCatalogManager():
 
         return json.dumps(self.catalog, indent=4)
 
-    # def isAuthorize(self, company : dict, credentials : dict):
-    #     """Check if the credentials are correct for the company.
-
-    #     Arguments:
-    #     `company` -- the company to check.
-    #     `credentials` -- the credentials to access the `company`.
-
-    #     Return:
-    #     `True` if the credentials are correct, `False` if the credential are for different company.
-    #     Raise an exception is the `CompanyToken` is not correct.
-    #     """
-
-    #     if "CompanyName" not in credentials:
-    #         raise web_exception(400, "Missing credentials")
-
-    #     if company["CompanyName"] == credentials["CompanyName"]:
-    #         if "CompanyToken" in credentials:
-    #             if company["CompanyToken"] == credentials["CompanyToken"]:
-    #                 return True
-    #             else:
-    #                 raise web_exception(401, "Wrong credentials")
-    #         else:
-    #             return False
-    #     else:
-    #         return False
-
     def findCompany(self, CompanyName: str):
         """Return the pointer to the company specified in `CompanyInfo`.
 
@@ -213,8 +187,7 @@ class ResourceCatalogManager():
         """Insert a new company in the catalog.
 
         Arguments: 
-        - `Info (dict)`: the information about the company.
-        Must contain the `CompanyInfo (dict)`: the information about the company.
+        - `CompanyInfo (dict)`: the information about the company.
         - `AdminInfo (dict)`: the information about the admin of the company.
         - `Fieldlist (dict)`: the list of fields of the company. 
 
@@ -229,38 +202,38 @@ class ResourceCatalogManager():
             raise web_exception(
                 400, "Missing CompanyInfo, AdminInfo or fieldsList")
 
+        if "CompanyName" not in CompanyInfo:
+            raise web_exception(400, "Missing CompanyName")
+
         out = {}
-        if self.findCompany(CompanyInfo) != None:
+        if self.findCompany(CompanyInfo["CompanyName"]) != None:
             out["Status"] = False
             out["Error"] = "Company already registered"
         else:
-            if all(key in CompanyInfo for key in ["CompanyName", "CompanyToken"]):
-                ID = self._IDs.get_ID()
-                AdminID = self._IDs.get_ID()
-                if ID == -1 or AdminID == -1:
-                    raise web_exception(500, "No more IDs available")
-                else:
-                    NewCompany = {
-                        "ID": ID,
-                        "CompanyName": CompanyInfo["CompanyName"],
-                        "CompanyToken": str(CompanyInfo["CompanyToken"]),
-                        "Location": CompanyInfo["Location"],
-                        "NumberOfFields": int(CompanyInfo["NumberOfFields"]),
-                        "adminID": AdminID,
-                        usersList_name: [],
-                        devicesList_name: [],
-                        fieldsList_name: Fieldlist
-                    }
-                    new_item = AdminInfo
-                    new_item["ID"] = AdminID
-                    new_item["lastUpdate"] = time.time()
-                    NewCompany[usersList_name].append(new_item)
-                    self.catalog[companyList_name].append(NewCompany)
-                    self.catalog["lastUpdate"] = time.time()
-                    out = {"Status": True,
-                           "CompanyID": ID,
-                           "CompanyToken": CompanyInfo["CompanyToken"]
-                           }
+            ID = self._IDs.get_ID()
+            AdminID = self._IDs.get_ID()
+            if ID == -1 or AdminID == -1:
+                raise web_exception(500, "No more IDs available")
+            else:
+                NewCompany = {
+                    "ID": ID,
+                    "CompanyName": CompanyInfo["CompanyName"],
+                    "Location": CompanyInfo["Location"],
+                    "NumberOfFields": int(CompanyInfo["NumberOfFields"]),
+                    "adminID": AdminID,
+                    usersList_name: [],
+                    devicesList_name: [],
+                    fieldsList_name: Fieldlist
+                }
+                new_item = AdminInfo
+                new_item["ID"] = AdminID
+                new_item["lastUpdate"] = time.time()
+                NewCompany[usersList_name].append(new_item)
+                self.catalog[companyList_name].append(NewCompany)
+                self.catalog["lastUpdate"] = time.time()
+                out = {"Status": True,
+                       "CompanyID": ID
+                       }
 
         return json.dumps(out, indent=4)
 
@@ -357,13 +330,8 @@ class ResourceCatalogManager():
     def deleteCompany(self, dict_info: dict):
         """Delete a company from the catalog. """
 
-        if "CompanyName" not in dict_info or "CompanyToken" not in dict_info:
-            raise web_exception(400, "Missing CompanyName or CompanyToken")
-        else:
-            CompanyInfo = {
-                "CompanyName": dict_info["CompanyName"],
-                "CompanyToken": dict_info["CompanyToken"]
-            }
+        if "CompanyName" not in dict_info:
+            raise web_exception(400, "Missing CompanyName")
 
         if "telegramID" not in dict_info:
             raise web_exception(400, "Missing telegramID")
@@ -372,7 +340,7 @@ class ResourceCatalogManager():
         except ValueError:
             raise web_exception(400, "Invalid telegramID")
 
-        company = self.findCompany(CompanyInfo["CompanyName"])
+        company = self.findCompany(dict_info["CompanyName"])
         if company == None:
             raise web_exception(404, "Company not found")
 
@@ -548,7 +516,7 @@ class RESTResourceCatalog(BaseService):
 
         Allowed URLs:
         - `/company`: delete the company from the platform. 
-        The parameters are `telegramID`, `CompanyName` and `CompanyToken`. 
+        The parameters are `telegramID` and `CompanyName`
         """
 
         if len(uri) == 1 and uri[0] == "company":

@@ -245,11 +245,10 @@ class SmartIrrigation(BaseService):
             print("ERROR: Weather Forecast service not available!")
             return None, None
         else:
-            if weatherService_data == {}:
-                return None, None
-
             daily_precipitation_sum = weatherService_data["daily"]["precipitation_sum"][0]
             soil_moisture_forecast = weatherService_data["hourly"]["soil_moisture_3_9cm"][hour]
+
+            print("Retrieved weather forecast from Weather Forecast service!")
             return soil_moisture_forecast, daily_precipitation_sum
 
 

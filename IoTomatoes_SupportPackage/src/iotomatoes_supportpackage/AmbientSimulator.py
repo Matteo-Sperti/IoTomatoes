@@ -30,7 +30,7 @@ class AmbientSimulator():
         if self._led:
             self._light = self._light + 1000 + 100*self.noiseValue()
         else:
-            self._light = self._light - 1000 - 100*self.noiseValue()
+            self._light = self._light - 100 - 100*self.noiseValue()
 
         if self._pump:
             self._soilMoisture += (0.5 + 0.02*self.noiseValue())

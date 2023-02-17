@@ -33,34 +33,27 @@ class DataVisualizer():
         """
 
         fileName = "graphMeasure.png"
-        yvalues = []
-        print("start: ", start, "end: ", end, "points: ", self.PointsPerGraph)
-        timestamps = [
-            start + x*(end-start)/self.PointsPerGraph for x in range(self.PointsPerGraph)]
-        xvalues = []
-        unit = ""
-        print(timestamps)
-        for i in range(len(timestamps) - 1):
-            try:
-                params = {
-                    "Field": Field,
-                    "measure": measure,
-                    "start_date": timestamps[i],
-                    "end_date": timestamps[i + 1],
-                }
-                response = requests.get(
-                    f"{self.MongoDB_url}/{CompanyName}/avg", params=params)
-                response.raise_for_status()
-                avg = response.json()
-            except:
-                raise web_exception(
-                    404, "Error getting data from the database")
-            else:
-                if avg != None and avg != False:
-                    yvalues.append(avg["Average"])
-                    xvalues.append(datetime.fromtimestamp(
-                        (timestamps[i] + timestamps[i + 1]) / 2))
-                    unit = avg["Unit"]
+        print(f"Getting graph of {measure} for Field {Field} of {CompanyName} from {start} to {end}...")
+        try:
+            params = {
+                "Field": Field,
+                "measure": measure,
+                "start_date": start,
+                "end_date": end,
+                "numPoints": self.PointsPerGraph
+            }
+            response = requests.get(
+                f"{self.MongoDB_url}/{CompanyName}/vector", params=params)
+            response.raise_for_status()
+            res_dict = response.json()
+        except:
+            raise web_exception(
+                404, "Error getting data from the database")
+        else:
+            xvalues = [datetime.fromtimestamp(
+                x) for x in res_dict["t"]]
+            yvalues = res_dict["v"]
+            unit = res_dict["u"]
 
         if len(yvalues) > 0 and len(xvalues) > 0 and unit != "":
             plt.plot(xvalues, yvalues)

@@ -35,7 +35,6 @@ class InsertNewCompany():
     @property
     def company(self):
         return {"CompanyName": self.response["CompanyName"],
-                "CompanyToken": self.response["CompanyToken"],
                 "Location": self.location,
                 "NumberOfFields": self.response["NumberOfFields"]}
 
@@ -82,28 +81,12 @@ class InsertNewCompany():
 
         elif self._status == 3:
             self.response["Surname"] = message
-            self._bot.sendMessage("Insert your Company Token")
+            self._bot.sendMessage(
+                "Insert your location as couple of coordinates:")
             self._status += 1
             return False
 
         elif self._status == 4:
-            self.response["CompanyToken"] = message
-            self._bot.sendMessage(f"Your Company Token is: {message}\nProceed with the registration?",
-                                  reply_markup=keyboardYESNO)
-            self._status += 1
-            return False
-
-        elif self._status == 5:
-            if message == "yes":
-                self._bot.sendMessage(
-                    "Insert your location as couple of coordinates:")
-                self._status += 1
-            else:
-                self._bot.sendMessage("Insert your Company Token")
-                self._status = 4
-            return False
-
-        elif self._status == 6:
             try:
                 message.replace(" ", "")
                 latitude, longitude = message.split(",")
@@ -117,7 +100,6 @@ class InsertNewCompany():
                 self._bot.sendMessage("Invalid location")
                 self._bot.sendMessage(
                     "Insert your location as couple of coordinates:")
-                self._status = 6
                 return False
             else:
                 self._bot.sendMessage(
@@ -125,7 +107,7 @@ class InsertNewCompany():
                 self._status += 1
                 return False
 
-        elif self._status == 7:
+        elif self._status == 5:
             if message == "yes":
                 self._bot.sendMessage(
                     "How many indipendent fields do you have in your company?")
@@ -133,10 +115,10 @@ class InsertNewCompany():
             else:
                 self._bot.sendMessage(
                     "Insert your location as couple coordinates:")
-                self._status = 6
+                self._status = 4
             return False
 
-        elif self._status == 8:
+        elif self._status == 6:
             try:
                 self.response["NumberOfFields"] = int(message)
             except:
@@ -144,7 +126,6 @@ class InsertNewCompany():
                     "Invalid number, please insert a positive integer number")
                 self._bot.sendMessage(
                     "How many indipendent fields do you have in your company?")
-                self._status = 8
                 return False
             else:
                 self._bot.sendMessage(
@@ -152,7 +133,7 @@ class InsertNewCompany():
                 self._status += 1
                 return False
 
-        elif self._status == 9:
+        elif self._status == 7:
             try:
                 fields = message.split(",")
                 if len(fields) != self.response["NumberOfFields"]:
@@ -168,12 +149,10 @@ class InsertNewCompany():
                 self._bot.sendMessage("Invalid input")
                 self._bot.sendMessage(
                     "Insert the colture of your fields, separated by a comma")
-                self._status = 9
                 return False
             else:
                 summary = (f"You are going to register the following company:\n"
                            f"Company Name: {self.response['CompanyName']}\n"
-                           f"Company Token: {self.response['CompanyToken']}\n"
                            f"Location: {self.location['latitude']}, {self.location['longitude']}\n\n"
                            f"{self.response['Name']} {self.response['Surname']} will be the admin of this company\n")
                 self._bot.sendMessage(summary)
@@ -182,7 +161,7 @@ class InsertNewCompany():
                 self._status += 1
                 return False
 
-        elif self._status == 10:
+        elif self._status == 8:
             if message == "yes":
                 if self.insert_company():
                     self._bot.sendMessage("Registration completed")
@@ -217,11 +196,9 @@ class InsertNewCompany():
                 res_dict = res.json()
                 if res_dict["Status"]:
                     CompanyID = res_dict["CompanyID"]
-                    CompanyToken = res_dict["CompanyToken"]
                     message = (f"""Company {self.company["CompanyName"]} registered\n"""
                                "Welcome to IoTomatoes Platform\n\n"
-                               f"CompanyID: {CompanyID}\n"
-                               f"CompanyToken: {CompanyToken}")
+                               f"CompanyID: {CompanyID}")
                     self._bot.sendMessage(message)
                     return True
                 else:
@@ -262,8 +239,7 @@ class RegisterNewUser():
 
     @property
     def company(self):
-        return {"CompanyName": self.response["CompanyName"],
-                "CompanyToken": self.response["CompanyToken"]}
+        return {"CompanyName": self.response["CompanyName"]}
 
     def update(self, message):
         """Update the status of the registration.
@@ -294,20 +270,15 @@ class RegisterNewUser():
 
         elif self._status == 3:
             self.response["Surname"] = message
-            self._bot.sendMessage("Insert your Company Token")
-            self._status += 1
-            return False
-
-        elif self._status == 4:
-            self.response["CompanyToken"] = message
-            summary = (f"You are going to register {self.completeName} as a new user of {self.response['CompanyName']}\n"
-                       f"Company Token: {self.response['CompanyToken']}\n")
+            summary = (
+                f"You are going to register you ({self.completeName})"
+                f"as a new user of {self.response['CompanyName']}\n")
             self._bot.sendMessage(
                 f"{summary}\nConfirm your registration?", reply_markup=keyboardYESNO)
             self._status += 1
             return False
 
-        elif self._status == 5:
+        elif self._status == 4:
             if message == "yes":
                 if self.insert_user():
                     self._bot.sendMessage("Registration completed")
@@ -331,8 +302,6 @@ class RegisterNewUser():
         except requests.exceptions.HTTPError as err:
             if err.response.status_code == 404:
                 self._bot.sendMessage("Company not registered")
-            elif err.response.status_code == 401:
-                self._bot.sendMessage("CompanyToken not valid")
             else:
                 print(f"{err.response.status_code} : {err.response.reason}")
             return False
@@ -443,7 +412,6 @@ class DeleteCompany():
         """
         self.chatID = chatID
         self.CompanyName = CompanyName
-        self.CompanyToken = ""
         self._connector = connector
         self._bot = sender
         self._status = 0
@@ -462,16 +430,11 @@ class DeleteCompany():
         if self._status == 0:
             self._bot.sendMessage(
                 "You are going to delete company " + self.CompanyName)
-            self._bot.sendMessage("Insert your Company Token")
-            self._status += 1
-
-        elif self._status == 1:
-            self.CompanyToken = message
             self._bot.sendMessage("Confirm your deletion?",
                                   reply_markup=keyboardYESNO)
             self._status += 1
 
-        elif self._status == 2:
+        elif self._status == 1:
             if message == "yes":
                 if self.delete_company():
                     self._bot.sendMessage("Deletion completed")
@@ -486,7 +449,7 @@ class DeleteCompany():
 
         try:
             params = {"CompanyName": self.CompanyName,
-                      "CompanyToken": self.CompanyToken, "telegramID": self.chatID}
+                      "telegramID": self.chatID}
             res = requests.delete(self._connector.ResourceCatalog_url + "/company",
                                   params=params)
             res.raise_for_status()
@@ -494,8 +457,6 @@ class DeleteCompany():
         except requests.exceptions.HTTPError as err:
             if err.response.status_code == 404:
                 self._bot.sendMessage("Company not registered")
-            elif err.response.status_code == 401:
-                self._bot.sendMessage("CompanyToken not valid")
             elif err.response.status_code == 403:
                 self._bot.sendMessage(
                     "You are not authorized to delete this company.\nContact your administrator.")

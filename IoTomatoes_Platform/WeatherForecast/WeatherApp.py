@@ -58,30 +58,30 @@ class WeatherApp:
 
         latitude, longitude = self.getLocation(CompanyName)
         if latitude is None or longitude is None:
-            return {}
+            raise web_exception(500, "No location found for the company")
 
         InputDict = self.IrrigationDict.copy()
         InputDict["latitude"] = latitude
         InputDict["longitude"] = longitude
         response = self.makeRequest(InputDict)
         if response is None:
-            return {}
+            raise web_exception(500, "Error in the Weather API")
 
-        return response  # DA SISTEMARE
+        return json.dumps(response)
 
     def LightingData(self, CompanyName: str):
         """Gets the data from the weather API for the lighting service"""
 
         latitude, longitude = self.getLocation(CompanyName)
         if latitude is None or longitude is None:
-            return {}
+            raise web_exception(500, "No location found for the company")
 
         InputDict = self.LightingDict.copy()
         InputDict["latitude"] = latitude
         InputDict["longitude"] = longitude
         response = self.makeRequest(InputDict)
         if response is None:
-            return {}
+            raise web_exception(500, "Error in the Weather API")
 
         listToBeConverted = (response["hourly"].pop("shortwave_radiation"))
         # converts the shortwave radiation to lux
@@ -95,7 +95,7 @@ class WeatherApp:
         response["hourly_units"].pop("shortwave_radiation")
         response["daily_units"]["Illumination_sum"] = "lux"
         response["daily_units"].pop("shortwave_radiation_sum")
-        return response
+        return json.dumps(response)
 
 
 class WheaterService(BaseService):
@@ -122,10 +122,10 @@ class WheaterService(BaseService):
             raise cherrypy.HTTPError(
                 404, "Please specify the service you want to use")
         else:
-            if uri[0] == "irrigation":
-                return json.dumps(self.weather.IrrigationData(uri[0]))
-            elif uri[0] == "lighting":
-                return json.dumps(self.weather.LightingData(uri[0]))
+            if uri[1] == "irrigation":
+                return self.weather.IrrigationData(uri[0])
+            elif uri[1] == "lighting":
+                return self.weather.LightingData(uri[0])
             else:
                 raise cherrypy.HTTPError(404, "Wrong URL")
 

@@ -62,7 +62,7 @@ class IoTDevice(BaseResource):
         """This function is used to notify the device when a message is received.
         If the device is an actuator it will set the actuator state.
         """
-        print(f"Resource {self.ID} received message on topic {topic}\n")
+        print(f"Resource {self.ID} received message on topic {topic}")
 
         if not self.isActuator:
             print("Resource is not an actuator.\n"

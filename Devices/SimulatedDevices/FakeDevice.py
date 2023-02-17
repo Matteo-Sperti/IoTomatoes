@@ -19,9 +19,9 @@ class SimDevice(IoTDevice):
     def setActuator(self, actuator: str, state: bool):
         """This function is used to set the state of an actuator in the AmbientSimulator."""
         if state:
-            print(f"Resource {self.ID}: {actuator} turned ON")
+            print(f"Resource {self.ID}: {actuator} turned ON\n")
         else:
-            print(f"Resource {self.ID}: {actuator} turned OFF")
+            print(f"Resource {self.ID}: {actuator} turned OFF\n")
         self._Ambient.setActuator(actuator, state)
 
     def get_temperature(self):

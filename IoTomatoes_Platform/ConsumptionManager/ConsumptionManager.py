@@ -32,7 +32,7 @@ class ConsumptionManager (BaseService):
                     'bn': self.serviceName,
                     'fieldNumber': dev['fieldNumber'],
                     'e': {
-                        'n': 'Consumption',
+                        'n': 'consumption',
                         'v': dev['Consumption_kWh'],
                         'u': 'kWh',
                         'power': dev['PowerConsumption_kW'],
@@ -51,7 +51,7 @@ class ConsumptionManager (BaseService):
                     'bn': self.serviceName,
                     'fieldNumber': dev['fieldNumber'],
                     'e': {
-                        'n': 'Consumption',
+                        'n': 'consumption',
                         'v': dev['Consumption_kWh'],
                         'u': 'kWh',
                         'power': dev['PowerConsumption_kW'],

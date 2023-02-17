@@ -205,6 +205,8 @@ class SmartLighting(BaseService):
             if weatherService_data == {}:
                 return None, None, None, None
 
+            print(json.dumps(weatherService_data, indent=4))
+
             light = weatherService_data["hourly"]["sunLight"][hour]
 
             # Estrazione e costruzione orario alba:
@@ -226,6 +228,8 @@ class SmartLighting(BaseService):
             sunset = datetime.time(sunsetHour, sunsetMinutes, 0)
 
             cloudCover = weatherService_data["hourly"]["cloudcover"][hour]
+
+            print("Retrieved weather forecast from Weather Forecast service!")
             return [cloudCover, light, sunrise, sunset]
 
 

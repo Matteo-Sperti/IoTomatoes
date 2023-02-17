@@ -327,31 +327,95 @@ class MongoConnection():
             }
             return json.dumps(resultDict)
 
-    def getPlant(self, PlantName: str):
-        """Get the plant informations
+    def GetMeasureVector(self, CompanyName: str, **kwargs):
+        """Get the average of a measure in a period of time.
 
         Arguments:
-        - `PlantName (str)`: name of the plant
+        - `CompanyName (str)`: unique name of the company.
+        - `CollectionName (str)`: name of the collection.
+        - `measure (str)`: name of the measure.
+        - `start (float)`: start date of the period.
+        - `end (float)`: end date of the period.
         """
-        db = self.client["PlantDatabase"]
-        collection = db["PlantData"]
-        item = collection.find_one({"PlantName": PlantName})
-
-        def exctractPlantInfo(dict_: dict):
-            """Extract the plant informations from the dictionary"""
-            plantInfo = {}
-            plantInfo["lightLimit"] = dict_["lightLimit"]
-            plantInfo["soilMoistureLimit"] = dict_["soilMoistureLimit"]
-            plantInfo["precipitationLimit"] = dict_["precipitationLimit"]
-            return plantInfo
-
-        if item != None:
-            return json.dumps(exctractPlantInfo(item))
+        if "Field" not in kwargs:
+            raise web_exception(400, "Missing CollectionName")
         else:
-            default = collection.find_one({"PlantName": "default"})
-            if default == None:
-                raise web_exception(500, "Default values not found")
-            return json.dumps(exctractPlantInfo(default))
+            CollectionName = kwargs["Field"]
+        
+        if "measure" not in kwargs:
+            raise web_exception(400, "Missing measure")
+        else:
+            measure = kwargs["measure"]
+        
+        if "start_date" not in kwargs:
+            raise web_exception(400, "Missing start")
+        else:
+            start = float(kwargs["start_date"])
+        
+        if "end_date" not in kwargs:
+            raise web_exception(400, "Missing end")
+        else:
+            end = float(kwargs["end_date"])
+
+        if "numPoints" in kwargs:
+            numPoints = int(kwargs["numPoint"])
+        else:
+            numPoints = 100
+    
+        if CompanyName not in self.client.list_database_names():
+            raise web_exception(404, "Company not found")
+
+        if CollectionName not in self.client[CompanyName].list_collection_names():
+            raise web_exception(404, "Field not found")
+
+        collection = self.client[CompanyName][CollectionName]
+
+        res = collection.aggregate([
+            {"$match": {"e.n": measure, "e.t": {"$gte": start, "$lte": end}}},
+            {"$unwind": "$e"},
+            {"$match": {"e.n": measure, "e.t": {"$gte": start, "$lte": end}}},
+            {"$sort": {"e.t": -1}},
+            {"$project": {
+                "_id": 0,
+                "v": "$e.v",
+                "u": "$e.u",
+                "t": "$e.t"
+            }},
+            {
+                "$bucketAuto": {
+                    "groupBy": "$t",
+                    "buckets": numPoints,
+                    "output": {
+                        "v": {"$avg": "$v"},
+                        "u": {"$first": "$u"},
+                        "t": {"$avg": "$t"}
+                    }
+                }},
+            {"$group": {
+                "_id": None,
+                "v": {"$push": "$v"},
+                "t": {"$push": "$t"},
+                "u": {"$first": "$u"}
+            }},
+            {"$project": {
+                "_id": 0,
+                "v": 1,
+                "t": 1,
+                "u": 1
+            }}
+        ])
+
+        res_list = list(res)
+        if res == None or len(res_list) == 0:
+            raise web_exception(404, "No data found")
+
+        res_info = res_list[0]
+        result = {
+            "Company": CompanyName,
+            "Field": CollectionName
+        }
+        result.update(res_info)
+        return json.dumps(result)
 
     def getTruckTrace(self, CompanyName: str, TruckID):
         """Get the truck trace informations
@@ -450,6 +514,32 @@ class MongoConnection():
         except:
             raise web_exception(404, "No data found")
 
+    def getPlant(self, PlantName: str):
+        """Get the plant informations
+
+        Arguments:
+        - `PlantName (str)`: name of the plant
+        """
+        db = self.client["PlantDatabase"]
+        collection = db["PlantData"]
+        item = collection.find_one({"PlantName": PlantName})
+
+        def exctractPlantInfo(dict_: dict):
+            """Extract the plant informations from the dictionary"""
+            plantInfo = {}
+            plantInfo["lightLimit"] = dict_["lightLimit"]
+            plantInfo["soilMoistureLimit"] = dict_["soilMoistureLimit"]
+            plantInfo["precipitationLimit"] = dict_["precipitationLimit"]
+            return plantInfo
+
+        if item != None:
+            return json.dumps(exctractPlantInfo(item))
+        else:
+            default = collection.find_one({"PlantName": "default"})
+            if default == None:
+                raise web_exception(500, "Default values not found")
+            return json.dumps(exctractPlantInfo(default))
+
 
 class RESTConnector(BaseService):
     exposed = True
@@ -483,6 +573,8 @@ class RESTConnector(BaseService):
         - `/<CompanyName>/avg` : get the average of a measure in a field of a company.
         The parameters are: `Field`, `measure`, `start_date`, `end_date`. 
         If `Field` is `all`, the average of all the fields is returned.
+        - `/<CompanyName>/vector` : get the last measure of a field of a company.
+        The parameters are: `Field`, `measure`, `start_date`, `end_date`. 
         - `/<CompanyName>/truckTrace` : get the trace of a truck.
         The parameter is: `TruckID`.
         - `/<CompanyName>/trucksPosition` : get the position of all the trucks.
@@ -498,6 +590,8 @@ class RESTConnector(BaseService):
             elif len(uri) == 2 and uri[1] == "avg" and params["Field"] == "all":
                 return self.mongo.getAvgAll(uri[0], params["measure"],
                                             float(params["start_date"]), float(params["end_date"]))
+            elif len(uri) == 2 and uri[1] == "vector":
+                return self.mongo.GetMeasureVector(uri[0], **params)
             elif len(uri) == 2 and uri[1] == "truckTrace":
                 return self.mongo.getTruckTrace(uri[0], params["TruckID"])
             elif len(uri) == 2 and uri[1] == "truckPosition":

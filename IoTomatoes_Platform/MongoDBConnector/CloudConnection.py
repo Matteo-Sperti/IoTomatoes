@@ -494,7 +494,7 @@ class MongoConnection():
                         "$map": {
                             "input": "$docs",
                             "in": {
-                                "TruckID": {"$toString": "$$this.id"},
+                                "k": {"$toString": "$$this.id"},
                                 "v": {
                                     "latitude": "$$this.lat",
                                     "longitude": "$$this.lon",

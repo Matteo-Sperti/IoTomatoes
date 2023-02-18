@@ -723,9 +723,11 @@ class CustomPlot():
         else:
             if "img64" in dict_:
                 fileName = "plot.png"
+                binaryString = dict_["img64"].encode("utf-8")
                 with open(fileName, "wb") as fh:
-                    fh.write(base64.b64decode(dict_["img64"]))
-                self._bot.sendPhoto(fileName)
+                    fh.write(base64.b64decode(binaryString))
+                with open(fileName, "rb") as fh:
+                    self._bot.sendPhoto(fh)
                 return True
             else:
                 return False
@@ -815,16 +817,19 @@ class GetPosition():
         try:
             res = requests.get(f"{url}/{self.CompanyName}/trucksPosition")
             res.raise_for_status()
-            listTruck = res.json()
+            dictTrucks = res.json()
         except:
             self._bot.sendMessage("Error in the connection with the Database")
             return []
         else:
             trucks = []
-            for truck in listTruck:
+            for ID, truck in dictTrucks.items():
                 info = {
-                    "ID": truck["TruckID"],
-                    "Location": truck["Location"],
+                    "ID": ID,
+                    "Location": {
+                        "latitude": truck["latitude"],
+                        "longitude": truck["longitude"]
+                    },
                     "LastUpdate": truck["t"],
                 }
                 trucks.append(info)
@@ -843,10 +848,20 @@ class GetPosition():
         """
 
         if self._status == 0:
-            keyboard = InlineKeyboardMarkup(inline_keyboard=[[
-                InlineKeyboardButton(text='Truck', callback_data='Truck'),
-                InlineKeyboardButton(text='Device', callback_data='Device'),
-            ]])
+            if self.devices == [] and self.trucks == []:
+                self._bot.sendMessage("No devices found")
+                return True
+            inline_keyboard_ = []
+            if self.devices != []:
+                button = InlineKeyboardButton(
+                    text="Devices", callback_data="Device")
+                inline_keyboard_.append([button])
+            if self.trucks != []:
+                button = InlineKeyboardButton(
+                    text="Trucks", callback_data="Truck")
+                inline_keyboard_.append([button])
+
+            keyboard = InlineKeyboardMarkup(inline_keyboard=inline_keyboard_)
             self._bot.sendMessage("What device do you want to see?",
                                   reply_markup=keyboard)
             self._status += 1
@@ -861,7 +876,7 @@ class GetPosition():
                     inline_keyboard_ = []
                     for device in self.trucks:
                         button = InlineKeyboardButton(
-                            text=f"Truck {device['ID']} : {device['deviceName']}", callback_data=f"{device['ID']}")
+                            text=f"Truck {device['ID']}", callback_data=f"{device['ID']}")
                         inline_keyboard_.append([button])
                     keyboard = InlineKeyboardMarkup(
                         inline_keyboard=inline_keyboard_)
@@ -890,28 +905,22 @@ class GetPosition():
                 return False
 
         elif self._status == 21:
-            try:
-                DeviceNumber = int(message)
-            except:
-                self._bot.sendMessage("Device ID must be an integer")
-                return False
-            else:
-                for device in self.trucks:
-                    if device["ID"] == DeviceNumber:
-                        if device["Location"]["latitudine"] == -1 or device["Location"]["longitudine"] == -1:
-                            self._bot.sendMessage(
-                                "No location available for this trucks")
-                            return True
-                        else:
-                            self.device = device
-                            self._bot.sendMessage(
-                                f"Truck {device['ID']}\nLast update: {device['LastUpdate']}")
-                            self._bot.sendLocation(
-                                device["Location"]["latitudine"], device["Location"]["longitudine"])
-                            return True
+            for device in self.trucks:
+                if device["ID"] == message:
+                    if device["Location"]["latitude"] == -1 or device["Location"]["longitude"] == -1:
+                        self._bot.sendMessage(
+                            "No location available for this trucks")
+                        return True
+                    else:
+                        self.device = device
+                        self._bot.sendMessage(
+                            f"Truck {device['ID']}\nLast update: {device['LastUpdate']}")
+                        self._bot.sendLocation(
+                            device["Location"]["latitude"], device["Location"]["longitude"])
+                        return True
 
-                self._bot.sendMessage("Choose a valid option")
-                return False
+            self._bot.sendMessage("Choose a valid option")
+            return False
 
         elif self._status == 31:
             try:
@@ -922,14 +931,14 @@ class GetPosition():
             else:
                 for device in self.devices:
                     if device["ID"] == DeviceNumber:
-                        if device["Location"]["latitudine"] == -1 or device["Location"]["longitudine"] == -1:
+                        if device["Location"]["latitude"] == -1 or device["Location"]["longitude"] == -1:
                             self._bot.sendMessage(
                                 "No location available for this device")
                             return True
                         else:
                             self.device = device
                             self._bot.sendLocation(
-                                device["Location"]["latitudine"], device["Location"]["longitudine"])
+                                device["Location"]["latitude"], device["Location"]["longitude"])
                             return True
 
                 self._bot.sendMessage("Choose a valid option")

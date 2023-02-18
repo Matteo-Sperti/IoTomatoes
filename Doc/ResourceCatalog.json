@@ -1,20 +1,20 @@
 {
-    "serviceName": "ResourceCatalog",
+    "ID": 1,
+    "serviceName": "resource_catalog",
     "availableServices": [
         "REST"
     ],
     "servicesDetails": [
         {
             "serviceType": "REST",
-            "serviceIP": "http://172.16.0.3:8081"
+            "serviceIP": "http://172.20.0.4:8080"
         }
     ],
-    "lastUpdate": 1674135821.476419,
+    "lastUpdate": 1676717544.6728122,
     "companiesList": [
         {
             "ID": 100,
             "CompanyName": "PatataNovella",
-            "CompanyToken": "123",
             "Location": {
                 "longitude": 7.48,
                 "latitude": 45.0
@@ -27,7 +27,7 @@
                     "Surname": "Sperti",
                     "telegramID": 615608459,
                     "ID": 101,
-                    "lastUpdate": 1674135487.4928083
+                    "lastUpdate": 1676716998.6616917
                 }
             ],
             "devicesList": [
@@ -40,45 +40,14 @@
                         {
                             "serviceType": "MQTT",
                             "subscribedTopics": [
-                                "PatataNovella/2/102/led",
-                                "PatataNovella/2/102/pump"
-                            ],
-                            "publishedTopics": []
-                        }
-                    ],
-                    "deviceName": "SimulatedDevice3",
-                    "field": 2,
-                    "Location": {
-                        "latitude": 45.001,
-                        "longitude": 7.481
-                    },
-                    "PowerConsumption_kW": 0,
-                    "isActuator": true,
-                    "actuatorType": [
-                        "led",
-                        "pump"
-                    ],
-                    "isSensor": false,
-                    "measureType": [],
-                    "lastUpdate": 1674135787.8653007
-                },
-                {
-                    "ID": 103,
-                    "availableServices": [
-                        "MQTT"
-                    ],
-                    "servicesDetails": [
-                        {
-                            "serviceType": "MQTT",
-                            "subscribedTopics": [
-                                "PatataNovella/1/103/led",
-                                "PatataNovella/1/103/pump"
+                                "PatataNovella/1/102/led",
+                                "PatataNovella/1/102/pump"
                             ],
                             "publishedTopics": []
                         }
                     ],
                     "deviceName": "SimulatedDevice2",
-                    "field": 1,
+                    "fieldNumber": 1,
                     "Location": {
                         "latitude": 44.996,
                         "longitude": 7.481
@@ -91,10 +60,10 @@
                     ],
                     "isSensor": false,
                     "measureType": [],
-                    "lastUpdate": 1674135788.00554
+                    "lastUpdate": 1676717539.4561088
                 },
                 {
-                    "ID": 104,
+                    "ID": 103,
                     "availableServices": [
                         "MQTT"
                     ],
@@ -103,15 +72,15 @@
                             "serviceType": "MQTT",
                             "subscribedTopics": [],
                             "publishedTopics": [
-                                "PatataNovella/1/104/temperature",
-                                "PatataNovella/1/104/humidity",
-                                "PatataNovella/1/104/light",
-                                "PatataNovella/1/104/soilMoisture"
+                                "PatataNovella/1/103/temperature",
+                                "PatataNovella/1/103/humidity",
+                                "PatataNovella/1/103/light",
+                                "PatataNovella/1/103/soilMoisture"
                             ]
                         }
                     ],
                     "deviceName": "SimulatedDevice1",
-                    "field": 1,
+                    "fieldNumber": 1,
                     "Location": {
                         "latitude": 44.996469,
                         "longitude": 7.482377
@@ -126,7 +95,36 @@
                         "light",
                         "soilMoisture"
                     ],
-                    "lastUpdate": 1674135788.0080748
+                    "lastUpdate": 1676717539.5807233
+                },
+                {
+                    "ID": 104,
+                    "availableServices": [
+                        "MQTT"
+                    ],
+                    "servicesDetails": [
+                        {
+                            "serviceType": "MQTT",
+                            "subscribedTopics": [],
+                            "publishedTopics": [
+                                "PatataNovella/0/104/position"
+                            ]
+                        }
+                    ],
+                    "deviceName": "SimulatedTruck2",
+                    "fieldNumber": 0,
+                    "Location": {
+                        "latitude": -1,
+                        "longitude": -1
+                    },
+                    "PowerConsumption_kW": 0,
+                    "isActuator": false,
+                    "actuatorType": [],
+                    "isSensor": true,
+                    "measureType": [
+                        "position"
+                    ],
+                    "lastUpdate": 1676717539.5161328
                 },
                 {
                     "ID": 105,
@@ -138,47 +136,14 @@
                             "serviceType": "MQTT",
                             "subscribedTopics": [],
                             "publishedTopics": [
-                                "PatataNovella/2/105/temperature",
-                                "PatataNovella/2/105/humidity",
-                                "PatataNovella/2/105/light"
-                            ]
-                        }
-                    ],
-                    "deviceName": "SimulatedDevice5",
-                    "field": 2,
-                    "Location": {
-                        "latitude": 44.996,
-                        "longitude": 7.481
-                    },
-                    "PowerConsumption_kW": 0,
-                    "isActuator": false,
-                    "actuatorType": [],
-                    "isSensor": true,
-                    "measureType": [
-                        "temperature",
-                        "humidity",
-                        "light"
-                    ],
-                    "lastUpdate": 1674135788.0495424
-                },
-                {
-                    "ID": 106,
-                    "availableServices": [
-                        "MQTT"
-                    ],
-                    "servicesDetails": [
-                        {
-                            "serviceType": "MQTT",
-                            "subscribedTopics": [],
-                            "publishedTopics": [
-                                "PatataNovella/1/106/humidity",
-                                "PatataNovella/1/106/light",
-                                "PatataNovella/1/106/soilMoisture"
+                                "PatataNovella/1/105/humidity",
+                                "PatataNovella/1/105/light",
+                                "PatataNovella/1/105/soilMoisture"
                             ]
                         }
                     ],
                     "deviceName": "SimulatedDevice4",
-                    "field": 1,
+                    "fieldNumber": 1,
                     "Location": {
                         "latitude": 44.996,
                         "longitude": 7.475
@@ -192,7 +157,69 @@
                         "light",
                         "soilMoisture"
                     ],
-                    "lastUpdate": 1674135788.1497066
+                    "lastUpdate": 1676717539.7368581
+                },
+                {
+                    "ID": 106,
+                    "availableServices": [
+                        "MQTT"
+                    ],
+                    "servicesDetails": [
+                        {
+                            "serviceType": "MQTT",
+                            "subscribedTopics": [],
+                            "publishedTopics": [
+                                "PatataNovella/0/106/position"
+                            ]
+                        }
+                    ],
+                    "deviceName": "SimulatedTruck1",
+                    "fieldNumber": 0,
+                    "Location": {
+                        "latitude": 45.01506697493688,
+                        "longitude": 7.495714840746703
+                    },
+                    "PowerConsumption_kW": 0,
+                    "isActuator": false,
+                    "actuatorType": [],
+                    "isSensor": true,
+                    "measureType": [
+                        "position"
+                    ],
+                    "lastUpdate": 1676717539.8073924
+                },
+                {
+                    "ID": 107,
+                    "availableServices": [
+                        "MQTT"
+                    ],
+                    "servicesDetails": [
+                        {
+                            "serviceType": "MQTT",
+                            "subscribedTopics": [],
+                            "publishedTopics": [
+                                "PatataNovella/2/107/temperature",
+                                "PatataNovella/2/107/humidity",
+                                "PatataNovella/2/107/light"
+                            ]
+                        }
+                    ],
+                    "deviceName": "SimulatedDevice5",
+                    "fieldNumber": 2,
+                    "Location": {
+                        "latitude": 44.996,
+                        "longitude": 7.481
+                    },
+                    "PowerConsumption_kW": 0,
+                    "isActuator": false,
+                    "actuatorType": [],
+                    "isSensor": true,
+                    "measureType": [
+                        "temperature",
+                        "humidity",
+                        "light"
+                    ],
+                    "lastUpdate": 1676717539.8644805
                 },
                 {
                     "ID": 108,
@@ -203,277 +230,25 @@
                         {
                             "serviceType": "MQTT",
                             "subscribedTopics": [
-                                "PatataNovella/1/108/pump"
+                                "PatataNovella/2/108/led"
                             ],
                             "publishedTopics": []
                         }
                     ],
-                    "deviceName": "SimDevice_2",
-                    "field": 1,
+                    "deviceName": "SimulatedDevice3",
+                    "fieldNumber": 2,
                     "Location": {
-                        "latitude": 45.00130933948873,
-                        "longitude": 7.483779007395185
-                    },
-                    "PowerConsumption_kW": 8,
-                    "isActuator": true,
-                    "actuatorType": [
-                        "pump"
-                    ],
-                    "isSensor": false,
-                    "measureType": [],
-                    "lastUpdate": 1674135813.2419128
-                },
-                {
-                    "ID": 109,
-                    "availableServices": [
-                        "MQTT"
-                    ],
-                    "servicesDetails": [
-                        {
-                            "serviceType": "MQTT",
-                            "subscribedTopics": [],
-                            "publishedTopics": [
-                                "PatataNovella/1/109/humidity",
-                                "PatataNovella/1/109/temperature"
-                            ]
-                        }
-                    ],
-                    "deviceName": "SimDevice_3",
-                    "field": 1,
-                    "Location": {
-                        "latitude": 45.00460220498349,
-                        "longitude": 7.482786866797712
+                        "latitude": 45.001,
+                        "longitude": 7.481
                     },
                     "PowerConsumption_kW": 0,
-                    "isActuator": false,
-                    "actuatorType": [],
-                    "isSensor": true,
-                    "measureType": [
-                        "humidity",
-                        "temperature"
-                    ],
-                    "lastUpdate": 1674135814.473051
-                },
-                {
-                    "ID": 110,
-                    "availableServices": [
-                        "MQTT"
-                    ],
-                    "servicesDetails": [
-                        {
-                            "serviceType": "MQTT",
-                            "subscribedTopics": [
-                                "PatataNovella/1/110/led"
-                            ],
-                            "publishedTopics": []
-                        }
-                    ],
-                    "deviceName": "SimDevice_4",
-                    "field": 1,
-                    "Location": {
-                        "latitude": 45.00466357875215,
-                        "longitude": 7.481601946896048
-                    },
-                    "PowerConsumption_kW": 6,
                     "isActuator": true,
                     "actuatorType": [
                         "led"
                     ],
                     "isSensor": false,
                     "measureType": [],
-                    "lastUpdate": 1674135815.681236
-                },
-                {
-                    "ID": 111,
-                    "availableServices": [
-                        "MQTT"
-                    ],
-                    "servicesDetails": [
-                        {
-                            "serviceType": "MQTT",
-                            "subscribedTopics": [
-                                "PatataNovella/1/111/led"
-                            ],
-                            "publishedTopics": []
-                        }
-                    ],
-                    "deviceName": "SimDevice_5",
-                    "field": 1,
-                    "Location": {
-                        "latitude": 45.004754824622296,
-                        "longitude": 7.4839222485027825
-                    },
-                    "PowerConsumption_kW": 11,
-                    "isActuator": true,
-                    "actuatorType": [
-                        "led"
-                    ],
-                    "isSensor": false,
-                    "measureType": [],
-                    "lastUpdate": 1674135816.7662942
-                },
-                {
-                    "ID": 112,
-                    "availableServices": [
-                        "MQTT"
-                    ],
-                    "servicesDetails": [
-                        {
-                            "serviceType": "MQTT",
-                            "subscribedTopics": [],
-                            "publishedTopics": [
-                                "PatataNovella/2/112/humidity",
-                                "PatataNovella/2/112/temperature",
-                                "PatataNovella/2/112/light",
-                                "PatataNovella/2/112/soilMoisture"
-                            ]
-                        }
-                    ],
-                    "deviceName": "SimDevice_6",
-                    "field": 2,
-                    "Location": {
-                        "latitude": 45.000293947221095,
-                        "longitude": 7.4750642943840395
-                    },
-                    "PowerConsumption_kW": 0,
-                    "isActuator": false,
-                    "actuatorType": [],
-                    "isSensor": true,
-                    "measureType": [
-                        "humidity",
-                        "temperature",
-                        "light",
-                        "soilMoisture"
-                    ],
-                    "lastUpdate": 1674135702.9240477
-                },
-                {
-                    "ID": 113,
-                    "availableServices": [
-                        "MQTT"
-                    ],
-                    "servicesDetails": [
-                        {
-                            "serviceType": "MQTT",
-                            "subscribedTopics": [
-                                "PatataNovella/2/113/led"
-                            ],
-                            "publishedTopics": []
-                        }
-                    ],
-                    "deviceName": "SimDevice_7",
-                    "field": 2,
-                    "Location": {
-                        "latitude": 45.00062487676501,
-                        "longitude": 7.4753933446264655
-                    },
-                    "PowerConsumption_kW": 15,
-                    "isActuator": true,
-                    "actuatorType": [
-                        "led"
-                    ],
-                    "isSensor": false,
-                    "measureType": [],
-                    "lastUpdate": 1674135764.181297
-                },
-                {
-                    "ID": 114,
-                    "availableServices": [
-                        "MQTT"
-                    ],
-                    "servicesDetails": [
-                        {
-                            "serviceType": "MQTT",
-                            "subscribedTopics": [
-                                "PatataNovella/2/114/led"
-                            ],
-                            "publishedTopics": []
-                        }
-                    ],
-                    "deviceName": "SimDevice_8",
-                    "field": 2,
-                    "Location": {
-                        "latitude": 45.00288790822603,
-                        "longitude": 7.476630297621598
-                    },
-                    "PowerConsumption_kW": 12,
-                    "isActuator": true,
-                    "actuatorType": [
-                        "led"
-                    ],
-                    "isSensor": false,
-                    "measureType": [],
-                    "lastUpdate": 1674135765.3357823
-                },
-                {
-                    "ID": 115,
-                    "availableServices": [
-                        "MQTT"
-                    ],
-                    "servicesDetails": [
-                        {
-                            "serviceType": "MQTT",
-                            "subscribedTopics": [],
-                            "publishedTopics": [
-                                "PatataNovella/2/115/humidity",
-                                "PatataNovella/2/115/soilMoisture",
-                                "PatataNovella/2/115/light",
-                                "PatataNovella/2/115/temperature"
-                            ]
-                        }
-                    ],
-                    "deviceName": "SimDevice_9",
-                    "field": 2,
-                    "Location": {
-                        "latitude": 45.00193038928016,
-                        "longitude": 7.476648940811623
-                    },
-                    "PowerConsumption_kW": 0,
-                    "isActuator": false,
-                    "actuatorType": [],
-                    "isSensor": true,
-                    "measureType": [
-                        "humidity",
-                        "soilMoisture",
-                        "light",
-                        "temperature"
-                    ],
-                    "lastUpdate": 1674135766.5253127
-                },
-                {
-                    "ID": 116,
-                    "availableServices": [
-                        "MQTT"
-                    ],
-                    "servicesDetails": [
-                        {
-                            "serviceType": "MQTT",
-                            "subscribedTopics": [],
-                            "publishedTopics": [
-                                "PatataNovella/2/116/light",
-                                "PatataNovella/2/116/soilMoisture",
-                                "PatataNovella/2/116/humidity",
-                                "PatataNovella/2/116/temperature"
-                            ]
-                        }
-                    ],
-                    "deviceName": "SimDevice_10",
-                    "field": 2,
-                    "Location": {
-                        "latitude": 45.00183102965681,
-                        "longitude": 7.478660319095735
-                    },
-                    "PowerConsumption_kW": 0,
-                    "isActuator": false,
-                    "actuatorType": [],
-                    "isSensor": true,
-                    "measureType": [
-                        "light",
-                        "soilMoisture",
-                        "humidity",
-                        "temperature"
-                    ],
-                    "lastUpdate": 1674135767.7057786
+                    "lastUpdate": 1676717539.8243678
                 }
             ],
             "fieldsList": [

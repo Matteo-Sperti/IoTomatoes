@@ -50,24 +50,27 @@ class DataVisualizer():
             raise web_exception(
                 404, "Error getting data from the database")
         else:
-            print(res_dict)
             xvalues = [datetime.fromtimestamp(
                 x) for x in res_dict["t"]]
-            print(xvalues)
+            xvalues = [x.strftime("%d/%m/%Y %H:%M:%S") for x in xvalues]
             yvalues = res_dict["v"]
             unit = res_dict["u"]
 
         if len(yvalues) > 0 and len(xvalues) > 0 and unit != "":
             plt.plot(xvalues, yvalues)
             plt.xlabel("Time")
+            plt.xticks(rotation=45, ha='right')
             plt.ylabel(f"{measure} ({unit})")
             plt.title(
                 f"Graph of {measure} for Field {Field} of {CompanyName}")
-            plt.savefig(fileName)
+            plt.savefig(fileName, bbox_inches='tight')
+            plt.close()
+            print("Graph saved as", fileName)
             with open(fileName, "rb") as image2string:
+                print("Converting image to base64...")
                 converted_string = base64.b64encode(image2string.read())
 
-            out = {"img64": converted_string}
+            out = {"img64": converted_string.decode('utf-8')}
             return json.dumps(out)
         else:
             raise web_exception(404, "No data available")
@@ -102,11 +105,13 @@ class DataVisualizer():
                          horizontalalignment='center', verticalalignment='bottom')
             plt.show()
             plt.title("Graph of consumption data")
-            plt.savefig(fileName)
+            plt.savefig(fileName, bbox_inches='tight')
+            plt.close()
             with open(fileName, "rb") as image2string:
+                print("Converting image to base64...")
                 converted_string = base64.b64encode(image2string.read())
 
-            out = {"img64": converted_string}
+            out = {"img64": converted_string.decode('utf-8')}
             return json.dumps(out)
 
 

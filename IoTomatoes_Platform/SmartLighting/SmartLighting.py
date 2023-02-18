@@ -134,11 +134,14 @@ class SmartLighting(BaseService):
         for device in company["devicesList"]:
             if fieldNumber == device["fieldNumber"] and device["isActuator"] == True:
                 if "led" in device["actuatorType"]:
-                    topics.append(f"{company['CompanyName']}/{fieldNumber}/{device['ID']}/led")
+                    topics.append(
+                        f"{company['CompanyName']}/{fieldNumber}/{device['ID']}/led")
 
         return topics
 
     def getPlantLimit(self, plant: str):
+        """Return the min and max light limit for the plant from the MongoDB service"""
+
         mongoDB_url = self.getOtherServiceURL(self.mongoToCall)
         if mongoDB_url == None or mongoDB_url == "":
             print("ERROR: MongoDB service not found!")
@@ -159,6 +162,13 @@ class SmartLighting(BaseService):
             return minLightLimit, maxLightLimit
 
     def getMongoDBdata(self, CompanyName: str, fieldID: int):
+        """Return the average soil moisture of the last controlPeriod seconds from the MongoDB service
+
+        Arguments:
+        - `CompanyName (str)`: Name of the company.
+        - `fieldID (int)`: ID of the field.
+        """
+
         mongoDB_url = self.getOtherServiceURL(self.mongoToCall)
 
         if mongoDB_url == None or mongoDB_url == "":

@@ -6,6 +6,9 @@ import signal
 
 from iotomatoes_supportpackage import BaseService
 
+maxLimitTemp = datetime.time(23, 59, 0)
+minLimitTemp = datetime.time(20, 0, 0)
+
 
 class SmartIrrigation(BaseService):
 
@@ -79,12 +82,7 @@ class SmartIrrigation(BaseService):
                     currentSoilMoisture = round(
                         0.75*currentSoilMoisture + 0.25*soilMoistureForecast, 2)
 
-                maxLimitTemp = datetime.time(23, 59, 0)
-                # da cambiare per poter eseguire le prove sul controllo
-                minLimitTemp = datetime.time(20, 0, 0)
-
                 # CONTROL ALGORITHM:
-                # controllo schedulato per la sera dalle 20 alle 24(quindi sappiamo già complessivamente se durante il giorno ha piovuto)
                 print(
                     f"Performing control on: Company={CompanyName} field={fieldID}")
                 if currentTime < minLimitTemp or currentTime > maxLimitTemp:
@@ -174,6 +172,8 @@ class SmartIrrigation(BaseService):
         return topics
 
     def getPlantLimit(self, plant: str):
+        """Return the plant information from the MongoDB service"""
+
         mongoDB_url = self.getOtherServiceURL(self.mongoToCall)
         if mongoDB_url == None or mongoDB_url == "":
             print("ERROR: MongoDB service not found!")
@@ -196,6 +196,13 @@ class SmartIrrigation(BaseService):
             return minSoilMoisture, maxSoilMoisture, precipitationLimit
 
     def getMongoDBdata(self, CompanyName: str, fieldID: int):
+        """Return the average soil moisture of the last controlPeriod seconds from the MongoDB service
+
+        Arguments:
+        - `CompanyName (str)`: Name of the company.
+        - `fieldID (int)`: ID of the field.
+        """
+
         mongoDB_url = self.getOtherServiceURL(self.mongoToCall)
 
         if mongoDB_url == None or mongoDB_url == "":

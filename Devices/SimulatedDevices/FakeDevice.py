@@ -13,7 +13,8 @@ class SimDevice(IoTDevice):
         and it subscribes to the topics specified in the ResourceCatalog.
         Finally it starts the simulator of the ambient conditions."""
 
-        self._Ambient = AmbientSimulator()
+        self._Ambient = AmbientSimulator(DeviceInfo["CompanyName"], DeviceInfo["fieldNumber"],
+                                         DeviceInfo["IoTomatoes_url"])
         super().__init__(DeviceInfo, sensor=self, actuator=self)
 
     def setActuator(self, actuator: str, state: bool):
@@ -47,7 +48,7 @@ class SimDevice(IoTDevice):
 
 def sigterm_handler(signal, frame):
     """Handler for the SIGTERM signal. It closes the MQTT client and the sensor."""
-    
+
     IoTSensor.close()
     print("Device stopped")
 

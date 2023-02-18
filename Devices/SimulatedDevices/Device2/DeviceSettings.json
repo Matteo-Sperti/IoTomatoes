@@ -3,6 +3,7 @@
     "fieldNumber" : 1,
     "isActuator" : true,
     "actuatorType" : ["led", "pump"],
+    "PowerConsumption_kW" : 20000,
     "CompanyName" : "PatataNovella",
     "Location" : {
         "latitude" : 44.996, 

@@ -417,7 +417,7 @@ class MongoConnection():
         result.update(res_info)
         return json.dumps(result)
 
-    def getTruckTrace(self, CompanyName: str, TruckID):
+    def getTruckTrace(self, CompanyName: str, TruckID: int):
         """Get the truck trace informations
 
         Arguments:
@@ -592,8 +592,8 @@ class RESTConnector(BaseService):
                                             float(params["start_date"]), float(params["end_date"]))
             elif len(uri) == 2 and uri[1] == "vector":
                 return self.mongo.GetMeasureVector(uri[0], **params)
-            elif len(uri) == 2 and uri[1] == "truckTrace":
-                return self.mongo.getTruckTrace(uri[0], params["TruckID"])
+            elif len(uri) == 3 and uri[2] == "trace":
+                return self.mongo.getTruckTrace(uri[0], int(uri[1]))
             elif len(uri) == 2 and uri[1] == "trucksPosition":
                 return self.mongo.getTrucksPosition(uri[0])
             elif len(uri) == 2 and uri[1] == "consumption":

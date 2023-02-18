@@ -29,13 +29,13 @@ class TraceGenerator(BaseService):
         self.gpx_template = """<?xml version="1.0" encoding="UTF-8"?>
 		<gpx version="1.1" creator="Python GPX Generator">
 			<trk>
-			<trkseg>
-				{trackpoints}
-		</trkseg>
-		</trk>
+                <trkseg>
+                    {trackpoints}
+                </trkseg>
+		    </trk>
 		</gpx>"""
 
-    def TruckPosition(self, CompanyName):
+    def TrucksPosition(self, CompanyName: str):
         """Get the position of all the trucks of a company.
 
         Arguments:
@@ -48,29 +48,36 @@ class TraceGenerator(BaseService):
         fileNamePng = "mapPositionsImage.png"
         try:
             response = requests.get(
-                f"{self.MongoDbUrl}/{CompanyName}/truckPosition")
+                f"{self.MongoDbUrl}/{CompanyName}/trucksPosition")
             response.raise_for_status()
             dict_ = response.json()
+        except requests.exceptions.HTTPError as err:
+            if err.response.status_code == 404:
+                raise web_exception(404, "No trucks found")
+            else:
+                raise web_exception(
+                    err.response.status_code, err.response.reason)
         except:
-            raise web_exception(404, "Error getting data from the database")
+            raise web_exception(500, "Error getting data from the database")
 
-        if dict_ == {}:
-            raise web_exception(404, "No trucks found")
-        else:
-            map = folium.Map(location=[dict_[dict_.keys[0]]["latitude"], dict_[
-                             dict_.keys[0]]["longitude"]])
-            for key in dict_.keys():
-                folium.Marker([dict_[key]["latitude"], dict_[key]
-                              ["longitude"]], popup="Truck "+key).add_to(map)
-            map.save("mapPositions.html")
-            imgkit.from_file(fileNameHtlm, fileNamePng)
-            with open(fileNamePng, "rb") as image_file:
-                encoded_string = base64.b64encode(image_file.read())
+        LatCenter = sum([dict_[id]["latitude"]
+                        for id in dict_.keys()]) / len(dict_.keys())
+        LonCenter = sum([dict_[id]["longitude"]
+                        for id in dict_.keys()]) / len(dict_.keys())
 
-            out = {"img64": encoded_string}
-            return json.dumps(out)
+        map = folium.Map(location=[LatCenter, LonCenter])
+        for key in dict_.keys():
+            folium.Marker([dict_[key]["latitude"], dict_[key]
+                           ["longitude"]], popup="Truck " + key).add_to(map)
+        map.save("mapPositions.html")
+        imgkit.from_file(fileNameHtlm, fileNamePng)
+        with open(fileNamePng, "rb") as image_file:
+            encoded_string = base64.b64encode(image_file.read())
 
-    def GenerateGPX(self, CompanyName, truckID):
+        out = {"img64": encoded_string.decode("utf-8")}
+        return json.dumps(out)
+
+    def GenerateGPX(self, CompanyName: str, truckID: str):
         """Generate a GPX file from the trace of a truck.
 
         Arguments:
@@ -83,39 +90,45 @@ class TraceGenerator(BaseService):
         fileNameHtlm = "mapTrace.html"
         fileNamePng = "mapTraceImage.png"
         try:
-            response = requests.get(f"{self.MongoDbUrl}/{CompanyName}/truckTrace",
-                                    params={"TruckID": truckID})
+            response = requests.get(
+                f"{self.MongoDbUrl}/{CompanyName}/{truckID}/trace")
             response.raise_for_status()
             dict_ = response.json()
+        except requests.exceptions.HTTPError as err:
+            if err.response.status_code == 404:
+                raise web_exception(404, "No trucks found")
+            else:
+                raise web_exception(
+                    err.response.status_code, err.response.reason)
         except:
-            raise web_exception(404, "Error getting data from the database")
-        if dict_ == {}:
-            raise web_exception(404, "No trucks found")
-        else:
-            lat = dict_["latitude"]
-            lon = dict_["longitude"]
-            for i in range(len(lat)):
-                self.trackpoints += f"<trkpt lat='{lat[i]}' lon='{lon[i]}'></trkpt>\n"
-            gpx_file = self.gpx_template.format(trackpoints=self.trackpoints)
+            raise web_exception(500, "Error getting data from the database")
 
-            gpx = gpxpy.parse(gpx_file)
-            first_point = gpx.tracks[0].segments[0].points[0]
-            map = folium.Map(
-                location=[first_point.latitude, first_point.longitude])
-            # Add GPX track as a polyline on the map
-            lat_lons = [(p.latitude, p.longitude)
-                        for p in gpx.tracks[0].segments[0].points]
-            folium.PolyLine(lat_lons, color='red',
-                            weight=2.5, opacity=1).add_to(map)
+        lat = dict_["latitude"]
+        lon = dict_["longitude"]
+        for i in range(len(lat)):
+            self.trackpoints += f"<trkpt lat='{lat[i]}' lon='{lon[i]}'></trkpt>\n"
+        gpx_file = self.gpx_template.format(trackpoints=self.trackpoints)
 
-            # Show map
-            map.save(fileNameHtlm)
-            imgkit.from_file(fileNameHtlm, fileNamePng)
-            with open(fileNamePng, "rb") as image_file:
-                encoded_string = base64.b64encode(image_file.read())
+        gpx = gpxpy.parse(gpx_file)
+        first_point = gpx.tracks[0].segments[0].points[0]
+        map = folium.Map(
+            location=[first_point.latitude, first_point.longitude])
+        # Add GPX track as a polyline on the map
+        lat_lons = [(p.latitude, p.longitude)
+                    for p in gpx.tracks[0].segments[0].points]
+        folium.PolyLine(lat_lons, color='red',
+                        weight=2.5, opacity=1).add_to(map)
+        folium.Marker([lat[-1], lon[-1]], popup="Truck " + truckID).add_to(map)
 
-            out = {"img64": encoded_string}
-            return json.dumps(out)
+        # Show map
+        map.save(fileNameHtlm)
+        map._to_png(fileNamePng)
+        imgkit.from_file(fileNameHtlm, fileNamePng)
+        with open(fileNamePng, "rb") as image_file:
+            encoded_string = base64.b64encode(image_file.read())
+
+        out = {"img64": encoded_string.decode("utf-8")}
+        return json.dumps(out)
 
 
 class LocalizationWebService(BaseService):
@@ -135,15 +148,14 @@ class LocalizationWebService(BaseService):
         """GET method of the REST API
 
         Allowed URIs:
-        - `/<CompanyName>/trace`: returns the trace of the truck in a map.
-        The truckID is passed as a parameter.
-        - `/<CompanyName>/position`: returns the position of the truck in a map
+        - `/<CompanyName>/<TruckID>/trace`: returns the trace of the truck in a map.
+        - `/<CompanyName>/trucksPosition`: returns the position of the trucks in a map
         """
         try:
-            if len(uri) == 2 and uri[1] == "trace":
-                return self.traceGen.GenerateGPX(uri[0], params["TruckID"])
-            if len(uri) == 2 and uri[1] == "position":
-                return self.traceGen.TruckPosition(uri[0])
+            if len(uri) == 3 and uri[2] == "trace":
+                return self.traceGen.GenerateGPX(uri[0], uri[1])
+            if len(uri) == 2 and uri[1] == "trucksPosition":
+                return self.traceGen.TrucksPosition(uri[0])
             else:
                 raise web_exception(404, "Resource not found.")
         except web_exception as e:

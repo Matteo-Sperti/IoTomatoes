@@ -11,5 +11,6 @@
         }
     ],
     "DataVisualizer_Service": "data_visualizer",
-    "Database_Service": "mongodb_connector"
+    "Database_Service": "mongodb_connector",
+    "Localization_Service": "localization"
 }

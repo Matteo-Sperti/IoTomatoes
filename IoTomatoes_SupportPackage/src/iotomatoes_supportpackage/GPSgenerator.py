@@ -1,6 +1,7 @@
 import random
 import json
 import requests
+import time
 
 
 class GPSgenerator():
@@ -9,7 +10,7 @@ class GPSgenerator():
         """Initialize the GPS generator.
 
         Arguments:
-                - `platformUrl (str)`: The url of the platform
+        - `platformUrl (str)`: The url of the platform
         - `CompanyName (str)`: The name of the company
         - `fileName (str)`: The name of the file where the position is saved.
         Default is "TruckSettings.json"
@@ -35,31 +36,29 @@ class GPSgenerator():
 
         if self.lat == -1 and self.lon == -1:
             LocationDict = self.getCompanyLocation()
-            if LocationDict is None:
-                print("ERROR: Company location not found!")
-                return
-            else:
-                self.lat = LocationDict["latitude"]
-                self.lon = LocationDict["longitude"]
-                self.savePosition()
+            self.lat = LocationDict["latitude"]
+            self.lon = LocationDict["longitude"]
+            self.savePosition()
 
     def getCompanyLocation(self):
         """Get the company location from the catalog."""
-        try:
-            print("Getting company location from the catalog...")
-            res = requests.get(self.url + "/rc/" +
-                               self.CompanyName + "/location")
-            res.raise_for_status()
-            res_dict = res.json()["Location"]
-            print("Company location found!")
-        except Exception as e:
-            print(e)
-            return None
-        else:
-            if "latitude" not in res_dict or "longitude" not in res_dict:
-                print("ERROR: Company location not found!")
-                return None
-            return res_dict
+        while True:
+            try:
+                print("Getting company location from the catalog...")
+                res = requests.get(self.url + "/rc/" +
+                                self.CompanyName + "/location")
+                res.raise_for_status()
+                res_dict = res.json()["Location"]
+            except Exception as e:
+                print(e)
+                time.sleep(5)
+            else:
+                if "latitude" not in res_dict or "longitude" not in res_dict:
+                    print("ERROR: Company location not found!")
+                    time.sleep(5)
+                else:
+                    print("Company location found!")
+                    return res_dict
 
     def randomPath(self):
         """Generate a random path for the truck."""

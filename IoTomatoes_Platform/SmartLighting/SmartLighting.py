@@ -92,12 +92,12 @@ class SmartLighting(BaseService):
                 else:
                     # CLOUDCOVER CONTROL
                     if cloudCover < 60:
-                        print("LIGHTING DOES NOT MAKE SENSE")
+                        print("No cloud cover, no lighting needed")
                         self.sendCommand(CompanyName, fieldID,
                                          actuatorTopicsForField, 0)
                     else:
                         command = 0
-                        print("LIGHTING MAKE SENSE")
+                        print("Cloud cover, lighting needed")
                         print(f"ON/OFF threshold={minLight}")
                         print(f"current value light={currentLight}")
 
@@ -215,9 +215,7 @@ class SmartLighting(BaseService):
             if weatherService_data == {}:
                 return None, None, None, None
 
-            print(json.dumps(weatherService_data, indent=4))
-
-            light = weatherService_data["hourly"]["sunLight"][hour]
+            light = weatherService_data["hourly"]["Illumination"][hour]
 
             # Estrazione e costruzione orario alba:
             sunrise = weatherService_data["daily"]["sunrise"][0]

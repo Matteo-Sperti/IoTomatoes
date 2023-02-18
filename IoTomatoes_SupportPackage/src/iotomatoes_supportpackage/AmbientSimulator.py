@@ -1,12 +1,13 @@
 import random
-
+import paho.mqtt.client as PahoMQTT
+import json
 from .MyThread import MyThread
 
 noiseAmplitude = 1
 
 
 class AmbientSimulator():
-    def __init__(self):
+    def __init__(self, CompanyName: str, fieldNumber: int, broker: str, port: int = 1883):
         """Simulates the ambient. Initialize the values of the sensors 
         and the actuators"""
 
@@ -14,14 +15,20 @@ class AmbientSimulator():
         self._humidity = 50
         self._light = 50000
         self._soilMoisture = 50
+
         self._led = False
         self._pump = False
 
+        self.broker = broker
+        self.port = port
+        self.baseTopic = f"{CompanyName}/{fieldNumber}"
+        self.fieldNumber = fieldNumber
         self.UpdateThread = MyThread(self.update, 5)
 
     def stop(self):
         """Stop the thread that updates the values of the sensors"""
         self.UpdateThread.stop()
+        self.stopMQTT()
 
     def update(self):
         """Update the values of the sensors according 
@@ -79,3 +86,55 @@ class AmbientSimulator():
             self._pump = state
         else:
             print("Actuator not valid")
+
+    def startMQTT(self):
+        """Starts the MQTT client.
+        It subscribes the topics and starts the MQTT client loop.
+        """
+
+        self.MQTTclientID = f"AmbientSimulator_{random.randint(0,1000)}"
+        self._isSubscriber = True
+        # create an instance of paho.mqtt.client
+        self._paho_mqtt = PahoMQTT.Client(self.MQTTclientID, True)
+        # register the callback
+        self._paho_mqtt.on_connect = self.myOnConnect
+        self._paho_mqtt.on_message = self.myOnMessageReceived
+        self._paho_mqtt.connect(self.broker, self.port)
+        self._paho_mqtt.loop_start()
+        self._paho_mqtt.subscribe(f"{self.baseTopic}/+/led", 2)
+        self._paho_mqtt.subscribe(f"{self.baseTopic}/+/pump", 2)
+
+    def myOnConnect(self, client, userdata, flags, rc):
+        """It provides information about Connection result with the broker"""
+
+        dic = {
+            "0": f"Connection successful to {self.broker}",
+            "1": f"Connection to {self.broker} refused - incorrect protocol version",
+            "2": f"Connection to {self.broker} refused - invalid client identifier",
+            "3": f"Connection to {self.broker} refused - server unavailable",
+        }
+        print(dic[str(rc)])
+
+    def myOnMessageReceived(self, paho_mqtt, userdata, msg):
+        """When a message is received, it is processed by this callback. 
+        It redirects the message to the notify method (which must be implemented by the user)"""
+
+        topic = msg.topic
+        actuator_topic = topic.split("/")[-1]
+        msgDict = json.loads(msg.payload)
+        print(f"AmbientSimulator : Received message '{msgDict}' on topic '{topic}'")
+        state = msgDict["e"][0]["v"]
+        if state == 0:
+            self.setActuator(actuator_topic, False)
+        elif state == 1:
+            self.setActuator(actuator_topic, False)
+
+    def stopMQTT(self):
+        """Stop the endpoint."""
+
+        self._paho_mqtt.unsubscribe(
+            [f"{self.baseTopic}/+/led",
+             f"{self.baseTopic}/+/pump"])
+
+        self._paho_mqtt.loop_stop()
+        self._paho_mqtt.disconnect()

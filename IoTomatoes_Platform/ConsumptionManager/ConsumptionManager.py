@@ -123,6 +123,9 @@ class ConsumptionManager (BaseService):
 
 
 def sigterm_handler(signal, frame):
+    global run
+
+    run = False
     cm.stop()
     print("ConsumptionManager stopped")
 
@@ -137,8 +140,7 @@ if __name__ == "__main__":
         print(e)
         print("Error, ConsumptionManager not initialized")
     else:
-        while True:
-            #!To change for testing
-            if datetime.datetime.now().second >= 59:  # Update the consumption every hour
-                cm.updateConsumption()
+        run = True
+        while run:
+            cm.updateConsumption()
             time.sleep(60)

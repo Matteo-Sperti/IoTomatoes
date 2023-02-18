@@ -104,6 +104,9 @@ class MessageHandler(telepot.helper.ChatHandler):
                 elif message == "/position":
                     self._command = GetPosition(
                         self._CompanyName, self.sender, self._connector)
+                elif message == "/trace":
+                    self._command = Trace(
+                        self._CompanyName, self.sender, self._connector)
                 else:
                     self.sender.sendMessage(f"Command not found or not permitted.\n"
                                             f"Type /help for more info.")
@@ -203,6 +206,7 @@ class IoTBot(BaseService):
         self.bot = ChatBox(self.tokenBot, self)
         self.DataVisualizer = settings["DataVisualizer_Service"]
         self.Database = settings["Database_Service"]
+        self.Localization = settings["Localization_Service"]
         MessageLoop(self.bot).run_as_thread()
 
     def get_token(self):

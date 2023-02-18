@@ -7,7 +7,7 @@ import signal
 from iotomatoes_supportpackage import BaseService
 
 maxLimitTemp = datetime.time(23, 59, 0)
-minLimitTemp = datetime.time(20, 0, 0)
+minLimitTemp = datetime.time(0, 0, 0)
 
 
 class SmartIrrigation(BaseService):

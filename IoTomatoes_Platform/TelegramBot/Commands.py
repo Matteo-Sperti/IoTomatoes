@@ -597,7 +597,7 @@ class CustomPlot():
         self._status = 0
 
     def update(self, message):
-        """Update the status of the change.
+        """Update the status of the chat.
 
         Arguments:
         - `message (str)` : the message received from the user.
@@ -764,7 +764,7 @@ class CustomPlot():
 
 class GetPosition():
     def __init__(self, CompanyName: str, sender, connector):
-        """Create a custom plot.
+        """Get the position of a resource.
 
         Arguments:
         - `CompanyName (str)` : the name of the company.
@@ -806,12 +806,11 @@ class GetPosition():
 
     def getTrucks(self):
         """Get the last position of the trucks of the company."""
-        """Get the last position of the truck from the Database"""
 
         url = self._connector.getOtherServiceURL(self._connector.Database)
         if url == None:
             self._bot.sendMessage(
-                "Error in the connection with the Resource Catalog")
+                "Error in the connection with the Service Catalog")
             return []
 
         try:
@@ -830,14 +829,14 @@ class GetPosition():
                         "latitude": truck["latitude"],
                         "longitude": truck["longitude"]
                     },
-                    "LastUpdate": truck["t"],
+                    "LastUpdate": datetime.datetime.fromtimestamp(truck["t"]).strftime('%Y-%m-%d %H:%M:%S')
                 }
                 trucks.append(info)
 
             return trucks
 
     def update(self, message):
-        """Update the status of the change.
+        """Update the status of the chat.
 
         Arguments:
         - `message (str)` : the message received from the user.
@@ -943,3 +942,100 @@ class GetPosition():
 
                 self._bot.sendMessage("Choose a valid option")
                 return False
+
+class Trace:
+    def __init__(self, CompanyName: str, sender, connector):
+        """Retrieve the trace of a truck.
+
+        Arguments:
+        - `CompanyName (str)` : the name of the company.
+        - `sender` : the object used to send messages to the user.
+        - `connector` : the IoTBot object used to connect to the Resource Catalog.
+        """
+        self.CompanyName = CompanyName
+        self.device = None
+        self._connector = connector
+        self._bot = sender
+        self._status = 0
+        self.trucksID = self.getTrucksID()
+
+    def getTrucksID(self):
+        """Get the list of trucks of the company."""
+
+        listResources = self._connector.getList(self.CompanyName, "devices")
+        if listResources == None:
+            self._bot.sendMessage(
+                "Error in the connection with the Resource Catalog")
+            return []
+        elif len(listResources) == 0:
+            self._bot.sendMessage("No devices registered")
+            return []
+        else:
+            trucks = []
+            for trucks in listResources:
+                if trucks["fieldNumber"] == 0:
+                    trucks.append(int(trucks["ID"]))
+
+            return trucks
+
+    def update(self, message):
+        """Update the status of the chat.
+
+        Arguments:
+        - `message (str)` : the message received from the user.
+
+        Returns:
+        - `True` if the procedure is completed.
+        - `False` otherwise.
+        """
+
+        if self._status == 0:
+            if self.trucksID == []:
+                self._bot.sendMessage("No trucks registered")
+                return True
+            else:
+                inline_keyboard_ = []
+                for device in self.trucksID:
+                    button = InlineKeyboardButton(
+                        text=f"Truck {device['ID']}", callback_data=f"{device['ID']}")
+                    inline_keyboard_.append([button])
+                keyboard = InlineKeyboardMarkup(
+                    inline_keyboard=inline_keyboard_)
+                self._bot.sendMessage(f"Choose the Truck of company {self.CompanyName}!",
+                                        reply_markup=keyboard)
+                self._status += 1
+                return False
+
+        elif self._status == 1:
+            try:
+                TruckNumber = int(message)
+            except:
+                self._bot.sendMessage("Truck ID must be an integer")
+                return False
+            else:
+                if TruckNumber not in self.trucksID:
+                    self._bot.sendMessage("Choose a valid option")
+                    return False
+                else:
+                    return self.getTrace(TruckNumber)
+
+    def getTrace(self, TruckNumber: int):
+        """Get the trace of a truck."""
+
+        url = self._connector.getOtherServiceURL(self._connector.Localization)
+        if url == None:
+            self._bot.sendMessage(
+                "Error in the connection with the Service Catalog")
+            return []
+
+        try:
+            res = requests.get(f"{url}/{self.CompanyName}/{TruckNumber}/trace")
+            res.raise_for_status()
+            print(res)
+        except:
+            self._bot.sendMessage("Error in the connection with the Database")
+            return False
+        else:
+            self._bot.sendMessage("Trace of the truck:")
+            return True
+        

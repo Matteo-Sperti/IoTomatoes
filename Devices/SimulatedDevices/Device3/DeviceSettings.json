@@ -3,6 +3,7 @@
     "fieldNumber" : 2,
     "isActuator" : true,
     "actuatorType" : ["led"],
+    "PowerConsumption_kW" : 10000,
     "CompanyName" : "PatataNovella",
     "Location" : {
         "latitude" : 45.001, 

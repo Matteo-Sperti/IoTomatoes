@@ -957,7 +957,7 @@ class Trace:
         self._connector = connector
         self._bot = sender
         self._status = 0
-        self.trucksID = self.getTrucksID()
+        self.trucksIDs = self.getTrucksID()
 
     def getTrucksID(self):
         """Get the list of trucks of the company."""
@@ -971,12 +971,12 @@ class Trace:
             self._bot.sendMessage("No devices registered")
             return []
         else:
-            trucks = []
-            for trucks in listResources:
-                if trucks["fieldNumber"] == 0:
-                    trucks.append(int(trucks["ID"]))
+            trucksList = []
+            for truck in listResources:
+                if truck["fieldNumber"] == 0:
+                    trucksList.append(int(truck["ID"]))
 
-            return trucks
+            return trucksList
 
     def update(self, message):
         """Update the status of the chat.
@@ -990,14 +990,14 @@ class Trace:
         """
 
         if self._status == 0:
-            if self.trucksID == []:
+            if self.trucksIDs == []:
                 self._bot.sendMessage("No trucks registered")
                 return True
             else:
                 inline_keyboard_ = []
-                for device in self.trucksID:
+                for device in self.trucksIDs:
                     button = InlineKeyboardButton(
-                        text=f"Truck {device['ID']}", callback_data=f"{device['ID']}")
+                        text=f"Truck {device}", callback_data=f"{device}")
                     inline_keyboard_.append([button])
                 keyboard = InlineKeyboardMarkup(
                     inline_keyboard=inline_keyboard_)
@@ -1013,11 +1013,12 @@ class Trace:
                 self._bot.sendMessage("Truck ID must be an integer")
                 return False
             else:
-                if TruckNumber not in self.trucksID:
+                if TruckNumber not in self.trucksIDs:
                     self._bot.sendMessage("Choose a valid option")
                     return False
                 else:
-                    return self.getTrace(TruckNumber)
+                    self.getTrace(TruckNumber)
+                    return True
 
     def getTrace(self, TruckNumber: int):
         """Get the trace of a truck."""
@@ -1026,16 +1027,12 @@ class Trace:
         if url == None:
             self._bot.sendMessage(
                 "Error in the connection with the Service Catalog")
-            return []
 
         try:
             res = requests.get(f"{url}/{self.CompanyName}/{TruckNumber}/trace")
             res.raise_for_status()
             print(res)
         except:
-            self._bot.sendMessage("Error in the connection with the Database")
-            return False
+            self._bot.sendMessage("Error in the connection with the Localization Service")
         else:
             self._bot.sendMessage("Trace of the truck:")
-            return True
-        

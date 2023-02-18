@@ -24,7 +24,6 @@ class TraceGenerator(BaseService):
         self.view_url = settings["view_url"]
         self.pswd = settings["password"]
         self.MongoDbUrl = MongoDbUrl
-        self.trackpoints = ""
 
         self.gpx_template = """<?xml version="1.0" encoding="UTF-8"?>
 		<gpx version="1.1" creator="Python GPX Generator">
@@ -105,9 +104,10 @@ class TraceGenerator(BaseService):
 
         lat = dict_["latitude"]
         lon = dict_["longitude"]
+        trackpoints = ""
         for i in range(len(lat)):
-            self.trackpoints += f"<trkpt lat='{lat[i]}' lon='{lon[i]}'></trkpt>\n"
-        gpx_file = self.gpx_template.format(trackpoints=self.trackpoints)
+            trackpoints += f"<trkpt lat='{lat[i]}' lon='{lon[i]}'></trkpt>\n"
+        gpx_file = self.gpx_template.format(trackpoints=trackpoints)
 
         gpx = gpxpy.parse(gpx_file)
         first_point = gpx.tracks[0].segments[0].points[0]
@@ -122,10 +122,11 @@ class TraceGenerator(BaseService):
 
         # Show map
         map.save(fileNameHtlm)
-        map._to_png(fileNamePng)
-        imgkit.from_file(fileNameHtlm, fileNamePng)
-        with open(fileNamePng, "rb") as image_file:
-            encoded_string = base64.b64encode(image_file.read())
+
+        options = {
+            'quiet': ''
+            }
+        encoded_string = imgkit.from_file(fileNameHtlm, False, options=options)
 
         out = {"img64": encoded_string.decode("utf-8")}
         return json.dumps(out)

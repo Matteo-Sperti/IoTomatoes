@@ -4,7 +4,6 @@ import time
 import cherrypy
 import requests
 import signal
-import pprint
 
 from iotomatoes_supportpackage import BaseService, web_exception, setREST
 

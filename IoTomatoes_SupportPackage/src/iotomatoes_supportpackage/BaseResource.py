@@ -2,7 +2,7 @@ import json
 import requests
 import time
 
-from .RefreshThread import RefreshThread
+from .MyThread import RefreshThread
 from .MQTTClient import BaseMQTTClient
 from .ItemInfo import (
     isMQTT, measureType, actuatorType, PowerConsumption_kW

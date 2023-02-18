@@ -14,14 +14,10 @@ It is possible to simulate a single device in a container (closest solution to t
 
 ### Configuration
 In the [DeviceSettings.json](DeviceSettings.json) configuration file you must specify (same configuration file of a real device):
-- **ServiceCatalog_url:**: the IP address of the IoTomatoes platform
+- **IoTomatoes_url:**: the IP address and the port of the IoTomatoes platform
 - **CompanyName:** the Company name
 - **field:** the field number in which the sensor is installed
-- the type of sensor or actuator (in this case ["humidity", "temperature"])
-
-Moreover you must add in the configuration file any additional information about the sensor or actuator. in this example:
-- **PIN_IN:** the PIN number of the Raspberry Pi where the sensor is connected
-- **measureTimeInterval:** the time interval between two measures
+- the type of sensor or actuator (for istance ["humidity", "temperature"])
 
 Optionally you can specify also:
 - **Location** of the sensor (latitude and longitude)

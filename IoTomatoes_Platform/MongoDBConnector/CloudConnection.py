@@ -358,7 +358,7 @@ class MongoConnection():
             end = float(kwargs["end_date"])
 
         if "numPoints" in kwargs:
-            numPoints = int(kwargs["numPoint"])
+            numPoints = int(kwargs["numPoints"])
         else:
             numPoints = 100
     
@@ -494,7 +494,7 @@ class MongoConnection():
                         "$map": {
                             "input": "$docs",
                             "in": {
-                                "k": {"$toString": "$$this.id"},
+                                "TruckID": {"$toString": "$$this.id"},
                                 "v": {
                                     "latitude": "$$this.lat",
                                     "longitude": "$$this.lon",
@@ -594,7 +594,7 @@ class RESTConnector(BaseService):
                 return self.mongo.GetMeasureVector(uri[0], **params)
             elif len(uri) == 2 and uri[1] == "truckTrace":
                 return self.mongo.getTruckTrace(uri[0], params["TruckID"])
-            elif len(uri) == 2 and uri[1] == "truckPosition":
+            elif len(uri) == 2 and uri[1] == "trucksPosition":
                 return self.mongo.getTrucksPosition(uri[0])
             elif len(uri) == 2 and uri[1] == "consumption":
                 return self.mongo.getConsumptionData(uri[0], float(params["start_date"]), float(params["end_date"]))

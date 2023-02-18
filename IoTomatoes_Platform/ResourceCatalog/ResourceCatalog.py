@@ -142,7 +142,20 @@ class ResourceCatalogManager():
         item = self.findCompany(CompanyName)
         if item != None:
             return json.dumps({"Location": item["Location"]}, indent=4)
-        raise web_exception(404, "Service info not found")
+        raise web_exception(404, "Company not found")
+    
+    def getDeviceLocation(self, CompanyName: str, IDvalue: int):
+        """Return the location of the device with ID `IDvalue` in json format.
+
+        Arguments:  
+        - `CompanyName (str)`: the name of the company to find. 
+        - `IDvalue (int)`: the ID of the device to find.
+        """
+
+        item = self.find_item(CompanyName, IDvalue)
+        if item != None:
+            return json.dumps({"Location": item["Location"]}, indent=4)
+        raise web_exception(404, "Device not found")
 
     def isRegistered(self, **params):
         """Return the name of the company if the `telegramID` is registered, 
@@ -455,6 +468,8 @@ class RESTResourceCatalog(BaseService):
                 return self.catalog.getLocation(uri[0])
             elif len(uri) == 2 and uri[1] == "topics":
                 return self.catalog.getTopics(uri[0], params)
+            elif len(uri) == 3 and uri[2] == "location":
+                return self.catalog.getDeviceLocation(uri[0], uri[1])
             else:
                 raise web_exception(404, "Resource not found.")
         except web_exception as e:

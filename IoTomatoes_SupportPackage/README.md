@@ -26,18 +26,29 @@ Moroever it add some noise to the ambient conditions to simulate the real condit
 
 **[Code >>](https://github.com/Matteo-Sperti/IoTomatoes_SupportPackage/src/AmbientSimulator.py)**
 
+### GPSgenerator
+
+This python class generates a tuple of coordinates (latitude, longitude) according for simulate the GPS position of a tractor. It exploits a simple random walk algorithm to generate the coordinates. The coordinates are generated starting from the company's location.
+
+**[Code >>](https://github.com/Matteo-Sperti/IoTomatoes_SupportPackage/src/GPSgenerator.py)**
+
 ### DeviceManager
 
 This python module contains some useful functions to check the devices status.
 
 **[Code >>](https://github.com/Matteo-Sperti/IoTomatoes_SupportPackage/src/DeviceManager.py)**
 
-### GenericEndopoint
+### BaseResource
 
-This python module contains the base class for all the endpoints of the IoT platform.
-In particular the GenericService class to be extended by the services and the GenericResource class to be extended by the devices.
+This python module contains the class for the base resource of the platform. It provides the function to construct the resource dictionary and to interact with the catalog of the platform. 
 
-**[Code >>](https://github.com/Matteo-Sperti/IoTomatoes_SupportPackage/src/GenericEndpoint.py)**
+**[Code >>](https://github.com/Matteo-Sperti/IoTomatoes_SupportPackage/src/BaseResource.py)**
+
+### BaseService
+
+This python module contains the class for the base service of the platform. It provides the function to construct the service dictionary and to interact with the catalog of the platform.
+
+**[Code >>](https://github.com/Matteo-Sperti/IoTomatoes_SupportPackage/src/BaseService.py)**
 
 ### ItemInfo
 

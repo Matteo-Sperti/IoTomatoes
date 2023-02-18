@@ -2,7 +2,7 @@
 
 IoT project for smart-agriculture.
 IoTomatoes provides support to agri-service providers in order to enhance productivity, 
-optimize water and light usage, and minimize environmental impact.
+optimize power consumption, and minimize environmental impact.
 
 The proposed IoT platform integrates different IoT devices in order to provide a suitable control strategy and data analysis for agricultural holdings management and grow different types of crops. It also guarantees standardized communication interfaces (REST and MQTT) to easily communicate with pre-existing sensors.
 
@@ -29,21 +29,21 @@ The required packages to run the IoT platform are:
 - [gpxpy](https://pypi.org/project/gpxpy/)
 - [folium](https://python-visualization.github.io/folium/)
 
-Moreover it is suggested to install the IoT support package [IoTomatoes_SupportPackage](./IoTomatoes_SupportPackage/README.md) that contains some useful functions to simplify the development of the IoT devices.
+Moreover it is suggested to install the support package [IoTomatoes_SupportPackage](./IoTomatoes_SupportPackage/README.md) that contains some useful functions to simplify the development of the IoT devices on your host PC.
 
     python -m pip install -i https://test.pypi.org/simple/ IoTomatoes_SupportPackage --no-deps
 
 # Contents
 
-- the [IoTomatoes_SupportPackage](./IoTomatoes_SupportPackage/README.md) package; it contains some useful functions to simplify the development of the IoT devices;
+- the [IoTomatoes_SupportPackage](./IoTomatoes_SupportPackage/README.md) package: it contains some useful functions to simplify the development of the IoT devices;
 
-- the [IoTomatoes_Platform](./IoTomatoes_Platform/README.md) folder; it contains the IoTomatoes IoT platform;
+- the [IoTomatoes_Platform](./IoTomatoes_Platform/README.md) folder: it contains the IoTomatoes IoT platform:
 
-- the [Devices](./Devices/README.md) folder; it contains the IoT devices developed for the project;
+- the [Devices](./Devices/README.md) folder: it contains the IoT devices developed for the project;
 
-- the [Doc](./Doc/README.md) folder; it contains some documentation about the project;
+- the [Doc](./Doc/README.md) folder: it contains some documentation about the project;
 
-- the [Tests](./Tests/README.md) folder; it contains some tests for the IoT platform.
+- the [Tests](./Tests/README.md) folder: it contains some tests for the IoT platform.
 
 # Disclaimer
 

@@ -21,8 +21,12 @@ You are currently registered in the company {0}.
 You can use the following commands:
 /users to see all the users of your company.
 /devices to see all the active devices of your company.
+/fields to see all the fields of your company.
 /delete_company to delete your company and all the data related to it.
 /plot to require a custom plot of your data.
+/position to retrieve the position of your devices.
+/change_plant to change the plant of your company.
+/help to see this message again.
 """
 
 WelcomeMessage = """Welcome to the IoTomatoesBot!
@@ -96,6 +100,9 @@ class MessageHandler(telepot.helper.ChatHandler):
                         self._CompanyName, self.sender, self._connector)
                 elif message == "/plot":
                     self._command = CustomPlot(
+                        self._CompanyName, self.sender, self._connector)
+                elif message == "/position":
+                    self._command = GetPosition(
                         self._CompanyName, self.sender, self._connector)
                 else:
                     self.sender.sendMessage(f"Command not found or not permitted.\n"
@@ -195,6 +202,7 @@ class IoTBot(BaseService):
         self.tokenBot = self.get_token()
         self.bot = ChatBox(self.tokenBot, self)
         self.DataVisualizer = settings["DataVisualizer_Service"]
+        self.Database = settings["Database_Service"]
         MessageLoop(self.bot).run_as_thread()
 
     def get_token(self):

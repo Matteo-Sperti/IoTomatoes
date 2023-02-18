@@ -50,8 +50,10 @@ class DataVisualizer():
             raise web_exception(
                 404, "Error getting data from the database")
         else:
+            print(res_dict)
             xvalues = [datetime.fromtimestamp(
                 x) for x in res_dict["t"]]
+            print(xvalues)
             yvalues = res_dict["v"]
             unit = res_dict["u"]
 

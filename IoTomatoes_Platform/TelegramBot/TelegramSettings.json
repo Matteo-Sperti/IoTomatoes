@@ -10,5 +10,6 @@
             "subscribedTopics": ["+/Notifications/#"]
         }
     ],
-    "DataVisualizer_Service": "data_visualizer"
+    "DataVisualizer_Service": "data_visualizer",
+    "Database_Service": "mongodb_connector"
 }

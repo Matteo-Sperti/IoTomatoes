@@ -49,7 +49,7 @@ class InsertNewCompany():
         - `message (str)` : the message received from the user.
 
         Return:
-        - `True` if the command is finished, 
+        - `True` if the command is finished,
         - `False` otherwise.
         """
         if self._status == 0:
@@ -359,22 +359,21 @@ def getDevices(CompanyName: str, bot, connector) -> None:
     elif len(devices) == 0:
         bot.sendMessage(f"No devices registered in {CompanyName}")
     else:
-        if devices != None:
-            message = (f"Devices in {CompanyName}:\n\n")
+        message = (f"Devices in {CompanyName}:\n\n")
+        bot.sendMessage(message)
+        for device in devices:
+            message = (f"Device Name: {device['deviceName']}\n"
+                       f"DeviceID: {device['ID']}\n"
+                       f"Field: {device['fieldNumber']}\n"
+                       f"Location: {device['Location']['latitude']}, {device['Location']['longitude']}\n")
+            if device["isActuator"]:
+                act_msg = f"Actuators: " + \
+                    ", ".join(device["actuatorType"])
+                message = message + act_msg + "\n"
+            if device["isSensor"]:
+                sens_msg = f"Sensors: " + ", ".join(device["measureType"])
+                message = message + sens_msg + "\n"
             bot.sendMessage(message)
-            for device in devices:
-                message = (f"Device Name: {device['deviceName']}\n"
-                           f"DeviceID: {device['ID']}\n"
-                           f"Field: {device['fieldNumber']}\n"
-                           f"Location: {device['Location']['latitude']}, {device['Location']['longitude']}\n")
-                if device["isActuator"]:
-                    act_msg = f"Actuators: " + \
-                        ", ".join(device["actuatorType"])
-                    message = message + act_msg + "\n"
-                if device["isSensor"]:
-                    sens_msg = f"Sensors: " + ", ".join(device["measureType"])
-                    message = message + sens_msg + "\n"
-                bot.sendMessage(message)
 
 
 def getFields(CompanyName: str, bot, connector) -> None:
@@ -391,13 +390,12 @@ def getFields(CompanyName: str, bot, connector) -> None:
     elif len(fields) == 0:
         bot.sendMessage(f"No fields registered in {CompanyName}")
     else:
-        if fields != None:
-            message = (f"Fields in {CompanyName}:\n\n")
+        message = (f"Fields in {CompanyName}:\n\n")
+        bot.sendMessage(message)
+        for field in fields:
+            message = (f"Field number: {field['fieldNumber']}\n"
+                       f"plant: {field['plant']}\n")
             bot.sendMessage(message)
-            for field in fields:
-                message = (f"Field number: {field['fieldNumber']}\n"
-                           f"plant: {field['plant']}\n")
-                bot.sendMessage(message)
 
 
 class DeleteCompany():
@@ -704,6 +702,9 @@ class CustomPlot():
 
         url = self._connector.getOtherServiceURL(
             self._connector.DataVisualizer)
+        if url == None:
+            return False
+
         try:
             params = {
                 "Field": self.FieldNumber,
@@ -756,4 +757,180 @@ class CustomPlot():
                 self._bot.sendPhoto(fileName)
                 return True
             else:
+                return False
+
+
+class GetPosition():
+    def __init__(self, CompanyName: str, sender, connector):
+        """Create a custom plot.
+
+        Arguments:
+        - `CompanyName (str)` : the name of the company.
+        - `sender` : the object used to send messages to the user.
+        - `connector` : the IoTBot object used to connect to the Resource Catalog.
+        """
+        self.CompanyName = CompanyName
+        self.device = None
+        self._connector = connector
+        self._bot = sender
+        self._status = 0
+        self.devices = self.getDevices()
+        self.trucks = self.getTrucks()
+
+    def getDevices(self):
+        """Get the list of devices of the company."""
+
+        listResources = self._connector.getList(self.CompanyName, "devices")
+        if listResources == None:
+            self._bot.sendMessage(
+                "Error in the connection with the Resource Catalog")
+            return []
+        elif len(listResources) == 0:
+            self._bot.sendMessage("No devices registered")
+            return []
+        else:
+            devices = []
+            for device in listResources:
+                info = {
+                    "ID": device["ID"],
+                    "deviceName": device["deviceName"],
+                    "Location": device["Location"],
+                }
+
+                if device["fieldNumber"] != 0:
+                    devices.append(info)
+
+            return devices
+
+    def getTrucks(self):
+        """Get the last position of the trucks of the company."""
+        """Get the last position of the truck from the Database"""
+
+        url = self._connector.getOtherServiceURL(self._connector.Database)
+        if url == None:
+            self._bot.sendMessage(
+                "Error in the connection with the Resource Catalog")
+            return []
+
+        try:
+            res = requests.get(f"{url}/{self.CompanyName}/trucksPosition")
+            res.raise_for_status()
+            listTruck = res.json()
+        except:
+            self._bot.sendMessage("Error in the connection with the Database")
+            return []
+        else:
+            trucks = []
+            for truck in listTruck:
+                info = {
+                    "ID": truck["TruckID"],
+                    "Location": truck["Location"],
+                    "LastUpdate": truck["t"],
+                }
+                trucks.append(info)
+
+            return trucks
+
+    def update(self, message):
+        """Update the status of the change.
+
+        Arguments:
+        - `message (str)` : the message received from the user.
+
+        Returns:
+        - `True` if the procedure is completed.
+        - `False` otherwise.
+        """
+
+        if self._status == 0:
+            keyboard = InlineKeyboardMarkup(inline_keyboard=[[
+                InlineKeyboardButton(text='Truck', callback_data='Truck'),
+                InlineKeyboardButton(text='Device', callback_data='Device'),
+            ]])
+            self._bot.sendMessage("What device do you want to see?",
+                                  reply_markup=keyboard)
+            self._status += 1
+            return False
+
+        elif self._status == 1:
+            if message == "Truck":
+                if self.trucks == []:
+                    self._bot.sendMessage("No trucks registered")
+                    return True
+                else:
+                    inline_keyboard_ = []
+                    for device in self.trucks:
+                        button = InlineKeyboardButton(
+                            text=f"Truck {device['ID']} : {device['deviceName']}", callback_data=f"{device['ID']}")
+                        inline_keyboard_.append([button])
+                    keyboard = InlineKeyboardMarkup(
+                        inline_keyboard=inline_keyboard_)
+                    self._bot.sendMessage(f"Choose the Truck of company {self.CompanyName}!",
+                                          reply_markup=keyboard)
+                    self._status = 21
+                    return False
+            elif message == "Device":
+                if self.devices == []:
+                    self._bot.sendMessage("No devices registered")
+                    return True
+                else:
+                    inline_keyboard_ = []
+                    for device in self.devices:
+                        button = InlineKeyboardButton(
+                            text=f"Device {device['ID']} : {device['deviceName']}", callback_data=f"{device['ID']}")
+                        inline_keyboard_.append([button])
+                    keyboard = InlineKeyboardMarkup(
+                        inline_keyboard=inline_keyboard_)
+                    self._bot.sendMessage(f"Choose the Device of company {self.CompanyName}!",
+                                          reply_markup=keyboard)
+                    self._status = 31
+                    return False
+            else:
+                self._bot.sendMessage("Choose a valid option")
+                return False
+
+        elif self._status == 21:
+            try:
+                DeviceNumber = int(message)
+            except:
+                self._bot.sendMessage("Device ID must be an integer")
+                return False
+            else:
+                for device in self.trucks:
+                    if device["ID"] == DeviceNumber:
+                        if device["Location"]["latitudine"] == -1 or device["Location"]["longitudine"] == -1:
+                            self._bot.sendMessage(
+                                "No location available for this trucks")
+                            return True
+                        else:
+                            self.device = device
+                            self._bot.sendMessage(
+                                f"Truck {device['ID']}\nLast update: {device['LastUpdate']}")
+                            self._bot.sendLocation(
+                                device["Location"]["latitudine"], device["Location"]["longitudine"])
+                            return True
+
+                self._bot.sendMessage("Choose a valid option")
+                return False
+
+        elif self._status == 31:
+            try:
+                DeviceNumber = int(message)
+            except:
+                self._bot.sendMessage("Device ID must be an integer")
+                return False
+            else:
+                for device in self.devices:
+                    if device["ID"] == DeviceNumber:
+                        if device["Location"]["latitudine"] == -1 or device["Location"]["longitudine"] == -1:
+                            self._bot.sendMessage(
+                                "No location available for this device")
+                            return True
+                        else:
+                            self.device = device
+                            self._bot.sendLocation(
+                                device["Location"]["latitudine"], device["Location"]["longitudine"])
+                            return True
+
+                self._bot.sendMessage("Choose a valid option")
                 return False

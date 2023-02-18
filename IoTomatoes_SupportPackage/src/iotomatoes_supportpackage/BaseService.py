@@ -2,7 +2,7 @@ import requests
 import time
 
 from .ItemInfo import isMQTT
-from .RefreshThread import RefreshThread
+from .MyThread import RefreshThread
 from .MQTTClient import BaseMQTTClient
 
 

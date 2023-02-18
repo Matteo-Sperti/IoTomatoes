@@ -10,13 +10,8 @@ The proposed IoT platform for Smart Farming is built on the base of the microser
 The **[docker-compose.yml](./docker-compose.yml)** file is a script that allows to build and run all the microservices of the IoT platform in a single command. In the configuration it uses a bridge network to allow the communication between the microservices. It also uses the host network to allow the communication between the services and the devices on the Raspberry Pi board.
 
 Together with all the microservices, it also launches:
-- the NGINX server that works as a reverse proxy to allow the communication between the services in the platform and the external world.
+- the NGINX server that allow the communication between the services in the platform and the external world.
 - the MOSQUITTO broker that works as a MQTT broker to allow the communication between the services in the platform and the external devices.
-
-## Device Connector
-Device connector for Raspberry Pi: It works as a device connector integrating the low-level technology of sensors  and actuators into the platform. The Raspberry Pi board communicates using low-energy communication protocols with temperature, humidity, air quality, solar radiations, soil moisture sensors located in the field, to retrieve environmental and soil information, or with leds and pumps. It communicates with the Catalog through REST and it works as a MQTT publisher to send the data collected, or as a MQTT subscriber to receive the actuation commands. It can be also used to integrate pre-existing sensors in the platform.
-
-**[Code >>](./Devices/)**  
 
 ## Resource Catalog
 It works as a REST Web Service and provides information about endpoints (URI and MQTT topics) of all the devices in the platform. Therefore, each IoT device will need to be registered and must be able to update it periodically.
@@ -35,12 +30,14 @@ It works as a REST Web Service and provides information about endpoints (URI and
 **[Service Catalog Settings >>](./Doc/ServiceCatalogSettings.json)**
 
 ## Database Connector
-prova
+It works as a REST Web Service and provides the possibility to store and retrieve data from the MongoDB database. It also exploits the MQTT protocol to receive messages from the different sensors and microservices.
 
 **[Code >>](./MongoDBConnector/)**  
 
 ## Telegram Bot
-It is a service that allows the integration of the IoT infrastructure into Telegram platform. It will exploit REST Web Services to retrieve IoT devices data from the Database Connector. Moreover, it will exploit the MQTT protocol to receive messages and alarms from the different microservices and it provides the possibility to manage your company.
+It is a service that allows the integration of the IoT infrastructure into Telegram platform. 
+This service will allow the user to manage his company through Telegram.
+It will exploit REST Web Services to retrieve IoT devices data from the Database Connector or from the Data Visualizer. Moreover, it will exploit the MQTT protocol to receive messages and alarms from the different microservices.
 
 **[Code >>](./TelegramBot/)**  
 
@@ -52,23 +49,23 @@ This service performs different data control strategies in order to ensure that 
 
 **[Code >>](./FaultDetectionService/)**  
 
+## Consumption Management
+It will retrieve and store data about main resources consumption (water, average electrical power, seed and fertilizer) from related REST Web Services. Through this service the company can have a picture of its consumption (and so of its outgoings) and can reduce the impact on the environment.
+
+**[Code >>](./ConsumptionManager/)** 
+
 ## Smart irrigation
-This service is used to manage the irrigation plant of the farm.
+This service is used to automatically manage the irrigation plant of the farm.
 
 **[Code >>](./SmartIrrigation/)**  
 
 ## Smart lighting
-This service retrieves solar lighting data from the sensors using the MQTT protocol and automatically controls the lighting system.
+This service retrieves sensors data already processed by the MongoDBConnector, the weather Forecast and integrate everything to obtain an autonomous control of the lighting system.
 
-**[Code >>](./SmartLighting/)**  
-
-## Consumption Management
-It will retrieve and store data about main resources consumption (water, average electrical power, seed and fertilizer) from related REST Web Services. Through this service the company can have a picture of its consumption (and so of its outgoings) and can reduce the impact on the environment.
-
-**[Code >>](./ConsumptionManager/)**  
+**[Code >>](./SmartLighting/)**   
 
 ## Weather Forecast
-This service uses third-party API to retrieve the weather information and forecast for the farm area. Moreover, it exploits the possibility to include in the analysis data coming from pre-existing weather stations.
+This service uses third-party API to retrieve the weather information and forecast for the farm area. Moreover, it exploits the possibility to include in the analysis data coming from pre-existing weather stations (further updates of the project)
 
 **[Code >>](./WeatherForecast/)**  
 

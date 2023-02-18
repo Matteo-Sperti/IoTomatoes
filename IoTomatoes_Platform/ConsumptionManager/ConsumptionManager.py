@@ -1,4 +1,3 @@
-import datetime
 import time
 import json
 import signal
@@ -25,6 +24,7 @@ class ConsumptionManager (BaseService):
     def updateConsumption(self):
         """Calculate the consumption of the actuators for the passed hour and update the database"""
 
+        totalConsumption = {}
         for dev in self.deviceList:
             if (dev['status'] == 'OFF' and dev['control']):
                 dev_consumption = {
@@ -39,6 +39,12 @@ class ConsumptionManager (BaseService):
                         't': time.time()
                     }
                 }
+                if dev['CompanyName'] in totalConsumption:
+                    totalConsumption[dev['CompanyName']
+                                     ] += dev['Consumption_kWh']
+                else:
+                    totalConsumption[dev['CompanyName']
+                                     ] = dev['Consumption_kWh']
                 dev['Consumption_kWh'] = 0
                 self._MQTTClient.myPublish(
                     f"{dev['CompanyName']}/{dev['fieldNumber']}/{dev['ID']}/consumption", dev_consumption)
@@ -58,10 +64,25 @@ class ConsumptionManager (BaseService):
                         't': time.time()
                     }
                 }
+                if dev['CompanyName'] in totalConsumption:
+                    totalConsumption[dev['CompanyName']
+                                     ] += dev['Consumption_kWh']
+                else:
+                    totalConsumption[dev['CompanyName']
+                                     ] = dev['Consumption_kWh']
                 dev['OnTime'] = time.time()
                 dev['Consumption_kWh'] = 0
                 self._MQTTClient.myPublish(
                     f"{dev['CompanyName']}/{dev['fieldNumber']}/{dev['ID']}/consumption", dev_consumption)
+
+        for CompanyName in totalConsumption:
+            message = {
+                'cn': CompanyName,
+                'bn': self.serviceName,
+                'tot_consumption': totalConsumption[CompanyName]
+            }
+            self._MQTTClient.myPublish(
+                f"{CompanyName}/Consumption", message)
 
     def updateStatus(self, actuatorID: int, command: str):
         """Update the status of the actuator, if it is turned OFF calculates its consumption.

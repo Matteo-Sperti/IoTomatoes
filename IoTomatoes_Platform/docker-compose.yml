@@ -86,8 +86,6 @@ services:
       dockerfile: Dockerfile
     environment:
       - TZ=Europe/Rome
-    ports:
-      - "1880:1880"
     depends_on:
       - resource_catalog
     networks:

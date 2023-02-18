@@ -62,7 +62,7 @@ class GPSgenerator():
 
     def randomPath(self):
         """Generate a random path for the truck."""
-        max_deviation = 0.01  # 1.1 meter
+        max_deviation = 0.001   # 0.001 degrees ~= 100 meters
 
         self.lat = self.lat + random.uniform(-max_deviation, max_deviation)
         self.lon = self.lon + random.uniform(-max_deviation, max_deviation)

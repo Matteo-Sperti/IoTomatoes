@@ -81,8 +81,8 @@ class SmartLighting(BaseService):
                         0.75*currentLight + 0.25*lightForecast, 2)
 
                 # CONTROL ALGORITHM:
-                # controllo schedulato dall'inizio dell'alba al tramonto (LA NOTTE NO, COSI SI LASCIA UN
-                # CICLO LUCE/BUIO ALLE PIANTE PER LA FOTOSINTESI)
+                # The control algorithm is scheduled on day time (between sunrise and sunset) and if the cloud cover is
+                # higher than 60%.
                 print(
                     f"Performing control on: Company={CompanyName} field={fieldID}")
                 if currentTime < Sunrise or currentTime > Sunset:
@@ -217,22 +217,20 @@ class SmartLighting(BaseService):
 
             light = weatherService_data["hourly"]["Illumination"][hour]
 
-            # Estrazione e costruzione orario alba:
+            # Sunrise time extraction and construction:
             sunrise = weatherService_data["daily"]["sunrise"][0]
             sunrise = sunrise.split("T")[1]
             sunriseHour = int(sunrise.split(":")[0])  # retrieves sunrise hour
             # retrieves sunrise minutes
             sunriseMinutes = int(sunrise.split(":")[1])
-            # crea un oggetto "data" con per avere l'ora dell'alba
             sunrise = datetime.time(sunriseHour, sunriseMinutes, 0)
 
-            # Estrazione e costruzione orario tramonto:
+            # Sunset time extraction and construction:
             sunset = weatherService_data["daily"]["sunset"][0]
             sunset = sunset.split("T")[1]
             sunsetHour = int(sunset.split(":")[0])  # retrieves sunset hour
             # retrieves sunset minutes
             sunsetMinutes = int(sunset.split(":")[1])
-            # crea un oggetto "data" per avere l'ora del tramonto
             sunset = datetime.time(sunsetHour, sunsetMinutes, 0)
 
             cloudCover = weatherService_data["hourly"]["cloudcover"][hour]

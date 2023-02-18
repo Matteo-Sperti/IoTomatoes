@@ -716,9 +716,14 @@ class CustomPlot():
                                params=params)
             res.raise_for_status()
             dict_ = res.json()
+        except requests.exceptions.HTTPError as err:
+            if err.response.status_code == 404:
+                self._bot.sendMessage("Measures not found")
+            else:
+                print(f"{err.response.status_code} : {err.response.reason}")
+            return False
         except:
-            self._bot.sendMessage(
-                "Error in the connection with the Data Visualization Service")
+            print(f"Error in the connection with the Data Visualization Service")
             return False
         else:
             if "img64" in dict_:
@@ -747,16 +752,23 @@ class CustomPlot():
                                params=params)
             res.raise_for_status()
             dict_ = res.json()
+        except requests.exceptions.HTTPError as err:
+            if err.response.status_code == 404:
+                self._bot.sendMessage("Measures not found")
+            else:
+                print(f"{err.response.status_code} : {err.response.reason}")
+            return False
         except:
-            self._bot.sendMessage(
-                "Error in the connection with the Data Visualization Service")
+            print(f"Error in the connection with the Data Visualization Service")
             return False
         else:
             if "img64" in dict_:
                 fileName = "plot.png"
+                binaryString = dict_["img64"].encode("utf-8")
                 with open(fileName, "wb") as fh:
-                    fh.write(base64.b64decode(dict_["img64"]))
-                self._bot.sendPhoto(fileName)
+                    fh.write(base64.b64decode(binaryString))
+                with open(fileName, "rb") as fh:
+                    self._bot.sendPhoto(fh)
                 return True
             else:
                 return False
@@ -943,6 +955,7 @@ class GetPosition():
                 self._bot.sendMessage("Choose a valid option")
                 return False
 
+
 class Trace:
     def __init__(self, CompanyName: str, sender, connector):
         """Retrieve the trace of a truck.
@@ -1002,7 +1015,7 @@ class Trace:
                 keyboard = InlineKeyboardMarkup(
                     inline_keyboard=inline_keyboard_)
                 self._bot.sendMessage(f"Choose the Truck of company {self.CompanyName}!",
-                                        reply_markup=keyboard)
+                                      reply_markup=keyboard)
                 self._status += 1
                 return False
 
@@ -1033,6 +1046,7 @@ class Trace:
             res.raise_for_status()
             print(res)
         except:
-            self._bot.sendMessage("Error in the connection with the Localization Service")
+            self._bot.sendMessage(
+                "Error in the connection with the Localization Service")
         else:
             self._bot.sendMessage("Trace of the truck:")

@@ -22,10 +22,11 @@ You can use the following commands:
 /users to see all the users of your company.
 /devices to see all the active devices of your company.
 /fields to see all the fields of your company.
+/change_plant to change the plant of your company.
 /delete_company to delete your company and all the data related to it.
 /plot to require a custom plot of your data.
 /position to retrieve the position of your devices.
-/change_plant to change the plant of your company.
+/trace to retrieve the trace of one of your truck.
 /help to see this message again.
 """
 

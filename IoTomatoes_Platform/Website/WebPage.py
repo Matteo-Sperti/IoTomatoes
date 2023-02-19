@@ -41,7 +41,7 @@ if __name__ == '__main__':
                 'request.dispatch': cherrypy.dispatch.MethodDispatcher(),
                 'tools.staticdir.root': os.path.abspath(os.getcwd()),
             },
-        '/css' : {
+        '/img' : {
                 'tools.staticdir.on' : True,
                 'tools.staticdir.dir' : './img'
             }

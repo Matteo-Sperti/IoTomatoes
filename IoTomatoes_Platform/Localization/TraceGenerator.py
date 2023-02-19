@@ -64,11 +64,11 @@ class TraceGenerator(BaseService):
         LonCenter = sum([dict_[id]["longitude"]
                         for id in dict_.keys()]) / len(dict_.keys())
 
-        map = folium.Map(location=[LatCenter, LonCenter])
+        map = folium.Map(location=[LatCenter, LonCenter], zoom_start=30)
         for key in dict_.keys():
             folium.Marker([dict_[key]["latitude"], dict_[key]
                            ["longitude"]], popup="Truck " + key).add_to(map)
-        map.save("mapPositions.html")
+        map.save(fileNameHtlm)
 
         # imgkit.from_file(fileNameHtlm, fileNamePng)
         # with open(fileNamePng, "rb") as image_file:
@@ -76,7 +76,7 @@ class TraceGenerator(BaseService):
 
         # out = {"img64": encoded_string.decode("utf-8")}
         
-        return open("mapPositions.html")
+        return open(fileNameHtlm)
     
     def GenerateGPX(self, CompanyName: str, truckID: str):
         """Generate a GPX file from the trace of a truck.
@@ -114,7 +114,7 @@ class TraceGenerator(BaseService):
         gpx = gpxpy.parse(gpx_file)
         first_point = gpx.tracks[0].segments[0].points[0]
         map = folium.Map(
-            location=[first_point.latitude, first_point.longitude])
+            location=[first_point.latitude, first_point.longitude], zoom_start=30)
         # Add GPX track as a polyline on the map
         lat_lons = [(p.latitude, p.longitude)
                     for p in gpx.tracks[0].segments[0].points]

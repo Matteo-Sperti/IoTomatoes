@@ -37,7 +37,7 @@
             "952ad60128e43d6a"
         ],
         "x": 14,
-        "y": 519,
+        "y": 199,
         "w": 1132,
         "h": 322
     },
@@ -256,7 +256,7 @@
             "b162538becd0a418"
         ],
         "x": 14,
-        "y": 419,
+        "y": 99,
         "w": 1032,
         "h": 82
     },
@@ -282,8 +282,8 @@
             "208e0eadd472ef69",
             "3f627e465ca4e20c"
         ],
-        "x": 674,
-        "y": 39,
+        "x": 14,
+        "y": 539,
         "w": 332,
         "h": 362
     },
@@ -301,7 +301,6 @@
         },
         "nodes": [
             "bd132edf0762af73",
-            "11665097c1ea2384",
             "c6888d41c8d468c3",
             "7f67f2f4899a9a2a",
             "ca2143976e294b36",
@@ -309,11 +308,12 @@
             "44d905bc4b56f5a3",
             "6378cf9c524cc11f",
             "d8caa7c2760a8025",
-            "6749db2c396a80c2"
+            "6749db2c396a80c2",
+            "e1a82cbae25fdb28"
         ],
-        "x": 14,
-        "y": 59,
-        "w": 612,
+        "x": 494,
+        "y": 639,
+        "w": 632,
         "h": 262
     },
     {
@@ -712,6 +712,15 @@
         "className": ""
     },
     {
+        "id": "4bed3390.45d6dc",
+        "type": "ui_tab",
+        "name": "Home",
+        "icon": "dashboard",
+        "order": 1,
+        "disabled": false,
+        "hidden": false
+    },
+    {
         "id": "09991aed2096e866",
         "type": "function",
         "z": "54c6c3bfbd6d9993",
@@ -1087,7 +1096,7 @@
         "targetType": "full",
         "statusVal": "",
         "statusType": "auto",
-        "x": 920,
+        "x": 740,
         "y": 1580,
         "wires": []
     },
@@ -1104,7 +1113,7 @@
         "finalize": "",
         "libs": [],
         "x": 740,
-        "y": 800,
+        "y": 480,
         "wires": [
             [
                 "952ad60128e43d6a"
@@ -1129,7 +1138,7 @@
         "senderr": false,
         "headers": [],
         "x": 500,
-        "y": 680,
+        "y": 360,
         "wires": [
             [
                 "5bb01c2048ea1eac",
@@ -1160,7 +1169,7 @@
         "payload": "true",
         "payloadType": "bool",
         "x": 120,
-        "y": 740,
+        "y": 420,
         "wires": [
             [
                 "ca33adc539d22833"
@@ -1180,7 +1189,7 @@
         "finalize": "",
         "libs": [],
         "x": 740,
-        "y": 680,
+        "y": 360,
         "wires": [
             [
                 "51712fd4a941ba16",
@@ -1276,7 +1285,7 @@
         "to": "",
         "reg": false,
         "x": 320,
-        "y": 680,
+        "y": 360,
         "wires": [
             [
                 "4fc9ecb544f1b806"
@@ -1502,7 +1511,7 @@
             "fab7484d5ad0b452"
         ],
         "x": 55,
-        "y": 680,
+        "y": 360,
         "wires": [
             [
                 "ca33adc539d22833"
@@ -1519,7 +1528,7 @@
             "84a3c27403220ddb"
         ],
         "x": 1105,
-        "y": 760,
+        "y": 440,
         "wires": []
     },
     {
@@ -1542,39 +1551,11 @@
         "from": "",
         "to": "",
         "reg": false,
-        "x": 300,
-        "y": 160,
+        "x": 780,
+        "y": 740,
         "wires": [
             [
                 "44d905bc4b56f5a3"
-            ]
-        ]
-    },
-    {
-        "id": "11665097c1ea2384",
-        "type": "change",
-        "z": "54c6c3bfbd6d9993",
-        "g": "753f47c82d92d3bf",
-        "name": "",
-        "rules": [
-            {
-                "t": "set",
-                "p": "payload",
-                "pt": "msg",
-                "to": "true",
-                "tot": "bool"
-            }
-        ],
-        "action": "",
-        "property": "",
-        "from": "",
-        "to": "",
-        "reg": false,
-        "x": 300,
-        "y": 220,
-        "wires": [
-            [
-                "6378cf9c524cc11f"
             ]
         ]
     },
@@ -1604,8 +1585,7 @@
         "y": 320,
         "wires": [
             [
-                "09991aed2096e866",
-                "ca33a40a46d31e6a"
+                "09991aed2096e866"
             ],
             [
                 "25062c6d6c024ad0"
@@ -2109,8 +2089,7 @@
         "y": 320,
         "wires": [
             [
-                "cac34d559af9f3e4",
-                "97a26a49a1ad821a"
+                "cac34d559af9f3e4"
             ]
         ]
     },
@@ -2136,7 +2115,7 @@
         "topic": "",
         "topicType": "str",
         "x": 990,
-        "y": 760,
+        "y": 440,
         "wires": [
             [
                 "5bc39fb82456f9e5"
@@ -2164,8 +2143,8 @@
         "payloadType": "str",
         "topic": "button",
         "topicType": "str",
-        "x": 100,
-        "y": 100,
+        "x": 580,
+        "y": 680,
         "wires": [
             [
                 "d8caa7c2760a8025"
@@ -2193,8 +2172,8 @@
         "payloadType": "str",
         "topic": "button",
         "topicType": "str",
-        "x": 120,
-        "y": 160,
+        "x": 600,
+        "y": 740,
         "wires": [
             [
                 "bd132edf0762af73"
@@ -2222,11 +2201,11 @@
         "payloadType": "bool",
         "topic": "",
         "topicType": "str",
-        "x": 110,
-        "y": 220,
+        "x": 590,
+        "y": 800,
         "wires": [
             [
-                "11665097c1ea2384"
+                "e1a82cbae25fdb28"
             ]
         ]
     },
@@ -2389,7 +2368,7 @@
         "layout": "row-left",
         "className": "",
         "x": 990,
-        "y": 560,
+        "y": 240,
         "wires": []
     },
     {
@@ -2407,7 +2386,7 @@
         "layout": "col-center",
         "className": "",
         "x": 970,
-        "y": 640,
+        "y": 320,
         "wires": []
     },
     {
@@ -2425,7 +2404,7 @@
         "layout": "row-center",
         "className": "",
         "x": 990,
-        "y": 680,
+        "y": 360,
         "wires": []
     },
     {
@@ -2443,7 +2422,7 @@
         "layout": "row-center",
         "className": "",
         "x": 990,
-        "y": 720,
+        "y": 400,
         "wires": []
     },
     {
@@ -2461,7 +2440,7 @@
         "layout": "row-center",
         "className": "",
         "x": 990,
-        "y": 600,
+        "y": 280,
         "wires": []
     },
     {
@@ -4061,7 +4040,7 @@
         "name": "Update tab",
         "events": "change",
         "x": 110,
-        "y": 620,
+        "y": 300,
         "wires": [
             [
                 "ca33adc539d22833"
@@ -4075,11 +4054,11 @@
         "g": "753f47c82d92d3bf",
         "name": "",
         "events": "connect",
-        "x": 100,
-        "y": 280,
+        "x": 580,
+        "y": 860,
         "wires": [
             [
-                "11665097c1ea2384"
+                "e1a82cbae25fdb28"
             ]
         ]
     },
@@ -4099,8 +4078,8 @@
         "resendOnRefresh": false,
         "templateScope": "global",
         "className": "",
-        "x": 840,
-        "y": 80,
+        "x": 180,
+        "y": 580,
         "wires": [
             []
         ],
@@ -4124,7 +4103,7 @@
         "templateScope": "local",
         "className": "backgr",
         "x": 980,
-        "y": 800,
+        "y": 480,
         "wires": [
             []
         ]
@@ -4145,8 +4124,8 @@
         "resendOnRefresh": true,
         "templateScope": "local",
         "className": "",
-        "x": 780,
-        "y": 160,
+        "x": 120,
+        "y": 660,
         "wires": [
             []
         ]
@@ -4167,8 +4146,8 @@
         "resendOnRefresh": true,
         "templateScope": "local",
         "className": "",
-        "x": 780,
-        "y": 200,
+        "x": 120,
+        "y": 700,
         "wires": [
             []
         ]
@@ -4189,8 +4168,8 @@
         "resendOnRefresh": true,
         "templateScope": "local",
         "className": "",
-        "x": 780,
-        "y": 240,
+        "x": 120,
+        "y": 740,
         "wires": [
             []
         ]
@@ -4211,8 +4190,8 @@
         "resendOnRefresh": true,
         "templateScope": "local",
         "className": "",
-        "x": 780,
-        "y": 280,
+        "x": 120,
+        "y": 780,
         "wires": [
             []
         ]
@@ -4233,8 +4212,8 @@
         "resendOnRefresh": false,
         "templateScope": "local",
         "className": "",
-        "x": 490,
-        "y": 160,
+        "x": 970,
+        "y": 740,
         "wires": [
             []
         ]
@@ -4247,18 +4226,20 @@
         "group": "dc85dc3382f47ab2",
         "name": "Localization Map",
         "order": 2,
-        "width": 7,
-        "height": 4,
-        "format": " <img src=\"http://hailshamhistoricalsociety.co.uk/images/Museum-entrance.png\" width=\"50\" height=\"2\">\n",
+        "width": "7",
+        "height": "7",
+        "format": "<div style=\"justify-content: center; align-items: center;\">\n    <iframe id=\"{{'my_'+$id}}\" src=\"\" width=\"360px\" height=\"360px\" frameBorder=\"0\"></iframe>\n</div>\n\n<script>\n    (function(scope) {\n    scope.$watch('msg', function(msg) {\n        if (msg) {\n            $(\"#my_\"+scope.$id).attr(\"src\", `${msg.payload}`);\n        }\n    });\n})(scope);\n</script>",
         "storeOutMessages": true,
         "fwdInMessages": true,
         "resendOnRefresh": true,
         "templateScope": "local",
         "className": "",
-        "x": 510,
-        "y": 220,
+        "x": 1010,
+        "y": 800,
         "wires": [
-            []
+            [
+                "125679bb4d7c6496"
+            ]
         ]
     },
     {
@@ -4871,7 +4852,7 @@
         "senderr": false,
         "headers": [],
         "x": 310,
-        "y": 460,
+        "y": 140,
         "wires": [
             [
                 "b162538becd0a418"
@@ -4901,7 +4882,7 @@
         "payload": "{\"serviceName\":\"Dashboard\",\"availableServices\":[\"REST\",\"MQTT\"],\"servicesDetails\":[{\"serviceType\":\"MQTT\",\"subscribedTopics\":[\"#\"]},{\"serviceType\":\"REST\",\"serviceIP\":\"http://dashboard:1880\"}]}",
         "payloadType": "json",
         "x": 110,
-        "y": 460,
+        "y": 140,
         "wires": [
             [
                 "5cabbdf8e12528c7"
@@ -4927,7 +4908,7 @@
         "topic": "topic",
         "outputs": 1,
         "x": 750,
-        "y": 460,
+        "y": 140,
         "wires": [
             [
                 "11a009cefeb1e519"
@@ -4952,7 +4933,7 @@
         "senderr": false,
         "headers": [],
         "x": 950,
-        "y": 460,
+        "y": 140,
         "wires": [
             []
         ]
@@ -4978,28 +4959,12 @@
         "to": "",
         "reg": false,
         "x": 520,
-        "y": 460,
+        "y": 140,
         "wires": [
             [
                 "146e266e936f2d04"
             ]
         ]
-    },
-    {
-        "id": "ca33a40a46d31e6a",
-        "type": "debug",
-        "z": "54c6c3bfbd6d9993",
-        "name": "debug 11",
-        "active": true,
-        "tosidebar": true,
-        "console": false,
-        "tostatus": false,
-        "complete": "false",
-        "statusVal": "",
-        "statusType": "auto",
-        "x": 2140,
-        "y": 120,
-        "wires": []
     },
     {
         "id": "29a8338f852b62b8",
@@ -5430,7 +5395,7 @@
         "authType": "",
         "senderr": false,
         "headers": [],
-        "x": 910,
+        "x": 750,
         "y": 1500,
         "wires": [
             [
@@ -5467,14 +5432,15 @@
         "topicType": "msg",
         "splitLayout": false,
         "className": "",
-        "x": 730,
+        "x": 570,
         "y": 1500,
         "wires": [
             [
                 "a1dc62aa44201866",
                 "5c11e7714d961214",
                 "c9a79b5a16416bb1",
-                "f838e3cc4ecd91ba"
+                "f838e3cc4ecd91ba",
+                "e1a82cbae25fdb28"
             ]
         ]
     },
@@ -5484,7 +5450,7 @@
         "z": "54c6c3bfbd6d9993",
         "name": "",
         "events": "change",
-        "x": 580,
+        "x": 420,
         "y": 1500,
         "wires": [
             [
@@ -5550,7 +5516,7 @@
         "from": "",
         "to": "",
         "reg": false,
-        "x": 400,
+        "x": 240,
         "y": 1500,
         "wires": [
             [
@@ -5564,7 +5530,7 @@
         "z": "54c6c3bfbd6d9993",
         "name": "",
         "events": "connect",
-        "x": 220,
+        "x": 60,
         "y": 1500,
         "wires": [
             [
@@ -5667,8 +5633,8 @@
         "resendOnRefresh": true,
         "templateScope": "local",
         "className": "",
-        "x": 780,
-        "y": 320,
+        "x": 120,
+        "y": 820,
         "wires": [
             []
         ]
@@ -5693,8 +5659,8 @@
         "from": "",
         "to": "",
         "reg": false,
-        "x": 300,
-        "y": 100,
+        "x": 780,
+        "y": 680,
         "wires": [
             [
                 "6749db2c396a80c2"
@@ -5708,8 +5674,8 @@
         "g": "753f47c82d92d3bf",
         "name": "",
         "events": "change",
-        "x": 480,
-        "y": 100,
+        "x": 960,
+        "y": 680,
         "wires": [
             []
         ]
@@ -5730,8 +5696,8 @@
         "resendOnRefresh": true,
         "templateScope": "local",
         "className": "",
-        "x": 780,
-        "y": 360,
+        "x": 120,
+        "y": 860,
         "wires": [
             []
         ]
@@ -5934,24 +5900,8 @@
         "format": "{{msg.payload.companyName}}",
         "layout": "row-spread",
         "className": "",
-        "x": 930,
-        "y": 1440,
-        "wires": []
-    },
-    {
-        "id": "97a26a49a1ad821a",
-        "type": "debug",
-        "z": "54c6c3bfbd6d9993",
-        "name": "debug 12",
-        "active": false,
-        "tosidebar": true,
-        "console": false,
-        "tostatus": false,
-        "complete": "false",
-        "statusVal": "",
-        "statusType": "auto",
-        "x": 1720,
-        "y": 220,
+        "x": 730,
+        "y": 1540,
         "wires": []
     },
     {
@@ -5970,8 +5920,8 @@
         "resendOnRefresh": true,
         "templateScope": "local",
         "className": "",
-        "x": 760,
-        "y": 120,
+        "x": 100,
+        "y": 620,
         "wires": [
             []
         ]
@@ -5984,17 +5934,71 @@
         "name": "LogoWeb",
         "order": 1,
         "width": 6,
-        "height": 2,
+        "height": 3,
         "format": " <img src=\"/img/logoDashboard.png\" width=\"50\" height=\"2\">\n",
         "storeOutMessages": true,
         "fwdInMessages": true,
         "resendOnRefresh": true,
         "templateScope": "local",
         "className": "",
-        "x": 740,
-        "y": 1440,
+        "x": 560,
+        "y": 1540,
         "wires": [
             []
         ]
+    },
+    {
+        "id": "e1a82cbae25fdb28",
+        "type": "function",
+        "z": "54c6c3bfbd6d9993",
+        "g": "753f47c82d92d3bf",
+        "name": "setCompanyName",
+        "func": "if (typeof msg.payload === 'object' && 'companyName' in msg.payload) {\n    var local = msg.payload.companyName\n    context.set('CompanyName', local);\n}\nelse {\n    var local = context.get('CompanyName') || \"\";\n}\n\nmsg.payload = \"/loc/\" + local + \"/trucksPosition\";\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 790,
+        "y": 800,
+        "wires": [
+            [
+                "6378cf9c524cc11f",
+                "cf455cbd092fe745"
+            ]
+        ]
+    },
+    {
+        "id": "cf455cbd092fe745",
+        "type": "debug",
+        "z": "54c6c3bfbd6d9993",
+        "name": "debug 2",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 900,
+        "y": 940,
+        "wires": []
+    },
+    {
+        "id": "125679bb4d7c6496",
+        "type": "debug",
+        "z": "54c6c3bfbd6d9993",
+        "name": "debug 3",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1240,
+        "y": 860,
+        "wires": []
     }
 ]

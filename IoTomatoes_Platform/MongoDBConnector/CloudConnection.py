@@ -340,17 +340,17 @@ class MongoConnection():
             raise web_exception(400, "Missing CollectionName")
         else:
             CollectionName = kwargs["Field"]
-        
+
         if "measure" not in kwargs:
             raise web_exception(400, "Missing measure")
         else:
             measure = kwargs["measure"]
-        
+
         if "start_date" not in kwargs:
             raise web_exception(400, "Missing start")
         else:
             start = float(kwargs["start_date"])
-        
+
         if "end_date" not in kwargs:
             raise web_exception(400, "Missing end")
         else:
@@ -360,7 +360,7 @@ class MongoConnection():
             numPoints = int(kwargs["numPoints"])
         else:
             numPoints = 100
-    
+
         if CompanyName not in self.client.list_database_names():
             raise web_exception(404, "Company not found")
 
@@ -423,6 +423,11 @@ class MongoConnection():
         - `CompanyName (str)`: name of the company
         - `TruckID (int)`: id of the truck
         """
+        if CompanyName not in self.client.list_database_names():
+            raise web_exception(404, "Company not found")
+
+        if "0" not in self.client[CompanyName].list_collection_names():
+            raise web_exception(404, "No truck found for this company")
 
         collection = self.client[CompanyName]["0"]
 
@@ -464,6 +469,12 @@ class MongoConnection():
         Arguments:
         - `CompanyName (str)`: name of the company
         """
+        if CompanyName not in self.client.list_database_names():
+            raise web_exception(404, "Company not found")
+
+        if "0" not in self.client[CompanyName].list_collection_names():
+            raise web_exception(404, "No truck found for this company")
+
         collection = self.client[CompanyName]["0"]
 
         res = collection.aggregate([

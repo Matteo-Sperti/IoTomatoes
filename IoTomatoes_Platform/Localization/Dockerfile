@@ -6,10 +6,6 @@ ENV PYTHONDONTWRITEBYTECODE=1
 # Turns off buffering for easier container logging
 ENV PYTHONUNBUFFERED=1
 
-# Install system dependencies
-ENV DEBIAN_FRONTEND=noninteractive
-RUN apt update && apt install -y wkhtmltopdf && rm -rf /var/lib/apt/lists/*
-
 # Install pip requirements
 COPY ./requirements.txt .
 RUN python -m pip install -r requirements.txt

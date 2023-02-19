@@ -35,18 +35,18 @@ class AmbientSimulator():
             to the state of the actuators"""
 
         if self._led:
-            self._light = self._light + 1000 + 100*self.noiseValue()
+            self._light = self._light + 1000 + random.uniform(-100, 100)
         else:
-            self._light = self._light - 100 - 100*self.noiseValue()
+            self._light = self._light - 10 + random.uniform(-100, 100)
 
         if self._pump:
-            self._soilMoisture += (0.5 + 0.02*self.noiseValue())
-            self._humidity += (0.1 + 0.02*self.noiseValue())
+            self._soilMoisture += (0.5 + random.uniform(-0.01, 0.01))
+            self._humidity += (0.1 + random.uniform(-0.01, 0.01))
         else:
-            self._soilMoisture -= (0.05 + 0.01*self.noiseValue())
-            self._humidity -= (0.01 + 0.01*self.noiseValue())
+            self._soilMoisture -= (0.05 + random.uniform(-0.01, 0.01))
+            self._humidity -= (0.01 + random.uniform(-0.01, 0.01))
 
-        self._temperature += (0.1 + 0.1*self.noiseValue())
+        self._temperature += random.uniform(-0.5, 0.5)
 
         self._soilMoisture = self.saturate(self._soilMoisture, 0, 100)
         self._humidity = self.saturate(self._humidity, 0, 100)

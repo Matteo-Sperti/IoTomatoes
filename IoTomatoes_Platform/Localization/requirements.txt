@@ -1,5 +1,4 @@
 CherryPy==18.8.0
 folium==0.14.0
 gpxpy==1.5.0
-imgkit==1.2.2
 requests==2.25.1

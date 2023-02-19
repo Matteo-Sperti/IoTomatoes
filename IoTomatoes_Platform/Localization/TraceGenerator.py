@@ -2,11 +2,8 @@ import json
 import gpxpy
 import folium
 import cherrypy
-import time
 import signal
 import requests
-import imgkit
-import base64
 
 from iotomatoes_supportpackage import BaseService, web_exception, setREST
 
@@ -44,7 +41,6 @@ class TraceGenerator(BaseService):
         """
 
         fileNameHtlm = "mapPositions.html"
-        fileNamePng = "mapPositionsImage.png"
         try:
             response = requests.get(
                 f"{self.MongoDbUrl}/{CompanyName}/trucksPosition")
@@ -64,17 +60,11 @@ class TraceGenerator(BaseService):
         LonCenter = sum([dict_[id]["longitude"]
                         for id in dict_.keys()]) / len(dict_.keys())
 
-        map = folium.Map(location=[LatCenter, LonCenter], zoom_start=30)
+        map = folium.Map(location=[LatCenter, LonCenter], zoom_start=15, width=360, height=360)
         for key in dict_.keys():
             folium.Marker([dict_[key]["latitude"], dict_[key]
                            ["longitude"]], popup="Truck " + key).add_to(map)
         map.save(fileNameHtlm)
-
-        # imgkit.from_file(fileNameHtlm, fileNamePng)
-        # with open(fileNamePng, "rb") as image_file:
-        #     encoded_string = base64.b64encode(image_file.read())
-
-        # out = {"img64": encoded_string.decode("utf-8")}
         
         return open(fileNameHtlm)
     
@@ -89,7 +79,6 @@ class TraceGenerator(BaseService):
         """
 
         fileNameHtlm = "mapTrace.html"
-        fileNamePng = "mapTraceImage.png"
         try:
             response = requests.get(
                 f"{self.MongoDbUrl}/{CompanyName}/{truckID}/trace")
@@ -114,7 +103,7 @@ class TraceGenerator(BaseService):
         gpx = gpxpy.parse(gpx_file)
         first_point = gpx.tracks[0].segments[0].points[0]
         map = folium.Map(
-            location=[first_point.latitude, first_point.longitude], zoom_start=30)
+            location=[first_point.latitude, first_point.longitude], zoom_start=15)
         # Add GPX track as a polyline on the map
         lat_lons = [(p.latitude, p.longitude)
                     for p in gpx.tracks[0].segments[0].points]
@@ -125,13 +114,7 @@ class TraceGenerator(BaseService):
         # Show map
         map.save(fileNameHtlm)
 
-        options = {
-            'quiet': ''
-            }
-        encoded_string = imgkit.from_file(fileNameHtlm, False, options=options)
-
-        out = {"img64": encoded_string.decode("utf-8")}
-        return json.dumps(out)
+        return open(fileNameHtlm)
 
 
 class LocalizationWebService(BaseService):

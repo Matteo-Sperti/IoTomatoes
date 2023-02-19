@@ -1040,13 +1040,18 @@ class Trace:
         if url == None:
             self._bot.sendMessage(
                 "Error in the connection with the Service Catalog")
+            return
 
         try:
             res = requests.get(f"{url}/{self.CompanyName}/{TruckNumber}/trace")
             res.raise_for_status()
-            print(res)
+            htmlres = res.text
         except:
             self._bot.sendMessage(
                 "Error in the connection with the Localization Service")
         else:
-            self._bot.sendMessage("Trace of the truck:")
+            fileName = f"trace_{TruckNumber}.html"
+            with open(fileName, "w") as f:
+                f.write(htmlres)
+            with open(fileName, "rb") as fout:
+                self._bot.sendDocument(fout)

@@ -278,11 +278,11 @@
             "a1b9db1458158cdb",
             "0e786d4f0e94f09a",
             "2080495962b5b255",
-            "304190e9a6e53660",
             "cfbfb45cc0ea0fca",
-            "208e0eadd472ef69"
+            "208e0eadd472ef69",
+            "3f627e465ca4e20c"
         ],
-        "x": 654,
+        "x": 674,
         "y": 39,
         "w": 332,
         "h": 362
@@ -4099,7 +4099,7 @@
         "resendOnRefresh": false,
         "templateScope": "global",
         "className": "",
-        "x": 820,
+        "x": 840,
         "y": 80,
         "wires": [
             []
@@ -4145,7 +4145,7 @@
         "resendOnRefresh": true,
         "templateScope": "local",
         "className": "",
-        "x": 760,
+        "x": 780,
         "y": 160,
         "wires": [
             []
@@ -4167,7 +4167,7 @@
         "resendOnRefresh": true,
         "templateScope": "local",
         "className": "",
-        "x": 760,
+        "x": 780,
         "y": 200,
         "wires": [
             []
@@ -4189,7 +4189,7 @@
         "resendOnRefresh": true,
         "templateScope": "local",
         "className": "",
-        "x": 760,
+        "x": 780,
         "y": 240,
         "wires": [
             []
@@ -4211,7 +4211,7 @@
         "resendOnRefresh": true,
         "templateScope": "local",
         "className": "",
-        "x": 760,
+        "x": 780,
         "y": 280,
         "wires": [
             []
@@ -4308,30 +4308,6 @@
         "x": 2290,
         "y": 260,
         "wires": []
-    },
-    {
-        "id": "304190e9a6e53660",
-        "type": "ui_media",
-        "z": "54c6c3bfbd6d9993",
-        "g": "169ea57b72f1db13",
-        "group": "cdd0e15889b1286d",
-        "name": "",
-        "width": 5,
-        "height": 2,
-        "order": 1,
-        "category": "Logo",
-        "file": "IoTomatoes_logo.png",
-        "layout": "center",
-        "showcontrols": true,
-        "loop": false,
-        "onstart": true,
-        "scope": "local",
-        "tooltip": "",
-        "x": 730,
-        "y": 120,
-        "wires": [
-            []
-        ]
     },
     {
         "id": "cac34d559af9f3e4",
@@ -5556,29 +5532,6 @@
         ]
     },
     {
-        "id": "63a14f91695bd4fd",
-        "type": "ui_media",
-        "z": "54c6c3bfbd6d9993",
-        "group": "cdbcaf9bc51ad72e",
-        "name": "",
-        "width": 6,
-        "height": 2,
-        "order": 1,
-        "category": "Logo",
-        "file": "IoTomatoes_logo.png",
-        "layout": "center",
-        "showcontrols": true,
-        "loop": false,
-        "onstart": true,
-        "scope": "local",
-        "tooltip": "",
-        "x": 730,
-        "y": 1460,
-        "wires": [
-            []
-        ]
-    },
-    {
         "id": "539f3176a2bd248c",
         "type": "change",
         "z": "54c6c3bfbd6d9993",
@@ -5714,7 +5667,7 @@
         "resendOnRefresh": true,
         "templateScope": "local",
         "className": "",
-        "x": 760,
+        "x": 780,
         "y": 320,
         "wires": [
             []
@@ -5777,7 +5730,7 @@
         "resendOnRefresh": true,
         "templateScope": "local",
         "className": "",
-        "x": 760,
+        "x": 780,
         "y": 360,
         "wires": [
             []
@@ -6000,5 +5953,48 @@
         "x": 1720,
         "y": 220,
         "wires": []
+    },
+    {
+        "id": "3f627e465ca4e20c",
+        "type": "ui_template",
+        "z": "54c6c3bfbd6d9993",
+        "g": "169ea57b72f1db13",
+        "group": "cdd0e15889b1286d",
+        "name": "LogoWeb",
+        "order": 1,
+        "width": 5,
+        "height": 2,
+        "format": " <img src=\"/img/logoDashboard.png\" width=\"50\" height=\"2\">\n",
+        "storeOutMessages": true,
+        "fwdInMessages": true,
+        "resendOnRefresh": true,
+        "templateScope": "local",
+        "className": "",
+        "x": 760,
+        "y": 120,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "d1f77717f344f557",
+        "type": "ui_template",
+        "z": "54c6c3bfbd6d9993",
+        "group": "cdbcaf9bc51ad72e",
+        "name": "LogoWeb",
+        "order": 1,
+        "width": 6,
+        "height": 2,
+        "format": " <img src=\"/img/logoDashboard.png\" width=\"50\" height=\"2\">\n",
+        "storeOutMessages": true,
+        "fwdInMessages": true,
+        "resendOnRefresh": true,
+        "templateScope": "local",
+        "className": "",
+        "x": 740,
+        "y": 1440,
+        "wires": [
+            []
+        ]
     }
 ]

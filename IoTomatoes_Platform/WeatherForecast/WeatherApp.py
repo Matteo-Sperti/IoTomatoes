@@ -98,7 +98,7 @@ class WeatherApp:
         return json.dumps(response)
 
 
-class WheaterService(BaseService):
+class WeatherService(BaseService):
     exposed = True
 
     def __init__(self, settings:  dict):
@@ -153,11 +153,8 @@ if __name__ == '__main__':
         }
     }
 
-    webService = WheaterService(settings)
+    webService = WeatherService(settings)
     cherrypy.tree.mount(webService, '/', conf)
     cherrypy.config.update({'server.socket_host': ip_address})
     cherrypy.config.update({'server.socket_port': port})
     cherrypy.engine.start()
-
-    while True:
-        time.sleep(5)

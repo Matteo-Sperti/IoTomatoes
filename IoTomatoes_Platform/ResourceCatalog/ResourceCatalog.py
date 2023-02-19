@@ -559,6 +559,3 @@ if __name__ == "__main__":
         cherrypy.config.update({'server.socket_host': ip_address})
         cherrypy.config.update({'server.socket_port': port})
         cherrypy.engine.start()
-
-        while True:
-            time.sleep(5)

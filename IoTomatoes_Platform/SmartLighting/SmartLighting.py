@@ -6,6 +6,8 @@ import signal
 
 from iotomatoes_supportpackage import BaseService
 
+weight = 0.75  # weight of the current measure in the average
+
 
 class SmartLighting(BaseService):
 
@@ -78,7 +80,7 @@ class SmartLighting(BaseService):
                     cloudCover = 100
                 else:
                     currentLight = round(
-                        0.75*currentLight + 0.25*lightForecast, 2)
+                        weight*currentLight + (1-weight)*lightForecast, 2)
 
                 # CONTROL ALGORITHM:
                 # The control algorithm is scheduled on day time (between sunrise and sunset) and if the cloud cover is

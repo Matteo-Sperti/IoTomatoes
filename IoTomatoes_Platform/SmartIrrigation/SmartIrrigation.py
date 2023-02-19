@@ -8,6 +8,7 @@ from iotomatoes_supportpackage import BaseService
 
 maxLimitTemp = datetime.time(23, 59, 0)
 minLimitTemp = datetime.time(0, 0, 0)
+weight = 0.75  # weight of the current measure in the average
 
 
 class SmartIrrigation(BaseService):
@@ -80,7 +81,7 @@ class SmartIrrigation(BaseService):
                     dailyPrecipitationSum = 0
                 else:
                     currentSoilMoisture = round(
-                        0.75*currentSoilMoisture + 0.25*soilMoistureForecast, 2)
+                        weight*currentSoilMoisture + (1-weight)*soilMoistureForecast, 2)
 
                 # CONTROL ALGORITHM:
                 print(

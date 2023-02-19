@@ -69,13 +69,15 @@ class TraceGenerator(BaseService):
             folium.Marker([dict_[key]["latitude"], dict_[key]
                            ["longitude"]], popup="Truck " + key).add_to(map)
         map.save("mapPositions.html")
-        imgkit.from_file(fileNameHtlm, fileNamePng)
-        with open(fileNamePng, "rb") as image_file:
-            encoded_string = base64.b64encode(image_file.read())
 
-        out = {"img64": encoded_string.decode("utf-8")}
-        return json.dumps(out)
+        # imgkit.from_file(fileNameHtlm, fileNamePng)
+        # with open(fileNamePng, "rb") as image_file:
+        #     encoded_string = base64.b64encode(image_file.read())
 
+        # out = {"img64": encoded_string.decode("utf-8")}
+        
+        return open("mapPositions.html")
+    
     def GenerateGPX(self, CompanyName: str, truckID: str):
         """Generate a GPX file from the trace of a truck.
 
@@ -190,6 +192,3 @@ if __name__ == "__main__":
     cherrypy.config.update({'server.socket_host': ip_address})
     cherrypy.config.update({'server.socket_port': port})
     cherrypy.engine.start()
-
-    while True:
-        time.sleep(5)

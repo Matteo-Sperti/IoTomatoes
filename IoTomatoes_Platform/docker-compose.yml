@@ -34,7 +34,6 @@ services:
     image: nginx
     volumes:
       - ./nginx.conf:/etc/nginx/nginx.conf
-      - ./index/:/var/www/data/:ro
     ports:
       - "8080:80"
     networks:
@@ -42,6 +41,20 @@ services:
     depends_on:
       - resource_catalog
       - dashboard
+      - website
+      - localization
+
+  website:
+    image: website
+    build:
+      context: ./Website
+      dockerfile: Dockerfile
+    depends_on:
+      - dashboard
+    networks:
+      - internal
+    volumes:
+      - iotomatoes_supportpackage:/app/iotomatoes_supportpackage
 
   service_catalog:
     image: service_catalog
@@ -88,6 +101,8 @@ services:
       - TZ=Europe/Rome
     depends_on:
       - resource_catalog
+    ports:
+      - 1880:1880
     networks:
       - internal
     volumes:

@@ -49,6 +49,7 @@ class SimDevice(IoTDevice):
 def sigterm_handler(signal, frame):
     """Handler for the SIGTERM signal. It closes the MQTT client and the sensor."""
 
+    IoTSensor._Ambient.stop()
     IoTSensor.close()
     print("Device stopped")
 

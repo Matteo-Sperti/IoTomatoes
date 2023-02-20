@@ -1,10 +1,5 @@
 version: '3.4'
 
-volumes:
-  iotomatoes_supportpackage:
-    name: iotomatoes_supportpackage
-    external: true
-
 services:
   device1:
     image: device1
@@ -12,8 +7,6 @@ services:
       context: .
       dockerfile: ./Device1/Dockerfile
     network_mode: "bridge"
-    volumes:
-      - iotomatoes_supportpackage:/app/iotomatoes_supportpackage
 
   device2:
     image: device2
@@ -21,8 +14,6 @@ services:
       context: .
       dockerfile: ./Device2/Dockerfile
     network_mode: "bridge"
-    volumes:
-      - iotomatoes_supportpackage:/app/iotomatoes_supportpackage
 
   device3:
     image: device3
@@ -30,8 +21,6 @@ services:
       context: .
       dockerfile: ./Device3/Dockerfile
     network_mode: "bridge"
-    volumes:
-      - iotomatoes_supportpackage:/app/iotomatoes_supportpackage
 
   device4:
     image: device4
@@ -39,8 +28,6 @@ services:
       context: .
       dockerfile: ./Device4/Dockerfile
     network_mode: "bridge"
-    volumes:
-      - iotomatoes_supportpackage:/app/iotomatoes_supportpackage
 
   device5:
     image: device5
@@ -48,8 +35,6 @@ services:
       context: .
       dockerfile: ./Device5/Dockerfile
     network_mode: "bridge"
-    volumes:
-      - iotomatoes_supportpackage:/app/iotomatoes_supportpackage
 
   truck1:
     image: truck1
@@ -57,8 +42,6 @@ services:
       context: .
       dockerfile: ./Truck1/Dockerfile
     network_mode: "bridge"
-    volumes:
-      - iotomatoes_supportpackage:/app/iotomatoes_supportpackage
 
   truck2:
     image: truck2
@@ -66,5 +49,3 @@ services:
       context: .
       dockerfile: ./Truck2/Dockerfile
     network_mode: "bridge"
-    volumes:
-      - iotomatoes_supportpackage:/app/iotomatoes_supportpackage

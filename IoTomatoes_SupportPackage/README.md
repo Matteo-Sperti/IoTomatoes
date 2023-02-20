@@ -28,7 +28,7 @@ Moroever it add some noise to the ambient conditions to simulate the real condit
 
 ### GPSgenerator
 
-This python class generates a tuple of coordinates (latitude, longitude) according for simulate the GPS position of a tractor. It exploits a simple random walk algorithm to generate the coordinates. The coordinates are generated starting from the company's location.
+This python class generates a tuple of coordinates (latitude, longitude) in order to simulate the GPS position of a tractor. It exploits a simple random walk algorithm to generate the coordinates. The coordinates are generated starting from the company's location.
 
 **[Code >>](https://github.com/Matteo-Sperti/IoTomatoes_SupportPackage/src/GPSgenerator.py)**
 
@@ -40,7 +40,7 @@ This python module contains some useful functions to check the devices status.
 
 ### BaseResource
 
-This python module contains the class for the base resource of the platform. It provides the function to construct the resource dictionary and to interact with the catalog of the platform. 
+This python module contains the class for the base resource of the platform. It provides the functionalities to construct the resource dictionary and to interact with the catalog of the platform. 
 
 **[Code >>](https://github.com/Matteo-Sperti/IoTomatoes_SupportPackage/src/BaseResource.py)**
 
@@ -52,7 +52,7 @@ This python module contains the class for the base service of the platform. It p
 
 ### ItemInfo
 
-This python module contains useful functions to get information from a dictionary in the platform according to the specification of the catalog.
+This python module contains useful functions to get informations from a dictionary in the platform according to the specification of the catalog.
 It also contains the class for constructing the information dictionary of a device starting from few parameters.
 
 **[Code >>](https://github.com/Matteo-Sperti/IoTomatoes_SupportPackage/src/ItemInfo.py)**

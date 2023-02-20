@@ -24,6 +24,7 @@ class AmbientSimulator():
         self.baseTopic = f"{CompanyName}/{fieldNumber}"
         self.fieldNumber = fieldNumber
         self.UpdateThread = MyThread(self.update, 5)
+        self.startMQTT()
 
     def stop(self):
         """Stop the thread that updates the values of the sensors"""
@@ -93,7 +94,6 @@ class AmbientSimulator():
         """
 
         self.MQTTclientID = f"AmbientSimulator_{random.randint(0,1000)}"
-        self._isSubscriber = True
         # create an instance of paho.mqtt.client
         self._paho_mqtt = PahoMQTT.Client(self.MQTTclientID, True)
         # register the callback
@@ -127,7 +127,7 @@ class AmbientSimulator():
         if state == 0:
             self.setActuator(actuator_topic, False)
         elif state == 1:
-            self.setActuator(actuator_topic, False)
+            self.setActuator(actuator_topic, True)
 
     def stopMQTT(self):
         """Stop the endpoint."""

@@ -5,13 +5,6 @@ networks:
     driver: bridge
 
 volumes:
-  iotomatoes_supportpackage:
-    name: iotomatoes_supportpackage
-    driver: local
-    driver_opts:
-      type: none
-      device: /home/matte/Desktop/PoliTO/ProgrammingIOT/IoTomatoes/IoTomatoes_SupportPackage/src/iotomatoes_supportpackage/
-      o: bind
   node-red-data: 
   mosquitto-data:
   mosquitto-log:
@@ -53,8 +46,6 @@ services:
       - dashboard
     networks:
       - internal
-    volumes:
-      - iotomatoes_supportpackage:/app/iotomatoes_supportpackage
 
   service_catalog:
     image: service_catalog
@@ -63,8 +54,6 @@ services:
       dockerfile: Dockerfile
     networks:
       - internal
-    volumes:
-      - iotomatoes_supportpackage:/app/iotomatoes_supportpackage
 
   resource_catalog:
     image: resource_catalog
@@ -74,8 +63,6 @@ services:
     depends_on:
       - service_catalog
       - mosquitto
-    volumes:
-      - iotomatoes_supportpackage:/app/iotomatoes_supportpackage
     networks:
       - internal
 
@@ -86,8 +73,6 @@ services:
       dockerfile: Dockerfile
     depends_on:
       - resource_catalog
-    volumes:
-      - iotomatoes_supportpackage:/app/iotomatoes_supportpackage
     networks:
       - internal
 
@@ -101,8 +86,6 @@ services:
       - TZ=Europe/Rome
     depends_on:
       - resource_catalog
-    ports:
-      - 1880:1880
     networks:
       - internal
     volumes:
@@ -117,8 +100,6 @@ services:
       - resource_catalog
     networks:
       - internal
-    volumes:
-      - iotomatoes_supportpackage:/app/iotomatoes_supportpackage
 
   weather_forecast:
     image: weather_forecast
@@ -129,8 +110,6 @@ services:
       - resource_catalog
     networks:
       - internal
-    volumes:
-      - iotomatoes_supportpackage:/app/iotomatoes_supportpackage
 
   smart_irrigation:
     image: smart_irrigation
@@ -142,8 +121,6 @@ services:
       - weather_forecast
     networks:
       - internal
-    volumes:
-      - iotomatoes_supportpackage:/app/iotomatoes_supportpackage
 
   smart_lighting:
     image: smart_lighting
@@ -155,8 +132,6 @@ services:
       - weather_forecast
     networks:
       - internal
-    volumes:
-      - iotomatoes_supportpackage:/app/iotomatoes_supportpackage
 
   fault_detection:
     image: fault_detection
@@ -167,8 +142,6 @@ services:
       - resource_catalog
     networks:
       - internal
-    volumes:
-      - iotomatoes_supportpackage:/app/iotomatoes_supportpackage
 
   consumption_manager:
     image: consumption_manager
@@ -179,8 +152,6 @@ services:
       - resource_catalog
     networks:
       - internal
-    volumes:
-      - iotomatoes_supportpackage:/app/iotomatoes_supportpackage
 
   localization:
     image: localization
@@ -188,11 +159,9 @@ services:
       context: ./Localization
       dockerfile: Dockerfile
     depends_on:
-      - resource_catalog
+      - mongodb_connector
     networks:
       - internal
-    volumes:
-      - iotomatoes_supportpackage:/app/iotomatoes_supportpackage
 
   data_visualizer:
     image: data_visualizer
@@ -203,5 +172,3 @@ services:
       - mongodb_connector
     networks:
       - internal
-    volumes:
-      - iotomatoes_supportpackage:/app/iotomatoes_supportpackage

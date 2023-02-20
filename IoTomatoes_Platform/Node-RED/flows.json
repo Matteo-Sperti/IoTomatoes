@@ -712,15 +712,6 @@
         "className": ""
     },
     {
-        "id": "4bed3390.45d6dc",
-        "type": "ui_tab",
-        "name": "Home",
-        "icon": "dashboard",
-        "order": 1,
-        "disabled": false,
-        "hidden": false
-    },
-    {
         "id": "09991aed2096e866",
         "type": "function",
         "z": "54c6c3bfbd6d9993",
@@ -4228,7 +4219,7 @@
         "order": 2,
         "width": "7",
         "height": "7",
-        "format": "<div style=\"justify-content: center; align-items: center;\">\n    <iframe id=\"{{'my_'+$id}}\" src=\"\" width=\"360px\" height=\"360px\" frameBorder=\"0\"></iframe>\n</div>\n\n<script>\n    (function(scope) {\n    scope.$watch('msg', function(msg) {\n        if (msg) {\n            $(\"#my_\"+scope.$id).attr(\"src\", `${msg.payload}`);\n        }\n    });\n})(scope);\n</script>",
+        "format": "<div style=\"justify-content: center; align-items: center;\">\n    <iframe id=\"{{'my_'+$id}}\" src=\"{{msg.payload}}\" width=\"360px\" height=\"360px\" frameBorder=\"0\"></iframe>\n</div>\n\n<script>\n    (function(scope) {\n    scope.$watch('msg', function(msg) {\n        if (msg) {\n            $(\"#my_\"+scope.$id).attr(\"src\", `${msg.payload}`);\n        }\n    });\n})(scope);\n</script>",
         "storeOutMessages": true,
         "fwdInMessages": true,
         "resendOnRefresh": true,
@@ -4237,9 +4228,7 @@
         "x": 1010,
         "y": 800,
         "wires": [
-            [
-                "125679bb4d7c6496"
-            ]
+            []
         ]
     },
     {
@@ -5983,22 +5972,6 @@
         "statusType": "auto",
         "x": 900,
         "y": 940,
-        "wires": []
-    },
-    {
-        "id": "125679bb4d7c6496",
-        "type": "debug",
-        "z": "54c6c3bfbd6d9993",
-        "name": "debug 3",
-        "active": true,
-        "tosidebar": true,
-        "console": false,
-        "tostatus": false,
-        "complete": "false",
-        "statusVal": "",
-        "statusType": "auto",
-        "x": 1240,
-        "y": 860,
         "wires": []
     }
 ]

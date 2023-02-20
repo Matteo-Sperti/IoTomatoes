@@ -43,8 +43,6 @@ Moreover it is suggested to install the support package [IoTomatoes_SupportPacka
 
 - the [Doc](./Doc/README.md) folder: it contains some documentation about the project;
 
-- the [Tests](./Tests/README.md) folder: it contains some tests for the IoT platform.
-
 # Disclaimer
 
 This project is a research project and it is not intended for commercial use. The authors are not responsible for any damage caused by the use of this software. The security of the IoT platform is not guaranteed as it is not the main focus of the project.

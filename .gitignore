@@ -2,3 +2,4 @@ IoTomatoes_Platform/ServiceCatalog/ServiceCatalogSettings.json
 .vscode/
 __pycache__/
 pyrightconfig.json
+TotalListener.py

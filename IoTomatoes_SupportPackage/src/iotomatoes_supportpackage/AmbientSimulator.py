@@ -7,7 +7,7 @@ noiseAmplitude = 1
 
 
 class AmbientSimulator():
-    def __init__(self, CompanyName: str, fieldNumber: int, broker: str, port: int = 1883):
+    def __init__(self, CompanyName: str, fieldNumber: int, brokerIP: str, port: int = 1883):
         """Simulates the ambient. Initialize the values of the sensors 
         and the actuators"""
 
@@ -19,7 +19,7 @@ class AmbientSimulator():
         self._led = False
         self._pump = False
 
-        self.broker = broker
+        self.broker = brokerIP
         self.port = port
         self.baseTopic = f"{CompanyName}/{fieldNumber}"
         self.fieldNumber = fieldNumber

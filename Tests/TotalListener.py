@@ -9,7 +9,7 @@ brokerPort = 1883
 class Listener():
     def __init__(self):
         self._broker, self._port = brokerIP, brokerPort
-        self.topic = "+/Consumption"
+        self.topic = "#"
 
     def stop(self):
         self._paho_mqtt.unsubscribe(self.topic)

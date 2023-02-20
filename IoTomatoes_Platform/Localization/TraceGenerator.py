@@ -60,7 +60,7 @@ class TraceGenerator(BaseService):
         LonCenter = sum([dict_[id]["longitude"]
                         for id in dict_.keys()]) / len(dict_.keys())
 
-        map = folium.Map(location=[LatCenter, LonCenter], zoom_start=15, width=360, height=360)
+        map = folium.Map(location=[LatCenter, LonCenter], zoom_start=12, width=360, height=360)
         for key in dict_.keys():
             folium.Marker([dict_[key]["latitude"], dict_[key]
                            ["longitude"]], popup="Truck " + key).add_to(map)

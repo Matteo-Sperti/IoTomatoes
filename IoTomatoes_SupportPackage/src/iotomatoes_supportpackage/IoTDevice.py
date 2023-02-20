@@ -83,7 +83,7 @@ class IoTDevice(BaseResource):
                     if state == 0:
                         self._Actuator.setActuator(actuator_topic, False)
                     elif state == 1:
-                        self._Actuator.setActuator(actuator_topic, False)
+                        self._Actuator.setActuator(actuator_topic, True)
                     else:
                         print(
                             f"Resource {self.ID}: {actuator_topic} state not valid")

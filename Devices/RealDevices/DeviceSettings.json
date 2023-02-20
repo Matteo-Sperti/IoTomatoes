@@ -3,6 +3,8 @@
     "fieldNumber" : 1,
     "isSensor" : true,
     "measureType" : ["temperature", "humidity"],
+    "isActuator" : true,
+    "actuatorType" : ["pump"],
     "CompanyName" : "PatataNovella",
     "Location" : {
         "latitude" : 45.02,
@@ -10,5 +12,6 @@
     },
     "IoTomatoes_url" : "http://172.20.10.3:8080",
     "measureTimeInterval" : 5,
-    "PIN_IN" : 17
+    "PIN_IN" : 17,
+    "PIN_OUT" : 22
 }

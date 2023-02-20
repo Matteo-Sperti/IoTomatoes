@@ -1,6 +1,7 @@
 import json
 import time
 import Adafruit_DHT
+import RPi.GPIO as GPIO
 
 from iotomatoes_supportpackage import IoTDevice
 
@@ -13,9 +14,15 @@ class RasPySensor(IoTDevice):
         the MQTT client, it will register the sensor to the ResourceCatalog and to the broker 
         and it will subscribe to the topics specified in the ResourceCatalog."""
 
-        super().__init__(DeviceInfo, sensor=self)
+        self.pinIN = settings["PIN_IN"]
+        self.pinOUT = settings["PIN_OUT"]
 
-        self.pin = settings["PIN_IN"]
+        GPIO.setmode(GPIO.BOARD)
+        GPIO.setwarnings(False)
+        GPIO.setup(self.pinOUT, GPIO.OUT)
+
+        super().__init__(DeviceInfo, sensor=self, actuator=self)
+
 
     def get_temperature(self):
         """This function is called periodically in order to get the sensor readings.
@@ -25,17 +32,23 @@ class RasPySensor(IoTDevice):
 
         # Try to grab a sensor reading.  Use the read_retry method which will retry up
         # to 15 times to get a sensor reading (waiting 2 seconds between each retry).
-        humidity, temperature = Adafruit_DHT.read_retry(sensor, self.pin)
+        humidity, temperature = Adafruit_DHT.read_retry(sensor, self.pinIN)
 
         return temperature
 
     def get_humidity(self):
         # Try to grab a sensor reading.  Use the read_retry method which will retry up
         # to 15 times to get a sensor reading (waiting 2 seconds between each retry).
-        humidity, temperature = Adafruit_DHT.read_retry(sensor, self.pin)
+        humidity, temperature = Adafruit_DHT.read_retry(sensor, self.pinIN)
 
         return humidity
 
+    def setActuator(self, actuator: str, state: bool):
+        """This function is used to set the state of an actuator in the AmbientSimulator."""
+
+        if actuator == self.actuatorType[0]:
+            print(f"Resource {self.ID}: {actuator} turned {'ON' if state else 'OFF'}\n")
+            GPIO.output(self.pinOUT,state)
 
 if __name__ == "__main__":
     try:

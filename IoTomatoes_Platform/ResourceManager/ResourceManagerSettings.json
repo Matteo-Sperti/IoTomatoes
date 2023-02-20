@@ -1,0 +1,8 @@
+{
+    "ServiceCatalog_url" : "http://service_catalog:8080",
+    "serviceName" : "resource_manager",
+    "availableServices" : [
+        "REST"
+    ],
+    "ControlPeriod": 600
+}

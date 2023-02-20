@@ -10,5 +10,7 @@
             "subscribedTopics": ["+/+/+/led", "+/+/+/pump"],
             "publishedTopics": ["Notifications"]
         }
-    ]
+    ],
+    "ResourceManager_ServiceName" : "resource_manager",
+    "ControlPeriod" : 60
 }

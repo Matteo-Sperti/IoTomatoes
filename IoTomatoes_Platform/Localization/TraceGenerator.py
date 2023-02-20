@@ -4,6 +4,7 @@ import folium
 import cherrypy
 import signal
 import requests
+import base64
 
 from iotomatoes_supportpackage import BaseService, web_exception, setREST
 
@@ -25,10 +26,10 @@ class TraceGenerator(BaseService):
         self.gpx_template = """<?xml version="1.0" encoding="UTF-8"?>
 		<gpx version="1.1" creator="Python GPX Generator">
 			<trk>
-                <trkseg>
-                    {trackpoints}
-                </trkseg>
-		    </trk>
+				<trkseg>
+					{trackpoints}
+				</trkseg>
+			</trk>
 		</gpx>"""
 
     def TrucksPosition(self, CompanyName: str):
@@ -40,7 +41,7 @@ class TraceGenerator(BaseService):
         Returns a dictionary containing a base64 encoded image.
         """
 
-        fileNameHtlm = "mapPositions.html"
+        fileNameHtml = "mapPositions.html"
         try:
             response = requests.get(
                 f"{self.MongoDbUrl}/{CompanyName}/trucksPosition")
@@ -56,18 +57,19 @@ class TraceGenerator(BaseService):
             raise web_exception(500, "Error getting data from the database")
 
         LatCenter = sum([dict_[id]["latitude"]
-                        for id in dict_.keys()]) / len(dict_.keys())
+                         for id in dict_.keys()]) / len(dict_.keys())
         LonCenter = sum([dict_[id]["longitude"]
-                        for id in dict_.keys()]) / len(dict_.keys())
+                         for id in dict_.keys()]) / len(dict_.keys())
 
-        map = folium.Map(location=[LatCenter, LonCenter], zoom_start=12, width=360, height=360)
+        map = folium.Map(location=[LatCenter, LonCenter],
+                         zoom_start=12, width=360, height=360)
         for key in dict_.keys():
             folium.Marker([dict_[key]["latitude"], dict_[key]
                            ["longitude"]], popup="Truck " + key).add_to(map)
-        map.save(fileNameHtlm)
-        
-        return open(fileNameHtlm)
-    
+        map.save(fileNameHtml)
+
+        return open(fileNameHtml)
+
     def GenerateGPX(self, CompanyName: str, truckID: str):
         """Generate a GPX file from the trace of a truck.
 
@@ -77,8 +79,8 @@ class TraceGenerator(BaseService):
 
         Returns a dictionary containing a base64 encoded image.
         """
+        fileNameHtml = "mapTrace.html"
 
-        fileNameHtlm = "mapTrace.html"
         try:
             response = requests.get(
                 f"{self.MongoDbUrl}/{CompanyName}/{truckID}/trace")
@@ -101,20 +103,66 @@ class TraceGenerator(BaseService):
         gpx_file = self.gpx_template.format(trackpoints=trackpoints)
 
         gpx = gpxpy.parse(gpx_file)
-        first_point = gpx.tracks[0].segments[0].points[0]
-        map = folium.Map(
-            location=[first_point.latitude, first_point.longitude], zoom_start=15)
-        # Add GPX track as a polyline on the map
         lat_lons = [(p.latitude, p.longitude)
                     for p in gpx.tracks[0].segments[0].points]
+        averageLat = sum([x[0] for x in lat_lons])/len(lat_lons)
+        averageLon = sum([x[1] for x in lat_lons])/len(lat_lons)
+        map = folium.Map(
+            location=[averageLat, averageLon], zoom_start=15)
+
         folium.PolyLine(lat_lons, color='red',
-                        weight=2.5, opacity=1).add_to(map)
+                                        weight=2.5, opacity=1).add_to(map)
         folium.Marker([lat[-1], lon[-1]], popup="Truck " + truckID).add_to(map)
 
         # Show map
-        map.save(fileNameHtlm)
+        map.save(fileNameHtml)
+        returnString = self.PngConverter(fileNameHtml)
+        return returnString
 
-        return open(fileNameHtlm)
+    def PngConverter(self, fileNameHtml):
+        '''Convert a html file to a png file.\n
+        A html file is encoded in base64 and sent to the API through a POST request.\n
+        Arguments:\n
+                - `fileNameHtml (str)`: Name of the html file.\n
+                - `fileNamePng (str)`: Name of the png file.\n									'''
+
+        apiUrl = settings["API_url"]
+
+        htmlBase64 = base64.b64encode(open(fileNameHtml, "rb").read())
+        base64String = htmlBase64.decode("utf-8")
+        post_request_dict = {
+            "Parameters": [
+                {
+                    "Name": "File",
+                    "FileValue": {
+                            "Name": fileNameHtml,
+                            "Data": base64String
+                    }
+                },
+
+                {
+                    "Name": "StoreFile",
+                    "Value": False
+                }
+            ]
+        }
+        try:
+            response = requests.post(apiUrl,  json=post_request_dict)
+            response.raise_for_status()
+            responseDict = response.json()
+        except requests.exceptions.HTTPError as err:
+            if err.response.status_code == 401:
+                raise web_exception(401, "Authentication error")
+            elif err.response.status_code == 400:
+                raise web_exception(400, "Bad request")
+            elif err.response.status_code == 500:
+                raise web_exception(500, "Internal server error")
+            else:
+                raise web_exception(
+                    err.response.status_code, err.response.reason)
+
+        returnString = responseDict["Files"][0]["FileData"]
+        return returnString
 
 
 class LocalizationWebService(BaseService):

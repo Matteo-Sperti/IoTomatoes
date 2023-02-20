@@ -1044,14 +1044,16 @@ class Trace:
 
         try:
             res = requests.get(f"{url}/{self.CompanyName}/{TruckNumber}/trace")
+            print(f"{url}/{self.CompanyName}/{TruckNumber}/trace")
             res.raise_for_status()
-            htmlres = res.text
+            png64= res.text
         except:
             self._bot.sendMessage(
                 "Error in the connection with the Localization Service")
         else:
-            fileName = f"trace_{TruckNumber}.html"
-            with open(fileName, "w") as f:
-                f.write(htmlres)
-            with open(fileName, "rb") as fout:
-                self._bot.sendDocument(fout)
+            fileName = f"trace{TruckNumber}.png"
+            with open(fileName, "wb") as fh:
+                    fh.write(base64.b64decode(png64))
+            with open(fileName, "rb") as fh:
+                    self._bot.sendPhoto(fh)
+                

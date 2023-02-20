@@ -1,6 +1,7 @@
 import time
 import json
 import signal
+import requests
 
 from iotomatoes_supportpackage import BaseService
 import iotomatoes_supportpackage.DeviceManager as DM
@@ -18,8 +19,16 @@ class ConsumptionManager (BaseService):
             'msg': "",
             't': ""
         }
-        companyList = self.getCompaniesList()
-        self.deviceList = DM.createDeviceList(companyList, isActuator=True)
+        self.resourceManagerToCall = settings['ResourceManager_ServiceName']
+        resourceManager_url = self.getOtherServiceURL(self.resourceManagerToCall)
+        if resourceManager_url == None or resourceManager_url == "":
+            print("ERROR: resource manager service not found!")
+        try:
+            devices_data = requests.get(f'http://{self.resourceManagerToCall}/getActuators')
+            self.deviceList = devices_data.json()
+        except:
+            print("ERROR: resource manager service not available!")
+            
 
     def updateConsumption(self):
         """Calculate the consumption of the actuators for the passed hour and update the database"""
@@ -129,7 +138,18 @@ class ConsumptionManager (BaseService):
             self._MQTTClient.myPublish(
                 f"{CompanyName}/{self._MQTTClient.publishedTopics[0]}", msg)
         else:
-            DM.checkUpdate(self, True)
+            resourceManager_url = self.getOtherServiceURL(self.resourceManagerToCall)
+            if resourceManager_url == None or resourceManager_url == "":
+                print("ERROR: resource manager service not found!")
+            try:
+                status_data = requests.get(f'http://{self.resourceManagerToCall}/checkActuatorUpdates')
+                status = status_data.json()['status']
+                if status == True:
+                    devices_data = requests.get(f'http://{self.resourceManagerToCall}/getActuators')
+                    new_deviceList = devices_data.json()
+                    DM.compareLists(self, new_deviceList)
+            except:
+                print("ERROR: resource manager service not available!")
             check_actuator = DM.inList(ActuatorID, self.deviceList)
             if check_actuator.is_error:
                 msg = self._message.copy()
@@ -145,7 +165,6 @@ class ConsumptionManager (BaseService):
 
 def sigterm_handler(signal, frame):
     global run
-
     run = False
     cm.stop()
     print("ConsumptionManager stopped")
@@ -156,6 +175,7 @@ signal.signal(signal.SIGTERM, sigterm_handler)
 if __name__ == "__main__":
     try:
         settings = json.load(open('ConsumptionManagerSettings.json', 'r'))
+        ControlPeriod = settings['ControlPeriod']
         cm = ConsumptionManager(settings)
     except Exception as e:
         print(e)
@@ -164,4 +184,4 @@ if __name__ == "__main__":
         run = True
         while run:
             cm.updateConsumption()
-            time.sleep(60)
+            time.sleep(ControlPeriod)

@@ -7,17 +7,17 @@ Functions:\n
 	- inList (list of dict, int) -> bool\n
 	- compare_dicts (dict, dict, list of str) -> bool\n
 """
+keys_to_ignore = ['CompanyName', 'status', 'OnTime',
+                  'control', 'Consumption_kWh', 'lastMeasure', 'lastUpdate']
 
 
-def createDeviceList(companyList: list, isActuator: bool = False):
+def createDeviceList(companyList: list):
     """Create a list of all devices integrating informations about 
     the last time a message was received from a device
-
     Arguments:
     - `companyList (list of dict)`: List of all companies and their devices.
     - `isActuator (bool)`: True if the list should contain only actuators, 
     False if the list should contain only sensors
-
     Return:
     - `deviceList (list of dict)`: List of all devices updated
     """
@@ -25,36 +25,49 @@ def createDeviceList(companyList: list, isActuator: bool = False):
     deviceList = []
     for comp in companyList:
         for dev in comp['devicesList']:
-            if dev['isActuator'] and isActuator:
+            if dev['isActuator']:
                 deviceList.append({**dev, **{'CompanyName': comp['CompanyName'],
                                              'status': 'OFF',
                                              'OnTime': 0,
                                              'control': False,
                                              'Consumption_kWh': 0}})
-            elif dev['isSensor'] and not isActuator:
-                deviceList.append({**dev, **{'lastMeasure': None,
-                                             'CompanyName': comp['CompanyName']}})
+            elif dev['isSensor']:
+                deviceList.append({**dev, **{'CompanyName': comp['CompanyName'],
+                                             'lastMeasure': None}})
+            elif dev['isActuator'] & dev['isSensor']:
+                deviceList.append({**dev, **{'CompanyName': comp['CompanyName'],
+                                             'lastMeasure': None,
+                                             'status': 'OFF',
+                                             'OnTime': 0,
+                                             'control': False,
+                                             'Consumption_kWh': 0}})
     return deviceList
 
 
-def checkUpdate(Connector, isActuator: bool):
+def filterList(deviceList: list, select: str):
+    if (select == 'Actuators'):
+        deviceList = list(filter(lambda d: d['isActuator'], deviceList))
+    elif (select == 'Sensors'):
+        deviceList = list(filter(lambda d: d['isSensor'], deviceList))
+
+    return deviceList
+
+
+def compareLists(Connector, new_deviceList, msg_on: bool = False):
     """Check if there are changes in the ResourceCatalog and update the device list"""
 
-    new_companyList = Connector.getCompaniesList()
-    new_deviceList = createDeviceList(new_companyList, isActuator=isActuator)
     for new_dev in new_deviceList:
-        if new_dev['isActuator'] == isActuator:
-            old_dev_iter = filter(lambda d: d.get(
-                'ID') == new_dev['ID'], Connector.deviceList)
+        old_dev_iter = filter(lambda d: d.get(
+            'ID') == new_dev['ID'], Connector.deviceList)
 
-            not_present = True
-            for d in old_dev_iter:
-                not_present = False
-                keys_to_ignore = selectKeys(isActuator)
-                if _different_dicts(d, new_dev, keys_to_ignore):
-                    for key in keys_to_ignore:
-                        new_dev[key] = d[key]
-                    d.update(new_dev)
+        not_present = True
+        for d in old_dev_iter:
+            not_present = False
+            if _different_dicts(d, new_dev, keys_to_ignore):
+                for key in keys_to_ignore:
+                    new_dev[key] = d[key]
+                d.update(new_dev)
+                if msg_on:
                     payload = Connector._message.copy()
                     payload['cn'] = new_dev['CompanyName']
                     payload['msg'] = f"Device {new_dev['ID']} updated."
@@ -63,8 +76,9 @@ def checkUpdate(Connector, isActuator: bool):
                     Connector._MQTTClient.myPublish(
                         f"{new_dev['CompanyName']}/{Connector._MQTTClient.publishedTopics[0]}", payload)
 
-            if not_present:
-                Connector.deviceList.append(new_dev)
+        if not_present:
+            Connector.deviceList.append(new_dev)
+            if msg_on:
                 payload = Connector._message.copy()
                 payload['cn'] = new_dev['CompanyName']
                 payload['msg'] = f"Device {new_dev['ID']} added."
@@ -74,24 +88,23 @@ def checkUpdate(Connector, isActuator: bool):
                     f"{new_dev['CompanyName']}/{Connector._MQTTClient.publishedTopics[0]}", payload)
 
     for old_dev in Connector.deviceList:
-        if old_dev['ID'] not in [d['ID'] for d in new_deviceList] and old_dev['isActuator'] == isActuator:
+        if old_dev['ID'] not in [d['ID'] for d in new_deviceList]:
             Connector.deviceList.remove(old_dev)
-            payload = Connector._message.copy()
-            payload['cn'] = old_dev['CompanyName']
-            payload['msg'] = f"Device {old_dev['ID']} removed."
-            payload['msgType'] = 'Update'
-            payload['t'] = time.time()
-            Connector._MQTTClient.myPublish(
-                f"{old_dev['CompanyName']}/{Connector._MQTTClient.publishedTopics[0]}", payload)
+            if msg_on:
+                payload = Connector._message.copy()
+                payload['cn'] = old_dev['CompanyName']
+                payload['msg'] = f"Device {old_dev['ID']} removed."
+                payload['msgType'] = 'Update'
+                payload['t'] = time.time()
+                Connector._MQTTClient.myPublish(
+                    f"{old_dev['CompanyName']}/{Connector._MQTTClient.publishedTopics[0]}", payload)
 
 
 def inList(deviceID: int, deviceList: list):
     """Check if an actuator is in the list of the actuators
-
     Arguments:
     - `deviceID (int)`: ID of the device to check
     - `deviceList (list of dict)`: List of all devices
-
     Return: `CheckResult` object with:
     - `error (bool)`: ".is_error"
     - `message (str)`: ".message"
@@ -101,14 +114,7 @@ def inList(deviceID: int, deviceList: list):
     for dev in deviceList:
         if dev['ID'] == deviceID:
             return CheckResult(is_error=False)
-    return CheckResult(is_error=True, messageType="Error", message="Actuator not found")
-
-
-def selectKeys(isActuator: bool):
-    if isActuator:
-        return ['CompanyName', 'status', 'OnTime', 'control', 'Consumption_kWh', 'lastUpdate']
-    else:
-        return ['CompanyName', 'lastMeasure', 'lastUpdate']
+    return CheckResult(is_error=True, messageType="Error", message="Device not found")
 
 
 def _different_dicts(dict1, dict2, keys_to_ignore):

@@ -1,11 +1,12 @@
 {
     "serviceName": "localization",
-    "ServiceCatalog_url" : "http://service_catalog:8080",
+    "ServiceCatalog_url": "http://service_catalog:8080",
     "create_url": "http://api.openstreetmap.org/api/0.6/gpx/create",
     "view_url": "http://api.openstreetmap.org/api/0.6/trace",
     "password": "SW9Ub21hdG9lczpJb1RvbWF0b2Vz",
-    "MongoDB_ServiceName" : "mongodb_connector",
-
+    "MongoDB_ServiceName": "mongodb_connector",
+    "API_url": "https://v2.convertapi.com/convert/html/to/png?Secret=7C4I0XHwkGv2mpqg",
+ 
     "availableServices": [
         "REST"
     ]

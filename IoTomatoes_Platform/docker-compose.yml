@@ -133,13 +133,23 @@ services:
     networks:
       - internal
 
+  resource_manager:
+    image: resource_manager
+    build:
+      context: ./ResourceManager
+      dockerfile: Dockerfile
+    depends_on:
+      - resource_catalog
+    networks:
+      - internal
+
   fault_detection:
     image: fault_detection
     build:
       context: ./FaultDetection
       dockerfile: Dockerfile
     depends_on:
-      - resource_catalog
+      - resource_manager
     networks:
       - internal
 
@@ -149,7 +159,7 @@ services:
       context: ./ConsumptionManager
       dockerfile: Dockerfile
     depends_on:
-      - resource_catalog
+      - resource_manager
     networks:
       - internal
 

@@ -23,14 +23,27 @@ class FaultDetector(BaseService):
             't': ''
         }
         self.resourceManagerToCall = settings['ResourceManager_ServiceName']
+        self.deviceList = []
+        self.updateDeviceList()
+
+    def updateDeviceList(self):
+        """Get the list of actuators"""
+
         resourceManager_url = self.getOtherServiceURL(
             self.resourceManagerToCall)
         if resourceManager_url == None or resourceManager_url == "":
             print("ERROR: resource manager service not found!")
+            return
+
         try:
-            devices_data = requests.get(
-                f'{resourceManager_url}/getSensors')
-            self.deviceList = devices_data.json()
+            status_data = requests.get(
+                f'{resourceManager_url}/checkSensorUpdates')
+            status = status_data.json()['status']
+            if status == True:
+                devices_data = requests.get(
+                    f'{resourceManager_url}/getSensors')
+                new_deviceList = devices_data.json()
+                self.deviceList = new_deviceList
         except:
             print("ERROR: resource manager service not available!")
 
@@ -84,7 +97,8 @@ class FaultDetector(BaseService):
         """
         device = None
         if unit != self.thresholds[measureType]['unit']:
-            return DM.CheckResult(is_error=True, messageType="Error", message=f"Unit of measure '{unit}' of device {deviceID} not recognized.")
+            return DM.CheckResult(is_error=True, messageType="Error",
+                                  message=f"Unit of measure '{unit}' of device {deviceID} not recognized.")
 
         for dev in self.deviceList:
             if dev['ID'] == deviceID:
@@ -95,7 +109,7 @@ class FaultDetector(BaseService):
         if (measureType == 'position'):
             try:
                 position_data = requests.get(
-                    f"http://{self.ResourceCatalog_url}/{device['CompanyName']}/location")
+                    f"{self.ResourceCatalog_url}/{device['CompanyName']}/location")
                 max_latitude = position_data.json(
                 )['Location']['latitude']+self.thresholds['latitude']['max_value']
                 min_latitude = position_data.json(
@@ -106,15 +120,18 @@ class FaultDetector(BaseService):
                 )['Location']['longitude']+self.thresholds['longitude']['min_value']
             except:
                 print("ERROR: resource catalog not available!")
-                return DM.CheckResult(is_error=True, messageType="Error", message=f"Position of company {device['CompanyName']} not found.")
-            if (measure['latitude'] > max_latitude or measure['latitude'] < min_latitude) or (measure['longitude'] > max_longitude or measure['longitude'] < min_longitude):
+                return DM.CheckResult(is_error=True, messageType="Error",
+                                      message=f"Position of company {device['CompanyName']} not found.")
+            if (measure['latitude'] > max_latitude or measure['latitude'] < min_latitude) or \
+                    (measure['longitude'] > max_longitude or measure['longitude'] < min_longitude):
                 message = (f"Device {deviceID} is out of the defined range, possible fault!\n"
                            f"Value = {measure['latitude']}, {measure['longitude']} {unit}")
                 return DM.CheckResult(is_error=True, messageType="Warning", message=message,
                                       device_id=deviceID)
         else:
             if measureType not in device['measureType']:
-                return DM.CheckResult(is_error=True, messageType="Error", message=f"Measure type of device {deviceID} not recognized.")
+                return DM.CheckResult(is_error=True, messageType="Error",
+                                      message=f"Measure type of device {deviceID} not recognized.")
 
             min_value = self.thresholds[measureType]['min_value']
             max_value = self.thresholds[measureType]['max_value']
@@ -130,9 +147,11 @@ class FaultDetector(BaseService):
         return DM.CheckResult(is_error=False)
 
     def notify(self, topic, payload):
-        """Parse the topic received, check the device status and the measure and publish the alert messages if needed.\n
-                Subscribed TOPICS format:\n
-                        - CompanyName/Field/DeviceID/MeasureType
+        """Parse the topic received, check the device status and the measure 
+        and publish the alert messages if needed.
+
+        Subscribed TOPICS format:
+        - CompanyName/Field/DeviceID/MeasureType
         """
         topic_list = topic.split('/')
         measureType = topic_list[-1]
@@ -150,21 +169,7 @@ class FaultDetector(BaseService):
             self._MQTTClient.myPublish(
                 f"{CompanyName}/{self._MQTTClient.publishedTopics[0]}", msg)
         else:
-            resourceManager_url = self.getOtherServiceURL(
-                self.resourceManagerToCall)
-            if resourceManager_url == None or resourceManager_url == "":
-                print("ERROR: resource manager service not found!")
-            try:
-                status_data = requests.get(
-                    f'http://{self.resourceManagerToCall}/checkSensorUpdates')
-                status = status_data.json()['status']
-                if status == True:
-                    devices_data = requests.get(
-                        f'http://{self.resourceManagerToCall}/getSensors')
-                    new_deviceList = devices_data.json()
-                    DM.compareLists(self, new_deviceList)
-            except:
-                print("ERROR: resource manager service not available!")
+            self.updateDeviceList()
             sensor_check = DM.inList(deviceID, self.deviceList)
             measure_check = self.checkMeasure(
                 deviceID, measureType, measure, unit)
@@ -189,7 +194,9 @@ class FaultDetector(BaseService):
                 self.updateStatus(deviceID)
 
     def checkDeviceStatus(self):
-        DM.checkUpdate(self, isActuator=False)
+        """Check the status of all the devices in the deviceList and publish the alert messages if needed.
+        """
+        self.updateDeviceList()
         for dev in self.deviceList:
             status = self.checkStatus(dev)
             if status.is_error:
@@ -204,6 +211,9 @@ class FaultDetector(BaseService):
 
 
 def sigterm_handler(signal, frame):
+    """Handler for SIGTERM signal.
+    Stop the FaultDetection."""
+    
     global run
     run = False
     fd.stop()

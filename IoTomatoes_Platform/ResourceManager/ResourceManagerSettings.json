@@ -4,5 +4,5 @@
     "availableServices" : [
         "REST"
     ],
-    "ControlPeriod": 600
+    "ControlPeriod": 60
 }

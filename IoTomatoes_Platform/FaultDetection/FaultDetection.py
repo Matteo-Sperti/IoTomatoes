@@ -103,18 +103,23 @@ class FaultDetector(BaseService):
         - `message (str)`: ".message"
         - `topic (str)`: ".topic" 
         """
-        device = None
+
         if unit != self.thresholds[measureType]['unit']:
             return CheckResult(is_error=True, messageType="Error",
                                message=f"Unit of measure '{unit}' of device {deviceID} not recognized.")
 
+        if self.deviceList == []:
+            return CheckResult(is_error=False)
+        
+        device = None
         for dev in self.deviceList:
             if dev['ID'] == deviceID:
                 device = dev
                 break
         if not device:
             return CheckResult(is_error=True, messageType="Error", message="Device not found")
-        if (measureType == 'position'):
+        
+        if measureType == 'position':
             try:
                 position_data = requests.get(
                     f"{self.ResourceCatalog_url}/{device['CompanyName']}/location")

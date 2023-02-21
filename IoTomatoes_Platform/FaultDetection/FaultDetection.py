@@ -5,7 +5,7 @@ import signal
 import requests
 
 from iotomatoes_supportpackage import BaseService
-import iotomatoes_supportpackage.DeviceManager as DM
+from iotomatoes_supportpackage.CheckResult import CheckResult
 
 
 class FaultDetector(BaseService):
@@ -76,11 +76,11 @@ class FaultDetector(BaseService):
             elapsedTime = (currentTime - device['lastMeasure']).total_seconds()
             if elapsedTime > 300:
                 message = f"Device {device['ID']} has not sent a message for more than 5 minutes, possible fault!"
-                return DM.CheckResult(is_error=True, messageType="Warning", message=message,
-                                      device_id=device['ID'])
+                return CheckResult(is_error=True, messageType="Warning", message=message,
+                                   device_id=device['ID'])
             else:
-                return DM.CheckResult(is_error=False)
-        return DM.CheckResult(is_error=False)
+                return CheckResult(is_error=False)
+        return CheckResult(is_error=False)
 
     def checkMeasure(self, deviceID: int, measureType: str,  measure, unit: str):
         """Check if a measure is out of the thresholds.
@@ -97,15 +97,15 @@ class FaultDetector(BaseService):
         """
         device = None
         if unit != self.thresholds[measureType]['unit']:
-            return DM.CheckResult(is_error=True, messageType="Error",
-                                  message=f"Unit of measure '{unit}' of device {deviceID} not recognized.")
+            return CheckResult(is_error=True, messageType="Error",
+                               message=f"Unit of measure '{unit}' of device {deviceID} not recognized.")
 
         for dev in self.deviceList:
             if dev['ID'] == deviceID:
                 device = dev
                 break
         if not device:
-            return DM.CheckResult(is_error=True, messageType="Error", message="Device not found")
+            return CheckResult(is_error=True, messageType="Error", message="Device not found")
         if (measureType == 'position'):
             try:
                 position_data = requests.get(
@@ -120,31 +120,31 @@ class FaultDetector(BaseService):
                 )['Location']['longitude']+self.thresholds['longitude']['min_value']
             except:
                 print("ERROR: resource catalog not available!")
-                return DM.CheckResult(is_error=True, messageType="Error",
-                                      message=f"Position of company {device['CompanyName']} not found.")
+                return CheckResult(is_error=True, messageType="Error",
+                                   message=f"Position of company {device['CompanyName']} not found.")
             if (measure['latitude'] > max_latitude or measure['latitude'] < min_latitude) or \
                     (measure['longitude'] > max_longitude or measure['longitude'] < min_longitude):
                 message = (f"Device {deviceID} is out of the defined range, possible fault!\n"
                            f"Value = {measure['latitude']}, {measure['longitude']} {unit}")
-                return DM.CheckResult(is_error=True, messageType="Warning", message=message,
-                                      device_id=deviceID)
+                return CheckResult(is_error=True, messageType="Warning", message=message,
+                                   device_id=deviceID)
         else:
             if measureType not in device['measureType']:
-                return DM.CheckResult(is_error=True, messageType="Error",
-                                      message=f"Measure type of device {deviceID} not recognized.")
+                return CheckResult(is_error=True, messageType="Error",
+                                   message=f"Measure type of device {deviceID} not recognized.")
 
             min_value = self.thresholds[measureType]['min_value']
             max_value = self.thresholds[measureType]['max_value']
 
             if min_value is None or max_value is None:
-                return DM.CheckResult(is_error=True, messageType="Error", message="Thresholds not configured")
+                return CheckResult(is_error=True, messageType="Error", message="Thresholds not configured")
 
             if measure > max_value or measure < min_value:
                 message = (f"Device {deviceID} has sent a measure out of the thresholds, possible fault!\n"
                            f"Value = {measure} {unit}")
-                return DM.CheckResult(is_error=True, messageType="Warning", message=message,
-                                      device_id=deviceID)
-        return DM.CheckResult(is_error=False)
+                return CheckResult(is_error=True, messageType="Warning", message=message,
+                                   device_id=deviceID)
+        return CheckResult(is_error=False)
 
     def notify(self, topic, payload):
         """Parse the topic received, check the device status and the measure 
@@ -170,18 +170,22 @@ class FaultDetector(BaseService):
                 f"{CompanyName}/{self._MQTTClient.publishedTopics[0]}", msg)
         else:
             self.updateDeviceList()
-            sensor_check = DM.inList(deviceID, self.deviceList)
+            found = False
+            for dev in self.deviceList:
+                if dev['ID'] == deviceID:
+                    found = True
+
             measure_check = self.checkMeasure(
                 deviceID, measureType, measure, unit)
-            if sensor_check.is_error:
+            if not found:
                 msg = self._message.copy()
                 msg['t'] = time.time()
                 msg['cn'] = CompanyName
-                msg['msgType'] = sensor_check.messageType
-                msg['msg'] = sensor_check.message
+                msg['msgType'] = "Error"
+                msg['msg'] = f"Device {deviceID} not found"
                 self._MQTTClient.myPublish(
                     f"{CompanyName}/{self._MQTTClient.publishedTopics[0]}", msg)
-            if measure_check.is_error:
+            elif measure_check.is_error:
                 msg = self._message.copy()
                 msg['t'] = time.time()
                 msg['cn'] = CompanyName
@@ -190,7 +194,7 @@ class FaultDetector(BaseService):
                 self._MQTTClient.myPublish(
                     f"{CompanyName}/{self._MQTTClient.publishedTopics[0]}", msg)
 
-            if (measure_check.is_error and sensor_check.is_error) == False:
+            if not measure_check.is_error and found:
                 self.updateStatus(deviceID)
 
     def checkDeviceStatus(self):
@@ -213,7 +217,7 @@ class FaultDetector(BaseService):
 def sigterm_handler(signal, frame):
     """Handler for SIGTERM signal.
     Stop the FaultDetection."""
-    
+
     global run
     run = False
     fd.stop()

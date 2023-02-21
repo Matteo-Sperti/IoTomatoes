@@ -32,11 +32,11 @@ This python class generates a tuple of coordinates (latitude, longitude) in orde
 
 **[Code >>](https://github.com/Matteo-Sperti/IoTomatoes_SupportPackage/src/GPSgenerator.py)**
 
-### DeviceManager
+### CheckResoult
 
-This python module contains some useful functions to check the devices status.
+This python module contains the class for the check result of the platform. It provides the functionalities to construct the check result dictionary.
 
-**[Code >>](https://github.com/Matteo-Sperti/IoTomatoes_SupportPackage/src/DeviceManager.py)**
+**[Code >>](https://github.com/Matteo-Sperti/IoTomatoes_SupportPackage/src/CheckResult.py)**
 
 ### BaseResource
 

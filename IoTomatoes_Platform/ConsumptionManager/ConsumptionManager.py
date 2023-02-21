@@ -4,7 +4,7 @@ import signal
 import requests
 
 from iotomatoes_supportpackage import BaseService
-import iotomatoes_supportpackage.DeviceManager as DM
+from iotomatoes_supportpackage.CheckResult import CheckResult
 
 
 class ConsumptionManager (BaseService):
@@ -107,30 +107,27 @@ class ConsumptionManager (BaseService):
             self._MQTTClient.myPublish(
                 f"{CompanyName}/Consumption", message)
 
-    def updateStatus(self, actuatorID: int, command: str):
+    def updateStatus(self, dev : dict, command: str):
         """Update the status of the actuator, if it is turned OFF calculates its consumption.
 
         Arguments:
-        - `actuatorID (str)` : ID of the actuator
+        - `dev (dict)` : actuator
         - `command (str)` : Command sent to the actuator
         """
-        for dev in self.deviceList:
-            if dev['ID'] == actuatorID:
-                if command == 1:
-                    dev['status'] = 'ON'
-                    dev['OnTime'] = time.time()
-                    dev['control'] = True
-                    return DM.CheckResult(is_error=False)
-                elif command == 0:
-                    dev['status'] = 'OFF'
-                    # Calculate the consumption of a actuator by its mean power consumption and the time it was on
-                    dev['Consumption_kWh'] += round(
-                        (time.time() - dev['OnTime'])*dev['PowerConsumption_kW']/3600, 2)
-                    dev['OnTime'] = 0
-                    return DM.CheckResult(is_error=False)
-                else:
-                    return DM.CheckResult(is_error=True, messageType="Error", message="Command not recognized")
-        return DM.CheckResult(is_error=True, messageType="Error", message="Actuator not found.")
+        if command == 1:
+            dev['status'] = 'ON'
+            dev['OnTime'] = time.time()
+            dev['control'] = True
+            return CheckResult(is_error=False)
+        elif command == 0:
+            dev['status'] = 'OFF'
+            # Calculate the consumption of a actuator by its mean power consumption and the time it was on
+            dev['Consumption_kWh'] += round(
+                (time.time() - dev['OnTime'])*dev['PowerConsumption_kW']/3600, 2)
+            dev['OnTime'] = 0
+            return CheckResult(is_error=False)
+        else:
+            return CheckResult(is_error=True, messageType="Error", message="Command not recognized")
 
     def notify(self, topic, payload):
         """Parse the message received and control the topic
@@ -153,18 +150,21 @@ class ConsumptionManager (BaseService):
                 f"{CompanyName}/{self._MQTTClient.publishedTopics[0]}", msg)
         else:
             self.updateDeviceList()
-            check_actuator = DM.inList(ActuatorID, self.deviceList)
-            if check_actuator.is_error:
+            found = False
+            for dev in self.deviceList:
+                if dev['ID'] == ActuatorID:
+                    self.updateStatus(dev, command)
+                    found = True
+                    break
+            
+            if not found:
                 msg = self._message.copy()
                 msg['cn'] = CompanyName
-                msg['msg'] = check_actuator.message
-                msg['msgType'] = check_actuator.messageType
+                msg['msg'] = "Actuator not found"
+                msg['msgType'] = "Error"
                 msg['t'] = time.time()
                 self._MQTTClient.myPublish(
                     f"{CompanyName}/{self._MQTTClient.publishedTopics[0]}", msg)
-            else:
-                self.updateStatus(ActuatorID, command)
-
 
 def sigterm_handler(signal, frame):
     """Handler for the SIGTERM signal, stops the ConsumptionManager"""

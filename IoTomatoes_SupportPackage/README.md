@@ -5,7 +5,6 @@ Python Support package for the IoT platform for smart agriculture.
 ## Requirements
 
 - [Python 3.x](https://www.python.org/)
-- [NumPy](https://numpy.org/)
 - [paho-mqtt](https://www.eclipse.org/paho/index.php?page=clients/python/index.php)
 - [requests](https://requests.readthedocs.io/en/latest/#)
 

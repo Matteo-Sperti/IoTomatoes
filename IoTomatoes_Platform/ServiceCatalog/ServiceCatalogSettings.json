@@ -1,0 +1,11 @@
+{
+    "owner": "IoTomatoes",
+    "CatalogName": "ServiceCatalog",
+    "broker": {
+        "IP": "mosquitto",
+        "port": 1883
+    },
+    "telegramToken": "5984202488:AAF_w6OEBQRdypbdP3ziU50fOXurUyuf_rU",
+    "filename": "ServiceCatalog.json",
+    "autoDeleteTime": 120
+}

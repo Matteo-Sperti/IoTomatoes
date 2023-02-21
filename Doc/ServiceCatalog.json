@@ -1,0 +1,180 @@
+{
+    "owner": "IoTomatoes",
+    "CatalogName": "ServiceCatalog",
+    "broker": {
+        "IP": "mosquitto",
+        "port": 1883
+    },
+    "telegramToken": "<telegramToken>",
+    "lastUpdate": 1676717544.1591444,
+    "servicesList": [
+        {
+            "ID": 1,
+            "serviceName": "resource_catalog",
+            "availableServices": [
+                "REST"
+            ],
+            "servicesDetails": [
+                {
+                    "serviceType": "REST",
+                    "serviceIP": "http://172.20.0.4:8080"
+                }
+            ],
+            "lastUpdate": 1676717484.7518282
+        },
+        {
+            "ID": 2,
+            "serviceName": "consumption_manager",
+            "availableServices": [
+                "MQTT"
+            ],
+            "servicesDetails": [
+                {
+                    "serviceType": "MQTT",
+                    "subscribedTopics": [
+                        "+/+/+/led",
+                        "+/+/+/pump"
+                    ],
+                    "publishedTopics": [
+                        "Notifications"
+                    ]
+                }
+            ],
+            "lastUpdate": 1676717484.9112144
+        },
+        {
+            "ID": 3,
+            "serviceName": "fault_detection",
+            "availableServices": [
+                "MQTT"
+            ],
+            "servicesDetails": [
+                {
+                    "serviceType": "MQTT",
+                    "subscribedTopics": [
+                        "+/+/+/temperature",
+                        "+/+/+/humidity",
+                        "+/+/+/light",
+                        "+/+/+/soilMoisture"
+                    ],
+                    "publishedTopics": [
+                        "Notifications"
+                    ]
+                }
+            ],
+            "lastUpdate": 1676717484.8834896
+        },
+        {
+            "ID": 5,
+            "serviceName": "weather_forecast",
+            "availableServices": [
+                "REST"
+            ],
+            "servicesDetails": [
+                {
+                    "serviceType": "REST",
+                    "serviceIP": "http://172.20.0.8:8080"
+                }
+            ],
+            "lastUpdate": 1676717485.613648
+        },
+        {
+            "ID": 7,
+            "serviceName": "mongodb_connector",
+            "availableServices": [
+                "MQTT",
+                "REST"
+            ],
+            "servicesDetails": [
+                {
+                    "serviceType": "MQTT",
+                    "subscribedTopics": [
+                        "#"
+                    ],
+                    "publishedTopics": []
+                },
+                {
+                    "serviceType": "REST",
+                    "serviceIP": "http://172.20.0.9:8080"
+                }
+            ],
+            "lastUpdate": 1676717486.0423336
+        },
+        {
+            "ID": 8,
+            "serviceName": "smart_irrigation",
+            "availableServices": [
+                "MQTT"
+            ],
+            "servicesDetails": [],
+            "lastUpdate": 1676717486.261086
+        },
+        {
+            "ID": 9,
+            "serviceName": "localization",
+            "availableServices": [
+                "REST"
+            ],
+            "servicesDetails": [
+                {
+                    "serviceType": "REST",
+                    "serviceIP": "http://172.20.0.7:8080"
+                }
+            ],
+            "lastUpdate": 1676717486.2277732
+        },
+        {
+            "ID": 10,
+            "serviceName": "Dashboard",
+            "availableServices": [
+                "MQTT",
+                "REST"
+            ],
+            "servicesDetails": [
+                {
+                    "serviceType": "MQTT",
+                    "subscribedTopics": [
+                        "#"
+                    ],
+                    "publishedTopics": []
+                },
+                {
+                    "serviceType": "REST",
+                    "serviceIP": "http://dashboard:1880"
+                }
+            ],
+            "lastUpdate": 1676717486.2489188
+        },
+        {
+            "ID": 12,
+            "serviceName": "telegram_bot",
+            "availableServices": [
+                "MQTT"
+            ],
+            "servicesDetails": [
+                {
+                    "serviceType": "MQTT",
+                    "subscribedTopics": [
+                        "+/Notifications/#"
+                    ],
+                    "publishedTopics": []
+                }
+            ],
+            "lastUpdate": 1676717542.547444
+        },
+        {
+            "ID": 14,
+            "serviceName": "data_visualizer",
+            "availableServices": [
+                "REST"
+            ],
+            "servicesDetails": [
+                {
+                    "serviceType": "REST",
+                    "serviceIP": "http://172.20.0.12:8080"
+                }
+            ],
+            "lastUpdate": 1676717543.5218594
+        }
+    ]
+}

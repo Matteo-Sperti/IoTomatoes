@@ -1,0 +1,4 @@
+{
+    "ServiceCatalog_url" : "http://service_catalog:8080",
+    "serviceName": "website"
+}

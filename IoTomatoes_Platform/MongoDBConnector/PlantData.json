@@ -1,0 +1,137 @@
+{
+    "potatoes": {
+        "lightLimit": {
+            "min": 20000,
+            "max": 60000
+        },
+        "soilMoistureLimit": {
+            "min": 70,
+            "max": 80,
+            "unit": "%"
+        },
+        "precipitationLimit": {
+            "max": 3,
+            "unit": "mm"
+        }
+    },
+    "tomatoes": {
+        "lightLimit": {
+            "min": 29000,
+            "max": 68000
+        },
+        "soilMoistureLimit": {
+            "min": 60,
+            "max": 75,
+            "unit": "%"
+        },
+        "precipitationLimit": {
+            "max": 1,
+            "unit": "mm"
+        }
+    },
+    "carrots": {
+        "lightLimit": {
+            "min": 35000,
+            "max": 70000
+        },
+        "soilMoistureLimit": {
+            "min": 65,
+            "max": 80,
+            "unit": "%"
+        },
+        "precipitationLimit": {
+            "max": 3,
+            "unit": "mm"
+        }
+    },
+    "eggplant": {
+        "lightLimit": {
+            "min": 36000,
+            "max": 62000
+        },
+        "soilMoistureLimit": {
+            "min": 55,
+            "max": 75,
+            "unit": "%"
+        },
+        "precipitationLimit": {
+            "max": 4,
+            "unit": "mm"
+        }
+    },
+    "corn": {
+        "lightLimit": {
+            "min": 22000,
+            "max": 47000
+        },
+        "soilMoistureLimit": {
+            "min": 60,
+            "max": 75,
+            "unit": "%"
+        },
+        "precipitationLimit": {
+            "max": 3,
+            "unit": "mm"
+        }
+    },
+    "garlic": {
+        "lightLimit": {
+            "min": 35000,
+            "max": 60000
+        },
+        "soilMoistureLimit": {
+            "min": 70,
+            "max": 85,
+            "unit": "%"
+        },
+        "precipitationLimit": {
+            "max": 5,
+            "unit": "mm"
+        }
+    },
+    "onion": {
+        "lightLimit": {
+            "min": 20000,
+            "max": 55000
+        },
+        "soilMoistureLimit": {
+            "min": 70,
+            "max": 85,
+            "unit": "%"
+        },
+        "precipitationLimit": {
+            "max": 2,
+            "unit": "mm"
+        }
+    },
+    "lettuce": {
+        "lightLimit": {
+            "min": 30000,
+            "max": 65000
+        },
+        "soilMoistureLimit": {
+            "min": 65,
+            "max": 70,
+            "unit": "%"
+        },
+        "precipitationLimit": {
+            "max": 4,
+            "unit": "mm"
+        }
+    },
+    "default": {
+        "lightLimit": {
+            "min": 15000,
+            "max": 90000
+        },
+        "soilMoistureLimit": {
+            "min": 30,
+            "max": 80,
+            "unit": "%"
+        },
+        "precipitationLimit": {
+            "max": 5,
+            "unit": "mm"
+        }
+    }
+}

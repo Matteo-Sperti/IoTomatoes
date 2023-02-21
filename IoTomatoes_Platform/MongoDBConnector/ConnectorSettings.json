@@ -1,0 +1,19 @@
+{
+    "ServiceCatalog_url" : "http://service_catalog:8080",
+    "serviceName": "mongodb_connector",
+    "PlantDatabaseName": "PlantData.json",
+    "PointsPerGraph": 7,
+    "availableServices": [
+        "MQTT",
+        "REST"
+    ],
+    "servicesDetails": [
+        {
+            "serviceType": "MQTT",
+            "subscribedTopics": [
+                "#"
+            ]
+        }
+    ],
+    "MongoDB_Url": "mongodb+srv://admin:admin@cluster0.lzvxrr9.mongodb.net/test?retryWrites=true"
+}

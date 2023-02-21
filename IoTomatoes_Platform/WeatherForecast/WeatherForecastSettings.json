@@ -1,0 +1,40 @@
+{
+    "ServiceCatalog_url" : "http://service_catalog:8080",
+    "WeatherUrl": "https://api.open-meteo.com/v1/forecast",
+    "serviceName": "weather_forecast",
+    "IrrigationDict": {
+        "hourly": [
+            "relativehumidity_2m",
+            "dewpoint_2m",
+            "precipitation",
+            "soil_temperature_6cm",
+            "soil_moisture_3_9cm"
+        ],
+        "daily": [
+            "precipitation_sum",
+            "precipitation_hours"
+        ],
+        "timezone": "auto"
+    },
+    "LightingDict":{
+        "hourly": [
+            "shortwave_radiation",
+            "direct_radiation",
+            "diffuse_radiation",
+            "direct_normal_irradiance",
+            "terrestrial_radiation",
+            "shortwave_radiation_instant",
+            "direct_radiation_instant",
+            "diffuse_radiation_instant",
+            "direct_normal_irradiance_instant",
+            "terrestrial_radiation_instant",
+            "cloudcover"
+        ],
+        "daily": [
+            "sunrise",
+            "sunset",
+            "shortwave_radiation_sum"
+        ],
+        "timezone": "auto"
+    }
+}

@@ -1,0 +1,16 @@
+{
+    "ServiceCatalog_url" : "http://service_catalog:8080",
+    "serviceName" : "telegram_bot",
+    "availableServices" : [
+        "MQTT"
+    ],
+    "servicesDetails" : [
+        {
+            "serviceType": "MQTT",
+            "subscribedTopics": ["+/Notifications/#"]
+        }
+    ],
+    "DataVisualizer_Service": "data_visualizer",
+    "Database_Service": "mongodb_connector",
+    "Localization_Service": "localization"
+}

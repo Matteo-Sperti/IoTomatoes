@@ -1,0 +1,12 @@
+{
+    "deviceName" : "SimulatedTruck2",
+    "isSensor" : true,
+    "measureType" : ["position"],
+    "CompanyName" : "PatataNovella",
+    "Location": {
+        "latitude": -1,
+        "longitude": -1
+    },
+    "IoTomatoes_url" : "http://172.17.0.1:8080",
+    "measureTimeInterval" : 5
+}

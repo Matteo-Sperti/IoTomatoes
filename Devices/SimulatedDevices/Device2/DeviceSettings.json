@@ -1,0 +1,14 @@
+{
+    "deviceName" : "SimulatedDevice2",
+    "fieldNumber" : 1,
+    "isActuator" : true,
+    "actuatorType" : ["led", "pump"],
+    "PowerConsumption_kW" : 20000,
+    "CompanyName" : "PatataNovella",
+    "Location" : {
+        "latitude" : 44.996, 
+        "longitude" : 7.481
+    },
+    "IoTomatoes_url" : "http://172.17.0.1:8080",
+    "measureTimeInterval" : 5
+}

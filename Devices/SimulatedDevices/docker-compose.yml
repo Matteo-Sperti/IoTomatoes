@@ -1,0 +1,51 @@
+version: '3.4'
+
+services:
+  device1:
+    image: device1
+    build:
+      context: .
+      dockerfile: ./Device1/Dockerfile
+    network_mode: "bridge"
+
+  device2:
+    image: device2
+    build:
+      context: .
+      dockerfile: ./Device2/Dockerfile
+    network_mode: "bridge"
+
+  device3:
+    image: device3
+    build:
+      context: .
+      dockerfile: ./Device3/Dockerfile
+    network_mode: "bridge"
+
+  device4:
+    image: device4
+    build:
+      context: .
+      dockerfile: ./Device4/Dockerfile
+    network_mode: "bridge"
+
+  device5:
+    image: device5
+    build:
+      context: .
+      dockerfile: ./Device5/Dockerfile
+    network_mode: "bridge"
+
+  truck1:
+    image: truck1
+    build:
+      context: .
+      dockerfile: ./Truck1/Dockerfile
+    network_mode: "bridge"
+
+  truck2:
+    image: truck2
+    build:
+      context: .
+      dockerfile: ./Truck2/Dockerfile
+    network_mode: "bridge"

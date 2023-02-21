@@ -1,0 +1,24 @@
+{
+  "ServiceCatalog_url" : "http://service_catalog:8080",
+  "serviceName" : "fault_detection",
+  "availableServices" : [
+      "MQTT"
+  ],
+  "servicesDetails" : [
+      {
+          "serviceType": "MQTT",
+          "subscribedTopics": ["+/+/+/temperature", "+/+/+/humidity", "+/+/+/light", "+/+/+/soilMoisture"],
+          "publishedTopics": ["Notifications"]
+      }
+  ],
+  "thresholds": {
+    "temperature" : {"max_value": 10000,"min_value": -100, "unit": "C"},
+    "humidity" : {"max_value": 100, "min_value": 0, "unit": "%"},
+    "light" : {"max_value": 100000, "min_value": 0.00001, "unit": "lx"},
+    "soilMoisture" : {"max_value": 100, "min_value": 0, "unit": "%"},
+    "latitude" : {"max_value": 1, "min_value": -1, "unit": "°"},
+    "longitude" : {"max_value": 1, "min_value": -1, "unit": "°"}
+  },
+  "ResourceManager_ServiceName" : "resource_manager",
+  "ControlPeriod" : 60
+}

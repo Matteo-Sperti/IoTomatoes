@@ -1,0 +1,15 @@
+{
+    "ServiceCatalog_url" : "http://service_catalog:8080",
+    "serviceName" : "resource_manager",
+    "availableServices" : [
+        "REST",
+        "MQTT"
+    ],
+    "servicesDetails" : [
+        {
+            "serviceType": "MQTT",
+            "publishedTopics": ["Notifications"]
+        }
+    ],
+    "ControlPeriod": 20
+}

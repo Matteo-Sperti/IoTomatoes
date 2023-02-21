@@ -1,0 +1,6 @@
+{
+    "serviceName": "resource_catalog",
+    "ServiceCatalog_url" : "http://service_catalog:8080",
+    "filename": "ResourceCatalog.json",
+    "autoDeleteTime": 120
+}

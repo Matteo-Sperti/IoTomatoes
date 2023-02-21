@@ -1,0 +1,184 @@
+version: '3.4'
+
+networks:
+  internal:
+    driver: bridge
+
+volumes:
+  node-red-data: 
+  mosquitto-data:
+  mosquitto-log:
+
+services:
+  mosquitto:
+    container_name: mosquitto
+    image: eclipse-mosquitto:2
+    volumes:
+      - ./mosquitto.conf:/mosquitto/config/mosquitto.conf:ro
+      - mosquitto-data:/mosquitto/data
+      - mosquitto-log:/mosquitto/log
+    ports:
+      - 1883:1883
+      - 9001:9001
+    networks:
+      - internal
+
+  load_balancer:
+    image: nginx
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf
+    ports:
+      - 8080:80
+    networks:
+      - internal
+    depends_on:
+      - resource_catalog
+      - dashboard
+      - website
+      - localization
+
+  website:
+    image: website
+    build:
+      context: ./Website
+      dockerfile: Dockerfile
+    depends_on:
+      - dashboard
+    networks:
+      - internal
+
+  service_catalog:
+    image: service_catalog
+    build:
+      context: ./ServiceCatalog
+      dockerfile: Dockerfile
+    networks:
+      - internal
+
+  resource_catalog:
+    image: resource_catalog
+    build:
+      context: ./ResourceCatalog
+      dockerfile: Dockerfile
+    depends_on:
+      - service_catalog
+      - mosquitto
+    networks:
+      - internal
+
+  telegram_bot:
+    image: telegram_bot
+    build:
+      context: ./TelegramBot
+      dockerfile: Dockerfile
+    depends_on:
+      - resource_catalog
+    networks:
+      - internal
+
+  dashboard:
+    container_name: dashboard
+    image: node-red
+    build: 
+      context: ./Node-RED
+      dockerfile: Dockerfile
+    environment:
+      - TZ=Europe/Rome
+    depends_on:
+      - resource_catalog
+    networks:
+      - internal
+    volumes:
+      - node-red-data:/data
+
+  mongodb_connector:
+    image: mongodb_connector
+    build:
+      context: ./MongoDBConnector
+      dockerfile: Dockerfile
+    depends_on:
+      - resource_catalog
+    networks:
+      - internal
+
+  weather_forecast:
+    image: weather_forecast
+    build:
+      context: ./WeatherForecast
+      dockerfile: Dockerfile
+    depends_on:
+      - resource_catalog
+    networks:
+      - internal
+
+  smart_irrigation:
+    image: smart_irrigation
+    build:
+      context: ./SmartIrrigation
+      dockerfile: Dockerfile
+    depends_on:
+      - mongodb_connector
+      - weather_forecast
+    networks:
+      - internal
+
+  smart_lighting:
+    image: smart_lighting
+    build:
+      context: ./SmartLighting
+      dockerfile: Dockerfile
+    depends_on:
+      - mongodb_connector
+      - weather_forecast
+    networks:
+      - internal
+
+  resource_manager:
+    image: resource_manager
+    build:
+      context: ./ResourceManager
+      dockerfile: Dockerfile
+    depends_on:
+      - resource_catalog
+    networks:
+      - internal
+
+  fault_detection:
+    image: fault_detection
+    build:
+      context: ./FaultDetection
+      dockerfile: Dockerfile
+    depends_on:
+      - resource_manager
+    networks:
+      - internal
+
+  consumption_manager:
+    image: consumption_manager
+    build:
+      context: ./ConsumptionManager
+      dockerfile: Dockerfile
+    depends_on:
+      - resource_manager
+    networks:
+      - internal
+
+  localization:
+    image: localization
+    build:
+      context: ./Localization
+      dockerfile: Dockerfile
+    depends_on:
+      - mongodb_connector
+    networks:
+      - internal
+
+  data_visualizer:
+    image: data_visualizer
+    build:
+      context: ./DataVisualizer
+      dockerfile: Dockerfile
+    depends_on:
+      - mongodb_connector
+    networks:
+      - internal

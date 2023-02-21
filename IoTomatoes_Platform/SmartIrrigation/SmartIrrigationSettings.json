@@ -1,0 +1,10 @@
+{
+    "ServiceCatalog_url" : "http://service_catalog:8080",
+    "serviceName" : "smart_irrigation",
+    "availableServices" : [
+        "MQTT"
+    ],
+    "controlTimeInterval": 60,
+    "WeatherForecast_ServiceName" : "weather_forecast",
+    "MongoDB_ServiceName" : "mongodb_connector"
+}

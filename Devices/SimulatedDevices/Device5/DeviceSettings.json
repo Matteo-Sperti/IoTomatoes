@@ -1,0 +1,13 @@
+{
+    "deviceName" : "SimulatedDevice5",
+    "fieldNumber" : 2,
+    "isSensor" : true,
+    "measureType" : ["temperature", "humidity", "light"],
+    "CompanyName" : "PatataNovella",
+    "Location" : {
+        "latitude" : 44.996, 
+        "longitude" : 7.481
+    },
+    "IoTomatoes_url" : "http://172.17.0.1:8080",
+    "measureTimeInterval" : 5
+}

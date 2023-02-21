@@ -1,0 +1,11 @@
+{
+    "owner": "IoTomatoes",
+    "CatalogName": "ServiceCatalog",
+    "broker": {
+        "IP": "mosquitto",
+        "port": 1883
+    },
+    "telegramToken": "<your telegram token>",
+    "filename": "ServiceCatalog.json",
+    "autoDeleteTime": 120
+}

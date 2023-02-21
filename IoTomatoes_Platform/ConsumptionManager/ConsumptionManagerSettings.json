@@ -1,0 +1,16 @@
+{
+    "ServiceCatalog_url" : "http://service_catalog:8080",
+    "serviceName" : "consumption_manager",
+    "availableServices" : [
+        "MQTT"
+    ],
+    "servicesDetails" : [
+        {
+            "serviceType": "MQTT",
+            "subscribedTopics": ["+/+/+/led", "+/+/+/pump"],
+            "publishedTopics": ["Notifications"]
+        }
+    ],
+    "ResourceManager_ServiceName" : "resource_manager",
+    "ControlPeriod" : 60
+}

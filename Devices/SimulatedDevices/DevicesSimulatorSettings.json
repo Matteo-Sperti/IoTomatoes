@@ -1,0 +1,6 @@
+{
+    "IoTomatoes_url" : "http://localhost:8080",
+    "MeasuresType" : ["temperature", "humidity", "light", "soilMoisture"],
+    "ActuatorsType" : ["led", "pump"],
+    "measureTimeInterval" : 5
+}

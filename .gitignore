@@ -1,0 +1,4 @@
+.vscode/
+__pycache__/
+pyrightconfig.json
+TotalListener.py

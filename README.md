@@ -23,7 +23,6 @@ The required packages to run the IoT platform are:
 - [paho-mqtt](https://www.eclipse.org/paho/index.php?page=clients/python/index.php)
 - [docker](https://www.docker.com/)
 - [requests](https://requests.readthedocs.io/en/latest/#)
-- [NumPy](https://numpy.org/)
 - [matplotlib](https://matplotlib.org/)
 - [gpxpy](https://pypi.org/project/gpxpy/)
 - [folium](https://python-visualization.github.io/folium/)

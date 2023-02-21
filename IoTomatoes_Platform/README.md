@@ -2,7 +2,9 @@
 
 The IoTomaoes IoT platform is a set of microservices that allow the management of a Smart Farming infrastructure. It is based on the microservices design pattern. It is developed in Python and it exploits the CherryPy framework to provide REST Web Services and the paho-mqtt library to provide MQTT services. It also exploits the MongoDB database to store the data.
 
-The IoT platform provides both push notification to the users in the company that a dashboard to actively visualize the data. The company employees can interact and monitor the status of the coltures
+The IoT platform provides both push notification to the users in the company that a dashboard to actively visualize the data. The company employees can interact and monitor the status of the coltures through a Telegram Bot. The platform also provides a fault detection system that allows to identify possible failures in the devices.
+
+In the following figure you can see the schema of the IoT platform. The IoT devices are represented by the green boxes. The blue boxes represent the microservices of the platform. The orange boxes rthe user interfaces of the platform while the yellow boxes represent the catalogs of the platform. Outside the platform there are the external devices (sensor, actuators, etc.) and the employees of a company.
 
 ![plot](../Doc/Schema_platform.png)
 
@@ -17,6 +19,13 @@ Together with all the microservices, it also launches:
 - the NGINX server that allow the communication between the services in the platform and the external world.
 - the MOSQUITTO broker that works as a MQTT broker to allow the communication between the services in the platform and the external devices.
 
+## Service Catalog
+It works as a REST Web Service and provides information about endpoints (URI and MQTT topics) of all the REST Web Services (including the Resource Catalog) in the platform. 
+
+**[Code >>](./ServiceCatalog/)**  
+
+**[Example of ServiceCatalog >>](https://github.com/Matteo-Sperti/IoTomatoes/blob/main/Doc/ServiceCatalog.json)**
+
 ## Resource Catalog
 It works as a REST Web Service and provides information about endpoints (URI and MQTT topics) of all the devices in the platform. Therefore, each IoT device will need to be registered and must be able to update it periodically.
 Moreover it contains all the information about the users and the companies of the platform.
@@ -24,13 +33,6 @@ Moreover it contains all the information about the users and the companies of th
 **[Code >>](./ResourceCatalog/)**  
 
 **[Example of ResourceCatalog >>](https://github.com/Matteo-Sperti/IoTomatoes/blob/main/Doc/ResourceCatalog.json)**
-
-## Service Catalog
-It works as a REST Web Service and provides information about endpoints (URI and MQTT topics) of all the REST Web Services (including the Resource Catalog) in the platform. 
-
-**[Code >>](./ServiceCatalog/)**  
-
-**[Example of ServiceCatalog >>](https://github.com/Matteo-Sperti/IoTomatoes/blob/main/Doc/ServiceCatalog.json)**
 
 ## Database Connector
 It works as a REST Web Service and provides the possibility to store and retrieve data from the MongoDB database. It also exploits the MQTT protocol to receive messages from the different sensors and microservices.
@@ -47,6 +49,7 @@ This service will allow the user to manage his company through Telegram. The use
 - change the plant type in a field;
 - plot the sensor data
 - retrieve the position of the devices and of the trucks.
+
 It will exploit REST Web Services to retrieve IoT devices data from the Database Connector, the Data Visualizer or the localization service. Moreover, it will exploit the MQTT protocol to receive messages and alarms from the different microservices.
 
 **[Code >>](./TelegramBot/)**  

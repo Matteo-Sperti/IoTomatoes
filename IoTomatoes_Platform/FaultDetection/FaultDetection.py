@@ -80,7 +80,6 @@ class FaultDetector(BaseService):
         """
 
         currentTime = datetime.datetime.now()
-        print(device)
         if device['lastMeasure'] is not None:
             elapsedTime = (currentTime - device['lastMeasure']).total_seconds()
             if elapsedTime > 300:
@@ -186,7 +185,7 @@ class FaultDetector(BaseService):
 
             measure_check = self.checkMeasure(
                 deviceID, measureType, measure, unit)
-            if not found:
+            if not found and self.deviceList != []:
                 msg = self._message.copy()
                 msg['t'] = time.time()
                 msg['cn'] = CompanyName

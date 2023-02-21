@@ -49,7 +49,6 @@ class ConsumptionManager (BaseService):
 
         totalConsumption = {}
         for dev in self.deviceList:
-            print(dev)
             if (dev['status'] == 'OFF' and dev['control']):
                 dev_consumption = {
                     'cn': dev['CompanyName'],

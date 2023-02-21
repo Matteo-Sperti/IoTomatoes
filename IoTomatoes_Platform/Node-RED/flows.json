@@ -1,6 +1,6 @@
 [
     {
-        "id": "54c6c3bfbd6d9993",
+        "id": "01be268ef23b84f3",
         "type": "tab",
         "label": "Main Flow",
         "disabled": false,
@@ -8,9 +8,9 @@
         "env": []
     },
     {
-        "id": "08d0724ddf5b999b",
+        "id": "6aba6e85a81f78d3",
         "type": "group",
-        "z": "54c6c3bfbd6d9993",
+        "z": "01be268ef23b84f3",
         "name": "Weather Forecast",
         "style": {
             "stroke": "#7fb7df",
@@ -20,31 +20,31 @@
             "color": "#0070c0"
         },
         "nodes": [
-            "25ea8e64778588ae",
-            "4fc9ecb544f1b806",
-            "5484d716effed6ba",
-            "5bb01c2048ea1eac",
-            "ca33adc539d22833",
-            "84a3c27403220ddb",
-            "5bc39fb82456f9e5",
-            "cee0e5ee85a4e536",
-            "81de30077de9d801",
-            "2cf5b28e54a11150",
-            "f594592a1eaa10df",
-            "5070f3f34ecf9a44",
-            "51712fd4a941ba16",
-            "e912d0829f74a764",
-            "952ad60128e43d6a"
+            "6ab27ec6729bac2b",
+            "723054d054659aef",
+            "9c4e979a745c5d17",
+            "118be9fa5df3d2d4",
+            "ac31fcaed037420f",
+            "b7f657e557b5517e",
+            "189c231540a44ef8",
+            "7be4115cdb83db52",
+            "d7c3600cbdd4447a",
+            "8276b8a77ea5d292",
+            "9f3790850b18c90c",
+            "6d61d49367d77090",
+            "81a310c99d89a1fd",
+            "10baf33c0ddcb7cd",
+            "bd6a39f80514f529"
         ],
         "x": 14,
-        "y": 199,
+        "y": 119,
         "w": 1132,
         "h": 322
     },
     {
-        "id": "416bee4d9d9eb702",
+        "id": "1c9e9e77a71c4448",
         "type": "group",
-        "z": "54c6c3bfbd6d9993",
+        "z": "01be268ef23b84f3",
         "name": "Field 4",
         "style": {
             "stroke": "#92d04f",
@@ -54,36 +54,36 @@
             "color": "#92d04f"
         },
         "nodes": [
-            "5ceb98acc42e8d72",
-            "d1e087d3b2fa0462",
-            "653706d3435d2bef",
-            "df752048e3a84c29",
-            "89d73b77b7d8eded",
-            "887dc38542d3c9b0",
-            "dd6a7e2206e9cf8f",
-            "4ef6474985b9c820",
-            "398dca16e967973f",
-            "2612d21701d07108",
-            "bc1c55b6eb768038",
-            "7b05edc2099db09c",
-            "6c0edeaec5503e4e",
-            "9c0cfc42e28109a7",
-            "83eda9de1787378a",
-            "bdbb39ce1dcb1bed",
-            "7d3c84d3c0ad03f2",
-            "452c8ce5f1e4adcd",
-            "77f63c69d96b02e7",
-            "cb9f0458f0d50755",
-            "d8ddc8706a39e573",
-            "77de0cb43a52e452",
-            "3db5d4eccd957785",
-            "9cf8d2022219684b",
-            "e8aacf5dd20812d0",
-            "3facc68a200937b8",
-            "61088dca915ee5e4",
-            "0b1d7ad9af3b3038",
-            "9bd1f68c315ab6cd",
-            "3d9e04ae3c463556"
+            "433681c0df4db18e",
+            "046c140f464967cc",
+            "00a620dfcc12456e",
+            "8108f810314e21d0",
+            "2b79b34ba6ae389c",
+            "55bc8f600b415438",
+            "2fcb45f5f09618e3",
+            "0a5bd8924af9aa13",
+            "30ce71893af79a0f",
+            "2e3515e2422d1d73",
+            "b92f72f8a9fadeb7",
+            "7c5415baa18c03ea",
+            "a26bb709bdf54963",
+            "fade06db7eb9ed4b",
+            "b5f0d067a84b647f",
+            "f6ebba6cd18ca426",
+            "78c5c647cd309e0e",
+            "a08d3257d26015bd",
+            "038969ef5d042c4e",
+            "7abc7bd4a21669ee",
+            "f4b3e7f97290fd23",
+            "63de9f180b8f6d45",
+            "75d51d1d8e4222f4",
+            "2feaf1e6568d5c6a",
+            "ef08897036aee93b",
+            "b7f1cae776933cec",
+            "33032e309378b70e",
+            "d1607ce65ef254f2",
+            "c69d1919e0b8bc60",
+            "471e039b9da6b6ce"
         ],
         "x": 2494,
         "y": 1659,
@@ -91,9 +91,9 @@
         "h": 482
     },
     {
-        "id": "1dcff70bb5d269ad",
+        "id": "5607e75c56be8a76",
         "type": "group",
-        "z": "54c6c3bfbd6d9993",
+        "z": "01be268ef23b84f3",
         "name": "Field 3",
         "style": {
             "stroke": "#92d04f",
@@ -103,36 +103,36 @@
             "color": "#92d04f"
         },
         "nodes": [
-            "66d5abb1c370543e",
-            "88642b2734029e75",
-            "15371fed98f7e2fc",
-            "eaf158901e0f2cdb",
-            "4dc94e190a4ede38",
-            "8134d6b30c491ce7",
-            "bc1ca85e74c77253",
-            "257733bddfb5be89",
-            "64488ac3965a1f09",
-            "2649d1d9728dfab1",
-            "367fcca0182d22c7",
-            "5e14d94b454dfb4f",
-            "39f4b3c42a6cacfb",
-            "5d91f6e5e4d69610",
-            "f33b13558d0d16e2",
-            "5964a87309788fe1",
-            "34b46a30a8518f9c",
-            "bc2594c6dd549e33",
-            "847bc0227ad2e83d",
-            "c3dcc49c6a76dd69",
-            "893f13056f4abcc0",
-            "af6c97e0526203de",
-            "a5c0358531bc3b4a",
-            "b236fbce862caad8",
-            "3cf7998136f9fc6c",
-            "68adb6db2bce1868",
-            "5dc1e3c550eb0293",
-            "cbebcdd8a82a39a9",
-            "0f38ed5b37c0047d",
-            "3e6601f5b230c113"
+            "d0439770858a3bdb",
+            "c6d764b98692a568",
+            "54ababd74641bb3b",
+            "2be7d4124a3ba179",
+            "8dcdad7ac4763fd6",
+            "c97d10eceeb82305",
+            "f80727fddb5eee29",
+            "71dfd362a07cc2e8",
+            "84b4a966e6364cc4",
+            "69d32c09d1f55711",
+            "b92752dba852861b",
+            "c35a5c52d1df4c52",
+            "753c1121fc0c0e2e",
+            "bac36cc3b2ad7758",
+            "3795c322d8e02535",
+            "9233cd8345c2c9b8",
+            "2c4e88ac9bacc85b",
+            "053d9d2f03fe9811",
+            "326e4338d4253459",
+            "ad6030fa6e8d3f6a",
+            "ecbcec90e1fc335a",
+            "addd6631beb16734",
+            "788371d6ad6ae854",
+            "094b9e938349d5ac",
+            "8bf151f27241becb",
+            "24dfe4b71e9f936f",
+            "6e5bf3e333cf1c3a",
+            "e20ac085560cc462",
+            "4fd913d6e43dddb9",
+            "ee06133432f84c25"
         ],
         "x": 2494,
         "y": 1179,
@@ -140,9 +140,9 @@
         "h": 482
     },
     {
-        "id": "c012487765f034fc",
+        "id": "b8492e4296574125",
         "type": "group",
-        "z": "54c6c3bfbd6d9993",
+        "z": "01be268ef23b84f3",
         "name": "Field 2",
         "style": {
             "stroke": "#92d04f",
@@ -152,35 +152,35 @@
             "color": "#92d04f"
         },
         "nodes": [
-            "a625a7b5d253de9e",
-            "9fae1729dc20277b",
-            "dd4d44e6c7585e52",
-            "62969b49a2c52e3c",
-            "8c3642d5bf8f094e",
-            "60f159cf626fd033",
-            "f56f2342bfdb0995",
-            "0c3d4f0f7f0cdf99",
-            "7eaf695dfc212841",
-            "41e8d24f03462aba",
-            "15fdd082aea98212",
-            "b136ba9ee0ad3e99",
-            "30d2520e3b4c4ff0",
-            "165f420e2a16f890",
-            "9dfd1ab8f9f685c2",
-            "24d7a860cf420409",
-            "a80ff969cc6fe56e",
-            "c6d2c2bb886af49a",
-            "bd1de411f8e3f56d",
-            "3e85ae98e149e719",
-            "0a3188521f1658fa",
-            "2d6d9e4704a073bf",
-            "a807259524efcc39",
-            "43ec5bfc3fa67450",
-            "a772f8756c46759d",
-            "87f788ebfc2a76cc",
-            "04d112a720937c9b",
-            "7f47620545a2d33f",
-            "1ca3432fd82643b3"
+            "d5bbc0c39119fc84",
+            "6abf87bc17c9328f",
+            "5a27660e0716d75e",
+            "3ef6835e76f4fcec",
+            "ce0e8dca48bf2e63",
+            "2ed0e6bf3a4d94e7",
+            "6509cb97c01ce518",
+            "9742b7484929ebc0",
+            "68e416e559ac58a7",
+            "24616268daae455a",
+            "67f55e97e1ea6d07",
+            "fc046d9aa4feaea1",
+            "d45ee1f056063b1a",
+            "ee6a379a385651ed",
+            "90e6dd5c1c41cc71",
+            "eca2b1305c93e1b1",
+            "a4222b4351b14865",
+            "93696e5a938a216c",
+            "5aab1da9727f6195",
+            "fd9b9b93ce25cbd9",
+            "24ee03abf3cad8f2",
+            "8f411cc702f7242e",
+            "2878b8ecb66d1ae8",
+            "3d5c8a148127da35",
+            "da47b51be8db8d4c",
+            "38b37d3f448e7ae0",
+            "5a1b72126f528f40",
+            "26f0446f83e8743a",
+            "d4a4d4fc2664168a"
         ],
         "x": 2494,
         "y": 699,
@@ -188,9 +188,9 @@
         "h": 482
     },
     {
-        "id": "354d2874de048d42",
+        "id": "b7a1c5ff6d42a2b2",
         "type": "group",
-        "z": "54c6c3bfbd6d9993",
+        "z": "01be268ef23b84f3",
         "name": "Field 1",
         "style": {
             "stroke": "#92d04f",
@@ -200,36 +200,36 @@
             "color": "#92d04f"
         },
         "nodes": [
-            "692c01edd179d7af",
-            "acc99d2c27c31b77",
-            "5707d930ecbc658a",
-            "5f888fc78c5397bf",
-            "ed2e3e697275deb9",
-            "480155bad90585ee",
-            "1686bb74cbdcc097",
-            "434184b11687360f",
-            "e0e6af6da425dd38",
-            "84e55c67958ffc41",
-            "74d898a2365dff9f",
-            "238c6261662cd19e",
-            "70528e820cc40d6f",
-            "aa57601253ce3f61",
-            "cfdf380ce4f23041",
-            "7b3c4959cd3a0200",
-            "5b32f69ea65e1452",
-            "d893fcc9b43c3435",
-            "bf3af8eb1ed36b90",
-            "de7fe50bae5315a4",
-            "08e5b1613c881cfe",
-            "0645a30718171ddc",
-            "f2b59f47bf70bf17",
-            "3148fb9c4ee39dce",
-            "2ddc8e2131fe76ef",
-            "fcb4366de42c024c",
-            "29a8338f852b62b8",
-            "e6c305ef1d899cc5",
-            "bd7ae576522b52e9",
-            "6630f479ed1809d6"
+            "db156bb2a1e5359f",
+            "f6b3ba419e43e58f",
+            "3d0fe63b62353950",
+            "5a1f96d680b55f14",
+            "13615d43fc63b638",
+            "3185656e6edcea3b",
+            "663f1ad237351006",
+            "6ca18b95b95e7bfe",
+            "e6d65f0e2bed9b55",
+            "1e5f52a9c1cbfd69",
+            "dafe5e328bcef7e7",
+            "479902ce1a68f115",
+            "3f609e528897c9ce",
+            "0bb03734acb0bea6",
+            "b2fb09063eaf53f1",
+            "e4de1da7d2626a52",
+            "684a236d23e42f63",
+            "018c96562f3a6147",
+            "e19dbf8221cc2728",
+            "33ef5908970c383d",
+            "bb0682ae5e263f06",
+            "87ad9ee0d22aa3a6",
+            "2136fa51b5ac928d",
+            "b7cae3b3ab8dbb69",
+            "2576ccf47c827254",
+            "e3ecbba7062b089e",
+            "ac2147204bccb56b",
+            "47f137afb531552d",
+            "840dbb40292bf33f",
+            "5bedc02cda4bef97"
         ],
         "x": 2494,
         "y": 219,
@@ -237,9 +237,9 @@
         "h": 482
     },
     {
-        "id": "829145b1a61a34fe",
+        "id": "a253b323941e42df",
         "type": "group",
-        "z": "54c6c3bfbd6d9993",
+        "z": "01be268ef23b84f3",
         "name": "Catalog Registration ",
         "style": {
             "stroke": "#ffC000",
@@ -249,21 +249,21 @@
             "color": "#ffC000"
         },
         "nodes": [
-            "5cabbdf8e12528c7",
-            "a844af5d2f5aa171",
-            "146e266e936f2d04",
-            "11a009cefeb1e519",
-            "b162538becd0a418"
+            "ac8ad91742046dba",
+            "cbf8dfd6080975d1",
+            "4bdcdb7ac6bb58ea",
+            "efd44737f752a18c",
+            "b00dcbdf3e7ae56b"
         ],
         "x": 14,
-        "y": 99,
+        "y": 19,
         "w": 1032,
         "h": 82
     },
     {
-        "id": "169ea57b72f1db13",
+        "id": "ed7ca175967ae604",
         "type": "group",
-        "z": "54c6c3bfbd6d9993",
+        "z": "01be268ef23b84f3",
         "name": "Dashboard Style",
         "style": {
             "stroke": "#6f2fa0",
@@ -273,24 +273,24 @@
             "color": "#6f2fa0"
         },
         "nodes": [
-            "7e1230196b3f6055",
-            "8ace7877e52e78f6",
-            "a1b9db1458158cdb",
-            "0e786d4f0e94f09a",
-            "2080495962b5b255",
-            "cfbfb45cc0ea0fca",
-            "208e0eadd472ef69",
-            "3f627e465ca4e20c"
+            "144efebfb54c1449",
+            "ed982b8d21d131a4",
+            "a5cbf2d06313b3b9",
+            "45c15227051bb78d",
+            "e2caec17d23b82f8",
+            "99657e25ae7f0344",
+            "c46f27576d0a06b2",
+            "768773f84eaf0c31"
         ],
         "x": 14,
-        "y": 539,
+        "y": 459,
         "w": 332,
         "h": 362
     },
     {
-        "id": "753f47c82d92d3bf",
+        "id": "d7b4bc8491e7a936",
         "type": "group",
-        "z": "54c6c3bfbd6d9993",
+        "z": "01be268ef23b84f3",
         "name": "Buttons",
         "style": {
             "stroke": "#ff0000",
@@ -300,26 +300,22 @@
             "color": "#ff0000"
         },
         "nodes": [
-            "bd132edf0762af73",
-            "c6888d41c8d468c3",
-            "7f67f2f4899a9a2a",
-            "ca2143976e294b36",
-            "559190b99c290935",
-            "44d905bc4b56f5a3",
-            "6378cf9c524cc11f",
-            "d8caa7c2760a8025",
-            "6749db2c396a80c2",
-            "e1a82cbae25fdb28"
+            "810251b126aca98d",
+            "90824775ce2a5c0f",
+            "ba2a8eb2b1caac3d",
+            "52cdeeca3c99af0e",
+            "642ceca271c98df2",
+            "11d7afb95e3f406c"
         ],
-        "x": 494,
-        "y": 639,
-        "w": 632,
-        "h": 262
+        "x": 374,
+        "y": 459,
+        "w": 612,
+        "h": 142
     },
     {
-        "id": "6de25c967950bdcd",
+        "id": "f3b8583edd5bb0e7",
         "type": "group",
-        "z": "54c6c3bfbd6d9993",
+        "z": "01be268ef23b84f3",
         "name": "Consumption Chart",
         "style": {
             "stroke": "#ff0000",
@@ -329,18 +325,18 @@
             "color": "#ff0000"
         },
         "nodes": [
-            "25062c6d6c024ad0",
-            "5f104faee7795fa0"
+            "ac3a26d1597999a9",
+            "9b5fa9838f1ac345"
         ],
-        "x": 2034,
-        "y": 339,
+        "x": 1904,
+        "y": 859,
         "w": 432,
         "h": 82
     },
     {
-        "id": "be4dab2fd84694fb",
+        "id": "b3fc116541e28b32",
         "type": "group",
-        "z": "54c6c3bfbd6d9993",
+        "z": "01be268ef23b84f3",
         "name": "Messages",
         "style": {
             "stroke": "#6f2fa0",
@@ -350,22 +346,258 @@
             "color": "#6f2fa0"
         },
         "nodes": [
-            "09991aed2096e866",
-            "c2ef5a9debc98b46"
+            "b83c0a9caa12f4a0",
+            "5618d80691aa8fd0"
         ],
-        "x": 2034,
-        "y": 219,
+        "x": 1894,
+        "y": 739,
         "w": 332,
         "h": 82
     },
     {
-        "id": "cfbf5bffbaa84de7",
-        "type": "ui_tab",
-        "name": "Field 1",
-        "icon": "fa-tree",
+        "id": "10b69a3755dc3651",
+        "type": "group",
+        "z": "01be268ef23b84f3",
+        "name": "Localization",
+        "style": {
+            "stroke": "#0070c0",
+            "fill": "#bfdbef",
+            "fill-opacity": "0.35",
+            "label": true,
+            "color": "#0070c0"
+        },
+        "nodes": [
+            "6c83ac66f94e765b",
+            "c045212752891651",
+            "aafcecbd3cf7920f"
+        ],
+        "x": 674,
+        "y": 959,
+        "w": 652,
+        "h": 82
+    },
+    {
+        "id": "718a14c9e72dbd97",
+        "type": "group",
+        "z": "01be268ef23b84f3",
+        "name": "Log in control",
+        "style": {
+            "stroke": "#6f2fa0",
+            "fill": "#dbcbe7",
+            "fill-opacity": "0.35",
+            "label": true,
+            "color": "#6f2fa0"
+        },
+        "nodes": [
+            "38bab2e548d3989c",
+            "97c880bb078f7fde",
+            "1ccaa7e90406fc2c",
+            "e62e9d31f2efd522",
+            "81626001917ad47a",
+            "935ee41ccac4efd5",
+            "df61e4f965ca721f",
+            "5537b7b41bf682bc",
+            "ba8f050613523d77",
+            "5ea8e0e4bd88627f",
+            "c637a6269b6aefb1",
+            "e4c40230572469bd",
+            "6d1dfb26077322f2"
+        ],
+        "x": 1194,
+        "y": 1319,
+        "w": 852,
+        "h": 302
+    },
+    {
+        "id": "75ce0633973f49ff",
+        "type": "mqtt-broker",
+        "name": "internal",
+        "broker": "http://mosquitto:1883",
+        "port": "1883",
+        "clientid": "",
+        "autoConnect": true,
+        "usetls": false,
+        "protocolVersion": "4",
+        "keepalive": "60",
+        "cleansession": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthPayload": "",
+        "birthMsg": {},
+        "closeTopic": "",
+        "closeQos": "0",
+        "closePayload": "",
+        "closeMsg": {},
+        "willTopic": "",
+        "willQos": "0",
+        "willPayload": "",
+        "willMsg": {},
+        "userProps": "",
+        "sessionExpiry": ""
+    },
+    {
+        "id": "31de8e5b82691490",
+        "type": "ui_group",
+        "name": "Weather",
+        "tab": "698e01817b646764",
+        "order": 2,
+        "disp": false,
+        "width": "7",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "cdd0e15889b1286d",
+        "type": "ui_group",
+        "name": "Home",
+        "tab": "698e01817b646764",
+        "order": 1,
+        "disp": false,
+        "width": "7",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "dc85dc3382f47ab2",
+        "type": "ui_group",
+        "name": "Localization",
+        "tab": "698e01817b646764",
+        "order": 5,
+        "disp": false,
+        "width": "7",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "f1b999f5373c31d8",
+        "type": "ui_group",
+        "name": "Actuators",
+        "tab": "cfbf5bffbaa84de7",
+        "order": 1,
+        "disp": true,
+        "width": "7",
+        "collapse": true,
+        "className": ""
+    },
+    {
+        "id": "5e32d1811541c3ed",
+        "type": "ui_group",
+        "name": "Actuators",
+        "tab": "915f7ddef7cd3dd6",
+        "order": 1,
+        "disp": true,
+        "width": "7",
+        "collapse": true,
+        "className": ""
+    },
+    {
+        "id": "d4d16815f75585a6",
+        "type": "ui_group",
+        "name": "Actuators",
+        "tab": "86c8368f92b091d5",
+        "order": 1,
+        "disp": true,
+        "width": "7",
+        "collapse": true,
+        "className": ""
+    },
+    {
+        "id": "63c960e3ff3fcba6",
+        "type": "ui_group",
+        "name": "Actuators",
+        "tab": "5109d4cb16cb06c6",
+        "order": 1,
+        "disp": true,
+        "width": "7",
+        "collapse": true,
+        "className": ""
+    },
+    {
+        "id": "78956960e46b2a2e",
+        "type": "ui_group",
+        "name": "Sensors",
+        "tab": "cfbf5bffbaa84de7",
+        "order": 3,
+        "disp": true,
+        "width": "7",
+        "collapse": true,
+        "className": ""
+    },
+    {
+        "id": "99dca6761e2d9c28",
+        "type": "ui_group",
+        "name": "Sensors",
+        "tab": "915f7ddef7cd3dd6",
+        "order": 3,
+        "disp": true,
+        "width": "7",
+        "collapse": true,
+        "className": ""
+    },
+    {
+        "id": "76c122f563a2790b",
+        "type": "ui_group",
+        "name": "Sensors",
+        "tab": "86c8368f92b091d5",
+        "order": 3,
+        "disp": true,
+        "width": "7",
+        "collapse": true,
+        "className": ""
+    },
+    {
+        "id": "dca27f708d79a283",
+        "type": "ui_group",
+        "name": "Sensors",
+        "tab": "5109d4cb16cb06c6",
+        "order": 3,
+        "disp": true,
+        "width": "7",
+        "collapse": true,
+        "className": ""
+    },
+    {
+        "id": "034412fb686048d4",
+        "type": "ui_group",
+        "name": "Consumption",
+        "tab": "698e01817b646764",
         "order": 4,
-        "disabled": false,
-        "hidden": false
+        "disp": false,
+        "width": 7,
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "2a745e6b.07df92",
+        "type": "ui_group",
+        "name": "Default",
+        "tab": "e63bce2d.68925",
+        "order": 1,
+        "disp": true,
+        "width": "6",
+        "collapse": true
+    },
+    {
+        "id": "6fd2c0e41aa3f4f8",
+        "type": "ui_group",
+        "name": "Messages",
+        "tab": "698e01817b646764",
+        "order": 3,
+        "disp": false,
+        "width": "7",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "cdbcaf9bc51ad72e",
+        "type": "ui_group",
+        "name": "Log in",
+        "tab": "6953e4180efb4601",
+        "order": 1,
+        "disp": false,
+        "width": "6",
+        "collapse": false,
+        "className": ""
     },
     {
         "id": "698e01817b646764",
@@ -373,6 +605,15 @@
         "name": "Home",
         "icon": "fa-th",
         "order": 2,
+        "disabled": false,
+        "hidden": false
+    },
+    {
+        "id": "cfbf5bffbaa84de7",
+        "type": "ui_tab",
+        "name": "Field 1",
+        "icon": "fa-tree",
+        "order": 4,
         "disabled": false,
         "hidden": false
     },
@@ -413,166 +654,22 @@
         "hidden": true
     },
     {
-        "id": "78956960e46b2a2e",
-        "type": "ui_group",
-        "name": "Sensors",
-        "tab": "cfbf5bffbaa84de7",
-        "order": 3,
-        "disp": true,
-        "width": "7",
-        "collapse": true,
-        "className": ""
-    },
-    {
-        "id": "6fd2c0e41aa3f4f8",
-        "type": "ui_group",
-        "name": "Messages",
-        "tab": "698e01817b646764",
-        "order": 3,
-        "disp": false,
-        "width": "7",
-        "collapse": false,
-        "className": ""
-    },
-    {
-        "id": "f1b999f5373c31d8",
-        "type": "ui_group",
-        "name": "Actuators",
-        "tab": "cfbf5bffbaa84de7",
+        "id": "6953e4180efb4601",
+        "type": "ui_tab",
+        "name": "Log in",
+        "icon": "fa-sign-in",
         "order": 1,
-        "disp": true,
-        "width": "7",
-        "collapse": true,
-        "className": ""
+        "disabled": false,
+        "hidden": false
     },
     {
-        "id": "5e32d1811541c3ed",
-        "type": "ui_group",
-        "name": "Actuators",
-        "tab": "915f7ddef7cd3dd6",
-        "order": 1,
-        "disp": true,
-        "width": "7",
-        "collapse": true,
-        "className": ""
-    },
-    {
-        "id": "99dca6761e2d9c28",
-        "type": "ui_group",
-        "name": "Sensors",
-        "tab": "915f7ddef7cd3dd6",
-        "order": 3,
-        "disp": true,
-        "width": "7",
-        "collapse": true,
-        "className": ""
-    },
-    {
-        "id": "d4d16815f75585a6",
-        "type": "ui_group",
-        "name": "Actuators",
-        "tab": "86c8368f92b091d5",
-        "order": 1,
-        "disp": true,
-        "width": "7",
-        "collapse": true,
-        "className": ""
-    },
-    {
-        "id": "76c122f563a2790b",
-        "type": "ui_group",
-        "name": "Sensors",
-        "tab": "86c8368f92b091d5",
-        "order": 3,
-        "disp": true,
-        "width": "7",
-        "collapse": true,
-        "className": ""
-    },
-    {
-        "id": "63c960e3ff3fcba6",
-        "type": "ui_group",
-        "name": "Actuators",
-        "tab": "5109d4cb16cb06c6",
-        "order": 1,
-        "disp": true,
-        "width": "7",
-        "collapse": true,
-        "className": ""
-    },
-    {
-        "id": "dca27f708d79a283",
-        "type": "ui_group",
-        "name": "Sensors",
-        "tab": "5109d4cb16cb06c6",
-        "order": 3,
-        "disp": true,
-        "width": "7",
-        "collapse": true,
-        "className": ""
-    },
-    {
-        "id": "2a745e6b.07df92",
-        "type": "ui_group",
-        "name": "Default",
-        "tab": "e63bce2d.68925",
-        "order": 1,
-        "disp": true,
-        "width": "6",
-        "collapse": true
-    },
-    {
-        "id": "31de8e5b82691490",
-        "type": "ui_group",
-        "name": "Weather",
-        "tab": "698e01817b646764",
-        "order": 2,
-        "disp": false,
-        "width": "7",
-        "collapse": false,
-        "className": ""
-    },
-    {
-        "id": "cdd0e15889b1286d",
-        "type": "ui_group",
-        "name": "Home",
-        "tab": "698e01817b646764",
-        "order": 1,
-        "disp": false,
-        "width": "7",
-        "collapse": false,
-        "className": ""
-    },
-    {
-        "id": "dc85dc3382f47ab2",
-        "type": "ui_group",
-        "name": "Localization",
-        "tab": "698e01817b646764",
-        "order": 5,
-        "disp": false,
-        "width": "7",
-        "collapse": false,
-        "className": ""
-    },
-    {
-        "id": "034412fb686048d4",
-        "type": "ui_group",
-        "name": "Consumption",
-        "tab": "698e01817b646764",
-        "order": 4,
-        "disp": false,
-        "width": 7,
-        "collapse": false,
-        "className": ""
-    },
-    {
-        "id": "7be7122d6aee8c4b",
+        "id": "e1ae17239929b921",
         "type": "ui_base",
         "theme": {
             "name": "theme-dark",
             "lightTheme": {
                 "default": "#0094CE",
-                "baseColor": "#0094CE",
+                "baseColor": "#6dbd66",
                 "baseFont": "-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Oxygen-Sans,Ubuntu,Cantarell,Helvetica Neue,sans-serif",
                 "edited": true,
                 "reset": false
@@ -588,13 +685,12 @@
                 "name": "Untitled Theme 1",
                 "default": "#4B7930",
                 "baseColor": "#4B7930",
-                "baseFont": "-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Oxygen-Sans,Ubuntu,Cantarell,Helvetica Neue,sans-serif",
-                "reset": false
+                "baseFont": "-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Oxygen-Sans,Ubuntu,Cantarell,Helvetica Neue,sans-serif"
             },
             "themeState": {
                 "base-color": {
                     "default": "#097479",
-                    "value": "#097479",
+                    "value": "#6dbd66",
                     "edited": true
                 },
                 "page-titlebar-backgroundColor": {
@@ -646,16 +742,16 @@
             }
         },
         "site": {
-            "name": "IoTomatoes Dashboard",
+            "name": "Node-RED Dashboard",
             "hideToolbar": "false",
-            "allowSwipe": "menu",
+            "allowSwipe": "false",
             "lockMenu": "false",
             "allowTempTheme": "true",
             "dateFormat": "DD/MM/YYYY",
             "sizes": {
                 "sx": 48,
                 "sy": 48,
-                "gx": 200,
+                "gx": 6,
                 "gy": 6,
                 "cx": 6,
                 "cy": 6,
@@ -665,57 +761,10 @@
         }
     },
     {
-        "id": "75ce0633973f49ff",
-        "type": "mqtt-broker",
-        "name": "internal",
-        "broker": "http://mosquitto:1883",
-        "port": "1883",
-        "clientid": "",
-        "autoConnect": true,
-        "usetls": false,
-        "protocolVersion": "4",
-        "keepalive": "60",
-        "cleansession": true,
-        "birthTopic": "",
-        "birthQos": "0",
-        "birthPayload": "",
-        "birthMsg": {},
-        "closeTopic": "",
-        "closeQos": "0",
-        "closePayload": "",
-        "closeMsg": {},
-        "willTopic": "",
-        "willQos": "0",
-        "willPayload": "",
-        "willMsg": {},
-        "userProps": "",
-        "sessionExpiry": ""
-    },
-    {
-        "id": "6953e4180efb4601",
-        "type": "ui_tab",
-        "name": "Log in",
-        "icon": "fa-sign-in",
-        "order": 1,
-        "disabled": false,
-        "hidden": false
-    },
-    {
-        "id": "cdbcaf9bc51ad72e",
-        "type": "ui_group",
-        "name": "Log in",
-        "tab": "6953e4180efb4601",
-        "order": 1,
-        "disp": false,
-        "width": "6",
-        "collapse": false,
-        "className": ""
-    },
-    {
-        "id": "09991aed2096e866",
+        "id": "b83c0a9caa12f4a0",
         "type": "function",
-        "z": "54c6c3bfbd6d9993",
-        "g": "be4dab2fd84694fb",
+        "z": "01be268ef23b84f3",
+        "g": "b3fc116541e28b32",
         "name": "addRow",
         "func": "var time = msg.mydom + \"/\" + msg.mymonthn + \"/\"+ msg.myyear + \" \" + msg.mytime\n\nmsg.payload =\n{\n    command: \"addRow\",\n    arguments: [\n        {\n            \"time\": time,\n            \"message\": msg.payload.msg,\n            \"type\": msg.payload.msgType\n        },\n        false\n    ],\n    returnPromise: true\n}\nreturn msg;",
         "outputs": 1,
@@ -723,18 +772,18 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 2120,
-        "y": 260,
+        "x": 1980,
+        "y": 780,
         "wires": [
             [
-                "c2ef5a9debc98b46"
+                "5618d80691aa8fd0"
             ]
         ]
     },
     {
-        "id": "a24466573364dc7d",
+        "id": "05b57213646c7285",
         "type": "mqtt in",
-        "z": "54c6c3bfbd6d9993",
+        "z": "01be268ef23b84f3",
         "name": "",
         "topic": "",
         "qos": "2",
@@ -744,20 +793,20 @@
         "rap": true,
         "rh": 0,
         "inputs": 1,
-        "x": 1190,
+        "x": 1310,
         "y": 1180,
         "wires": [
             [
-                "a2ec836806c27a0d",
-                "8b93c60fe82d1418"
+                "2154e52838d1621c",
+                "846aea6c21b02c27"
             ]
         ]
     },
     {
-        "id": "692c01edd179d7af",
+        "id": "db156bb2a1e5359f",
         "type": "switch",
-        "z": "54c6c3bfbd6d9993",
-        "g": "354d2874de048d42",
+        "z": "01be268ef23b84f3",
+        "g": "b7a1c5ff6d42a2b2",
         "name": "SelectMeasurement",
         "property": "topic",
         "propertyType": "msg",
@@ -800,32 +849,32 @@
         "y": 520,
         "wires": [
             [
-                "08e5b1613c881cfe"
+                "bb0682ae5e263f06"
             ],
             [
-                "0645a30718171ddc"
+                "87ad9ee0d22aa3a6"
             ],
             [
-                "f2b59f47bf70bf17"
+                "2136fa51b5ac928d"
             ],
             [
-                "3148fb9c4ee39dce"
+                "b7cae3b3ab8dbb69"
             ],
             [
-                "2ddc8e2131fe76ef",
-                "acc99d2c27c31b77"
+                "2576ccf47c827254",
+                "f6b3ba419e43e58f"
             ],
             [
-                "fcb4366de42c024c",
-                "5707d930ecbc658a"
+                "e3ecbba7062b089e",
+                "3d0fe63b62353950"
             ]
         ]
     },
     {
-        "id": "a625a7b5d253de9e",
+        "id": "d5bbc0c39119fc84",
         "type": "switch",
-        "z": "54c6c3bfbd6d9993",
-        "g": "c012487765f034fc",
+        "z": "01be268ef23b84f3",
+        "g": "b8492e4296574125",
         "name": "SelectMeasurement",
         "property": "topic",
         "propertyType": "msg",
@@ -868,31 +917,31 @@
         "y": 1000,
         "wires": [
             [
-                "0a3188521f1658fa"
+                "24ee03abf3cad8f2"
             ],
             [
-                "2d6d9e4704a073bf"
+                "8f411cc702f7242e"
             ],
             [
-                "a807259524efcc39"
+                "2878b8ecb66d1ae8"
             ],
             [
-                "43ec5bfc3fa67450"
+                "3d5c8a148127da35"
             ],
             [
-                "a772f8756c46759d",
-                "9fae1729dc20277b"
+                "da47b51be8db8d4c",
+                "6abf87bc17c9328f"
             ],
             [
-                "87f788ebfc2a76cc",
-                "dd4d44e6c7585e52"
+                "38b37d3f448e7ae0",
+                "5a27660e0716d75e"
             ]
         ]
     },
     {
-        "id": "008d41bd477c76cd",
+        "id": "0ac475b14f8e45e6",
         "type": "switch",
-        "z": "54c6c3bfbd6d9993",
+        "z": "01be268ef23b84f3",
         "name": "SelectField",
         "property": "topic",
         "propertyType": "msg",
@@ -925,24 +974,24 @@
         "y": 1180,
         "wires": [
             [
-                "5f888fc78c5397bf"
+                "5a1f96d680b55f14"
             ],
             [
-                "62969b49a2c52e3c"
+                "3ef6835e76f4fcec"
             ],
             [
-                "eaf158901e0f2cdb"
+                "2be7d4124a3ba179"
             ],
             [
-                "df752048e3a84c29"
+                "8108f810314e21d0"
             ]
         ]
     },
     {
-        "id": "66d5abb1c370543e",
+        "id": "d0439770858a3bdb",
         "type": "switch",
-        "z": "54c6c3bfbd6d9993",
-        "g": "1dcff70bb5d269ad",
+        "z": "01be268ef23b84f3",
+        "g": "5607e75c56be8a76",
         "name": "SelectMeasurement",
         "property": "topic",
         "propertyType": "msg",
@@ -985,32 +1034,32 @@
         "y": 1480,
         "wires": [
             [
-                "893f13056f4abcc0"
+                "ecbcec90e1fc335a"
             ],
             [
-                "af6c97e0526203de"
+                "addd6631beb16734"
             ],
             [
-                "a5c0358531bc3b4a"
+                "788371d6ad6ae854"
             ],
             [
-                "b236fbce862caad8"
+                "094b9e938349d5ac"
             ],
             [
-                "3cf7998136f9fc6c",
-                "88642b2734029e75"
+                "8bf151f27241becb",
+                "c6d764b98692a568"
             ],
             [
-                "68adb6db2bce1868",
-                "15371fed98f7e2fc"
+                "24dfe4b71e9f936f",
+                "54ababd74641bb3b"
             ]
         ]
     },
     {
-        "id": "5ceb98acc42e8d72",
+        "id": "433681c0df4db18e",
         "type": "switch",
-        "z": "54c6c3bfbd6d9993",
-        "g": "416bee4d9d9eb702",
+        "z": "01be268ef23b84f3",
+        "g": "1c9e9e77a71c4448",
         "name": "SelectMeasurement",
         "property": "topic",
         "propertyType": "msg",
@@ -1053,49 +1102,32 @@
         "y": 1960,
         "wires": [
             [
-                "d8ddc8706a39e573"
+                "f4b3e7f97290fd23"
             ],
             [
-                "77de0cb43a52e452"
+                "63de9f180b8f6d45"
             ],
             [
-                "3db5d4eccd957785"
+                "75d51d1d8e4222f4"
             ],
             [
-                "9cf8d2022219684b"
+                "2feaf1e6568d5c6a"
             ],
             [
-                "e8aacf5dd20812d0",
-                "d1e087d3b2fa0462"
+                "ef08897036aee93b",
+                "046c140f464967cc"
             ],
             [
-                "3facc68a200937b8",
-                "653706d3435d2bef"
+                "b7f1cae776933cec",
+                "00a620dfcc12456e"
             ]
         ]
     },
     {
-        "id": "a1dc62aa44201866",
-        "type": "debug",
-        "z": "54c6c3bfbd6d9993",
-        "name": "debug 1",
-        "active": true,
-        "tosidebar": true,
-        "console": false,
-        "tostatus": false,
-        "complete": "true",
-        "targetType": "full",
-        "statusVal": "",
-        "statusType": "auto",
-        "x": 740,
-        "y": 1580,
-        "wires": []
-    },
-    {
-        "id": "25ea8e64778588ae",
+        "id": "6ab27ec6729bac2b",
         "type": "function",
-        "z": "54c6c3bfbd6d9993",
-        "g": "08d0724ddf5b999b",
+        "z": "01be268ef23b84f3",
+        "g": "6aba6e85a81f78d3",
         "name": "Format forecast data",
         "func": "var fcdata = {}; \nvar units=flow.get('units');\nif (units===undefined)\n{\n  units=\"imperial\";\n}\n\nfunction formatTemp(high, low){\n  var temp\n    if (units == \"imperial\") {\n        if (low){\n          temp = Math.round(parseFloat(high)) + '/' + Math.round(parseFloat(low))\n        }\n        else {\n          temp = Math.round(parseFloat(high)) + '°F'\n        }\n    }\n    else { // metric\n        if (low){\n          temp = Math.round(parseFloat(high)) + '/' + Math.round(parseFloat(low))\n        }\n        else {\n          temp = Math.round(parseFloat(high)) + '°C'\n        }\n    }\n    return temp;\n}\n\nfunction dayName(unixTime){\n  var dateObject = new Date(unixTime * 1000);\n  return dateObject.toLocaleString(flow.get('lang'), { timezone: msg.payload.timezone, weekday: 'short'});\n  // If the line above is not producing the correct short weekday names for the language set by 'lang',\n  //   you can try upgrading to NodeJS version 13 or higher (when full international support was added for the toLocaleString function),\n  //   or you can use the code below which is an example for French short weekday names.\n  /*\n  switch (dateObject.toLocaleString('en', { timezone: msg.payload.timezone, weekday: 'short'})) {\n    case 'Mon':\n      return 'Lun';\n    case 'Tue':\n      return 'Mar';\n    case 'Wed':\n      return 'Mer';\n    case 'Thu':\n      return 'Jeu';\n    case 'Fri':\n      return 'Ven';\n    case 'Sat':\n      return 'Sam';\n    case 'Sun':\n      return 'Dim';\n  }\n*/\n}\n\nfunction timeConvert(UNIX_timestamp){\n  var dateObject = new Date(UNIX_timestamp * 1000);\n  if (flow.get('hour12')) {  // 12 hour time format\n    return dateObject.toLocaleString('en', { timezone: msg.payload.timezone, hour12: true, hour: 'numeric'}).toLowerCase();\n  } else {  // 24 hour time format\n    return dateObject.toLocaleString('en', { timezone: msg.payload.timezone, hour12: false, hour: 'numeric'}) + ':00';\n  }      \n}\n\n// prepare forecast data for CSS based ui widget\nfcdata.payload = {\n  rowtext: {\n  \tdata01: {\n      cell01: timeConvert(msg.payload.dt)\n  \t},\n  \tdata02: {\n      cell01: formatTemp(msg.payload.main.temp)\n  \t}\n  },\n  rowicons: {\n  \tdata01: {\n  \t\tcell01: msg.payload.weather[0].icon\n  \t}\n  }\n}\n\nreturn fcdata;",
         "outputs": 1,
@@ -1104,18 +1136,18 @@
         "finalize": "",
         "libs": [],
         "x": 740,
-        "y": 480,
+        "y": 400,
         "wires": [
             [
-                "952ad60128e43d6a"
+                "bd6a39f80514f529"
             ]
         ]
     },
     {
-        "id": "4fc9ecb544f1b806",
+        "id": "723054d054659aef",
         "type": "http request",
-        "z": "54c6c3bfbd6d9993",
-        "g": "08d0724ddf5b999b",
+        "z": "01be268ef23b84f3",
+        "g": "6aba6e85a81f78d3",
         "name": "Get OWM data",
         "method": "GET",
         "ret": "obj",
@@ -1129,19 +1161,19 @@
         "senderr": false,
         "headers": [],
         "x": 500,
-        "y": 360,
+        "y": 280,
         "wires": [
             [
-                "5bb01c2048ea1eac",
-                "25ea8e64778588ae"
+                "118be9fa5df3d2d4",
+                "6ab27ec6729bac2b"
             ]
         ]
     },
     {
-        "id": "5484d716effed6ba",
+        "id": "9c4e979a745c5d17",
         "type": "inject",
-        "z": "54c6c3bfbd6d9993",
-        "g": "08d0724ddf5b999b",
+        "z": "01be268ef23b84f3",
+        "g": "6aba6e85a81f78d3",
         "name": "Trigger",
         "props": [
             {
@@ -1160,18 +1192,18 @@
         "payload": "true",
         "payloadType": "bool",
         "x": 120,
-        "y": 420,
+        "y": 340,
         "wires": [
             [
-                "ca33adc539d22833"
+                "ac31fcaed037420f"
             ]
         ]
     },
     {
-        "id": "5bb01c2048ea1eac",
+        "id": "118be9fa5df3d2d4",
         "type": "function",
-        "z": "54c6c3bfbd6d9993",
-        "g": "08d0724ddf5b999b",
+        "z": "01be268ef23b84f3",
+        "g": "6aba6e85a81f78d3",
         "name": "Format current data",
         "func": "var icon = {}; \n\nvar units = flow.get('units');\nif (units === undefined) {units = 'imperial';}\n\nfunction timeConvert(UNIX_timestamp){\n  var dateObject = new Date(UNIX_timestamp * 1000);\n  if (flow.get('hour12')) {  // 12 hour time format\n    return dateObject.toLocaleString('en', { timezone: msg.payload.timezone, hour12: true, hour: 'numeric', minute: '2-digit'}).toLowerCase();\n  } else {  // 24 hour time format\n    return dateObject.toLocaleString('en', { timezone: msg.payload.timezone, hour12: false, hour: 'numeric', minute: '2-digit'});\n  }      \n}\n\nvar degreesToCardinal = function(deg){\n  if (deg>11.25 && deg<=33.75){return \"NNE\";}\n  else if (deg>33.75 && deg<56.25){return \"NE\";}\n  else if (deg>56.25 && deg<78.75){return \"ENE\";}\n  else if (deg>78.75 && deg<101.25){return \"E\";}\n  else if (deg>101.25 && deg<123.75){return \"ESE\";}\n  else if (deg>123.75 && deg<146.25){return \"SE\";}\n  else if (deg>146.25 && deg<168.75){return \"SSE\";}\n  else if (deg>168.75 && deg<191.25){return \"S\";}\n  else if (deg>191.25 && deg<213.75){return \"SSW\";}\n  else if (deg>213.75 && deg<236.25){return \"SW\";}\n  else if (deg>236.25 && deg<258.75){return \"WSW\";}\n  else if (deg>258.75 && deg<281.25){return \"W\";}\n  else if (deg>281.25 && deg<303.75){return \"WNW\";}\n  else if (deg>303.75 && deg<326.25){return \"NW\";}\n  else if (deg>326.25 && deg<348.75){return \"NNW\";}\n  else {return \"N\";}\n}\n\nif (units == \"imperial\")\n{\n  msg.payload.main.temp = Math.round(msg.payload.main.temp) + ' °F';\n  msg.payload.wind.speed = Math.round(msg.payload.wind.speed) + ' mph';\n}\nelse  // metric units\n{\n  msg.payload.main.temp = Math.round(msg.payload.main.temp) + ' °C';\n  msg.payload.wind.speed = Math.round(msg.payload.wind.speed) + ' m/s';\n}\n\nmsg.payload.wind.cardinal = degreesToCardinal(msg.payload.wind.deg);\n\nmsg.payload.sys.sunrise = timeConvert(msg.payload.sys.sunrise);\nmsg.payload.sys.sunset = timeConvert(msg.payload.sys.sunset);\n\nvar iconString = 'wi-owm-' + msg.payload.weather[0].icon + ' wi-4x';\nicon = {\n    ui_control: {\n        icon: iconString\n    }\n}; \n\nreturn [msg, icon];",
         "outputs": 2,
@@ -1180,25 +1212,25 @@
         "finalize": "",
         "libs": [],
         "x": 740,
-        "y": 360,
+        "y": 280,
         "wires": [
             [
-                "51712fd4a941ba16",
-                "2cf5b28e54a11150",
-                "81de30077de9d801",
-                "f594592a1eaa10df",
-                "5070f3f34ecf9a44"
+                "81a310c99d89a1fd",
+                "8276b8a77ea5d292",
+                "d7c3600cbdd4447a",
+                "9f3790850b18c90c",
+                "6d61d49367d77090"
             ],
             [
-                "cee0e5ee85a4e536"
+                "7be4115cdb83db52"
             ]
         ]
     },
     {
-        "id": "ca33adc539d22833",
+        "id": "ac31fcaed037420f",
         "type": "change",
-        "z": "54c6c3bfbd6d9993",
-        "g": "08d0724ddf5b999b",
+        "z": "01be268ef23b84f3",
+        "g": "6aba6e85a81f78d3",
         "name": "Settings",
         "rules": [
             {
@@ -1276,18 +1308,18 @@
         "to": "",
         "reg": false,
         "x": 320,
-        "y": 360,
+        "y": 280,
         "wires": [
             [
-                "4fc9ecb544f1b806"
+                "723054d054659aef"
             ]
         ]
     },
     {
-        "id": "acc99d2c27c31b77",
+        "id": "f6b3ba419e43e58f",
         "type": "trigger",
-        "z": "54c6c3bfbd6d9993",
-        "g": "354d2874de048d42",
+        "z": "01be268ef23b84f3",
+        "g": "b7a1c5ff6d42a2b2",
         "name": "",
         "op1": "",
         "op2": "0",
@@ -1305,15 +1337,15 @@
         "y": 580,
         "wires": [
             [
-                "bf3af8eb1ed36b90"
+                "e19dbf8221cc2728"
             ]
         ]
     },
     {
-        "id": "5707d930ecbc658a",
+        "id": "3d0fe63b62353950",
         "type": "trigger",
-        "z": "54c6c3bfbd6d9993",
-        "g": "354d2874de048d42",
+        "z": "01be268ef23b84f3",
+        "g": "b7a1c5ff6d42a2b2",
         "name": "",
         "op1": "",
         "op2": "0",
@@ -1331,15 +1363,15 @@
         "y": 660,
         "wires": [
             [
-                "de7fe50bae5315a4"
+                "33ef5908970c383d"
             ]
         ]
     },
     {
-        "id": "9fae1729dc20277b",
+        "id": "6abf87bc17c9328f",
         "type": "trigger",
-        "z": "54c6c3bfbd6d9993",
-        "g": "c012487765f034fc",
+        "z": "01be268ef23b84f3",
+        "g": "b8492e4296574125",
         "name": "",
         "op1": "",
         "op2": "0",
@@ -1357,15 +1389,15 @@
         "y": 1060,
         "wires": [
             [
-                "9dfd1ab8f9f685c2"
+                "90e6dd5c1c41cc71"
             ]
         ]
     },
     {
-        "id": "dd4d44e6c7585e52",
+        "id": "5a27660e0716d75e",
         "type": "trigger",
-        "z": "54c6c3bfbd6d9993",
-        "g": "c012487765f034fc",
+        "z": "01be268ef23b84f3",
+        "g": "b8492e4296574125",
         "name": "",
         "op1": "",
         "op2": "0",
@@ -1383,15 +1415,15 @@
         "y": 1140,
         "wires": [
             [
-                "24d7a860cf420409"
+                "eca2b1305c93e1b1"
             ]
         ]
     },
     {
-        "id": "88642b2734029e75",
+        "id": "c6d764b98692a568",
         "type": "trigger",
-        "z": "54c6c3bfbd6d9993",
-        "g": "1dcff70bb5d269ad",
+        "z": "01be268ef23b84f3",
+        "g": "5607e75c56be8a76",
         "name": "",
         "op1": "",
         "op2": "0",
@@ -1409,15 +1441,15 @@
         "y": 1540,
         "wires": [
             [
-                "f33b13558d0d16e2"
+                "3795c322d8e02535"
             ]
         ]
     },
     {
-        "id": "15371fed98f7e2fc",
+        "id": "54ababd74641bb3b",
         "type": "trigger",
-        "z": "54c6c3bfbd6d9993",
-        "g": "1dcff70bb5d269ad",
+        "z": "01be268ef23b84f3",
+        "g": "5607e75c56be8a76",
         "name": "",
         "op1": "",
         "op2": "0",
@@ -1435,15 +1467,15 @@
         "y": 1620,
         "wires": [
             [
-                "5964a87309788fe1"
+                "9233cd8345c2c9b8"
             ]
         ]
     },
     {
-        "id": "d1e087d3b2fa0462",
+        "id": "046c140f464967cc",
         "type": "trigger",
-        "z": "54c6c3bfbd6d9993",
-        "g": "416bee4d9d9eb702",
+        "z": "01be268ef23b84f3",
+        "g": "1c9e9e77a71c4448",
         "name": "",
         "op1": "",
         "op2": "0",
@@ -1461,15 +1493,15 @@
         "y": 2020,
         "wires": [
             [
-                "83eda9de1787378a"
+                "b5f0d067a84b647f"
             ]
         ]
     },
     {
-        "id": "653706d3435d2bef",
+        "id": "00a620dfcc12456e",
         "type": "trigger",
-        "z": "54c6c3bfbd6d9993",
-        "g": "416bee4d9d9eb702",
+        "z": "01be268ef23b84f3",
+        "g": "1c9e9e77a71c4448",
         "name": "",
         "op1": "",
         "op2": "0",
@@ -1487,46 +1519,46 @@
         "y": 2100,
         "wires": [
             [
-                "bdbb39ce1dcb1bed"
+                "f6ebba6cd18ca426"
             ]
         ]
     },
     {
-        "id": "84a3c27403220ddb",
+        "id": "b7f657e557b5517e",
         "type": "link in",
-        "z": "54c6c3bfbd6d9993",
-        "g": "08d0724ddf5b999b",
+        "z": "01be268ef23b84f3",
+        "g": "6aba6e85a81f78d3",
         "name": "",
         "links": [
-            "5bc39fb82456f9e5",
+            "189c231540a44ef8",
             "fab7484d5ad0b452"
         ],
         "x": 55,
-        "y": 360,
+        "y": 280,
         "wires": [
             [
-                "ca33adc539d22833"
+                "ac31fcaed037420f"
             ]
         ]
     },
     {
-        "id": "5bc39fb82456f9e5",
+        "id": "189c231540a44ef8",
         "type": "link out",
-        "z": "54c6c3bfbd6d9993",
-        "g": "08d0724ddf5b999b",
+        "z": "01be268ef23b84f3",
+        "g": "6aba6e85a81f78d3",
         "name": "Refresh",
         "links": [
-            "84a3c27403220ddb"
+            "b7f657e557b5517e"
         ],
         "x": 1105,
-        "y": 440,
+        "y": 360,
         "wires": []
     },
     {
-        "id": "bd132edf0762af73",
+        "id": "810251b126aca98d",
         "type": "change",
-        "z": "54c6c3bfbd6d9993",
-        "g": "753f47c82d92d3bf",
+        "z": "01be268ef23b84f3",
+        "g": "d7b4bc8491e7a936",
         "name": "",
         "rules": [
             {
@@ -1542,18 +1574,18 @@
         "from": "",
         "to": "",
         "reg": false,
-        "x": 780,
-        "y": 740,
+        "x": 690,
+        "y": 560,
         "wires": [
             [
-                "44d905bc4b56f5a3"
+                "52cdeeca3c99af0e"
             ]
         ]
     },
     {
-        "id": "f9394e0b13dbfd18",
+        "id": "9cd9b4d7e6e25baf",
         "type": "switch",
-        "z": "54c6c3bfbd6d9993",
+        "z": "01be268ef23b84f3",
         "name": "",
         "property": "topic",
         "propertyType": "msg",
@@ -1572,22 +1604,22 @@
         "checkall": "true",
         "repair": false,
         "outputs": 2,
-        "x": 1930,
-        "y": 320,
+        "x": 1790,
+        "y": 840,
         "wires": [
             [
-                "09991aed2096e866"
+                "b83c0a9caa12f4a0"
             ],
             [
-                "25062c6d6c024ad0"
+                "ac3a26d1597999a9"
             ]
         ]
     },
     {
-        "id": "25062c6d6c024ad0",
+        "id": "ac3a26d1597999a9",
         "type": "change",
-        "z": "54c6c3bfbd6d9993",
-        "g": "6de25c967950bdcd",
+        "z": "01be268ef23b84f3",
+        "g": "f3b8583edd5bb0e7",
         "name": "",
         "rules": [
             {
@@ -1603,18 +1635,18 @@
         "from": "",
         "to": "",
         "reg": false,
-        "x": 2140,
-        "y": 380,
+        "x": 2010,
+        "y": 900,
         "wires": [
             [
-                "5f104faee7795fa0"
+                "9b5fa9838f1ac345"
             ]
         ]
     },
     {
-        "id": "c9a79b5a16416bb1",
+        "id": "7c4125a4c895edc8",
         "type": "function",
-        "z": "54c6c3bfbd6d9993",
+        "z": "01be268ef23b84f3",
         "name": "createTopic",
         "func": "var companyName = msg.payload.companyName\nmsg.topic = companyName + \"/#\"\nmsg.action = \"subscribe\"\nreturn msg",
         "outputs": 1,
@@ -1626,14 +1658,14 @@
         "y": 1180,
         "wires": [
             [
-                "a24466573364dc7d"
+                "05b57213646c7285"
             ]
         ]
     },
     {
-        "id": "a2ec836806c27a0d",
+        "id": "e97a4e4de142784b",
         "type": "function",
-        "z": "54c6c3bfbd6d9993",
+        "z": "01be268ef23b84f3",
         "name": "ParsingField",
         "func": "if ('fieldNumber' in msg.payload){\n    msg.topic = msg.payload.fieldNumber \n}\n    \nreturn msg",
         "outputs": 1,
@@ -1641,19 +1673,19 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 1670,
+        "x": 1910,
         "y": 1180,
         "wires": [
             [
-                "008d41bd477c76cd"
+                "0ac475b14f8e45e6"
             ]
         ]
     },
     {
-        "id": "62969b49a2c52e3c",
+        "id": "3ef6835e76f4fcec",
         "type": "function",
-        "z": "54c6c3bfbd6d9993",
-        "g": "c012487765f034fc",
+        "z": "01be268ef23b84f3",
+        "g": "b8492e4296574125",
         "name": "ParseType",
         "func": "if ('bn' in msg.payload) {\n    if (msg.payload.bn != \"consumption_manager\") {\n        if ('e' in msg.payload) {\n            if ('u' in msg.payload.e.at(-1)) {\n                msg.topic = msg.payload.e.at(-1).n\n                msg.payload = msg.payload.e.at(-1).v\n            }\n        }\n    }\n}\n\nreturn msg;",
         "outputs": 1,
@@ -1665,15 +1697,15 @@
         "y": 1000,
         "wires": [
             [
-                "a625a7b5d253de9e"
+                "d5bbc0c39119fc84"
             ]
         ]
     },
     {
-        "id": "5f888fc78c5397bf",
+        "id": "5a1f96d680b55f14",
         "type": "function",
-        "z": "54c6c3bfbd6d9993",
-        "g": "354d2874de048d42",
+        "z": "01be268ef23b84f3",
+        "g": "b7a1c5ff6d42a2b2",
         "name": "ParseType",
         "func": "if ('bn' in msg.payload) {\n    if (msg.payload.bn != \"consumption_manager\") {\n        if ('e' in msg.payload) {\n            if ('u' in msg.payload.e.at(-1)) {\n                msg.topic = msg.payload.e.at(-1).n\n                msg.payload = msg.payload.e.at(-1).v\n            }\n        }\n    }\n}\n\nreturn msg;",
         "outputs": 1,
@@ -1685,15 +1717,15 @@
         "y": 520,
         "wires": [
             [
-                "692c01edd179d7af"
+                "db156bb2a1e5359f"
             ]
         ]
     },
     {
-        "id": "eaf158901e0f2cdb",
+        "id": "2be7d4124a3ba179",
         "type": "function",
-        "z": "54c6c3bfbd6d9993",
-        "g": "1dcff70bb5d269ad",
+        "z": "01be268ef23b84f3",
+        "g": "5607e75c56be8a76",
         "name": "ParseType",
         "func": "if ('bn' in msg.payload) {\n    if (msg.payload.bn != \"consumption_manager\") {\n        if ('e' in msg.payload) {\n            if ('u' in msg.payload.e.at(-1)) {\n                msg.topic = msg.payload.e.at(-1).n\n                msg.payload = msg.payload.e.at(-1).v\n            }\n        }\n    }\n}\n\nreturn msg;",
         "outputs": 1,
@@ -1705,15 +1737,15 @@
         "y": 1480,
         "wires": [
             [
-                "66d5abb1c370543e"
+                "d0439770858a3bdb"
             ]
         ]
     },
     {
-        "id": "df752048e3a84c29",
+        "id": "8108f810314e21d0",
         "type": "function",
-        "z": "54c6c3bfbd6d9993",
-        "g": "416bee4d9d9eb702",
+        "z": "01be268ef23b84f3",
+        "g": "1c9e9e77a71c4448",
         "name": "ParseType",
         "func": "if ('bn' in msg.payload) {\n    if (msg.payload.bn != \"consumption_manager\") {\n        if ('e' in msg.payload) {\n            if ('u' in msg.payload.e.at(-1)) {\n                msg.topic = msg.payload.e.at(-1).n\n                msg.payload = msg.payload.e.at(-1).v\n            }\n        }\n    }\n}\n\nreturn msg;",
         "outputs": 1,
@@ -1725,15 +1757,15 @@
         "y": 1960,
         "wires": [
             [
-                "5ceb98acc42e8d72"
+                "433681c0df4db18e"
             ]
         ]
     },
     {
-        "id": "ed2e3e697275deb9",
+        "id": "13615d43fc63b638",
         "type": "function",
-        "z": "54c6c3bfbd6d9993",
-        "g": "354d2874de048d42",
+        "z": "01be268ef23b84f3",
+        "g": "b7a1c5ff6d42a2b2",
         "name": "round",
         "func": "msg.payload = Math.round(msg.payload * 100) / 100\nreturn msg;",
         "outputs": 1,
@@ -1745,16 +1777,16 @@
         "y": 340,
         "wires": [
             [
-                "74d898a2365dff9f",
-                "cfdf380ce4f23041"
+                "dafe5e328bcef7e7",
+                "b2fb09063eaf53f1"
             ]
         ]
     },
     {
-        "id": "480155bad90585ee",
+        "id": "3185656e6edcea3b",
         "type": "function",
-        "z": "54c6c3bfbd6d9993",
-        "g": "354d2874de048d42",
+        "z": "01be268ef23b84f3",
+        "g": "b7a1c5ff6d42a2b2",
         "name": "round",
         "func": "msg.payload = Math.round(msg.payload * 100) / 100\nreturn msg;",
         "outputs": 1,
@@ -1766,16 +1798,16 @@
         "y": 380,
         "wires": [
             [
-                "238c6261662cd19e",
-                "7b3c4959cd3a0200"
+                "479902ce1a68f115",
+                "e4de1da7d2626a52"
             ]
         ]
     },
     {
-        "id": "1686bb74cbdcc097",
+        "id": "663f1ad237351006",
         "type": "function",
-        "z": "54c6c3bfbd6d9993",
-        "g": "354d2874de048d42",
+        "z": "01be268ef23b84f3",
+        "g": "b7a1c5ff6d42a2b2",
         "name": "round",
         "func": "msg.payload = Math.round(msg.payload * 100) / 100\nreturn msg;",
         "outputs": 1,
@@ -1787,16 +1819,16 @@
         "y": 420,
         "wires": [
             [
-                "70528e820cc40d6f",
-                "5b32f69ea65e1452"
+                "3f609e528897c9ce",
+                "684a236d23e42f63"
             ]
         ]
     },
     {
-        "id": "434184b11687360f",
+        "id": "6ca18b95b95e7bfe",
         "type": "function",
-        "z": "54c6c3bfbd6d9993",
-        "g": "354d2874de048d42",
+        "z": "01be268ef23b84f3",
+        "g": "b7a1c5ff6d42a2b2",
         "name": "round",
         "func": "msg.payload = Math.round(msg.payload * 100) / 100\nreturn msg;",
         "outputs": 1,
@@ -1808,16 +1840,16 @@
         "y": 460,
         "wires": [
             [
-                "aa57601253ce3f61",
-                "d893fcc9b43c3435"
+                "0bb03734acb0bea6",
+                "018c96562f3a6147"
             ]
         ]
     },
     {
-        "id": "8c3642d5bf8f094e",
+        "id": "ce0e8dca48bf2e63",
         "type": "function",
-        "z": "54c6c3bfbd6d9993",
-        "g": "c012487765f034fc",
+        "z": "01be268ef23b84f3",
+        "g": "b8492e4296574125",
         "name": "round",
         "func": "msg.payload = Math.round(msg.payload * 100) / 100\nreturn msg;",
         "outputs": 1,
@@ -1829,16 +1861,16 @@
         "y": 820,
         "wires": [
             [
-                "15fdd082aea98212",
-                "a80ff969cc6fe56e"
+                "67f55e97e1ea6d07",
+                "a4222b4351b14865"
             ]
         ]
     },
     {
-        "id": "60f159cf626fd033",
+        "id": "2ed0e6bf3a4d94e7",
         "type": "function",
-        "z": "54c6c3bfbd6d9993",
-        "g": "c012487765f034fc",
+        "z": "01be268ef23b84f3",
+        "g": "b8492e4296574125",
         "name": "round",
         "func": "msg.payload = Math.round(msg.payload * 100) / 100\nreturn msg;",
         "outputs": 1,
@@ -1850,16 +1882,16 @@
         "y": 860,
         "wires": [
             [
-                "b136ba9ee0ad3e99",
-                "c6d2c2bb886af49a"
+                "fc046d9aa4feaea1",
+                "93696e5a938a216c"
             ]
         ]
     },
     {
-        "id": "f56f2342bfdb0995",
+        "id": "6509cb97c01ce518",
         "type": "function",
-        "z": "54c6c3bfbd6d9993",
-        "g": "c012487765f034fc",
+        "z": "01be268ef23b84f3",
+        "g": "b8492e4296574125",
         "name": "round",
         "func": "msg.payload = Math.round(msg.payload * 100) / 100\nreturn msg;",
         "outputs": 1,
@@ -1871,15 +1903,15 @@
         "y": 900,
         "wires": [
             [
-                "30d2520e3b4c4ff0"
+                "d45ee1f056063b1a"
             ]
         ]
     },
     {
-        "id": "0c3d4f0f7f0cdf99",
+        "id": "9742b7484929ebc0",
         "type": "function",
-        "z": "54c6c3bfbd6d9993",
-        "g": "c012487765f034fc",
+        "z": "01be268ef23b84f3",
+        "g": "b8492e4296574125",
         "name": "round",
         "func": "msg.payload = Math.round(msg.payload * 100) / 100\nreturn msg;",
         "outputs": 1,
@@ -1891,17 +1923,17 @@
         "y": 940,
         "wires": [
             [
-                "bd1de411f8e3f56d",
-                "165f420e2a16f890",
-                "3e85ae98e149e719"
+                "5aab1da9727f6195",
+                "ee6a379a385651ed",
+                "fd9b9b93ce25cbd9"
             ]
         ]
     },
     {
-        "id": "4dc94e190a4ede38",
+        "id": "8dcdad7ac4763fd6",
         "type": "function",
-        "z": "54c6c3bfbd6d9993",
-        "g": "1dcff70bb5d269ad",
+        "z": "01be268ef23b84f3",
+        "g": "5607e75c56be8a76",
         "name": "round",
         "func": "msg.payload = Math.round(msg.payload * 100) / 100\nreturn msg;",
         "outputs": 1,
@@ -1913,16 +1945,16 @@
         "y": 1300,
         "wires": [
             [
-                "367fcca0182d22c7",
-                "34b46a30a8518f9c"
+                "b92752dba852861b",
+                "2c4e88ac9bacc85b"
             ]
         ]
     },
     {
-        "id": "8134d6b30c491ce7",
+        "id": "c97d10eceeb82305",
         "type": "function",
-        "z": "54c6c3bfbd6d9993",
-        "g": "1dcff70bb5d269ad",
+        "z": "01be268ef23b84f3",
+        "g": "5607e75c56be8a76",
         "name": "round",
         "func": "msg.payload = Math.round(msg.payload * 100) / 100\nreturn msg;",
         "outputs": 1,
@@ -1934,16 +1966,16 @@
         "y": 1340,
         "wires": [
             [
-                "5e14d94b454dfb4f",
-                "bc2594c6dd549e33"
+                "c35a5c52d1df4c52",
+                "053d9d2f03fe9811"
             ]
         ]
     },
     {
-        "id": "bc1ca85e74c77253",
+        "id": "f80727fddb5eee29",
         "type": "function",
-        "z": "54c6c3bfbd6d9993",
-        "g": "1dcff70bb5d269ad",
+        "z": "01be268ef23b84f3",
+        "g": "5607e75c56be8a76",
         "name": "round",
         "func": "msg.payload = Math.round(msg.payload * 100) / 100\nreturn msg;",
         "outputs": 1,
@@ -1955,16 +1987,16 @@
         "y": 1380,
         "wires": [
             [
-                "39f4b3c42a6cacfb",
-                "847bc0227ad2e83d"
+                "753c1121fc0c0e2e",
+                "326e4338d4253459"
             ]
         ]
     },
     {
-        "id": "257733bddfb5be89",
+        "id": "71dfd362a07cc2e8",
         "type": "function",
-        "z": "54c6c3bfbd6d9993",
-        "g": "1dcff70bb5d269ad",
+        "z": "01be268ef23b84f3",
+        "g": "5607e75c56be8a76",
         "name": "round",
         "func": "msg.payload = Math.round(msg.payload * 100) / 100\nreturn msg;",
         "outputs": 1,
@@ -1976,16 +2008,16 @@
         "y": 1420,
         "wires": [
             [
-                "5d91f6e5e4d69610",
-                "c3dcc49c6a76dd69"
+                "bac36cc3b2ad7758",
+                "ad6030fa6e8d3f6a"
             ]
         ]
     },
     {
-        "id": "89d73b77b7d8eded",
+        "id": "2b79b34ba6ae389c",
         "type": "function",
-        "z": "54c6c3bfbd6d9993",
-        "g": "416bee4d9d9eb702",
+        "z": "01be268ef23b84f3",
+        "g": "1c9e9e77a71c4448",
         "name": "round",
         "func": "msg.payload = Math.round(msg.payload * 100) / 100\nreturn msg;",
         "outputs": 1,
@@ -1997,16 +2029,16 @@
         "y": 1780,
         "wires": [
             [
-                "bc1c55b6eb768038",
-                "7d3c84d3c0ad03f2"
+                "b92f72f8a9fadeb7",
+                "78c5c647cd309e0e"
             ]
         ]
     },
     {
-        "id": "887dc38542d3c9b0",
+        "id": "55bc8f600b415438",
         "type": "function",
-        "z": "54c6c3bfbd6d9993",
-        "g": "416bee4d9d9eb702",
+        "z": "01be268ef23b84f3",
+        "g": "1c9e9e77a71c4448",
         "name": "round",
         "func": "msg.payload = Math.round(msg.payload * 100) / 100\nreturn msg;",
         "outputs": 1,
@@ -2018,16 +2050,16 @@
         "y": 1820,
         "wires": [
             [
-                "7b05edc2099db09c",
-                "452c8ce5f1e4adcd"
+                "7c5415baa18c03ea",
+                "a08d3257d26015bd"
             ]
         ]
     },
     {
-        "id": "dd6a7e2206e9cf8f",
+        "id": "2fcb45f5f09618e3",
         "type": "function",
-        "z": "54c6c3bfbd6d9993",
-        "g": "416bee4d9d9eb702",
+        "z": "01be268ef23b84f3",
+        "g": "1c9e9e77a71c4448",
         "name": "round",
         "func": "msg.payload = Math.round(msg.payload * 100) / 100\nreturn msg;",
         "outputs": 1,
@@ -2039,16 +2071,16 @@
         "y": 1860,
         "wires": [
             [
-                "6c0edeaec5503e4e",
-                "77f63c69d96b02e7"
+                "a26bb709bdf54963",
+                "038969ef5d042c4e"
             ]
         ]
     },
     {
-        "id": "4ef6474985b9c820",
+        "id": "0a5bd8924af9aa13",
         "type": "function",
-        "z": "54c6c3bfbd6d9993",
-        "g": "416bee4d9d9eb702",
+        "z": "01be268ef23b84f3",
+        "g": "1c9e9e77a71c4448",
         "name": "round",
         "func": "msg.payload = Math.round(msg.payload * 100) / 100\nreturn msg;",
         "outputs": 1,
@@ -2060,15 +2092,15 @@
         "y": 1900,
         "wires": [
             [
-                "9c0cfc42e28109a7",
-                "cb9f0458f0d50755"
+                "fade06db7eb9ed4b",
+                "7abc7bd4a21669ee"
             ]
         ]
     },
     {
-        "id": "8b93c60fe82d1418",
+        "id": "2154e52838d1621c",
         "type": "function",
-        "z": "54c6c3bfbd6d9993",
+        "z": "01be268ef23b84f3",
         "name": "Parser",
         "func": "if ('msg' in msg.payload){\n    msg.topic = \"msg\"\n}\nelse if ('tot_consumption' in msg.payload){\n    msg.topic = \"consumption\"\n}\n\nreturn msg",
         "outputs": 1,
@@ -2076,19 +2108,19 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 1570,
-        "y": 320,
+        "x": 1470,
+        "y": 840,
         "wires": [
             [
-                "cac34d559af9f3e4"
+                "502b58f8cae5f329"
             ]
         ]
     },
     {
-        "id": "cee0e5ee85a4e536",
+        "id": "7be4115cdb83db52",
         "type": "ui_button",
-        "z": "54c6c3bfbd6d9993",
-        "g": "08d0724ddf5b999b",
+        "z": "01be268ef23b84f3",
+        "g": "6aba6e85a81f78d3",
         "name": "IconRefresh",
         "group": "31de8e5b82691490",
         "order": 1,
@@ -2106,18 +2138,18 @@
         "topic": "",
         "topicType": "str",
         "x": 990,
-        "y": 440,
+        "y": 360,
         "wires": [
             [
-                "5bc39fb82456f9e5"
+                "189c231540a44ef8"
             ]
         ]
     },
     {
-        "id": "c6888d41c8d468c3",
+        "id": "90824775ce2a5c0f",
         "type": "ui_button",
-        "z": "54c6c3bfbd6d9993",
-        "g": "753f47c82d92d3bf",
+        "z": "01be268ef23b84f3",
+        "g": "d7b4bc8491e7a936",
         "name": "",
         "group": "cdd0e15889b1286d",
         "order": 2,
@@ -2134,19 +2166,19 @@
         "payloadType": "str",
         "topic": "button",
         "topicType": "str",
-        "x": 580,
-        "y": 680,
+        "x": 470,
+        "y": 500,
         "wires": [
             [
-                "d8caa7c2760a8025"
+                "642ceca271c98df2"
             ]
         ]
     },
     {
-        "id": "7f67f2f4899a9a2a",
+        "id": "ba2a8eb2b1caac3d",
         "type": "ui_button",
-        "z": "54c6c3bfbd6d9993",
-        "g": "753f47c82d92d3bf",
+        "z": "01be268ef23b84f3",
+        "g": "d7b4bc8491e7a936",
         "name": "",
         "group": "cdd0e15889b1286d",
         "order": 5,
@@ -2163,19 +2195,19 @@
         "payloadType": "str",
         "topic": "button",
         "topicType": "str",
-        "x": 600,
-        "y": 740,
+        "x": 480,
+        "y": 560,
         "wires": [
             [
-                "bd132edf0762af73"
+                "810251b126aca98d"
             ]
         ]
     },
     {
-        "id": "ca2143976e294b36",
+        "id": "6c83ac66f94e765b",
         "type": "ui_button",
-        "z": "54c6c3bfbd6d9993",
-        "g": "753f47c82d92d3bf",
+        "z": "01be268ef23b84f3",
+        "g": "10b69a3755dc3651",
         "name": "MapRefresh",
         "group": "dc85dc3382f47ab2",
         "order": 1,
@@ -2192,19 +2224,19 @@
         "payloadType": "bool",
         "topic": "",
         "topicType": "str",
-        "x": 590,
-        "y": 800,
+        "x": 770,
+        "y": 1000,
         "wires": [
             [
-                "e1a82cbae25fdb28"
+                "aafcecbd3cf7920f"
             ]
         ]
     },
     {
-        "id": "e0e6af6da425dd38",
+        "id": "e6d65f0e2bed9b55",
         "type": "ui_text",
-        "z": "54c6c3bfbd6d9993",
-        "g": "354d2874de048d42",
+        "z": "01be268ef23b84f3",
+        "g": "b7a1c5ff6d42a2b2",
         "group": "f1b999f5373c31d8",
         "order": 2,
         "width": 3,
@@ -2219,10 +2251,10 @@
         "wires": []
     },
     {
-        "id": "84e55c67958ffc41",
+        "id": "1e5f52a9c1cbfd69",
         "type": "ui_text",
-        "z": "54c6c3bfbd6d9993",
-        "g": "354d2874de048d42",
+        "z": "01be268ef23b84f3",
+        "g": "b7a1c5ff6d42a2b2",
         "group": "f1b999f5373c31d8",
         "order": 5,
         "width": 3,
@@ -2237,10 +2269,10 @@
         "wires": []
     },
     {
-        "id": "7eaf695dfc212841",
+        "id": "68e416e559ac58a7",
         "type": "ui_text",
-        "z": "54c6c3bfbd6d9993",
-        "g": "c012487765f034fc",
+        "z": "01be268ef23b84f3",
+        "g": "b8492e4296574125",
         "group": "5e32d1811541c3ed",
         "order": 2,
         "width": 3,
@@ -2255,10 +2287,10 @@
         "wires": []
     },
     {
-        "id": "41e8d24f03462aba",
+        "id": "24616268daae455a",
         "type": "ui_text",
-        "z": "54c6c3bfbd6d9993",
-        "g": "c012487765f034fc",
+        "z": "01be268ef23b84f3",
+        "g": "b8492e4296574125",
         "group": "5e32d1811541c3ed",
         "order": 5,
         "width": 3,
@@ -2273,10 +2305,10 @@
         "wires": []
     },
     {
-        "id": "64488ac3965a1f09",
+        "id": "84b4a966e6364cc4",
         "type": "ui_text",
-        "z": "54c6c3bfbd6d9993",
-        "g": "1dcff70bb5d269ad",
+        "z": "01be268ef23b84f3",
+        "g": "5607e75c56be8a76",
         "group": "d4d16815f75585a6",
         "order": 2,
         "width": 3,
@@ -2291,10 +2323,10 @@
         "wires": []
     },
     {
-        "id": "2649d1d9728dfab1",
+        "id": "69d32c09d1f55711",
         "type": "ui_text",
-        "z": "54c6c3bfbd6d9993",
-        "g": "1dcff70bb5d269ad",
+        "z": "01be268ef23b84f3",
+        "g": "5607e75c56be8a76",
         "group": "d4d16815f75585a6",
         "order": 5,
         "width": 3,
@@ -2309,10 +2341,10 @@
         "wires": []
     },
     {
-        "id": "398dca16e967973f",
+        "id": "30ce71893af79a0f",
         "type": "ui_text",
-        "z": "54c6c3bfbd6d9993",
-        "g": "416bee4d9d9eb702",
+        "z": "01be268ef23b84f3",
+        "g": "1c9e9e77a71c4448",
         "group": "63c960e3ff3fcba6",
         "order": 2,
         "width": 3,
@@ -2327,10 +2359,10 @@
         "wires": []
     },
     {
-        "id": "2612d21701d07108",
+        "id": "2e3515e2422d1d73",
         "type": "ui_text",
-        "z": "54c6c3bfbd6d9993",
-        "g": "416bee4d9d9eb702",
+        "z": "01be268ef23b84f3",
+        "g": "1c9e9e77a71c4448",
         "group": "63c960e3ff3fcba6",
         "order": 5,
         "width": 3,
@@ -2345,10 +2377,10 @@
         "wires": []
     },
     {
-        "id": "81de30077de9d801",
+        "id": "d7c3600cbdd4447a",
         "type": "ui_text",
-        "z": "54c6c3bfbd6d9993",
-        "g": "08d0724ddf5b999b",
+        "z": "01be268ef23b84f3",
+        "g": "6aba6e85a81f78d3",
         "group": "31de8e5b82691490",
         "order": 7,
         "width": 2,
@@ -2359,14 +2391,14 @@
         "layout": "row-left",
         "className": "",
         "x": 990,
-        "y": 240,
+        "y": 160,
         "wires": []
     },
     {
-        "id": "2cf5b28e54a11150",
+        "id": "8276b8a77ea5d292",
         "type": "ui_text",
-        "z": "54c6c3bfbd6d9993",
-        "g": "08d0724ddf5b999b",
+        "z": "01be268ef23b84f3",
+        "g": "6aba6e85a81f78d3",
         "group": "31de8e5b82691490",
         "order": 6,
         "width": 3,
@@ -2377,14 +2409,14 @@
         "layout": "col-center",
         "className": "",
         "x": 970,
-        "y": 320,
+        "y": 240,
         "wires": []
     },
     {
-        "id": "f594592a1eaa10df",
+        "id": "9f3790850b18c90c",
         "type": "ui_text",
-        "z": "54c6c3bfbd6d9993",
-        "g": "08d0724ddf5b999b",
+        "z": "01be268ef23b84f3",
+        "g": "6aba6e85a81f78d3",
         "group": "31de8e5b82691490",
         "order": 3,
         "width": 3,
@@ -2395,14 +2427,14 @@
         "layout": "row-center",
         "className": "",
         "x": 990,
-        "y": 360,
+        "y": 280,
         "wires": []
     },
     {
-        "id": "5070f3f34ecf9a44",
+        "id": "6d61d49367d77090",
         "type": "ui_text",
-        "z": "54c6c3bfbd6d9993",
-        "g": "08d0724ddf5b999b",
+        "z": "01be268ef23b84f3",
+        "g": "6aba6e85a81f78d3",
         "group": "31de8e5b82691490",
         "order": 4,
         "width": 3,
@@ -2413,14 +2445,14 @@
         "layout": "row-center",
         "className": "",
         "x": 990,
-        "y": 400,
+        "y": 320,
         "wires": []
     },
     {
-        "id": "51712fd4a941ba16",
+        "id": "81a310c99d89a1fd",
         "type": "ui_text",
-        "z": "54c6c3bfbd6d9993",
-        "g": "08d0724ddf5b999b",
+        "z": "01be268ef23b84f3",
+        "g": "6aba6e85a81f78d3",
         "group": "31de8e5b82691490",
         "order": 5,
         "width": 2,
@@ -2431,14 +2463,14 @@
         "layout": "row-center",
         "className": "",
         "x": 990,
-        "y": 280,
+        "y": 200,
         "wires": []
     },
     {
-        "id": "74d898a2365dff9f",
+        "id": "dafe5e328bcef7e7",
         "type": "ui_gauge",
-        "z": "54c6c3bfbd6d9993",
-        "g": "354d2874de048d42",
+        "z": "01be268ef23b84f3",
+        "g": "b7a1c5ff6d42a2b2",
         "name": "Temp. Gauge1",
         "group": "78956960e46b2a2e",
         "order": 1,
@@ -2464,10 +2496,10 @@
         "wires": []
     },
     {
-        "id": "238c6261662cd19e",
+        "id": "479902ce1a68f115",
         "type": "ui_gauge",
-        "z": "54c6c3bfbd6d9993",
-        "g": "354d2874de048d42",
+        "z": "01be268ef23b84f3",
+        "g": "b7a1c5ff6d42a2b2",
         "name": "Hum. Gauge1",
         "group": "78956960e46b2a2e",
         "order": 3,
@@ -2493,10 +2525,10 @@
         "wires": []
     },
     {
-        "id": "70528e820cc40d6f",
+        "id": "3f609e528897c9ce",
         "type": "ui_gauge",
-        "z": "54c6c3bfbd6d9993",
-        "g": "354d2874de048d42",
+        "z": "01be268ef23b84f3",
+        "g": "b7a1c5ff6d42a2b2",
         "name": "Moist. Gauge1",
         "group": "78956960e46b2a2e",
         "order": 5,
@@ -2522,10 +2554,10 @@
         "wires": []
     },
     {
-        "id": "aa57601253ce3f61",
+        "id": "0bb03734acb0bea6",
         "type": "ui_gauge",
-        "z": "54c6c3bfbd6d9993",
-        "g": "354d2874de048d42",
+        "z": "01be268ef23b84f3",
+        "g": "b7a1c5ff6d42a2b2",
         "name": "Light Gauge1",
         "group": "78956960e46b2a2e",
         "order": 7,
@@ -2551,10 +2583,10 @@
         "wires": []
     },
     {
-        "id": "15fdd082aea98212",
+        "id": "67f55e97e1ea6d07",
         "type": "ui_gauge",
-        "z": "54c6c3bfbd6d9993",
-        "g": "c012487765f034fc",
+        "z": "01be268ef23b84f3",
+        "g": "b8492e4296574125",
         "name": "Temp. Gauge2",
         "group": "99dca6761e2d9c28",
         "order": 1,
@@ -2580,10 +2612,10 @@
         "wires": []
     },
     {
-        "id": "b136ba9ee0ad3e99",
+        "id": "fc046d9aa4feaea1",
         "type": "ui_gauge",
-        "z": "54c6c3bfbd6d9993",
-        "g": "c012487765f034fc",
+        "z": "01be268ef23b84f3",
+        "g": "b8492e4296574125",
         "name": "Hum. Gauge2",
         "group": "99dca6761e2d9c28",
         "order": 3,
@@ -2609,10 +2641,10 @@
         "wires": []
     },
     {
-        "id": "30d2520e3b4c4ff0",
+        "id": "d45ee1f056063b1a",
         "type": "ui_gauge",
-        "z": "54c6c3bfbd6d9993",
-        "g": "c012487765f034fc",
+        "z": "01be268ef23b84f3",
+        "g": "b8492e4296574125",
         "name": "Moist. Gauge2",
         "group": "99dca6761e2d9c28",
         "order": 5,
@@ -2638,10 +2670,10 @@
         "wires": []
     },
     {
-        "id": "165f420e2a16f890",
+        "id": "ee6a379a385651ed",
         "type": "ui_gauge",
-        "z": "54c6c3bfbd6d9993",
-        "g": "c012487765f034fc",
+        "z": "01be268ef23b84f3",
+        "g": "b8492e4296574125",
         "name": "Light Gauge2",
         "group": "99dca6761e2d9c28",
         "order": 7,
@@ -2667,10 +2699,10 @@
         "wires": []
     },
     {
-        "id": "367fcca0182d22c7",
+        "id": "b92752dba852861b",
         "type": "ui_gauge",
-        "z": "54c6c3bfbd6d9993",
-        "g": "1dcff70bb5d269ad",
+        "z": "01be268ef23b84f3",
+        "g": "5607e75c56be8a76",
         "name": "Temp. Gauge3",
         "group": "76c122f563a2790b",
         "order": 1,
@@ -2696,10 +2728,10 @@
         "wires": []
     },
     {
-        "id": "5e14d94b454dfb4f",
+        "id": "c35a5c52d1df4c52",
         "type": "ui_gauge",
-        "z": "54c6c3bfbd6d9993",
-        "g": "1dcff70bb5d269ad",
+        "z": "01be268ef23b84f3",
+        "g": "5607e75c56be8a76",
         "name": "Hum. Gauge3",
         "group": "76c122f563a2790b",
         "order": 3,
@@ -2725,10 +2757,10 @@
         "wires": []
     },
     {
-        "id": "39f4b3c42a6cacfb",
+        "id": "753c1121fc0c0e2e",
         "type": "ui_gauge",
-        "z": "54c6c3bfbd6d9993",
-        "g": "1dcff70bb5d269ad",
+        "z": "01be268ef23b84f3",
+        "g": "5607e75c56be8a76",
         "name": "Moist. Gauge3",
         "group": "76c122f563a2790b",
         "order": 5,
@@ -2754,10 +2786,10 @@
         "wires": []
     },
     {
-        "id": "5d91f6e5e4d69610",
+        "id": "bac36cc3b2ad7758",
         "type": "ui_gauge",
-        "z": "54c6c3bfbd6d9993",
-        "g": "1dcff70bb5d269ad",
+        "z": "01be268ef23b84f3",
+        "g": "5607e75c56be8a76",
         "name": "Light Gauge3",
         "group": "76c122f563a2790b",
         "order": 7,
@@ -2783,10 +2815,10 @@
         "wires": []
     },
     {
-        "id": "bc1c55b6eb768038",
+        "id": "b92f72f8a9fadeb7",
         "type": "ui_gauge",
-        "z": "54c6c3bfbd6d9993",
-        "g": "416bee4d9d9eb702",
+        "z": "01be268ef23b84f3",
+        "g": "1c9e9e77a71c4448",
         "name": "Temp. Gauge4",
         "group": "dca27f708d79a283",
         "order": 1,
@@ -2812,10 +2844,10 @@
         "wires": []
     },
     {
-        "id": "7b05edc2099db09c",
+        "id": "7c5415baa18c03ea",
         "type": "ui_gauge",
-        "z": "54c6c3bfbd6d9993",
-        "g": "416bee4d9d9eb702",
+        "z": "01be268ef23b84f3",
+        "g": "1c9e9e77a71c4448",
         "name": "Hum. Gauge4",
         "group": "dca27f708d79a283",
         "order": 3,
@@ -2841,10 +2873,10 @@
         "wires": []
     },
     {
-        "id": "6c0edeaec5503e4e",
+        "id": "a26bb709bdf54963",
         "type": "ui_gauge",
-        "z": "54c6c3bfbd6d9993",
-        "g": "416bee4d9d9eb702",
+        "z": "01be268ef23b84f3",
+        "g": "1c9e9e77a71c4448",
         "name": "Moist. Gauge4",
         "group": "dca27f708d79a283",
         "order": 5,
@@ -2870,10 +2902,10 @@
         "wires": []
     },
     {
-        "id": "9c0cfc42e28109a7",
+        "id": "fade06db7eb9ed4b",
         "type": "ui_gauge",
-        "z": "54c6c3bfbd6d9993",
-        "g": "416bee4d9d9eb702",
+        "z": "01be268ef23b84f3",
+        "g": "1c9e9e77a71c4448",
         "name": "Light Gauge4",
         "group": "dca27f708d79a283",
         "order": 7,
@@ -2899,10 +2931,10 @@
         "wires": []
     },
     {
-        "id": "cfdf380ce4f23041",
+        "id": "b2fb09063eaf53f1",
         "type": "ui_chart",
-        "z": "54c6c3bfbd6d9993",
-        "g": "354d2874de048d42",
+        "z": "01be268ef23b84f3",
+        "g": "b7a1c5ff6d42a2b2",
         "name": "Temp. Chart1",
         "group": "78956960e46b2a2e",
         "order": 2,
@@ -2944,10 +2976,10 @@
         ]
     },
     {
-        "id": "7b3c4959cd3a0200",
+        "id": "e4de1da7d2626a52",
         "type": "ui_chart",
-        "z": "54c6c3bfbd6d9993",
-        "g": "354d2874de048d42",
+        "z": "01be268ef23b84f3",
+        "g": "b7a1c5ff6d42a2b2",
         "name": "Hum. Chart1",
         "group": "78956960e46b2a2e",
         "order": 4,
@@ -2989,10 +3021,10 @@
         ]
     },
     {
-        "id": "5b32f69ea65e1452",
+        "id": "684a236d23e42f63",
         "type": "ui_chart",
-        "z": "54c6c3bfbd6d9993",
-        "g": "354d2874de048d42",
+        "z": "01be268ef23b84f3",
+        "g": "b7a1c5ff6d42a2b2",
         "name": "Moist. Chart1",
         "group": "78956960e46b2a2e",
         "order": 6,
@@ -3034,10 +3066,10 @@
         ]
     },
     {
-        "id": "d893fcc9b43c3435",
+        "id": "018c96562f3a6147",
         "type": "ui_chart",
-        "z": "54c6c3bfbd6d9993",
-        "g": "354d2874de048d42",
+        "z": "01be268ef23b84f3",
+        "g": "b7a1c5ff6d42a2b2",
         "name": "Light Chart1",
         "group": "78956960e46b2a2e",
         "order": 8,
@@ -3079,10 +3111,10 @@
         ]
     },
     {
-        "id": "bf3af8eb1ed36b90",
+        "id": "e19dbf8221cc2728",
         "type": "ui_chart",
-        "z": "54c6c3bfbd6d9993",
-        "g": "354d2874de048d42",
+        "z": "01be268ef23b84f3",
+        "g": "b7a1c5ff6d42a2b2",
         "name": "PumpChart1",
         "group": "f1b999f5373c31d8",
         "order": 3,
@@ -3124,10 +3156,10 @@
         ]
     },
     {
-        "id": "de7fe50bae5315a4",
+        "id": "33ef5908970c383d",
         "type": "ui_chart",
-        "z": "54c6c3bfbd6d9993",
-        "g": "354d2874de048d42",
+        "z": "01be268ef23b84f3",
+        "g": "b7a1c5ff6d42a2b2",
         "name": "LedChart1",
         "group": "f1b999f5373c31d8",
         "order": 6,
@@ -3169,10 +3201,10 @@
         ]
     },
     {
-        "id": "9dfd1ab8f9f685c2",
+        "id": "90e6dd5c1c41cc71",
         "type": "ui_chart",
-        "z": "54c6c3bfbd6d9993",
-        "g": "c012487765f034fc",
+        "z": "01be268ef23b84f3",
+        "g": "b8492e4296574125",
         "name": "PumpChart2",
         "group": "5e32d1811541c3ed",
         "order": 3,
@@ -3214,10 +3246,10 @@
         ]
     },
     {
-        "id": "24d7a860cf420409",
+        "id": "eca2b1305c93e1b1",
         "type": "ui_chart",
-        "z": "54c6c3bfbd6d9993",
-        "g": "c012487765f034fc",
+        "z": "01be268ef23b84f3",
+        "g": "b8492e4296574125",
         "name": "LedChart2",
         "group": "5e32d1811541c3ed",
         "order": 6,
@@ -3259,10 +3291,10 @@
         ]
     },
     {
-        "id": "a80ff969cc6fe56e",
+        "id": "a4222b4351b14865",
         "type": "ui_chart",
-        "z": "54c6c3bfbd6d9993",
-        "g": "c012487765f034fc",
+        "z": "01be268ef23b84f3",
+        "g": "b8492e4296574125",
         "name": "Temp. Chart2",
         "group": "99dca6761e2d9c28",
         "order": 2,
@@ -3304,10 +3336,10 @@
         ]
     },
     {
-        "id": "c6d2c2bb886af49a",
+        "id": "93696e5a938a216c",
         "type": "ui_chart",
-        "z": "54c6c3bfbd6d9993",
-        "g": "c012487765f034fc",
+        "z": "01be268ef23b84f3",
+        "g": "b8492e4296574125",
         "name": "Hum. Chart2",
         "group": "99dca6761e2d9c28",
         "order": 4,
@@ -3349,10 +3381,10 @@
         ]
     },
     {
-        "id": "bd1de411f8e3f56d",
+        "id": "5aab1da9727f6195",
         "type": "ui_chart",
-        "z": "54c6c3bfbd6d9993",
-        "g": "c012487765f034fc",
+        "z": "01be268ef23b84f3",
+        "g": "b8492e4296574125",
         "name": "Moist. Chart2",
         "group": "99dca6761e2d9c28",
         "order": 6,
@@ -3394,10 +3426,10 @@
         ]
     },
     {
-        "id": "3e85ae98e149e719",
+        "id": "fd9b9b93ce25cbd9",
         "type": "ui_chart",
-        "z": "54c6c3bfbd6d9993",
-        "g": "c012487765f034fc",
+        "z": "01be268ef23b84f3",
+        "g": "b8492e4296574125",
         "name": "Light Chart2",
         "group": "99dca6761e2d9c28",
         "order": 8,
@@ -3439,10 +3471,10 @@
         ]
     },
     {
-        "id": "f33b13558d0d16e2",
+        "id": "3795c322d8e02535",
         "type": "ui_chart",
-        "z": "54c6c3bfbd6d9993",
-        "g": "1dcff70bb5d269ad",
+        "z": "01be268ef23b84f3",
+        "g": "5607e75c56be8a76",
         "name": "PumpChart3",
         "group": "d4d16815f75585a6",
         "order": 3,
@@ -3484,10 +3516,10 @@
         ]
     },
     {
-        "id": "5964a87309788fe1",
+        "id": "9233cd8345c2c9b8",
         "type": "ui_chart",
-        "z": "54c6c3bfbd6d9993",
-        "g": "1dcff70bb5d269ad",
+        "z": "01be268ef23b84f3",
+        "g": "5607e75c56be8a76",
         "name": "LedChart3",
         "group": "d4d16815f75585a6",
         "order": 6,
@@ -3529,10 +3561,10 @@
         ]
     },
     {
-        "id": "34b46a30a8518f9c",
+        "id": "2c4e88ac9bacc85b",
         "type": "ui_chart",
-        "z": "54c6c3bfbd6d9993",
-        "g": "1dcff70bb5d269ad",
+        "z": "01be268ef23b84f3",
+        "g": "5607e75c56be8a76",
         "name": "Temp. Chart3",
         "group": "76c122f563a2790b",
         "order": 2,
@@ -3574,10 +3606,10 @@
         ]
     },
     {
-        "id": "bc2594c6dd549e33",
+        "id": "053d9d2f03fe9811",
         "type": "ui_chart",
-        "z": "54c6c3bfbd6d9993",
-        "g": "1dcff70bb5d269ad",
+        "z": "01be268ef23b84f3",
+        "g": "5607e75c56be8a76",
         "name": "Hum. Chart3",
         "group": "76c122f563a2790b",
         "order": 4,
@@ -3619,10 +3651,10 @@
         ]
     },
     {
-        "id": "847bc0227ad2e83d",
+        "id": "326e4338d4253459",
         "type": "ui_chart",
-        "z": "54c6c3bfbd6d9993",
-        "g": "1dcff70bb5d269ad",
+        "z": "01be268ef23b84f3",
+        "g": "5607e75c56be8a76",
         "name": "Moist. Chart3",
         "group": "76c122f563a2790b",
         "order": 6,
@@ -3664,10 +3696,10 @@
         ]
     },
     {
-        "id": "c3dcc49c6a76dd69",
+        "id": "ad6030fa6e8d3f6a",
         "type": "ui_chart",
-        "z": "54c6c3bfbd6d9993",
-        "g": "1dcff70bb5d269ad",
+        "z": "01be268ef23b84f3",
+        "g": "5607e75c56be8a76",
         "name": "Light Chart3",
         "group": "76c122f563a2790b",
         "order": 8,
@@ -3709,10 +3741,10 @@
         ]
     },
     {
-        "id": "83eda9de1787378a",
+        "id": "b5f0d067a84b647f",
         "type": "ui_chart",
-        "z": "54c6c3bfbd6d9993",
-        "g": "416bee4d9d9eb702",
+        "z": "01be268ef23b84f3",
+        "g": "1c9e9e77a71c4448",
         "name": "PumpChart4",
         "group": "63c960e3ff3fcba6",
         "order": 3,
@@ -3754,10 +3786,10 @@
         ]
     },
     {
-        "id": "bdbb39ce1dcb1bed",
+        "id": "f6ebba6cd18ca426",
         "type": "ui_chart",
-        "z": "54c6c3bfbd6d9993",
-        "g": "416bee4d9d9eb702",
+        "z": "01be268ef23b84f3",
+        "g": "1c9e9e77a71c4448",
         "name": "LedChart4",
         "group": "63c960e3ff3fcba6",
         "order": 6,
@@ -3799,10 +3831,10 @@
         ]
     },
     {
-        "id": "7d3c84d3c0ad03f2",
+        "id": "78c5c647cd309e0e",
         "type": "ui_chart",
-        "z": "54c6c3bfbd6d9993",
-        "g": "416bee4d9d9eb702",
+        "z": "01be268ef23b84f3",
+        "g": "1c9e9e77a71c4448",
         "name": "Temp. Chart4",
         "group": "dca27f708d79a283",
         "order": 2,
@@ -3844,10 +3876,10 @@
         ]
     },
     {
-        "id": "452c8ce5f1e4adcd",
+        "id": "a08d3257d26015bd",
         "type": "ui_chart",
-        "z": "54c6c3bfbd6d9993",
-        "g": "416bee4d9d9eb702",
+        "z": "01be268ef23b84f3",
+        "g": "1c9e9e77a71c4448",
         "name": "Hum. Chart4",
         "group": "dca27f708d79a283",
         "order": 4,
@@ -3889,10 +3921,10 @@
         ]
     },
     {
-        "id": "77f63c69d96b02e7",
+        "id": "038969ef5d042c4e",
         "type": "ui_chart",
-        "z": "54c6c3bfbd6d9993",
-        "g": "416bee4d9d9eb702",
+        "z": "01be268ef23b84f3",
+        "g": "1c9e9e77a71c4448",
         "name": "Moist. Chart4",
         "group": "dca27f708d79a283",
         "order": 6,
@@ -3934,10 +3966,10 @@
         ]
     },
     {
-        "id": "cb9f0458f0d50755",
+        "id": "7abc7bd4a21669ee",
         "type": "ui_chart",
-        "z": "54c6c3bfbd6d9993",
-        "g": "416bee4d9d9eb702",
+        "z": "01be268ef23b84f3",
+        "g": "1c9e9e77a71c4448",
         "name": "Light Chart4",
         "group": "dca27f708d79a283",
         "order": 8,
@@ -3979,10 +4011,10 @@
         ]
     },
     {
-        "id": "5f104faee7795fa0",
+        "id": "9b5fa9838f1ac345",
         "type": "ui_chart",
-        "z": "54c6c3bfbd6d9993",
-        "g": "6de25c967950bdcd",
+        "z": "01be268ef23b84f3",
+        "g": "f3b8583edd5bb0e7",
         "name": "Consumption Chart",
         "group": "034412fb686048d4",
         "order": 1,
@@ -4017,47 +4049,32 @@
         "outputs": 1,
         "useDifferentColor": false,
         "className": "",
-        "x": 2350,
-        "y": 380,
+        "x": 2220,
+        "y": 900,
         "wires": [
             []
         ]
     },
     {
-        "id": "e912d0829f74a764",
+        "id": "10baf33c0ddcb7cd",
         "type": "ui_ui_control",
-        "z": "54c6c3bfbd6d9993",
-        "g": "08d0724ddf5b999b",
+        "z": "01be268ef23b84f3",
+        "g": "6aba6e85a81f78d3",
         "name": "Update tab",
         "events": "change",
         "x": 110,
-        "y": 300,
+        "y": 220,
         "wires": [
             [
-                "ca33adc539d22833"
+                "ac31fcaed037420f"
             ]
         ]
     },
     {
-        "id": "559190b99c290935",
-        "type": "ui_ui_control",
-        "z": "54c6c3bfbd6d9993",
-        "g": "753f47c82d92d3bf",
-        "name": "",
-        "events": "connect",
-        "x": 580,
-        "y": 860,
-        "wires": [
-            [
-                "e1a82cbae25fdb28"
-            ]
-        ]
-    },
-    {
-        "id": "7e1230196b3f6055",
+        "id": "144efebfb54c1449",
         "type": "ui_template",
-        "z": "54c6c3bfbd6d9993",
-        "g": "169ea57b72f1db13",
+        "z": "01be268ef23b84f3",
+        "g": "ed7ca175967ae604",
         "group": "2a745e6b.07df92",
         "name": "Dashboard Theme : Modern Dark",
         "order": 1,
@@ -4070,7 +4087,7 @@
         "templateScope": "global",
         "className": "",
         "x": 180,
-        "y": 580,
+        "y": 500,
         "wires": [
             []
         ],
@@ -4078,10 +4095,10 @@
         "info": "# Modern Dark Theme for node-red-dashboard\n\nInspired by Victor Lucachi with his [Node Red Dashboard Concept](https://dribbble.com/shots/10356530-Node-Red-Dashboard-Concept) on Dribbble. Thank you for your work.\n\n## Customize\n\n1. Go on dashboard customisation tab (At the right of Debug Console).\n2. Select the style `Dark`.\n3. Pick the color you want. Example `#66B5F8`\n\n## Buttons\n\nUse `2x2` size for buttons with icon and text on the screenshot"
     },
     {
-        "id": "952ad60128e43d6a",
+        "id": "bd6a39f80514f529",
         "type": "ui_template",
-        "z": "54c6c3bfbd6d9993",
-        "g": "08d0724ddf5b999b",
+        "z": "01be268ef23b84f3",
+        "g": "6aba6e85a81f78d3",
         "group": "31de8e5b82691490",
         "name": "Forecast2",
         "order": 2,
@@ -4094,18 +4111,62 @@
         "templateScope": "local",
         "className": "backgr",
         "x": 980,
-        "y": 480,
+        "y": 400,
         "wires": [
             []
         ]
     },
     {
-        "id": "8ace7877e52e78f6",
+        "id": "ed982b8d21d131a4",
         "type": "ui_template",
-        "z": "54c6c3bfbd6d9993",
-        "g": "169ea57b72f1db13",
+        "z": "01be268ef23b84f3",
+        "g": "ed7ca175967ae604",
         "group": "f1b999f5373c31d8",
         "name": "Field 1 Format",
+        "order": 1,
+        "width": 0,
+        "height": 0,
+        "format": "<style>\n    .nr-dashboard-text.experiment {\n        background-color: #6DBD66\n    }\n    .nr-dashboard-text.wibble p.label{\n        font-size: 1.0em;\n    }\n    .nr-dashboard-text.wibble p.value{\n        font-size: 1.6em;\n    }\n</style>",
+        "storeOutMessages": true,
+        "fwdInMessages": true,
+        "resendOnRefresh": true,
+        "templateScope": "local",
+        "className": "",
+        "x": 120,
+        "y": 580,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "a5cbf2d06313b3b9",
+        "type": "ui_template",
+        "z": "01be268ef23b84f3",
+        "g": "ed7ca175967ae604",
+        "group": "5e32d1811541c3ed",
+        "name": "Field 2 Format",
+        "order": 1,
+        "width": 0,
+        "height": 0,
+        "format": "<style>\n    .nr-dashboard-text.experiment {\n        background-color: #6DBD66\n    }\n    .nr-dashboard-text.wibble p.label{\n        font-size: 1.0em;\n    }\n    .nr-dashboard-text.wibble p.value{\n        font-size: 1.6em;\n    }\n</style>",
+        "storeOutMessages": true,
+        "fwdInMessages": true,
+        "resendOnRefresh": true,
+        "templateScope": "local",
+        "className": "",
+        "x": 120,
+        "y": 620,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "45c15227051bb78d",
+        "type": "ui_template",
+        "z": "01be268ef23b84f3",
+        "g": "ed7ca175967ae604",
+        "group": "d4d16815f75585a6",
+        "name": "Field 3 Format",
         "order": 1,
         "width": 0,
         "height": 0,
@@ -4122,12 +4183,12 @@
         ]
     },
     {
-        "id": "a1b9db1458158cdb",
+        "id": "e2caec17d23b82f8",
         "type": "ui_template",
-        "z": "54c6c3bfbd6d9993",
-        "g": "169ea57b72f1db13",
-        "group": "5e32d1811541c3ed",
-        "name": "Field 2 Format",
+        "z": "01be268ef23b84f3",
+        "g": "ed7ca175967ae604",
+        "group": "63c960e3ff3fcba6",
+        "name": "Field 4 Format",
         "order": 1,
         "width": 0,
         "height": 0,
@@ -4144,54 +4205,10 @@
         ]
     },
     {
-        "id": "0e786d4f0e94f09a",
+        "id": "52cdeeca3c99af0e",
         "type": "ui_template",
-        "z": "54c6c3bfbd6d9993",
-        "g": "169ea57b72f1db13",
-        "group": "d4d16815f75585a6",
-        "name": "Field 3 Format",
-        "order": 1,
-        "width": 0,
-        "height": 0,
-        "format": "<style>\n    .nr-dashboard-text.experiment {\n        background-color: #6DBD66\n    }\n    .nr-dashboard-text.wibble p.label{\n        font-size: 1.0em;\n    }\n    .nr-dashboard-text.wibble p.value{\n        font-size: 1.6em;\n    }\n</style>",
-        "storeOutMessages": true,
-        "fwdInMessages": true,
-        "resendOnRefresh": true,
-        "templateScope": "local",
-        "className": "",
-        "x": 120,
-        "y": 740,
-        "wires": [
-            []
-        ]
-    },
-    {
-        "id": "2080495962b5b255",
-        "type": "ui_template",
-        "z": "54c6c3bfbd6d9993",
-        "g": "169ea57b72f1db13",
-        "group": "63c960e3ff3fcba6",
-        "name": "Field 4 Format",
-        "order": 1,
-        "width": 0,
-        "height": 0,
-        "format": "<style>\n    .nr-dashboard-text.experiment {\n        background-color: #6DBD66\n    }\n    .nr-dashboard-text.wibble p.label{\n        font-size: 1.0em;\n    }\n    .nr-dashboard-text.wibble p.value{\n        font-size: 1.6em;\n    }\n</style>",
-        "storeOutMessages": true,
-        "fwdInMessages": true,
-        "resendOnRefresh": true,
-        "templateScope": "local",
-        "className": "",
-        "x": 120,
-        "y": 780,
-        "wires": [
-            []
-        ]
-    },
-    {
-        "id": "44d905bc4b56f5a3",
-        "type": "ui_template",
-        "z": "54c6c3bfbd6d9993",
-        "g": "753f47c82d92d3bf",
+        "z": "01be268ef23b84f3",
+        "g": "d7b4bc8491e7a936",
         "group": "cdd0e15889b1286d",
         "name": "Bot redirect",
         "order": 6,
@@ -4203,17 +4220,17 @@
         "resendOnRefresh": false,
         "templateScope": "local",
         "className": "",
-        "x": 970,
-        "y": 740,
+        "x": 890,
+        "y": 560,
         "wires": [
             []
         ]
     },
     {
-        "id": "6378cf9c524cc11f",
+        "id": "c045212752891651",
         "type": "ui_template",
-        "z": "54c6c3bfbd6d9993",
-        "g": "753f47c82d92d3bf",
+        "z": "01be268ef23b84f3",
+        "g": "10b69a3755dc3651",
         "group": "dc85dc3382f47ab2",
         "name": "Localization Map",
         "order": 2,
@@ -4225,17 +4242,17 @@
         "resendOnRefresh": true,
         "templateScope": "local",
         "className": "",
-        "x": 1010,
-        "y": 800,
+        "x": 1210,
+        "y": 1000,
         "wires": [
             []
         ]
     },
     {
-        "id": "c2ef5a9debc98b46",
+        "id": "5618d80691aa8fd0",
         "type": "ui_table",
-        "z": "54c6c3bfbd6d9993",
-        "g": "be4dab2fd84694fb",
+        "z": "01be268ef23b84f3",
+        "g": "b3fc116541e28b32",
         "group": "6fd2c0e41aa3f4f8",
         "name": "",
         "order": 1,
@@ -4275,14 +4292,14 @@
         ],
         "outputs": 0,
         "cts": false,
-        "x": 2290,
-        "y": 260,
+        "x": 2150,
+        "y": 780,
         "wires": []
     },
     {
-        "id": "cac34d559af9f3e4",
+        "id": "502b58f8cae5f329",
         "type": "simpletime",
-        "z": "54c6c3bfbd6d9993",
+        "z": "01be268ef23b84f3",
         "name": "",
         "mydate": false,
         "myymd": false,
@@ -4303,19 +4320,19 @@
         "myepoch": false,
         "myrawdate": false,
         "mypm": false,
-        "x": 1750,
-        "y": 320,
+        "x": 1630,
+        "y": 840,
         "wires": [
             [
-                "f9394e0b13dbfd18"
+                "9cd9b4d7e6e25baf"
             ]
         ]
     },
     {
-        "id": "08e5b1613c881cfe",
+        "id": "bb0682ae5e263f06",
         "type": "moving-average",
-        "z": "54c6c3bfbd6d9993",
-        "g": "354d2874de048d42",
+        "z": "01be268ef23b84f3",
+        "g": "b7a1c5ff6d42a2b2",
         "name": "AVG",
         "amount": "10",
         "weight": "cumulative",
@@ -4323,15 +4340,15 @@
         "y": 340,
         "wires": [
             [
-                "29a8338f852b62b8"
+                "ac2147204bccb56b"
             ]
         ]
     },
     {
-        "id": "0645a30718171ddc",
+        "id": "87ad9ee0d22aa3a6",
         "type": "moving-average",
-        "z": "54c6c3bfbd6d9993",
-        "g": "354d2874de048d42",
+        "z": "01be268ef23b84f3",
+        "g": "b7a1c5ff6d42a2b2",
         "name": "AVG",
         "amount": 10,
         "weight": "cumulative",
@@ -4339,15 +4356,15 @@
         "y": 380,
         "wires": [
             [
-                "e6c305ef1d899cc5"
+                "47f137afb531552d"
             ]
         ]
     },
     {
-        "id": "f2b59f47bf70bf17",
+        "id": "2136fa51b5ac928d",
         "type": "moving-average",
-        "z": "54c6c3bfbd6d9993",
-        "g": "354d2874de048d42",
+        "z": "01be268ef23b84f3",
+        "g": "b7a1c5ff6d42a2b2",
         "name": "AVG",
         "amount": 10,
         "weight": "cumulative",
@@ -4355,15 +4372,15 @@
         "y": 420,
         "wires": [
             [
-                "bd7ae576522b52e9"
+                "840dbb40292bf33f"
             ]
         ]
     },
     {
-        "id": "3148fb9c4ee39dce",
+        "id": "b7cae3b3ab8dbb69",
         "type": "moving-average",
-        "z": "54c6c3bfbd6d9993",
-        "g": "354d2874de048d42",
+        "z": "01be268ef23b84f3",
+        "g": "b7a1c5ff6d42a2b2",
         "name": "AVG",
         "amount": 10,
         "weight": "cumulative",
@@ -4371,15 +4388,15 @@
         "y": 460,
         "wires": [
             [
-                "6630f479ed1809d6"
+                "5bedc02cda4bef97"
             ]
         ]
     },
     {
-        "id": "0a3188521f1658fa",
+        "id": "24ee03abf3cad8f2",
         "type": "moving-average",
-        "z": "54c6c3bfbd6d9993",
-        "g": "c012487765f034fc",
+        "z": "01be268ef23b84f3",
+        "g": "b8492e4296574125",
         "name": "AVG",
         "amount": "10",
         "weight": "cumulative",
@@ -4387,15 +4404,15 @@
         "y": 820,
         "wires": [
             [
-                "04d112a720937c9b"
+                "5a1b72126f528f40"
             ]
         ]
     },
     {
-        "id": "2d6d9e4704a073bf",
+        "id": "8f411cc702f7242e",
         "type": "moving-average",
-        "z": "54c6c3bfbd6d9993",
-        "g": "c012487765f034fc",
+        "z": "01be268ef23b84f3",
+        "g": "b8492e4296574125",
         "name": "AVG",
         "amount": 10,
         "weight": "cumulative",
@@ -4403,15 +4420,15 @@
         "y": 860,
         "wires": [
             [
-                "60f159cf626fd033"
+                "2ed0e6bf3a4d94e7"
             ]
         ]
     },
     {
-        "id": "a807259524efcc39",
+        "id": "2878b8ecb66d1ae8",
         "type": "moving-average",
-        "z": "54c6c3bfbd6d9993",
-        "g": "c012487765f034fc",
+        "z": "01be268ef23b84f3",
+        "g": "b8492e4296574125",
         "name": "AVG",
         "amount": 10,
         "weight": "cumulative",
@@ -4419,15 +4436,15 @@
         "y": 900,
         "wires": [
             [
-                "7f47620545a2d33f"
+                "26f0446f83e8743a"
             ]
         ]
     },
     {
-        "id": "43ec5bfc3fa67450",
+        "id": "3d5c8a148127da35",
         "type": "moving-average",
-        "z": "54c6c3bfbd6d9993",
-        "g": "c012487765f034fc",
+        "z": "01be268ef23b84f3",
+        "g": "b8492e4296574125",
         "name": "AVG",
         "amount": 10,
         "weight": "cumulative",
@@ -4435,15 +4452,15 @@
         "y": 940,
         "wires": [
             [
-                "1ca3432fd82643b3"
+                "d4a4d4fc2664168a"
             ]
         ]
     },
     {
-        "id": "893f13056f4abcc0",
+        "id": "ecbcec90e1fc335a",
         "type": "moving-average",
-        "z": "54c6c3bfbd6d9993",
-        "g": "1dcff70bb5d269ad",
+        "z": "01be268ef23b84f3",
+        "g": "5607e75c56be8a76",
         "name": "AVG",
         "amount": "10",
         "weight": "cumulative",
@@ -4451,15 +4468,15 @@
         "y": 1300,
         "wires": [
             [
-                "5dc1e3c550eb0293"
+                "6e5bf3e333cf1c3a"
             ]
         ]
     },
     {
-        "id": "af6c97e0526203de",
+        "id": "addd6631beb16734",
         "type": "moving-average",
-        "z": "54c6c3bfbd6d9993",
-        "g": "1dcff70bb5d269ad",
+        "z": "01be268ef23b84f3",
+        "g": "5607e75c56be8a76",
         "name": "AVG",
         "amount": 10,
         "weight": "cumulative",
@@ -4467,15 +4484,15 @@
         "y": 1340,
         "wires": [
             [
-                "cbebcdd8a82a39a9"
+                "e20ac085560cc462"
             ]
         ]
     },
     {
-        "id": "a5c0358531bc3b4a",
+        "id": "788371d6ad6ae854",
         "type": "moving-average",
-        "z": "54c6c3bfbd6d9993",
-        "g": "1dcff70bb5d269ad",
+        "z": "01be268ef23b84f3",
+        "g": "5607e75c56be8a76",
         "name": "AVG",
         "amount": 10,
         "weight": "cumulative",
@@ -4483,15 +4500,15 @@
         "y": 1380,
         "wires": [
             [
-                "0f38ed5b37c0047d"
+                "4fd913d6e43dddb9"
             ]
         ]
     },
     {
-        "id": "b236fbce862caad8",
+        "id": "094b9e938349d5ac",
         "type": "moving-average",
-        "z": "54c6c3bfbd6d9993",
-        "g": "1dcff70bb5d269ad",
+        "z": "01be268ef23b84f3",
+        "g": "5607e75c56be8a76",
         "name": "AVG",
         "amount": 10,
         "weight": "cumulative",
@@ -4499,15 +4516,15 @@
         "y": 1420,
         "wires": [
             [
-                "3e6601f5b230c113"
+                "ee06133432f84c25"
             ]
         ]
     },
     {
-        "id": "d8ddc8706a39e573",
+        "id": "f4b3e7f97290fd23",
         "type": "moving-average",
-        "z": "54c6c3bfbd6d9993",
-        "g": "416bee4d9d9eb702",
+        "z": "01be268ef23b84f3",
+        "g": "1c9e9e77a71c4448",
         "name": "AVG",
         "amount": "10",
         "weight": "cumulative",
@@ -4515,15 +4532,15 @@
         "y": 1780,
         "wires": [
             [
-                "61088dca915ee5e4"
+                "33032e309378b70e"
             ]
         ]
     },
     {
-        "id": "77de0cb43a52e452",
+        "id": "63de9f180b8f6d45",
         "type": "moving-average",
-        "z": "54c6c3bfbd6d9993",
-        "g": "416bee4d9d9eb702",
+        "z": "01be268ef23b84f3",
+        "g": "1c9e9e77a71c4448",
         "name": "AVG",
         "amount": 10,
         "weight": "cumulative",
@@ -4531,15 +4548,15 @@
         "y": 1820,
         "wires": [
             [
-                "0b1d7ad9af3b3038"
+                "d1607ce65ef254f2"
             ]
         ]
     },
     {
-        "id": "3db5d4eccd957785",
+        "id": "75d51d1d8e4222f4",
         "type": "moving-average",
-        "z": "54c6c3bfbd6d9993",
-        "g": "416bee4d9d9eb702",
+        "z": "01be268ef23b84f3",
+        "g": "1c9e9e77a71c4448",
         "name": "AVG",
         "amount": 10,
         "weight": "cumulative",
@@ -4547,15 +4564,15 @@
         "y": 1860,
         "wires": [
             [
-                "9bd1f68c315ab6cd"
+                "c69d1919e0b8bc60"
             ]
         ]
     },
     {
-        "id": "9cf8d2022219684b",
+        "id": "2feaf1e6568d5c6a",
         "type": "moving-average",
-        "z": "54c6c3bfbd6d9993",
-        "g": "416bee4d9d9eb702",
+        "z": "01be268ef23b84f3",
+        "g": "1c9e9e77a71c4448",
         "name": "AVG",
         "amount": 10,
         "weight": "cumulative",
@@ -4563,15 +4580,15 @@
         "y": 1900,
         "wires": [
             [
-                "3d9e04ae3c463556"
+                "471e039b9da6b6ce"
             ]
         ]
     },
     {
-        "id": "2ddc8e2131fe76ef",
+        "id": "2576ccf47c827254",
         "type": "ui_led",
-        "z": "54c6c3bfbd6d9993",
-        "g": "354d2874de048d42",
+        "z": "01be268ef23b84f3",
+        "g": "b7a1c5ff6d42a2b2",
         "order": 4,
         "group": "f1b999f5373c31d8",
         "width": 3,
@@ -4600,10 +4617,10 @@
         "wires": []
     },
     {
-        "id": "fcb4366de42c024c",
+        "id": "e3ecbba7062b089e",
         "type": "ui_led",
-        "z": "54c6c3bfbd6d9993",
-        "g": "354d2874de048d42",
+        "z": "01be268ef23b84f3",
+        "g": "b7a1c5ff6d42a2b2",
         "order": 7,
         "group": "f1b999f5373c31d8",
         "width": 3,
@@ -4632,10 +4649,10 @@
         "wires": []
     },
     {
-        "id": "a772f8756c46759d",
+        "id": "da47b51be8db8d4c",
         "type": "ui_led",
-        "z": "54c6c3bfbd6d9993",
-        "g": "c012487765f034fc",
+        "z": "01be268ef23b84f3",
+        "g": "b8492e4296574125",
         "order": 4,
         "group": "5e32d1811541c3ed",
         "width": 3,
@@ -4664,10 +4681,10 @@
         "wires": []
     },
     {
-        "id": "87f788ebfc2a76cc",
+        "id": "38b37d3f448e7ae0",
         "type": "ui_led",
-        "z": "54c6c3bfbd6d9993",
-        "g": "c012487765f034fc",
+        "z": "01be268ef23b84f3",
+        "g": "b8492e4296574125",
         "order": 7,
         "group": "5e32d1811541c3ed",
         "width": 3,
@@ -4696,10 +4713,10 @@
         "wires": []
     },
     {
-        "id": "3cf7998136f9fc6c",
+        "id": "8bf151f27241becb",
         "type": "ui_led",
-        "z": "54c6c3bfbd6d9993",
-        "g": "1dcff70bb5d269ad",
+        "z": "01be268ef23b84f3",
+        "g": "5607e75c56be8a76",
         "order": 4,
         "group": "d4d16815f75585a6",
         "width": 3,
@@ -4728,10 +4745,10 @@
         "wires": []
     },
     {
-        "id": "68adb6db2bce1868",
+        "id": "24dfe4b71e9f936f",
         "type": "ui_led",
-        "z": "54c6c3bfbd6d9993",
-        "g": "1dcff70bb5d269ad",
+        "z": "01be268ef23b84f3",
+        "g": "5607e75c56be8a76",
         "order": 7,
         "group": "d4d16815f75585a6",
         "width": 3,
@@ -4760,10 +4777,10 @@
         "wires": []
     },
     {
-        "id": "e8aacf5dd20812d0",
+        "id": "ef08897036aee93b",
         "type": "ui_led",
-        "z": "54c6c3bfbd6d9993",
-        "g": "416bee4d9d9eb702",
+        "z": "01be268ef23b84f3",
+        "g": "1c9e9e77a71c4448",
         "order": 4,
         "group": "63c960e3ff3fcba6",
         "width": 3,
@@ -4792,10 +4809,10 @@
         "wires": []
     },
     {
-        "id": "3facc68a200937b8",
+        "id": "b7f1cae776933cec",
         "type": "ui_led",
-        "z": "54c6c3bfbd6d9993",
-        "g": "416bee4d9d9eb702",
+        "z": "01be268ef23b84f3",
+        "g": "1c9e9e77a71c4448",
         "order": 7,
         "group": "63c960e3ff3fcba6",
         "width": 3,
@@ -4824,10 +4841,10 @@
         "wires": []
     },
     {
-        "id": "5cabbdf8e12528c7",
+        "id": "ac8ad91742046dba",
         "type": "http request",
-        "z": "54c6c3bfbd6d9993",
-        "g": "829145b1a61a34fe",
+        "z": "01be268ef23b84f3",
+        "g": "a253b323941e42df",
         "name": "",
         "method": "POST",
         "ret": "obj",
@@ -4841,18 +4858,18 @@
         "senderr": false,
         "headers": [],
         "x": 310,
-        "y": 140,
+        "y": 60,
         "wires": [
             [
-                "b162538becd0a418"
+                "b00dcbdf3e7ae56b"
             ]
         ]
     },
     {
-        "id": "a844af5d2f5aa171",
+        "id": "cbf8dfd6080975d1",
         "type": "inject",
-        "z": "54c6c3bfbd6d9993",
-        "g": "829145b1a61a34fe",
+        "z": "01be268ef23b84f3",
+        "g": "a253b323941e42df",
         "name": "",
         "props": [
             {
@@ -4871,18 +4888,18 @@
         "payload": "{\"serviceName\":\"Dashboard\",\"availableServices\":[\"REST\",\"MQTT\"],\"servicesDetails\":[{\"serviceType\":\"MQTT\",\"subscribedTopics\":[\"#\"]},{\"serviceType\":\"REST\",\"serviceIP\":\"http://dashboard:1880\"}]}",
         "payloadType": "json",
         "x": 110,
-        "y": 140,
+        "y": 60,
         "wires": [
             [
-                "5cabbdf8e12528c7"
+                "ac8ad91742046dba"
             ]
         ]
     },
     {
-        "id": "146e266e936f2d04",
+        "id": "4bdcdb7ac6bb58ea",
         "type": "trigger",
-        "z": "54c6c3bfbd6d9993",
-        "g": "829145b1a61a34fe",
+        "z": "01be268ef23b84f3",
+        "g": "a253b323941e42df",
         "name": "",
         "op1": "",
         "op2": "",
@@ -4897,18 +4914,18 @@
         "topic": "topic",
         "outputs": 1,
         "x": 750,
-        "y": 140,
+        "y": 60,
         "wires": [
             [
-                "11a009cefeb1e519"
+                "efd44737f752a18c"
             ]
         ]
     },
     {
-        "id": "11a009cefeb1e519",
+        "id": "efd44737f752a18c",
         "type": "http request",
-        "z": "54c6c3bfbd6d9993",
-        "g": "829145b1a61a34fe",
+        "z": "01be268ef23b84f3",
+        "g": "a253b323941e42df",
         "name": "",
         "method": "PUT",
         "ret": "txt",
@@ -4922,16 +4939,16 @@
         "senderr": false,
         "headers": [],
         "x": 950,
-        "y": 140,
+        "y": 60,
         "wires": [
             []
         ]
     },
     {
-        "id": "b162538becd0a418",
+        "id": "b00dcbdf3e7ae56b",
         "type": "change",
-        "z": "54c6c3bfbd6d9993",
-        "g": "829145b1a61a34fe",
+        "z": "01be268ef23b84f3",
+        "g": "a253b323941e42df",
         "name": "",
         "rules": [
             {
@@ -4948,18 +4965,18 @@
         "to": "",
         "reg": false,
         "x": 520,
-        "y": 140,
+        "y": 60,
         "wires": [
             [
-                "146e266e936f2d04"
+                "4bdcdb7ac6bb58ea"
             ]
         ]
     },
     {
-        "id": "29a8338f852b62b8",
+        "id": "ac2147204bccb56b",
         "type": "trigger",
-        "z": "54c6c3bfbd6d9993",
-        "g": "354d2874de048d42",
+        "z": "01be268ef23b84f3",
+        "g": "b7a1c5ff6d42a2b2",
         "name": "",
         "op1": "",
         "op2": "",
@@ -4977,15 +4994,15 @@
         "y": 340,
         "wires": [
             [
-                "ed2e3e697275deb9"
+                "13615d43fc63b638"
             ]
         ]
     },
     {
-        "id": "e6c305ef1d899cc5",
+        "id": "47f137afb531552d",
         "type": "trigger",
-        "z": "54c6c3bfbd6d9993",
-        "g": "354d2874de048d42",
+        "z": "01be268ef23b84f3",
+        "g": "b7a1c5ff6d42a2b2",
         "name": "",
         "op1": "",
         "op2": "",
@@ -5003,15 +5020,15 @@
         "y": 380,
         "wires": [
             [
-                "480155bad90585ee"
+                "3185656e6edcea3b"
             ]
         ]
     },
     {
-        "id": "bd7ae576522b52e9",
+        "id": "840dbb40292bf33f",
         "type": "trigger",
-        "z": "54c6c3bfbd6d9993",
-        "g": "354d2874de048d42",
+        "z": "01be268ef23b84f3",
+        "g": "b7a1c5ff6d42a2b2",
         "name": "",
         "op1": "",
         "op2": "",
@@ -5029,15 +5046,15 @@
         "y": 420,
         "wires": [
             [
-                "1686bb74cbdcc097"
+                "663f1ad237351006"
             ]
         ]
     },
     {
-        "id": "6630f479ed1809d6",
+        "id": "5bedc02cda4bef97",
         "type": "trigger",
-        "z": "54c6c3bfbd6d9993",
-        "g": "354d2874de048d42",
+        "z": "01be268ef23b84f3",
+        "g": "b7a1c5ff6d42a2b2",
         "name": "",
         "op1": "",
         "op2": "",
@@ -5055,15 +5072,15 @@
         "y": 460,
         "wires": [
             [
-                "434184b11687360f"
+                "6ca18b95b95e7bfe"
             ]
         ]
     },
     {
-        "id": "04d112a720937c9b",
+        "id": "5a1b72126f528f40",
         "type": "trigger",
-        "z": "54c6c3bfbd6d9993",
-        "g": "c012487765f034fc",
+        "z": "01be268ef23b84f3",
+        "g": "b8492e4296574125",
         "name": "",
         "op1": "",
         "op2": "",
@@ -5081,14 +5098,14 @@
         "y": 820,
         "wires": [
             [
-                "8c3642d5bf8f094e"
+                "ce0e8dca48bf2e63"
             ]
         ]
     },
     {
-        "id": "ddacaf2460e6f678",
+        "id": "defd02cc53e2f3c3",
         "type": "trigger",
-        "z": "54c6c3bfbd6d9993",
+        "z": "01be268ef23b84f3",
         "name": "",
         "op1": "",
         "op2": "",
@@ -5109,10 +5126,10 @@
         ]
     },
     {
-        "id": "7f47620545a2d33f",
+        "id": "26f0446f83e8743a",
         "type": "trigger",
-        "z": "54c6c3bfbd6d9993",
-        "g": "c012487765f034fc",
+        "z": "01be268ef23b84f3",
+        "g": "b8492e4296574125",
         "name": "",
         "op1": "",
         "op2": "",
@@ -5130,15 +5147,15 @@
         "y": 900,
         "wires": [
             [
-                "f56f2342bfdb0995"
+                "6509cb97c01ce518"
             ]
         ]
     },
     {
-        "id": "1ca3432fd82643b3",
+        "id": "d4a4d4fc2664168a",
         "type": "trigger",
-        "z": "54c6c3bfbd6d9993",
-        "g": "c012487765f034fc",
+        "z": "01be268ef23b84f3",
+        "g": "b8492e4296574125",
         "name": "",
         "op1": "",
         "op2": "",
@@ -5156,15 +5173,15 @@
         "y": 940,
         "wires": [
             [
-                "0c3d4f0f7f0cdf99"
+                "9742b7484929ebc0"
             ]
         ]
     },
     {
-        "id": "5dc1e3c550eb0293",
+        "id": "6e5bf3e333cf1c3a",
         "type": "trigger",
-        "z": "54c6c3bfbd6d9993",
-        "g": "1dcff70bb5d269ad",
+        "z": "01be268ef23b84f3",
+        "g": "5607e75c56be8a76",
         "name": "",
         "op1": "",
         "op2": "",
@@ -5182,15 +5199,15 @@
         "y": 1300,
         "wires": [
             [
-                "4dc94e190a4ede38"
+                "8dcdad7ac4763fd6"
             ]
         ]
     },
     {
-        "id": "cbebcdd8a82a39a9",
+        "id": "e20ac085560cc462",
         "type": "trigger",
-        "z": "54c6c3bfbd6d9993",
-        "g": "1dcff70bb5d269ad",
+        "z": "01be268ef23b84f3",
+        "g": "5607e75c56be8a76",
         "name": "",
         "op1": "",
         "op2": "",
@@ -5208,15 +5225,15 @@
         "y": 1340,
         "wires": [
             [
-                "8134d6b30c491ce7"
+                "c97d10eceeb82305"
             ]
         ]
     },
     {
-        "id": "0f38ed5b37c0047d",
+        "id": "4fd913d6e43dddb9",
         "type": "trigger",
-        "z": "54c6c3bfbd6d9993",
-        "g": "1dcff70bb5d269ad",
+        "z": "01be268ef23b84f3",
+        "g": "5607e75c56be8a76",
         "name": "",
         "op1": "",
         "op2": "",
@@ -5234,15 +5251,15 @@
         "y": 1380,
         "wires": [
             [
-                "bc1ca85e74c77253"
+                "f80727fddb5eee29"
             ]
         ]
     },
     {
-        "id": "3e6601f5b230c113",
+        "id": "ee06133432f84c25",
         "type": "trigger",
-        "z": "54c6c3bfbd6d9993",
-        "g": "1dcff70bb5d269ad",
+        "z": "01be268ef23b84f3",
+        "g": "5607e75c56be8a76",
         "name": "",
         "op1": "",
         "op2": "",
@@ -5260,15 +5277,15 @@
         "y": 1420,
         "wires": [
             [
-                "257733bddfb5be89"
+                "71dfd362a07cc2e8"
             ]
         ]
     },
     {
-        "id": "61088dca915ee5e4",
+        "id": "33032e309378b70e",
         "type": "trigger",
-        "z": "54c6c3bfbd6d9993",
-        "g": "416bee4d9d9eb702",
+        "z": "01be268ef23b84f3",
+        "g": "1c9e9e77a71c4448",
         "name": "",
         "op1": "",
         "op2": "",
@@ -5286,15 +5303,15 @@
         "y": 1780,
         "wires": [
             [
-                "89d73b77b7d8eded"
+                "2b79b34ba6ae389c"
             ]
         ]
     },
     {
-        "id": "0b1d7ad9af3b3038",
+        "id": "d1607ce65ef254f2",
         "type": "trigger",
-        "z": "54c6c3bfbd6d9993",
-        "g": "416bee4d9d9eb702",
+        "z": "01be268ef23b84f3",
+        "g": "1c9e9e77a71c4448",
         "name": "",
         "op1": "",
         "op2": "",
@@ -5312,15 +5329,15 @@
         "y": 1820,
         "wires": [
             [
-                "887dc38542d3c9b0"
+                "55bc8f600b415438"
             ]
         ]
     },
     {
-        "id": "9bd1f68c315ab6cd",
+        "id": "c69d1919e0b8bc60",
         "type": "trigger",
-        "z": "54c6c3bfbd6d9993",
-        "g": "416bee4d9d9eb702",
+        "z": "01be268ef23b84f3",
+        "g": "1c9e9e77a71c4448",
         "name": "",
         "op1": "",
         "op2": "",
@@ -5338,15 +5355,15 @@
         "y": 1860,
         "wires": [
             [
-                "dd6a7e2206e9cf8f"
+                "2fcb45f5f09618e3"
             ]
         ]
     },
     {
-        "id": "3d9e04ae3c463556",
+        "id": "471e039b9da6b6ce",
         "type": "trigger",
-        "z": "54c6c3bfbd6d9993",
-        "g": "416bee4d9d9eb702",
+        "z": "01be268ef23b84f3",
+        "g": "1c9e9e77a71c4448",
         "name": "",
         "op1": "",
         "op2": "",
@@ -5364,14 +5381,14 @@
         "y": 1900,
         "wires": [
             [
-                "4ef6474985b9c820"
+                "0a5bd8924af9aa13"
             ]
         ]
     },
     {
-        "id": "5c11e7714d961214",
+        "id": "b353fa35fa85c644",
         "type": "http request",
-        "z": "54c6c3bfbd6d9993",
+        "z": "01be268ef23b84f3",
         "name": "",
         "method": "GET",
         "ret": "obj",
@@ -5384,18 +5401,18 @@
         "authType": "",
         "senderr": false,
         "headers": [],
-        "x": 750,
+        "x": 930,
         "y": 1500,
         "wires": [
             [
-                "9be601196b8ff4f6"
+                "1ccaa7e90406fc2c"
             ]
         ]
     },
     {
-        "id": "226f4b5d57f785e3",
+        "id": "a9a65368822f7550",
         "type": "ui_form",
-        "z": "54c6c3bfbd6d9993",
+        "z": "01be268ef23b84f3",
         "name": "",
         "label": "",
         "group": "cdbcaf9bc51ad72e",
@@ -5421,48 +5438,49 @@
         "topicType": "msg",
         "splitLayout": false,
         "className": "",
-        "x": 570,
+        "x": 710,
         "y": 1500,
         "wires": [
             [
-                "a1dc62aa44201866",
-                "5c11e7714d961214",
-                "c9a79b5a16416bb1",
-                "f838e3cc4ecd91ba",
-                "e1a82cbae25fdb28"
+                "b353fa35fa85c644",
+                "7c4125a4c895edc8",
+                "9a115ff9f2287b05",
+                "aafcecbd3cf7920f"
             ]
         ]
     },
     {
-        "id": "bf04fc6e8247320f",
+        "id": "ee6a9151c3d904e9",
         "type": "ui_ui_control",
-        "z": "54c6c3bfbd6d9993",
+        "z": "01be268ef23b84f3",
         "name": "",
         "events": "change",
-        "x": 420,
+        "x": 540,
         "y": 1500,
         "wires": [
             [
-                "226f4b5d57f785e3"
+                "a9a65368822f7550"
             ]
         ]
     },
     {
-        "id": "097d90363b505d4c",
+        "id": "38bab2e548d3989c",
         "type": "ui_ui_control",
-        "z": "54c6c3bfbd6d9993",
+        "z": "01be268ef23b84f3",
+        "g": "718a14c9e72dbd97",
         "name": "",
         "events": "change",
-        "x": 1920,
-        "y": 1340,
+        "x": 1960,
+        "y": 1360,
         "wires": [
             []
         ]
     },
     {
-        "id": "2887cd4d0aebc22a",
+        "id": "97c880bb078f7fde",
         "type": "change",
-        "z": "54c6c3bfbd6d9993",
+        "z": "01be268ef23b84f3",
+        "g": "718a14c9e72dbd97",
         "name": "",
         "rules": [
             {
@@ -5478,18 +5496,18 @@
         "from": "",
         "to": "",
         "reg": false,
-        "x": 1740,
-        "y": 1340,
+        "x": 1780,
+        "y": 1360,
         "wires": [
             [
-                "097d90363b505d4c"
+                "38bab2e548d3989c"
             ]
         ]
     },
     {
-        "id": "539f3176a2bd248c",
+        "id": "3466dfce29777014",
         "type": "change",
-        "z": "54c6c3bfbd6d9993",
+        "z": "01be268ef23b84f3",
         "name": "",
         "rules": [
             {
@@ -5505,32 +5523,33 @@
         "from": "",
         "to": "",
         "reg": false,
-        "x": 240,
+        "x": 360,
         "y": 1500,
         "wires": [
             [
-                "bf04fc6e8247320f"
+                "ee6a9151c3d904e9"
             ]
         ]
     },
     {
-        "id": "9015befa527d2667",
+        "id": "fce8902973546953",
         "type": "ui_ui_control",
-        "z": "54c6c3bfbd6d9993",
+        "z": "01be268ef23b84f3",
         "name": "",
         "events": "connect",
-        "x": 60,
+        "x": 180,
         "y": 1500,
         "wires": [
             [
-                "539f3176a2bd248c"
+                "3466dfce29777014"
             ]
         ]
     },
     {
-        "id": "9be601196b8ff4f6",
+        "id": "1ccaa7e90406fc2c",
         "type": "switch",
-        "z": "54c6c3bfbd6d9993",
+        "z": "01be268ef23b84f3",
+        "g": "718a14c9e72dbd97",
         "name": "",
         "property": "statusCode",
         "propertyType": "msg",
@@ -5553,17 +5572,18 @@
         "y": 1500,
         "wires": [
             [
-                "0b93c29eb24e7bdb"
+                "6d1dfb26077322f2"
             ],
             [
-                "15d688d52989c8d8"
+                "81626001917ad47a"
             ]
         ]
     },
     {
-        "id": "61a1a25cd7ea09f4",
+        "id": "e62e9d31f2efd522",
         "type": "ui_toast",
-        "z": "54c6c3bfbd6d9993",
+        "z": "01be268ef23b84f3",
+        "g": "718a14c9e72dbd97",
         "position": "top right",
         "displayTime": "10",
         "highlight": "red",
@@ -5575,14 +5595,15 @@
         "className": "",
         "topic": "",
         "name": "Unautorized Access",
-        "x": 1700,
-        "y": 1620,
+        "x": 1720,
+        "y": 1580,
         "wires": []
     },
     {
-        "id": "15d688d52989c8d8",
+        "id": "81626001917ad47a",
         "type": "change",
-        "z": "54c6c3bfbd6d9993",
+        "z": "01be268ef23b84f3",
+        "g": "718a14c9e72dbd97",
         "name": "",
         "rules": [
             {
@@ -5598,19 +5619,19 @@
         "from": "",
         "to": "",
         "reg": false,
-        "x": 1480,
-        "y": 1620,
+        "x": 1500,
+        "y": 1580,
         "wires": [
             [
-                "61a1a25cd7ea09f4"
+                "e62e9d31f2efd522"
             ]
         ]
     },
     {
-        "id": "cfbfb45cc0ea0fca",
+        "id": "99657e25ae7f0344",
         "type": "ui_template",
-        "z": "54c6c3bfbd6d9993",
-        "g": "169ea57b72f1db13",
+        "z": "01be268ef23b84f3",
+        "g": "ed7ca175967ae604",
         "group": "cdbcaf9bc51ad72e",
         "name": "Log in Interface",
         "order": 3,
@@ -5623,16 +5644,16 @@
         "templateScope": "local",
         "className": "",
         "x": 120,
-        "y": 820,
+        "y": 740,
         "wires": [
             []
         ]
     },
     {
-        "id": "d8caa7c2760a8025",
+        "id": "642ceca271c98df2",
         "type": "change",
-        "z": "54c6c3bfbd6d9993",
-        "g": "753f47c82d92d3bf",
+        "z": "01be268ef23b84f3",
+        "g": "d7b4bc8491e7a936",
         "name": "",
         "rules": [
             {
@@ -5648,32 +5669,32 @@
         "from": "",
         "to": "",
         "reg": false,
-        "x": 780,
-        "y": 680,
+        "x": 690,
+        "y": 500,
         "wires": [
             [
-                "6749db2c396a80c2"
+                "11d7afb95e3f406c"
             ]
         ]
     },
     {
-        "id": "6749db2c396a80c2",
+        "id": "11d7afb95e3f406c",
         "type": "ui_ui_control",
-        "z": "54c6c3bfbd6d9993",
-        "g": "753f47c82d92d3bf",
+        "z": "01be268ef23b84f3",
+        "g": "d7b4bc8491e7a936",
         "name": "",
         "events": "change",
-        "x": 960,
-        "y": 680,
+        "x": 880,
+        "y": 500,
         "wires": [
             []
         ]
     },
     {
-        "id": "208e0eadd472ef69",
+        "id": "c46f27576d0a06b2",
         "type": "ui_template",
-        "z": "54c6c3bfbd6d9993",
-        "g": "169ea57b72f1db13",
+        "z": "01be268ef23b84f3",
+        "g": "ed7ca175967ae604",
         "group": "cdd0e15889b1286d",
         "name": "Home Interface",
         "order": 4,
@@ -5686,27 +5707,29 @@
         "templateScope": "local",
         "className": "",
         "x": 120,
-        "y": 860,
+        "y": 780,
         "wires": [
             []
         ]
     },
     {
-        "id": "02039cb965e92448",
+        "id": "935ee41ccac4efd5",
         "type": "ui_ui_control",
-        "z": "54c6c3bfbd6d9993",
+        "z": "01be268ef23b84f3",
+        "g": "718a14c9e72dbd97",
         "name": "",
         "events": "change",
-        "x": 1920,
-        "y": 1380,
+        "x": 1960,
+        "y": 1400,
         "wires": [
             []
         ]
     },
     {
-        "id": "af4570266338d59b",
+        "id": "df61e4f965ca721f",
         "type": "change",
-        "z": "54c6c3bfbd6d9993",
+        "z": "01be268ef23b84f3",
+        "g": "718a14c9e72dbd97",
         "name": "",
         "rules": [
             {
@@ -5722,30 +5745,32 @@
         "from": "",
         "to": "",
         "reg": false,
-        "x": 1740,
-        "y": 1380,
+        "x": 1780,
+        "y": 1400,
         "wires": [
             [
-                "02039cb965e92448"
+                "935ee41ccac4efd5"
             ]
         ]
     },
     {
-        "id": "d1412875eacef295",
+        "id": "5537b7b41bf682bc",
         "type": "ui_ui_control",
-        "z": "54c6c3bfbd6d9993",
+        "z": "01be268ef23b84f3",
+        "g": "718a14c9e72dbd97",
         "name": "",
         "events": "change",
-        "x": 1920,
-        "y": 1420,
+        "x": 1960,
+        "y": 1440,
         "wires": [
             []
         ]
     },
     {
-        "id": "dd507ebece152238",
+        "id": "ba8f050613523d77",
         "type": "change",
-        "z": "54c6c3bfbd6d9993",
+        "z": "01be268ef23b84f3",
+        "g": "718a14c9e72dbd97",
         "name": "",
         "rules": [
             {
@@ -5761,30 +5786,32 @@
         "from": "",
         "to": "",
         "reg": false,
-        "x": 1740,
-        "y": 1420,
+        "x": 1780,
+        "y": 1440,
         "wires": [
             [
-                "d1412875eacef295"
+                "5537b7b41bf682bc"
             ]
         ]
     },
     {
-        "id": "fa60d1ec6e76af31",
+        "id": "5ea8e0e4bd88627f",
         "type": "ui_ui_control",
-        "z": "54c6c3bfbd6d9993",
+        "z": "01be268ef23b84f3",
+        "g": "718a14c9e72dbd97",
         "name": "",
         "events": "change",
-        "x": 1920,
-        "y": 1460,
+        "x": 1960,
+        "y": 1480,
         "wires": [
             []
         ]
     },
     {
-        "id": "034407ecf366a5b1",
+        "id": "c637a6269b6aefb1",
         "type": "change",
-        "z": "54c6c3bfbd6d9993",
+        "z": "01be268ef23b84f3",
+        "g": "718a14c9e72dbd97",
         "name": "",
         "rules": [
             {
@@ -5800,18 +5827,19 @@
         "from": "",
         "to": "",
         "reg": false,
-        "x": 1740,
-        "y": 1460,
+        "x": 1780,
+        "y": 1480,
         "wires": [
             [
-                "fa60d1ec6e76af31"
+                "5ea8e0e4bd88627f"
             ]
         ]
     },
     {
-        "id": "0b5ee8a19ac198ad",
+        "id": "e4c40230572469bd",
         "type": "switch",
-        "z": "54c6c3bfbd6d9993",
+        "z": "01be268ef23b84f3",
+        "g": "718a14c9e72dbd97",
         "name": "",
         "property": "payload.n_fields",
         "propertyType": "msg",
@@ -5840,27 +5868,28 @@
         "checkall": "true",
         "repair": false,
         "outputs": 4,
-        "x": 1570,
-        "y": 1400,
+        "x": 1610,
+        "y": 1420,
         "wires": [
             [
-                "2887cd4d0aebc22a"
+                "97c880bb078f7fde"
             ],
             [
-                "af4570266338d59b"
+                "df61e4f965ca721f"
             ],
             [
-                "dd507ebece152238"
+                "ba8f050613523d77"
             ],
             [
-                "034407ecf366a5b1"
+                "c637a6269b6aefb1"
             ]
         ]
     },
     {
-        "id": "0b93c29eb24e7bdb",
+        "id": "6d1dfb26077322f2",
         "type": "function",
-        "z": "54c6c3bfbd6d9993",
+        "z": "01be268ef23b84f3",
+        "g": "718a14c9e72dbd97",
         "name": "function 1",
         "func": "msg.payload.n_fields = msg.payload.length\nreturn msg;",
         "outputs": 1,
@@ -5868,18 +5897,18 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 1440,
-        "y": 1400,
+        "x": 1480,
+        "y": 1420,
         "wires": [
             [
-                "0b5ee8a19ac198ad"
+                "e4c40230572469bd"
             ]
         ]
     },
     {
-        "id": "f838e3cc4ecd91ba",
+        "id": "9a115ff9f2287b05",
         "type": "ui_text",
-        "z": "54c6c3bfbd6d9993",
+        "z": "01be268ef23b84f3",
         "group": "cdd0e15889b1286d",
         "order": 3,
         "width": 0,
@@ -5889,15 +5918,15 @@
         "format": "{{msg.payload.companyName}}",
         "layout": "row-spread",
         "className": "",
-        "x": 730,
-        "y": 1540,
+        "x": 910,
+        "y": 1620,
         "wires": []
     },
     {
-        "id": "3f627e465ca4e20c",
+        "id": "768773f84eaf0c31",
         "type": "ui_template",
-        "z": "54c6c3bfbd6d9993",
-        "g": "169ea57b72f1db13",
+        "z": "01be268ef23b84f3",
+        "g": "ed7ca175967ae604",
         "group": "cdd0e15889b1286d",
         "name": "LogoWeb",
         "order": 1,
@@ -5910,15 +5939,15 @@
         "templateScope": "local",
         "className": "",
         "x": 100,
-        "y": 620,
+        "y": 540,
         "wires": [
             []
         ]
     },
     {
-        "id": "d1f77717f344f557",
+        "id": "075ceb2c6b18b8bd",
         "type": "ui_template",
-        "z": "54c6c3bfbd6d9993",
+        "z": "01be268ef23b84f3",
         "group": "cdbcaf9bc51ad72e",
         "name": "LogoWeb",
         "order": 1,
@@ -5930,17 +5959,17 @@
         "resendOnRefresh": true,
         "templateScope": "local",
         "className": "",
-        "x": 560,
-        "y": 1540,
+        "x": 920,
+        "y": 1580,
         "wires": [
             []
         ]
     },
     {
-        "id": "e1a82cbae25fdb28",
+        "id": "aafcecbd3cf7920f",
         "type": "function",
-        "z": "54c6c3bfbd6d9993",
-        "g": "753f47c82d92d3bf",
+        "z": "01be268ef23b84f3",
+        "g": "10b69a3755dc3651",
         "name": "setCompanyName",
         "func": "if (typeof msg.payload === 'object' && 'companyName' in msg.payload) {\n    var local = msg.payload.companyName\n    context.set('CompanyName', local);\n}\nelse {\n    var local = context.get('CompanyName') || \"\";\n}\n\nmsg.payload = \"/loc/\" + local + \"/trucksPosition\";\n\nreturn msg;",
         "outputs": 1,
@@ -5948,30 +5977,37 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 790,
-        "y": 800,
+        "x": 990,
+        "y": 1000,
         "wires": [
             [
-                "6378cf9c524cc11f",
-                "cf455cbd092fe745"
+                "c045212752891651"
             ]
         ]
     },
     {
-        "id": "cf455cbd092fe745",
-        "type": "debug",
-        "z": "54c6c3bfbd6d9993",
-        "name": "debug 2",
-        "active": true,
-        "tosidebar": true,
-        "console": false,
-        "tostatus": false,
-        "complete": "payload",
-        "targetType": "msg",
-        "statusVal": "",
-        "statusType": "auto",
-        "x": 900,
-        "y": 940,
-        "wires": []
+        "id": "846aea6c21b02c27",
+        "type": "delay",
+        "z": "01be268ef23b84f3",
+        "name": "",
+        "pauseType": "rate",
+        "timeout": "5",
+        "timeoutUnits": "seconds",
+        "rate": "1",
+        "nbRateUnits": "1",
+        "rateUnits": "second",
+        "randomFirst": "1",
+        "randomLast": "5",
+        "randomUnits": "seconds",
+        "drop": false,
+        "allowrate": false,
+        "outputs": 1,
+        "x": 1600,
+        "y": 1180,
+        "wires": [
+            [
+                "e97a4e4de142784b"
+            ]
+        ]
     }
 ]

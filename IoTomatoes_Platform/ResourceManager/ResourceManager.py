@@ -23,10 +23,8 @@ class ResourceManager(BaseService):
             'msg': "",
             't': ""
         }
-        self.ActuatorsStatus = True
-        self.SensorsStatus = True
-        companyList = self.getCompaniesList()
-        self.deviceList = self.createDeviceList(companyList)
+        self.deviceList = []
+        self.checkUpdates()
 
     def checkUpdates(self):
         """Check if there are changes in the ResourceCatalog and update the device list"""
@@ -99,16 +97,16 @@ class ResourceManager(BaseService):
         deviceList = []
         for comp in companyList:
             for dev in comp['devicesList']:
-                if dev['isActuator']:
+                if dev['isActuator'] and not dev['isSensor']:
                     deviceList.append({**dev, **{'CompanyName': comp['CompanyName'],
                                                 'status': 'OFF',
                                                 'OnTime': 0,
                                                 'control': False,
                                                 'Consumption_kWh': 0}})
-                elif dev['isSensor']:
+                elif dev['isSensor'] and not dev['isActuator']:
                     deviceList.append({**dev, **{'CompanyName': comp['CompanyName'],
                                                 'lastMeasure': None}})
-                elif dev['isActuator'] & dev['isSensor']:
+                elif dev['isActuator'] and dev['isSensor']:
                     deviceList.append({**dev, **{'CompanyName': comp['CompanyName'],
                                                 'lastMeasure': None,
                                                 'status': 'OFF',
@@ -116,6 +114,42 @@ class ResourceManager(BaseService):
                                                 'control': False,
                                                 'Consumption_kWh': 0}})
         return deviceList
+
+    @property
+    def ActuatorsStatus(self):
+        """Get the status of the Actuators"""
+
+        return self._ActuatorsStatus
+
+    @ActuatorsStatus.setter
+    def ActuatorsStatus(self, value: bool):
+        """Set the status of the Actuators"""
+
+        self._ActuatorsStatus = value
+
+    @property
+    def SensorsStatus(self):
+        """Get the status of the Sensors"""
+
+        return self._SensorsStatus
+    
+    @SensorsStatus.setter
+    def SensorsStatus(self, value: bool):
+        """Set the status of the Sensors"""
+
+        self._SensorsStatus = value
+    
+    @property
+    def SensorsList(self):
+        """Get the list of all sensors"""
+
+        return [dev for dev in self.deviceList if dev['isSensor']]
+    
+    @property
+    def ActuatorsList(self):
+        """Get the list of all actuators"""
+
+        return [dev for dev in self.deviceList if dev['isActuator']]
 
     def GET(self, *uri, **params):
         """GET method for the REST API"""
@@ -130,10 +164,10 @@ class ResourceManager(BaseService):
                 return json.dumps({'status': self.SensorsStatus})
             elif uri[0] == "getActuators":
                 self.ActuatorsStatus = False
-                return json.dumps(_filterList(self.deviceList, 'getActuators'))
+                return json.dumps(self.ActuatorsList)
             elif uri[0] == "getSensors":
                 self.SensorsStatus = False
-                return json.dumps(_filterList(self.deviceList, 'getSensors'))
+                return json.dumps(self.SensorsList)
             else:
                 raise cherrypy.HTTPError(404, "Wrong URL")
 
@@ -146,16 +180,6 @@ def _different_dicts(dict1, dict2, keys_to_ignore):
                       v in dict2.items() if k not in keys_to_ignore}
 
     return dict1_filtered != dict2_filtered
-
-def _filterList(deviceList: list, select: str):
-    """Filter the device list based on the select parameter"""
-
-    if (select == 'Actuators'):
-        deviceList = list(filter(lambda d: d['isActuator'], deviceList))
-    elif (select == 'Sensors'):
-        deviceList = list(filter(lambda d: d['isSensor'], deviceList))
-
-    return deviceList
 
 
 def sigterm_handler(signal, frame):

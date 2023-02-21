@@ -4,7 +4,7 @@ import signal
 import requests
 
 from iotomatoes_supportpackage import BaseService
-from iotomatoes_supportpackage.CheckResult import CheckResult
+from iotomatoes_supportpackage import CheckResult
 
 
 class ConsumptionManager (BaseService):
@@ -49,6 +49,7 @@ class ConsumptionManager (BaseService):
 
         totalConsumption = {}
         for dev in self.deviceList:
+            print(dev)
             if (dev['status'] == 'OFF' and dev['control']):
                 dev_consumption = {
                     'cn': dev['CompanyName'],

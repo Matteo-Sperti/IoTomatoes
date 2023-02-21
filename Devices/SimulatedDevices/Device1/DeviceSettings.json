@@ -3,6 +3,8 @@
     "fieldNumber" : 1,
     "isSensor" : true,
     "measureType" : ["temperature", "humidity", "light", "soilMoisture"],
+    "isActuator" : true,
+    "actuatorType" : ["led"],
     "CompanyName" : "PatataNovella",
     "Location" : {
         "latitude" : 44.996469, 

@@ -1,4 +1,0 @@
-from iotomatoes_supportpackage.IoTDevice import IoTDevice
-from iotomatoes_supportpackage.BaseService import BaseService
-from iotomatoes_supportpackage.MyExceptions import web_exception, InfoException
-from iotomatoes_supportpackage.ItemInfo import setREST

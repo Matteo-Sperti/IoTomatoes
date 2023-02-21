@@ -5,7 +5,7 @@ import signal
 import requests
 
 from iotomatoes_supportpackage import BaseService
-from iotomatoes_supportpackage.CheckResult import CheckResult
+from iotomatoes_supportpackage import CheckResult
 
 
 class FaultDetector(BaseService):
@@ -25,6 +25,14 @@ class FaultDetector(BaseService):
         self.resourceManagerToCall = settings['ResourceManager_ServiceName']
         self.deviceList = []
         self.updateDeviceList()
+
+    @property
+    def deviceList(self):
+        return self._deviceList
+
+    @deviceList.setter
+    def deviceList(self, new_deviceList: list):
+        self._deviceList = new_deviceList
 
     def updateDeviceList(self):
         """Get the list of actuators"""
@@ -72,6 +80,7 @@ class FaultDetector(BaseService):
         """
 
         currentTime = datetime.datetime.now()
+        print(device)
         if device['lastMeasure'] is not None:
             elapsedTime = (currentTime - device['lastMeasure']).total_seconds()
             if elapsedTime > 300:

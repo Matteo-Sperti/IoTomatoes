@@ -82,7 +82,7 @@ class InsertNewCompany():
         elif self._status == 3:
             self.response["Surname"] = message
             self._bot.sendMessage(
-                "Insert your location as couple of coordinates:")
+                "Insert your location as couple of coordinates (e.g. 45.56, 6.47):")
             self._status += 1
             return False
 
@@ -238,8 +238,8 @@ class RegisterNewUser():
         return f"{self.UserInfo['Name']} {self.UserInfo['Surname']}"
 
     @property
-    def company(self):
-        return {"CompanyName": self.response["CompanyName"]}
+    def CompanyName(self):
+        return self.response["CompanyName"]
 
     def update(self, message):
         """Update the status of the registration.
@@ -296,8 +296,8 @@ class RegisterNewUser():
         - `False` otherwise.
         """
         try:
-            res = requests.post(self._connector.ResourceCatalog_url + f"/user",
-                                params=self.company, json=self.UserInfo)
+            res = requests.post(self._connector.ResourceCatalog_url + f"{self.CompanyName}/user",
+                                json=self.UserInfo)
             res.raise_for_status()
         except requests.exceptions.HTTPError as err:
             if err.response.status_code == 404:
@@ -312,7 +312,7 @@ class RegisterNewUser():
             try:
                 res_dict = res.json()
                 UserID = res_dict["ID"]
-                message = (f"""User {self.completeName} registered in company {self.company["CompanyName"]}\n"""
+                message = (f"""User {self.completeName} registered in company {self.CompanyName}\n"""
                            "Welcome to IoTomatoes Platform\n\n"
                            f"UserID: {UserID}\n")
                 self._bot.sendMessage(message)

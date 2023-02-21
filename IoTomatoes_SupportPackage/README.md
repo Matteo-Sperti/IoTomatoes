@@ -19,9 +19,9 @@ To install the package, run the following command:
 
 ### AmbientSimulator
 
-This python class simulates the ambient conditions of the field. It is used to test the IoT platform.
-It subscribes to the actuators' topics and modifies the ambient conditions accordingly.
-Moroever it add some noise to the ambient conditions to simulate the real conditions.
+This python class simulates the enviroment conditions of the field. It is used to test the IoT platform.
+It subscribes to the actuators' topics and modifies the enviroment conditions accordingly.
+Moroever it add some noise to the ambient variables to simulate the real conditions.
 
 **[Code >>](https://github.com/Matteo-Sperti/IoTomatoes_SupportPackage/src/AmbientSimulator.py)**
 
@@ -31,21 +31,21 @@ This python class generates a tuple of coordinates (latitude, longitude) in orde
 
 **[Code >>](https://github.com/Matteo-Sperti/IoTomatoes_SupportPackage/src/GPSgenerator.py)**
 
-### CheckResoult
+### CheckResult
 
-This python module contains the class for the check result of the platform. It provides the functionalities to construct the check result dictionary.
+This python module contains the class for the check result dictionary. It is used by the services that control the sensors and actuators status.
 
 **[Code >>](https://github.com/Matteo-Sperti/IoTomatoes_SupportPackage/src/CheckResult.py)**
 
 ### BaseResource
 
-This python module contains the class for the base resource of the platform. It provides the functionalities to construct the resource dictionary and to interact with the catalog of the platform. 
+This python module contains the class for the base resource of the platform. It provides the functionalities to construct the resource dictionary and to interact with the resource catalog of the platform. 
 
 **[Code >>](https://github.com/Matteo-Sperti/IoTomatoes_SupportPackage/src/BaseResource.py)**
 
 ### BaseService
 
-This python module contains the class for the base service of the platform. It provides the function to construct the service dictionary and to interact with the catalog of the platform.
+This python module contains the class for the base service of the platform. It provides the function to construct the service dictionary and to interact with the service catalog of the platform.
 
 **[Code >>](https://github.com/Matteo-Sperti/IoTomatoes_SupportPackage/src/BaseService.py)**
 
@@ -71,7 +71,7 @@ It generates unique integer IDS for each instance of this class.
 
 ### MyThread
 
-This python module contains the class for the custom threads of the platform.
+This python module contains the class for the custom threads of the platform. In particular it contains the class for the thread that periodically sends the refresh message to the catalog.
 
 **[Code >>](https://github.com/Matteo-Sperti/IoTomatoes_SupportPackage/src/MyThread.py)**
 

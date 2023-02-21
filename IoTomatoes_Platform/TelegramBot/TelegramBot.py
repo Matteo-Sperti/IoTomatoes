@@ -41,6 +41,7 @@ If your company is already registered, you can register your account to your com
 /register_user to register yourself in an existing company.
 """
 
+timeoutBOT = 120
 
 class MessageHandler(telepot.helper.ChatHandler):
     def __init__(self, seed_tuple, connector, **kwargs):
@@ -164,7 +165,7 @@ class ChatBox(telepot.DelegatorBot):
                 pave_event_space())(
                     per_chat_id_in(
                         self._seen, types='private'), create_open, MessageHandler,
-                self._connector, timeout=300),
+                self._connector, timeout=timeoutBOT),
 
             # For senders never seen before, send him a welcome message.
             (self._is_newcomer, custom_thread(call(self._send_welcome))),

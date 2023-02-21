@@ -4,8 +4,7 @@ import json
 import signal
 import requests
 
-from iotomatoes_supportpackage import BaseService
-from iotomatoes_supportpackage import CheckResult
+from iotomatoes_supportpackage import BaseService, CheckResult
 
 
 class FaultDetector(BaseService):
@@ -74,9 +73,8 @@ class FaultDetector(BaseService):
         - `device (dict)`: Device to check
 
         Return: `CheckResult` object with:
-        - `error (bool)`: ".is_error"\n
-        - `message (str)`: ".message"\n
-        - `topic (str)`: ".topic" 
+        - `error (bool)`: ".is_error"
+        - `message (str)`: ".message"
         """
 
         currentTime = datetime.datetime.now()
@@ -101,7 +99,6 @@ class FaultDetector(BaseService):
         Return: `CheckResult` object with:
         - `error (bool)`: ".is_error"
         - `message (str)`: ".message"
-        - `topic (str)`: ".topic" 
         """
 
         if unit != self.thresholds[measureType]['unit']:

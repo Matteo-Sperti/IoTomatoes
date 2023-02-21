@@ -46,9 +46,10 @@ class DataVisualizer():
                 f"{self.MongoDB_url}/{CompanyName}/vector", params=params)
             response.raise_for_status()
             res_dict = response.json()
+        except requests.exceptions.HTTPError as err:
+            raise web_exception(err.response.status_code, err.response.reason)
         except:
-            raise web_exception(
-                404, "Error getting data from the database")
+            raise web_exception(500, "Error getting data from the database")
         else:
             xvalues = [datetime.fromtimestamp(
                 x) for x in res_dict["t"]]
@@ -94,6 +95,8 @@ class DataVisualizer():
 
             counts = dict_["Values"]
             bins = dict_["Fields"]
+        except requests.exceptions.HTTPError as err:
+            raise web_exception(err.response.status_code, err.response.reason)
         except:
             raise web_exception(500, "Error getting data from the database")
         else:

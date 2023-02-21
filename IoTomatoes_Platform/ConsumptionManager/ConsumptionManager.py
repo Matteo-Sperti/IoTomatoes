@@ -3,8 +3,7 @@ import json
 import signal
 import requests
 
-from iotomatoes_supportpackage import BaseService
-from iotomatoes_supportpackage import CheckResult
+from iotomatoes_supportpackage import BaseService, CheckResult
 
 
 class ConsumptionManager (BaseService):

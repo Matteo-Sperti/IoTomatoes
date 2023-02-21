@@ -3,6 +3,7 @@
 Code to insert a real sensor or actuator in the IoT platform.
 
 In this example the RaspberryPy must be connected to a DHT11 temperature and humidity sensor.
+The board is connected also to a led to simulate an actuator.
 
 ## Requirements
 On your RaspberryPy you must install:
@@ -24,11 +25,12 @@ Install the requirements and the IoT support package:
 In the [DeviceSettings.json](DeviceSettings.json) configuration file you must specify:
 - **IoTomatoes_url:**: the IP address and the port of the IoTomatoes platform
 - **CompanyName:** the Company name
-- **field:** the field number in which the sensor is installed
+- **fieldNumber:** the field number in which the sensor is installed
 - the type of sensor or actuator (in this case ["humidity", "temperature"])
 
 Moreover you must add in the configuration file any additional information about the sensor or actuator. in this example:
 - **PIN_IN:** the PIN number of the Raspberry Pi where the sensor is connected
+- **PIN_OUT** the PIN number of the Raspberry Pi where the actuator is connected
 - **measureTimeInterval:** the time interval between two measures
 
 Optionally you can specify also:

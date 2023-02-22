@@ -7,7 +7,7 @@ import signal
 from iotomatoes_supportpackage import BaseService
 
 maxLimitTemp = datetime.time(23, 59, 0)
-minLimitTemp = datetime.time(0, 0, 0)
+minLimitTemp = datetime.time(0, 0, 0) #in production it should be 20:00
 weight = 0.75  # weight of the current measure in the average
 
 

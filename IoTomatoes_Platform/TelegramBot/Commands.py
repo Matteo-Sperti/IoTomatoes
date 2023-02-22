@@ -136,8 +136,17 @@ class InsertNewCompany():
         elif self._status == 7:
             try:
                 fields = message.split(",")
+            except:
+                self._bot.sendMessage("Invalid input")
+                self._bot.sendMessage(
+                    "Insert the colture of your fields, separated by a comma")
+                return False
+            else:
                 if len(fields) != self.response["NumberOfFields"]:
-                    raise ValueError
+                    self._bot.sendMessage("Wrong number of fields")
+                    self._bot.sendMessage(
+                        "Insert the colture of your fields, separated by a comma")
+                    return False
 
                 self.response["fieldsList"] = []
                 for i, field in enumerate(fields):
@@ -145,12 +154,7 @@ class InsertNewCompany():
                         "fieldNumber": i+1,
                         "plant": field.lower().strip()
                     })
-            except:
-                self._bot.sendMessage("Invalid input")
-                self._bot.sendMessage(
-                    "Insert the colture of your fields, separated by a comma")
-                return False
-            else:
+
                 summary = (f"You are going to register the following company:\n"
                            f"Company Name: {self.response['CompanyName']}\n"
                            f"Location: {self.location['latitude']}, {self.location['longitude']}\n\n"
@@ -296,8 +300,8 @@ class RegisterNewUser():
         - `False` otherwise.
         """
         try:
-            res = requests.post(self._connector.ResourceCatalog_url + f"{self.CompanyName}/user",
-                                json=self.UserInfo)
+            url = self._connector.ResourceCatalog_url + f"/{self.CompanyName}/user"
+            res = requests.post(url, json=self.UserInfo)
             res.raise_for_status()
         except requests.exceptions.HTTPError as err:
             if err.response.status_code == 404:
@@ -533,7 +537,7 @@ class ChangePlant():
                 self._status += 1
 
         elif self._status == 2:
-            self.newplant = message
+            self.newplant = message.lower()
             change = f"You are changing the plant of field {self.FieldNumber} of company {self.CompanyName} to {self.newplant}"
             self._bot.sendMessage(
                 f"{change}\nConfirm your change?", reply_markup=keyboardYESNO)
@@ -608,19 +612,19 @@ class CustomPlot():
         """
 
         if self._status == 0:
-            self._bot.sendMessage("Insert the measurement you want to plot (e.g. temperature)")
+            self._bot.sendMessage("Insert the measurement you want to plot (e.g. temperature, soilMoisture)")
             self._status += 1
             return False
 
         elif self._status == 1:
-            if message == "consumption":
+            if message.lower() == "consumption":
                 self.Measure = "consumption"
                 self._bot.sendMessage(
                     "Insert the start date (format YYYY-MM-DD)")
                 self._status = 3
                 return False
             else:
-                self.Measure = message.lower()
+                self.Measure = message
                 fields = self._connector.getList(self.CompanyName, "fields")
                 if fields == None:
                     self._bot.sendMessage(

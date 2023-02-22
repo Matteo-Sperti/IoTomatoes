@@ -9,5 +9,5 @@
         "longitude" : 7.481
     },
     "IoTomatoes_url" : "http://localhost:8080",
-    "measureTimeInterval" : 5
+    "measureTimeInterval" : 10
 }

@@ -159,7 +159,7 @@ class ConsumptionManager (BaseService):
                     found = True
                     break
             
-            if not found:
+            if not found and self.deviceList != []:
                 msg = self._message.copy()
                 msg['cn'] = CompanyName
                 msg['msg'] = "Actuator not found"

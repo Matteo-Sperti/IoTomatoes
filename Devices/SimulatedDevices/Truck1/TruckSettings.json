@@ -4,8 +4,8 @@
     "measureType" : ["position"],
     "CompanyName" : "PatataNovella",
     "Location": {
-        "latitude": 45.01506697493687771,
-        "longitude": 7.495714840746703
+        "latitude": -1,
+        "longitude": -1
     },
     "IoTomatoes_url" : "http://localhost:8080",
     "measureTimeInterval" : 5

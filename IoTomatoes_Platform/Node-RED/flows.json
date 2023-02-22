@@ -3557,7 +3557,7 @@
         "order": 6,
         "width": 0,
         "height": 0,
-        "format": "<script>\n    (function(scope) {\n    scope.$watch('msg.payload', function(data) {\n        if (data == \"Bot\") {\n          window.open(\"https://t.me/IoTomatoes_bot\");\n          window.location.href = \"https://t.me/IoTomatoes_bot\";\n        }\n    });\n})(scope);\n</script>",
+        "format": "<script>\n    (function(scope) {\n    scope.$watch('msg.payload', function(data) {\n        if (data == \"Bot\") {\n          window.open(\"https://t.me/IoTomatoesBOT\");\n          window.location.href = \"https://t.me/IoTomatoesBOT\";\n        }\n    });\n})(scope);\n</script>",
         "storeOutMessages": false,
         "fwdInMessages": true,
         "resendOnRefresh": false,

@@ -4,7 +4,7 @@ import json
 import signal
 import requests
 
-from iotomatoes_supportpackage import BaseService, CheckResult
+from iotomatoes_supportpackage import BaseService, CheckResult, compareLists
 
 
 class FaultDetector(BaseService):
@@ -50,7 +50,7 @@ class FaultDetector(BaseService):
                 devices_data = requests.get(
                     f'{resourceManager_url}/getSensors')
                 new_deviceList = devices_data.json()
-                self.deviceList = new_deviceList
+                compareLists(self, new_deviceList)
         except:
             print("ERROR: resource manager service not available!")
 

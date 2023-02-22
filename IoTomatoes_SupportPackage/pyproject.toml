@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "IoTomatoes_SupportPackage"
-version = "0.1.0"
+version = "0.1.1"
 authors = [
   { name="Matteo Sperti", mail="matteo.sperti@studenti.polito.it"},
   { name="Luca Zanetti", mail="luca.zanett.99@gmail.com"},

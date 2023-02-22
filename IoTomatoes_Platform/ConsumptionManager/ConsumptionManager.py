@@ -3,7 +3,7 @@ import json
 import signal
 import requests
 
-from iotomatoes_supportpackage import BaseService, CheckResult
+from iotomatoes_supportpackage import BaseService, CheckResult, compareLists
 
 
 class ConsumptionManager (BaseService):
@@ -68,6 +68,7 @@ class ConsumptionManager (BaseService):
                     totalConsumption[dev['CompanyName']
                                      ] = dev['Consumption_kWh']
                 dev['Consumption_kWh'] = 0
+                print(f"Consumption: {dev_consumption}")
                 self._MQTTClient.myPublish(
                     f"{dev['CompanyName']}/{dev['fieldNumber']}/{dev['ID']}/consumption", dev_consumption)
 
@@ -94,6 +95,7 @@ class ConsumptionManager (BaseService):
                                      ] = dev['Consumption_kWh']
                 dev['OnTime'] = time.time()
                 dev['Consumption_kWh'] = 0
+                print(f"Consumption: {dev_consumption}")
                 self._MQTTClient.myPublish(
                     f"{dev['CompanyName']}/{dev['fieldNumber']}/{dev['ID']}/consumption", dev_consumption)
 
@@ -103,6 +105,7 @@ class ConsumptionManager (BaseService):
                 'bn': self.serviceName,
                 'tot_consumption': totalConsumption[CompanyName]
             }
+            print(f"Total Consumption: {message}")
             self._MQTTClient.myPublish(
                 f"{CompanyName}/Consumption", message)
 

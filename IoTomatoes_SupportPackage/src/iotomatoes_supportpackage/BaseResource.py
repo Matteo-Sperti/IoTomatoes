@@ -52,9 +52,9 @@ class BaseResource():
             except requests.exceptions.HTTPError as err:
                 print(f"{err.response.status_code} : {err.response.reason}")
                 time.sleep(1)
-            except:
-                print(f"Connection Error\nRetrying connection\n")
-                time.sleep(1)
+            except Exception as e:
+                print(e)
+                time.sleep(5)
             else:
                 if "ID" in res_dict:
                     print("Resource registered to the Resource Catalog")

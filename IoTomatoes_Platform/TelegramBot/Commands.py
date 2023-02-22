@@ -271,8 +271,8 @@ class RegisterNewUser():
         elif self._status == 3:
             self.response["Surname"] = message
             summary = (
-                f"You are going to register you ({self.completeName})"
-                f"as a new user of {self.response['CompanyName']}\n")
+                f"You are going to register you ({self.completeName}) "
+                f"as a new user of {self.CompanyName}\n")
             self._bot.sendMessage(
                 f"{summary}\nConfirm your registration?", reply_markup=keyboardYESNO)
             self._status += 1
@@ -608,7 +608,7 @@ class CustomPlot():
         """
 
         if self._status == 0:
-            self._bot.sendMessage("Insert the measurement you want to plot")
+            self._bot.sendMessage("Insert the measurement you want to plot (e.g. temperature)")
             self._status += 1
             return False
 
@@ -620,7 +620,7 @@ class CustomPlot():
                 self._status = 3
                 return False
             else:
-                self.Measure = message
+                self.Measure = message.lower()
                 fields = self._connector.getList(self.CompanyName, "fields")
                 if fields == None:
                     self._bot.sendMessage(

@@ -470,9 +470,9 @@ class RESTResourceCatalog(BaseService):
         - `/company`: insert a new company in the catalog. 
         The body must contain the company information and the Administrator information.
         - `/<CompanyName>/device`: insert a new device in the catalog. 
-        The parameters are the device information.
+        The device information must be in the body.
         - `/<CompanyName>/user`: insert a new user in the catalog. 
-        The parameters are the user information.
+        The user information must be in the body.
         """
         try:
             if len(uri) == 1 and uri[0] == "company":
@@ -495,7 +495,7 @@ class RESTResourceCatalog(BaseService):
 
         Allowed URLs:
         - `/<CompanyName>/refresh`: update the device information. 
-        The parameters are `ID`, `CompanyName`.
+        `ID` of the device is passed as parameter.
         - `/<CompanyName>/field`: update the field information. 
         In the parameters must be the field number and the new plant.
         """

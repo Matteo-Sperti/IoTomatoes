@@ -3,8 +3,6 @@ import random
 import requests
 
 from FakeDevice import SimDevice
-import sys
-sys.path.append("../../IoTomatoes_SupportPackage/src/")
 from iotomatoes_supportpackage.MyIDGenerator import IDs
 
 HelpMessage = """

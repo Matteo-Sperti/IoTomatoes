@@ -212,8 +212,8 @@ class SmartIrrigation(BaseService):
 
         try:
             params = {"Field": fieldID,
-                      "start_date": time.time() - self.controlPeriod,
-                      "end_date": time.time(),
+                      "start_date": time.time() - 2*self.controlPeriod,
+                      "end_date": time.time() - self.controlPeriod,
                       "measure": "soilMoisture"}
             r = requests.get(f"{mongoDB_url}/{CompanyName}/avg", params=params)
             r.raise_for_status()

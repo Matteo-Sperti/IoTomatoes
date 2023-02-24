@@ -135,7 +135,7 @@ class FaultDetector(BaseService):
             if (measure['latitude'] > max_latitude or measure['latitude'] < min_latitude) or \
                     (measure['longitude'] > max_longitude or measure['longitude'] < min_longitude):
                 message = (f"Device {deviceID} is out of the defined range, possible fault!\n"
-                           f"Value = {measure['latitude']}, {measure['longitude']} {unit}")
+                           f"Value = {measure['latitude']:.2f}, {measure['longitude']:.2f} {unit}")
                 return CheckResult(is_error=True, messageType="Warning", message=message,
                                    device_id=deviceID)
         else:
@@ -151,7 +151,7 @@ class FaultDetector(BaseService):
 
             if measure > max_value or measure < min_value:
                 message = (f"Device {deviceID} has sent a measure out of the thresholds, possible fault!\n"
-                           f"Value = {measure} {unit}")
+                           f"Value = {measure:.2f} {unit}")
                 return CheckResult(is_error=True, messageType="Warning", message=message,
                                    device_id=deviceID)
         return CheckResult(is_error=False)

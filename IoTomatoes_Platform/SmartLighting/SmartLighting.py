@@ -37,13 +37,13 @@ class SmartLighting(BaseService):
     def control(self):
         """It performs:
         1. Call to resource catalog -> to retrieve information about each field for each company
-        2. Call to MongoDB to retrieve information about last hour measures (currentLigh) and previous hour measures 
-          (previousLight)
-        3. Call to Weather forecast service to retrieve information about current cloudcover percentage, light, 
-        sunrise hour and sunset hour. 
+        2. Call to MongoDB to retrieve information about last hour measures (currentLigh) 
+            and light plant limits
+        3. Call to Weather forecast service to retrieve information about current cloudcover 
+            percentage, light, sunrise hour and sunset hour. 
 
-        With these information it integrates the forecast light with sensor measures and performs a simple control 
-        strategy to check if the light is under a fixed threshold"""
+        With these information it integrates the forecast light with sensor measures and performs 
+        a simple control strategy to check if the light is under a fixed threshold"""
 
         companyList = self.getCompaniesList()
 
@@ -83,8 +83,8 @@ class SmartLighting(BaseService):
                         weight*currentLight + (1-weight)*lightForecast, 2)
 
                 # CONTROL ALGORITHM:
-                # The control algorithm is scheduled on day time (between sunrise and sunset) and if the cloud cover is
-                # higher than 60%.
+                # The control algorithm is scheduled on day time (between sunrise and sunset) and 
+                # if the cloud cover is higher than 60%.
                 print(
                     f"Performing control on: Company={CompanyName} field={fieldID}")
                 if currentTime < Sunrise or currentTime > Sunset:
@@ -100,8 +100,8 @@ class SmartLighting(BaseService):
                     else:
                         command = 0
                         print("Cloud cover, lighting needed")
-                        print(f"ON/OFF threshold={minLight}")
-                        print(f"current value light={currentLight}")
+                        print(f"ON/OFF threshold={minLight:.2f}")
+                        print(f"current value light={currentLight:.2f}")
 
                         if currentLight <= minLight:
                             command = 1
@@ -164,7 +164,7 @@ class SmartLighting(BaseService):
             return minLightLimit, maxLightLimit
 
     def getMongoDBdata(self, CompanyName: str, fieldID: int):
-        """Return the average soil moisture of the last controlPeriod seconds from the MongoDB service
+        """Return the average light of the last controlPeriod seconds from the MongoDB service
 
         Arguments:
         - `CompanyName (str)`: Name of the company.

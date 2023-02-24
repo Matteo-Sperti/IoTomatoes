@@ -7,7 +7,7 @@ import signal
 from iotomatoes_supportpackage import BaseService
 
 maxLimitTemp = datetime.time(23, 59, 0)
-minLimitTemp = datetime.time(0, 0, 0) #in production it should be 20:00
+minLimitTemp = datetime.time(0, 0, 0)  # in production it should be 20:00
 weight = 0.75  # weight of the current measure in the average
 
 
@@ -39,9 +39,11 @@ class SmartIrrigation(BaseService):
     def control(self):
         """It performs:
         1. Call to resource catalog -> to retrieve information about each field for each company
-        2. Call to MongoDB to retrieve information about last hour measures (currentSoilMoisture)
-            and previoius hour measures (previousSoilMoisture)
-        3. Call to Weather forecast service to retrieve information about precipitation during the day
+        2. Call to MongoDB to retrieve information about last hour measures (currentSoilMoisture),
+            previous hour measures (previousSoilMoisture), SoilMoistuire and precipitation plant limits
+        3. Call to Weather forecast service to retrieve information about precipitation during the day and
+            the forecasted measure of SoilMoisture (that will be integrated with the measure from sensors 
+            provided by MongoDB)
         With these information it performs a control strategy with an hysteresis law in order to send
         the command ON when the soil moisture mesaure decrease and is under a specific low threshold
         and to send command OFF in the opposite case"""
@@ -103,35 +105,35 @@ class SmartIrrigation(BaseService):
                         # After the precipitations control, we assume that soilMoisture increasing is related
                         # only to our irrigation and not also to possible external phenomena
 
-                        print(f"OFF threshold={maxSoilMoisture}")
-                        print(f"ON threshold={minSoilMoisture}")
+                        print(f"OFF threshold={maxSoilMoisture:.2f}")
+                        print(f"ON threshold={minSoilMoisture:.2f}")
                         print(
-                            f"current value soil moisture={currentSoilMoisture}")
+                            f"current value soil moisture={currentSoilMoisture:.2f}")
                         print(
-                            f"previous value soil moisture={previousSoilMoisture}")
+                            f"previous value soil moisture={previousSoilMoisture:.2f}")
 
                         if currentSoilMoisture > previousSoilMoisture:
                             print("soilMoisture is increasing")
                             if currentSoilMoisture >= maxSoilMoisture:
                                 print(
-                                    f"""current soil moisture over/on the OFF limit: {currentSoilMoisture}>={maxSoilMoisture}""")
+                                    f"current soil moisture over/on the OFF limit: {currentSoilMoisture:.2f}>={maxSoilMoisture}")
                                 command = 0
 
                             else:
                                 print(
-                                    f"""current soil moisture under the OFF limit: {currentSoilMoisture}<{maxSoilMoisture}""")
+                                    f"current soil moisture under the OFF limit: {currentSoilMoisture:.2f}<{maxSoilMoisture}")
                                 command = 1
 
                         elif currentSoilMoisture < previousSoilMoisture:
                             print(f"soilMoisture is decreasing")
                             if currentSoilMoisture <= minSoilMoisture:
                                 print(
-                                    f"""current soil moisture under/on the ON limit: {currentSoilMoisture}<={minSoilMoisture}""")
+                                    f"current soil moisture under/on the ON limit: {currentSoilMoisture:.2f}<={minSoilMoisture}")
                                 command = 1
 
                             else:
                                 print(
-                                    f"""current soil moisture over the ON limit: {currentSoilMoisture}>{minSoilMoisture}""")
+                                    f"current soil moisture over the ON limit: {currentSoilMoisture:.2f}>{minSoilMoisture}")
                                 command = 0
 
                         else:

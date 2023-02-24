@@ -17,7 +17,7 @@ fieldsList_name = "fieldsList"
 
 class ResourceCatalogManager():
     def __init__(self, heading: dict, filename="CompanyCatalog.json", autoDeleteTime: int = 120,
-                 IDs=IDs(100)):
+                 IDs=IDs(100), loadFromFile: bool = False):
         """Initialize the catalog manager.
 
         Arguments: 
@@ -32,6 +32,10 @@ class ResourceCatalogManager():
 
         self._filename = filename
         self._IDs = IDs
+
+        if loadFromFile:
+            self.load()
+
         self._autoDeleteTime = autoDeleteTime
         self._autoDeleteItemsThread = MyThread(
             self.autoDeleteItems, interval=self._autoDeleteTime)
@@ -45,6 +49,21 @@ class ResourceCatalogManager():
             fp.close()
         except FileNotFoundError:
             print(f"File {self._filename} not found!")
+
+    def load(self):
+        """Load the catalog from the file specified in the initialization."""
+
+        try:
+            fp = open(self._filename, "r")
+            oldCatalog = json.load(fp)
+            fp.close()
+        except FileNotFoundError:
+            print(f"File {self._filename} not found!")
+        else:
+            if companyList_name in oldCatalog:
+                self.catalog[companyList_name] = oldCatalog[companyList_name]
+            else:
+                print(f"Company list not found in {self._filename}!")
 
     def print_catalog(self):
         """Return the catalog in json format."""

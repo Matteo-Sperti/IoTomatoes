@@ -8,7 +8,7 @@
         {
             "serviceType": "MQTT",
             "subscribedTopics": ["+/+/+/led", "+/+/+/pump"],
-            "publishedTopics": ["Notifications"]
+            "publishedTopics": ["Consumption"]
         }
     ],
     "ResourceManager_ServiceName" : "resource_manager",
